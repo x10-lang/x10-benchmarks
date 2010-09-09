@@ -11,9 +11,9 @@ public final class BlockedArray implements (Int,Int)=>Double {
         public val max_y:Int;
         private val delta:Int;
         private val offset:Int;
-        public val raw:Rail[Double]!;
+        public val raw:Rail[Double];
     
-        public def this(I:Int, J:Int, bx:Int, by:Int, rand:Random!) {
+        public def this(I:Int, J:Int, bx:Int, by:Int, rand:Random) {
             min_x = I*bx;
             min_y = J*by;
             max_x = (I+1)*bx-1;
@@ -39,9 +39,9 @@ public final class BlockedArray implements (Int,Int)=>Double {
         public val min_y:Int;
         public val max_x:Int;
         public val max_y:Int;
-        private val array:BlockedArray{self.at(here)};
+        private val array:BlockedArray;
 
-        public def this(min_x:Int, min_y:Int, max_x:Int, max_y:Int, array:BlockedArray{self.at(here)}) {
+        public def this(min_x:Int, min_y:Int, max_x:Int, max_y:Int, array:BlockedArray) {
             this.min_x = min_x;
             this.min_y = min_y;
             this.max_x = max_x;
@@ -62,7 +62,7 @@ public final class BlockedArray implements (Int,Int)=>Double {
     private val min_x:Int;
     private val min_y:Int;
     private val ny:Int;
-    private val data:ValRail[Block!];
+    private val data:ValRail[Block];
 
     public def this(M:Int, N:Int, bx:Int, by:Int, px:Int, py:Int) {
         this.bx = bx;
@@ -77,7 +77,7 @@ public final class BlockedArray implements (Int,Int)=>Double {
         this.min_y = min_y;
         this.ny = ny;
         val rand = new Random(here.id*1000);
-        data = ValRail.make[Block!](nx*ny, (k:Int)=>new Block(k/ny*px+min_x, k%ny*py+min_y, bx, by, rand));
+        data = ValRail.make[Block](nx*ny, (k:Int)=>new Block(k/ny*px+min_x, k%ny*py+min_y, bx, by, rand));
     }
 
     public def apply(i:Int, j:Int) = blockOf(i, j)(i, j);
@@ -100,7 +100,7 @@ public final class BlockedArray implements (Int,Int)=>Double {
         return ArrayView(view_min_x, view_min_y, view_max_x, view_max_y, b);
     }
 
-    public def getRow(row:Int, min_y:Int, max_y:Int, rail:Rail[Double]!) {
+    public def getRow(row:Int, min_y:Int, max_y:Int, rail:Rail[Double]) {
         val brow = row/bx;
         val view = blocks(brow, brow, min_y/by, max_y/by);
         var n:Int = 0;
@@ -113,7 +113,7 @@ public final class BlockedArray implements (Int,Int)=>Double {
         return n;
     }
 
-    public def setRow(row:Int, min_y:Int, max_y:Int, rail:Rail[Double]!) {
+    public def setRow(row:Int, min_y:Int, max_y:Int, rail:Rail[Double]) {
         val brow = row / bx;
         val view = blocks(brow, brow, min_y/by, max_y/by);
         var n:Int = 0;
@@ -125,7 +125,7 @@ public final class BlockedArray implements (Int,Int)=>Double {
         }
     }
 
-    public def swapRow(row:Int, min_y:Int, max_y:Int, rail:Rail[Double]!) {
+    public def swapRow(row:Int, min_y:Int, max_y:Int, rail:Rail[Double]) {
         val brow = row / bx;
         val view = blocks(brow, brow, min_y/by, max_y/by);
         var n:Int = 0;

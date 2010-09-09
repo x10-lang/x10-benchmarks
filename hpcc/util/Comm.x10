@@ -5,7 +5,7 @@ import x10.compiler.*;
 @NativeCPPInclude("pgas_collectives.h")
 final public class Comm {
 
-    private global val my_id:Int;
+    private val my_id:Int;
 
     private static class Integer {
         var value:Int;
@@ -37,7 +37,7 @@ final public class Comm {
             "x10::lang::Runtime::decreaseParallelism(1);") {}
     }
 
-    public def broadcast(a:Rail[Int]!, rootRank:Int) {
+    public def broadcast(a:Rail[Int], rootRank:Int) {
         @Native("c++",
             "void* buf = a->raw();" +
             "unsigned len = a->FMGL(length);" +
@@ -47,7 +47,7 @@ final public class Comm {
             "x10::lang::Runtime::decreaseParallelism(1);") {}
     }
 
-    public def broadcast_d(a:Rail[Double]!, rootRank:Int) {
+    public def broadcast_d(a:Rail[Double], rootRank:Int) {
         @Native("c++",
             "void* buf = a->raw();" +
             "unsigned len = a->FMGL(length);" +
@@ -57,7 +57,7 @@ final public class Comm {
             "x10::lang::Runtime::decreaseParallelism(1);") {}
     }
 
-    public def alltoall(a:Rail[Double]!, b:Rail[Double]!, chunkSize:Int) {
+    public def alltoall(a:Rail[Double], b:Rail[Double], chunkSize:Int) {
         @Native("c++",
             "void *r = __pgasrt_tspcoll_ialltoall(FMGL(my_id),  a->raw(), b->raw(), chunkSize*sizeof(x10_double));" +
             "x10::lang::Runtime::increaseParallelism();" +

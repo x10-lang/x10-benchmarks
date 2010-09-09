@@ -1,8 +1,8 @@
 package rc7;
 
 final public class Timer {
-    public val total:Rail[Long]!;
-    public val count:Rail[Long]!;
+    public val total:Rail[Long];
+    public val count:Rail[Long];
 
     public def this(n:Int) {
         total = Rail.make[Long](n, (Int)=>0L);

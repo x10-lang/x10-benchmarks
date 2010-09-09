@@ -16,7 +16,7 @@ import x10.util.Team;
 @NativeCPPCompilationUnit("ft_natives.cc")
 class fft {
     @Native("c++", "execute_plan(#1, (double *) (#2)->raw(), (double *) (#3)->raw(), #4, #5, #6)")
-    native static def execute_plan(plan:Long, A:Rail[Double]!, B:Rail[Double]!, SQRTN:Int, i0:Int, i1:Int):Void;
+    native static def execute_plan(plan:Long, A:Rail[Double], B:Rail[Double], SQRTN:Int, i0:Int, i1:Int):Void;
 
     @Native("c++", "create_plan(#1, #2, #3)")
     native static def create_plan(SQRTN:Int, direction:Int, flags:Int):Long;
@@ -24,11 +24,11 @@ class fft {
     const unique = Dist.makeUnique();
 
     static class Block {
-        val A:Rail[Double]!;
-        val B:Rail[Double]!;
-        val C:Rail[Double]!;
+        val A:Rail[Double];
+        val B:Rail[Double];
+        val C:Rail[Double];
         val Cs:PlaceLocalHandle[Rail[Double]];
-        val D:Rail[Double]!;
+        val D:Rail[Double];
         val I:Int;
         val nRows:Int;
         val SQRTN:Int;
@@ -63,7 +63,7 @@ class fft {
             }
         }
 
-        static def make(I:Int, nRows:Int, localSize:Int, N:Long, SQRTN:Int, verify:Boolean, Cs:PlaceLocalHandle[Rail[Double]]):Block! {
+        static def make(I:Int, nRows:Int, localSize:Int, N:Long, SQRTN:Int, verify:Boolean, Cs:PlaceLocalHandle[Rail[Double]]):Block {
             val block = new Block(I, nRows, localSize, N, SQRTN, verify, Cs);
             block.init(localSize, verify);
             /* finish */ ateach ((p) in unique) {} // initialize transport
@@ -205,7 +205,7 @@ class fft {
         /* finish  ateach ((p) in unique)*/ FFT().check();
     }
     
-    public static def main(args:Rail[String]!) {
+    public static def main(args:Rail[String]) {
         val M = (args.length > 0) ? Int.parseInt(args(0)) : 10;
         val verify = (args.length > 1) ? Boolean.parseBoolean(args(1)) : true;
         val SQRTN = 1 << M;
