@@ -35,8 +35,8 @@ class LU {
     val py:Int;
     val A:PlaceLocalHandle[BlockedArray];
     val A_here:BlockedArray!;
-    val colRole:UInt;
-    val rowRole:UInt;
+    val colRole:Int;
+    val rowRole:Int;
     val col:Team;
     val row:Team;
     var ready:Boolean;
@@ -139,7 +139,7 @@ class LU {
                 timer.stop(6);
                 timer.start(7);
                 timer.start(11);
-                col.bcast(colRole, J%px as UInt, rowForBroadcast, 0u, rowForBroadcast, 0u, rowForBroadcast.length as UInt);
+                col.bcast(colRole, J%px, rowForBroadcast, 0, rowForBroadcast, 0, rowForBroadcast.length);
                 timer.stop(11);
                 timer.stop(7);
                 if(!A_panel_j.empty()) {
@@ -156,7 +156,7 @@ class LU {
     
     def swapRows(J:Int, timer:Timer!) {
         timer.start(10);
-        row.bcast(rowRole, J%py as UInt, pivot, 0u, pivot, 0u, pivot.length as UInt);
+        row.bcast(rowRole, J%py, pivot, 0, pivot, 0, pivot.length);
         timer.stop(10);
 
         val row_panel = A_here.blocks(J, J, J + 1, NB);
@@ -191,7 +191,7 @@ class LU {
             if (A_here.hasCol(J)) tmp = A_here.block(J, J).raw; else tmp = colBuffer;
             val diag = tmp;
             timer.start(10);
-            row.bcast(rowRole, J%py as UInt, diag, 0u, diag, 0u, diag.length as UInt);
+            row.bcast(rowRole, J%py, diag, 0, diag, 0, diag.length);
             timer.stop(10);
             for (var cj:Int = J + 1; cj <= NB; ++cj) if (A_here.hasCol(cj)) {
                 blockTriSolve(A_here.block(J, cj).raw, diag, B);
@@ -205,7 +205,7 @@ class LU {
             for (var cj:Int = A_U.min_y; cj <= A_U.max_y; cj += py) {
                 val block = A_here.hasBlock(J, cj) ? A_U.block(J, cj).raw : colBuffers(cj/py);
                 timer.start(11);
-                col.bcast(colRole, J%px as UInt, block, 0u, block, 0u, block.length as UInt);
+                col.bcast(colRole, J%px, block, 0, block, 0, block.length);
                 timer.stop(11);
             }
         }
@@ -217,7 +217,7 @@ class LU {
             for (var ci:Int = A_L.min_x; ci <= A_L.max_x; ci += px) {
                 val block = A_here.hasBlock(ci, J) ? A_L.block(ci, J).raw : rowBuffers(ci/px);
                 timer.start(10);
-                row.bcast(rowRole, J%py as UInt, block, 0u, block, 0u, block.length as UInt);
+                row.bcast(rowRole, J%py, block, 0, block, 0, block.length);
                 timer.stop(10);
             }
         }
@@ -293,7 +293,7 @@ class LU {
                 var tmp:Rail[Double]!;
                 if (A_here.hasRow(I)) tmp = A_here.block(I, NB).raw; else tmp = colBuffer;
                 val bufferY = tmp;
-                col.bcast(colRole, I%px as UInt, bufferY, 0u, bufferY, 0u, bufferY.length as UInt);
+                col.bcast(colRole, I%px, bufferY, 0, bufferY, 0, bufferY.length);
                 for (var ci:Int = 0; ci < I; ++ci) if (A_here.hasRow(ci)) {
                     blockMulSub(A_here.block(ci, NB).raw, memget(ci, I), bufferY, B);
                 }

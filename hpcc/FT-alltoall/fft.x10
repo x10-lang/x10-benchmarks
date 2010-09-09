@@ -72,7 +72,7 @@ class fft {
 
         def rowFFTS(fwd:Boolean) {
             execute_plan(fwd?fftwPlan:fftwInversePlan, A, B, SQRTN, 0, nRows);
-            Team.WORLD.barrier(here.id as UInt);
+            Team.WORLD.barrier(here.id);
         }
 
         def bytwiddle(sign:Int) {
@@ -89,7 +89,7 @@ class fft {
                     A(idx+1) = ai * c - ar * s;
                 }
             }
-            Team.WORLD.barrier(here.id as UInt);
+            Team.WORLD.barrier(here.id);
         }
 
         def check() {
@@ -98,7 +98,7 @@ class fft {
             for (var q:Int=0; q<A.length; ++q) {
                 if (Math.abs(A(q)-D(q)) > threshold) Console.ERR.println("Error at "+q+" "+A(q).toString()+" "+D(q).toString());
             }
-            Team.WORLD.barrier(here.id as UInt);
+            Team.WORLD.barrier(here.id);
         }
 
         def transpose() {           
@@ -129,12 +129,12 @@ class fft {
                 //B.copyTo(k * chunkSize, Place.places(k), Cs, dstIndex, chunkSize, ()=>{++nCopy;});
             }
             alltoall_timer -= System.nanoTime();
-            Team.WORLD.alltoall(here.id as UInt, B, 0u, C, 0u, chunkSize as UInt);
+            Team.WORLD.alltoall(here.id, B, 0, C, 0, chunkSize);
             alltoall_timer += System.nanoTime();
             //await (nCopy == Place.MAX_PLACES);
             //nCopy = 0;
             //x10.io.Console.OUT.println("before barrier" + here.id);                   
-            Team.WORLD.barrier(here.id as UInt);
+            Team.WORLD.barrier(here.id);
             //x10.io.Console.OUT.println("after barrier" + here.id);                   
         }
 
@@ -160,7 +160,7 @@ class fft {
                     }                   
                 }
             }
-            Team.WORLD.barrier(here.id as UInt);
+            Team.WORLD.barrier(here.id);
         }
     }
 
