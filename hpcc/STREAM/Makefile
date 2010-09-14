@@ -1,5 +1,5 @@
 
-SRCS	:= FSSimpleDist.x10 ../util/*.x10
+SRCS	:= FSSimpleDist.x10
 
 all: stream-opt stream-dbg
 
