@@ -59,6 +59,8 @@ template<class FMGL(T)> class PriorityQueue  {
 
     FMGL(T) top() { return this->__priority_queue.top(); }
 
+    void pop() { this->__priority_queue.pop(); }
+
     void push(FMGL(T) element) { this->__priority_queue.push(element); }
     /** instrumentation END */
 };

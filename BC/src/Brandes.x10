@@ -22,6 +22,13 @@ public final class Brandes {
                            (Dist.makeUnique(), ()=>new Brandes());
       val myQueue = PriorityQueue[Int]();
       myQueue.push(0);
+      Console.OUT.println (myQueue.top());
+      myQueue.pop();
+      if (!myQueue.empty()) {
+        Console.OUT.println ("What!");
+      } else {
+        Console.OUT.println ("Thats right!");
+      }
 
       finish {
         for (var thisPlace:Int = 0; thisPlace<numPlaces; ++thisPlace) {
