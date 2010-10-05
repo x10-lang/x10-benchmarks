@@ -65,4 +65,4 @@ run-brandes: brandes
 
 clean:
 	rm -rf core*.* *.dSYM *.inc 
-	rm -rf ${X10_CLASSES_CC} ${X10_CLASSES_H}
+	rm -rf ${X10_CLASSES_CC} ${X10_CLASSES_H} ${TARGET}
