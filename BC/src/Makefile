@@ -43,9 +43,13 @@ X10CXXFLAGS=-report \
             -NO_CHECKS \
             -O  
 
+X10_STRUCTS=Edge.x10
+X10_STRUCTS_CC=$(X10_STRUCTS:.x10=.cc)
+X10_STRUCTS_H=$(X10_STRUCTS:.x10=.h)
+X10_STRUCTS_STRUCTS_H=$(X10_STRUCTS:.x10=.struct_h)
+
 X10_CLASSES=Brandes.x10 \
-            Rmat.x10 \
-            Edge.x10
+            Rmat.x10 
 X10_CLASSES_CC=$(X10_CLASSES:.x10=.cc)
 X10_CLASSES_H=$(X10_CLASSES:.x10=.h)
 
@@ -54,6 +58,7 @@ TARGET=brandes
 all: ${TARGET}
 
 brandes: ${X10_CLASSES} \
+         ${X10_STRUCTS} \
          PriorityQueue.x10 \
          PriorityQueue.cc \
          PriorityQueue.h \
@@ -68,3 +73,4 @@ run-brandes: brandes
 clean:
 	rm -rf core*.* *.dSYM *.inc 
 	rm -rf ${X10_CLASSES_CC} ${X10_CLASSES_H} ${TARGET}
+	rm -rf ${X10_STRUCTS_CC} ${X10_STRUCTS_H} ${X10_STRUCTS_STRUCTS_H}

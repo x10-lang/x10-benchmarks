@@ -31,10 +31,10 @@ public final class Rmat {
   private final def rand (rng:Random, numElements:Int) =
                  ValRail.make[Double] (numElements, (Int)=>rng.nextDouble());
 
-  private final def makeRail (lhs:ValRail[Double], rhs:Double) =
+  private final def greaterThan (lhs:ValRail[Double], rhs:Double) =
     ValRail.make[Int] (lhs.length(), (i:Int)=>(lhs(i) > rhs) ? 1 : 0);
 
-  private final def makeRail (lhs:ValRail[Double], 
+  private final def greaterThan (lhs:ValRail[Double], 
                               rhs:ValRail[Double]) =
     ValRail.make[Int] (lhs.length(), (i:Int)=>(lhs(i) > rhs(i)) ? 1 : 0);
 
@@ -73,10 +73,10 @@ public final class Rmat {
     val aNorm = a / (a+b);
 
     for (var ib:Int=0; ib<this.n; ++ib) {
-      val iiBit = this.makeRail (this.rand (rng, M), ab);
+      val iiBit = this.greaterThan (this.rand (rng, M), ab);
       val jjBitComparator = this.add (this.multiply (iiBit, cNorm, false),
                                       this.multiply (iiBit, aNorm, true));
-      val jjBit = this.makeRail (this.rand (rng, M), jjBitComparator);
+      val jjBit = this.greaterThan (this.rand (rng, M), jjBitComparator);
       val exponent = Math.pow (2, ib) as Int;
       ii = this.add (ii, this.multiply (iiBit, exponent));
       jj = this.add (jj, this.multiply (jjBit, exponent));

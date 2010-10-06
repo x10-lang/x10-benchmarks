@@ -1,4 +1,4 @@
-public final class Edge {
+public final struct Edge {
   private val destination:Long;
   private val weight:UInt;
 
@@ -8,7 +8,7 @@ public final class Edge {
     this.weight = weight;
   }
 
-  public def getDestination () : Long = this.destination;
+  public def getDestination () = this.destination;
 
-  public def getWeight () : UInt = this.weight;
+  public def getWeight () = this.weight;
 }
