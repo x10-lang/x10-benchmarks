@@ -42,10 +42,10 @@ X10CXXFLAGS=-report \
             -NO_CHECKS \
             -O  
 
-X10_STRUCTS=Edge.x10
-X10_STRUCTS_CC=$(X10_STRUCTS:.x10=.cc)
-X10_STRUCTS_H=$(X10_STRUCTS:.x10=.h)
-X10_STRUCTS_STRUCTS_H=$(X10_STRUCTS:.x10=.struct_h)
+#X10_STRUCTS=Edge.x10
+#10_STRUCTS_CC=$(X10_STRUCTS:.x10=.cc)
+#10_STRUCTS_H=$(X10_STRUCTS:.x10=.h)
+#10_STRUCTS_STRUCTS_H=$(X10_STRUCTS:.x10=.struct_h)
 
 X10_CLASSES=Brandes.x10 \
             Rmat.x10 \
@@ -68,7 +68,7 @@ brandes: ${X10_CLASSES} \
 	rm -f PriorityQueue.inc
 
 run-brandes: brandes
-	mpirun -np 4 -hostfile host.list ./brandes
+	mpirun -np 1 -hostfile host.list ./brandes
 
 testrng: TestRandom.x10
 	${X10CXX} ${X10CXXFLAGS} $< -o $@ 

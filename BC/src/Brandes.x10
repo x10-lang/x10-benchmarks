@@ -10,7 +10,9 @@ import x10.util.Stack;
 // import x10.util.ValRail;
 
 public final class Brandes {
-  private final def printHello() = Console.OUT.println ("Hello from Brandes");
+  public static type VertexType = Int;
+
+  private def printHello() = Console.OUT.println ("Hello from Brandes");
 
   public static def main (args:Array[String](1)):void {
     try {
