@@ -12,7 +12,7 @@ import x10.util.Stack;
 public final class Brandes {
   private final def printHello() = Console.OUT.println ("Hello from Brandes");
 
-  public static def main (args:Rail[String]!):void {
+  public static def main (args:Array[String](1)):void {
     try {
       val cmdLineParams = new OptionsParser 
                       (args, null,
@@ -38,7 +38,7 @@ public final class Brandes {
 
       finish {
         for (var thisPlace:Int = 0; thisPlace<numPlaces; ++thisPlace) {
-          async (Place(thisPlace)) brandesHandle().printHello();
+          async at (Place(thisPlace)) brandesHandle().printHello();
         }
       }
     } catch (e:Throwable) {

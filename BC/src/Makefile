@@ -2,7 +2,7 @@
 
 # <BEGIN> user settings #
 
-export X10CXX 		?= ~/Software/src/x10/x10-2.0.6/x10.dist/bin/x10c++
+export X10CXX 		?= ~/Software/src/x10/x10-trunk/x10.dist/bin/x10c++
 
 #leave blank by default, X10 automatically chooses a transport for you. To
 #force a particular implementation, please uncheck one of the other options.
