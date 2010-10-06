@@ -31,6 +31,15 @@ public final class Brandes {
       val c:Double = cmdLineParams ("-c", 0.1);
       val d:Double = cmdLineParams ("-d", 0.25);
 
+      Console.OUT.println ("Running SSCA2 with the following parameters:");
+      Console.OUT.println ("seed = " + seed);
+      Console.OUT.println ("N = " + Math.pow(2, n) as Int);
+      Console.OUT.println ("a = " + a);
+      Console.OUT.println ("b = " + b);
+      Console.OUT.println ("c = " + c);
+      Console.OUT.println ("d = " + d);
+
+
       val numPlaces = Place.MAX_PLACES;
       val brandesHandle = PlaceLocalHandle.make[Brandes]
                            (Dist.makeUnique(), ()=>new Brandes());

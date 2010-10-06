@@ -123,6 +123,9 @@ public final class Rmat {
       ii = this.add (ii, this.multiply (iiBit, exponent));
       jj = this.add (jj, this.multiply (jjBit, exponent));
     }
+
+    Console.OUT.println (ii);
+    Console.OUT.println (jj);
     
     return this.makeAdjacencyList (ii, jj);
   }
