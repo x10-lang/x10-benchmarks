@@ -5,9 +5,6 @@ import x10.lang.Math;
 import x10.util.Random;
 import x10.util.Stack;
 
-// Need to implement this
-// import x10.util.PriorityQueue;
-
 // This seems to be automatically included
 // import x10.util.Rail;
 // import x10.util.ValRail;
@@ -17,18 +14,27 @@ public final class Brandes {
 
   public static def main (args:Rail[String]!):void {
     try {
+      val cmdLineParams = new OptionsParser 
+                      (args, null,
+                       [Option("s", "", "Seed for the random number"),
+                        Option("n", "", "Number of vertices = 2^n"),
+                        Option("a", "", "Probability a"),
+                        Option("b", "", "Probability b"),
+                        Option("c", "", "Probability c"),
+                        Option("d", "", "Probability d")]);
+      val seed:Long = cmdLineParams ("-s", 2);
+      val n:Int = cmdLineParams ("-n", 2);
+      val a:Double = cmdLineParams ("-a", 0.55);
+      val b:Double = cmdLineParams ("-b", 0.1);
+      val c:Double = cmdLineParams ("-c", 0.1);
+      val d:Double = cmdLineParams ("-d", 0.25);
+
       val numPlaces = Place.MAX_PLACES;
       val brandesHandle = PlaceLocalHandle.make[Brandes]
                            (Dist.makeUnique(), ()=>new Brandes());
-      val myQueue = PriorityQueue[Int]();
-      myQueue.push(0);
-      Console.OUT.println (myQueue.top());
-      myQueue.pop();
-      if (!myQueue.empty()) {
-        Console.OUT.println ("What!");
-      } else {
-        Console.OUT.println ("Thats right!");
-      }
+
+      val recursiveMatrixGenerator = new Rmat (seed, n, a, b, c, d);
+      val adjacencyList = recursiveMatrixGenerator.generate ();
 
       finish {
         for (var thisPlace:Int = 0; thisPlace<numPlaces; ++thisPlace) {

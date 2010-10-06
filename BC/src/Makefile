@@ -2,7 +2,7 @@
 
 # <BEGIN> user settings #
 
-export X10CXX 		?= ~/Projects/x10/x10-2.0.6/x10.dist/bin/x10c++
+export X10CXX 		?= ~/Software/src/x10/x10-2.0.6/x10.dist/bin/x10c++
 
 #leave blank by default, X10 automatically chooses a transport for you. To
 #force a particular implementation, please uncheck one of the other options.
@@ -43,7 +43,9 @@ X10CXXFLAGS=-report \
             -NO_CHECKS \
             -O  
 
-X10_CLASSES=Brandes.x10 
+X10_CLASSES=Brandes.x10 \
+            Rmat.x10 \
+            Edge.x10
 X10_CLASSES_CC=$(X10_CLASSES:.x10=.cc)
 X10_CLASSES_H=$(X10_CLASSES:.x10=.h)
 
@@ -51,7 +53,7 @@ TARGET=brandes
 
 all: ${TARGET}
 
-brandes: Brandes.x10 \
+brandes: ${X10_CLASSES} \
          PriorityQueue.x10 \
          PriorityQueue.cc \
          PriorityQueue.h \
