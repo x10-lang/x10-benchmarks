@@ -40,8 +40,9 @@ public final class Rmat {
 
   private final def multiply (lhs:Rail[Int], multiplier:Double, flip:Boolean) =
     Rail.make[Double] 
-      (lhs.length(), (i:Int)=>(lhs(i) as Double)*
-                              ((flip)?(multiplier-1):multiplier));
+      (lhs.length(), (i:Int)=> { 
+                   val lhsMultiplier = flip ? ((lhs(i) > 0) ? 0 : 1) : lhs(i);
+                   multiplier*(lhsMultiplier as Double)});
 
   private final def multiply (lhs:Rail[Int], multiplier:Int) =
     Rail.make[Int] (lhs.length(), (i:Int)=>lhs(i)*multiplier);
@@ -68,7 +69,6 @@ public final class Rmat {
       }
     }
   }
-
 
   private final def makeAdjacencyList (row:Rail[Int],
                                        col:Rail[Int]) {
@@ -111,8 +111,8 @@ public final class Rmat {
 
     // Loop over each order of bit
     val ab = a+b;
-    val cNorm = c / (c+d);
-    val aNorm = a / (a+b);
+    val cNorm = c/(c+d);
+    val aNorm = a/(a+b);
 
     for (var ib:Int=0; ib<this.n; ++ib) {
       val iiBit = this.greaterThan (this.rand (rng, M), ab);

@@ -29,9 +29,12 @@ function graph = rmat (SCALE,a,b,c,d)
     % Compare with probabilities and set bits of indices
     ii_bit = rand(M,1) > ab;
     jj_bit = rand(M,1) > (c_norm.*ii_bit + a_norm.*not(ii_bit));
-    ii = ii + (2^(ib-1)).*ii_bit;
-    jj = jj + (2^(ib-1)).*jj_bit;
+    ii = ii + ((2^(ib-1)).*ii_bit);
+    jj = jj + ((2^(ib-1)).*jj_bit);
   end
+
+  ii
+  jj
 
   % Create adjacency matrix for veiwing purposes
   answer = sparse (ii, jj, ones(M,1))
