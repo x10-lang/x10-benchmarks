@@ -44,9 +44,9 @@ X10CXXFLAGS=-report \
 
 X10_STRUCTS=AdjacencyGraph.x10 \
             Rmat.x10 
-10_STRUCTS_CC=$(X10_STRUCTS:.x10=.cc)
-10_STRUCTS_H=$(X10_STRUCTS:.x10=.h)
-10_STRUCTS_STRUCTS_H=$(X10_STRUCTS:.x10=.struct_h)
+X10_STRUCTS_CC=$(X10_STRUCTS:.x10=.cc)
+X10_STRUCTS_H=$(X10_STRUCTS:.x10=.h)
+X10_STRUCTS_STRUCTS_H=$(X10_STRUCTS:.x10=.struct_h)
 
 X10_CLASSES=Brandes.x10 \
             NaivePriorityQueue.x10 \
