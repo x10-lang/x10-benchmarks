@@ -22,7 +22,8 @@ public final class Brandes {
    * Sequential version to calculate the betweenness centrality. The algorithm
    * is found in Brandes' 2004 work.
    */
-  public static def sequentialBrandes(graph:AdjacencyGraph [Brandes.VertexType]){
+  public static def sequentialBrandes
+                             (graph:AdjacencyGraph [Brandes.VertexType]) {
 
     // Remember that the vertices are numbered from (0, N], where N=(2^n).
     val N = graph.numVertices ();
