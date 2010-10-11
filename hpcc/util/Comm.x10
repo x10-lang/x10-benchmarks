@@ -13,9 +13,9 @@ final public class Comm {
         def this(i:Int) { value = i; }
     }
 
-    private const world = PlaceLocalHandle.make[Comm](Dist.makeUnique(), ()=>new Comm(0));;
+    private static world = PlaceLocalHandle.make[Comm](Dist.makeUnique(), ()=>new Comm(0));;
 
-    private const last_id = PlaceLocalHandle.make[Integer](Dist.makeUnique(), ()=>new Integer(0));
+    private static last_id = PlaceLocalHandle.make[Integer](Dist.makeUnique(), ()=>new Integer(0));
 
     private def this(new_id:Int) {
         my_id = new_id;
@@ -37,29 +37,29 @@ final public class Comm {
             "x10::lang::Runtime::decreaseParallelism(1);") {}
     }
 
-    public def broadcast(a:Rail[Int], rootRank:Int) {
+    public def broadcast(a:Array[Int], rootRank:Int) {
         @Native("c++",
-            "void* buf = a->raw();" +
-            "unsigned len = a->FMGL(length);" +
+            "void* buf = a->raw()->raw();" +
+            "unsigned len = a->FMGL(size);" +
             "void *r = __pgasrt_tspcoll_ibcast(FMGL(my_id),  rootRank, buf, buf, len*sizeof(x10_int));" +
             "x10::lang::Runtime::increaseParallelism();" +
             "while (!__pgasrt_tspcoll_isdone(r)) x10rt_probe();" +
             "x10::lang::Runtime::decreaseParallelism(1);") {}
     }
 
-    public def broadcast_d(a:Rail[Double], rootRank:Int) {
+    public def broadcast_d(a:Array[Double], rootRank:Int) {
         @Native("c++",
-            "void* buf = a->raw();" +
-            "unsigned len = a->FMGL(length);" +
+            "void* buf = a->raw()->raw();" +
+            "unsigned len = a->FMGL(size);" +
             "void *r = __pgasrt_tspcoll_ibcast(FMGL(my_id),  rootRank, buf, buf, len*sizeof(x10_double));" +
             "x10::lang::Runtime::increaseParallelism();" +
             "while (!__pgasrt_tspcoll_isdone(r)) x10rt_probe();" +
             "x10::lang::Runtime::decreaseParallelism(1);") {}
     }
 
-    public def alltoall(a:Rail[Double], b:Rail[Double], chunkSize:Int) {
+    public def alltoall(a:Array[Double], b:Array[Double], chunkSize:Int) {
         @Native("c++",
-            "void *r = __pgasrt_tspcoll_ialltoall(FMGL(my_id),  a->raw(), b->raw(), chunkSize*sizeof(x10_double));" +
+            "void *r = __pgasrt_tspcoll_ialltoall(FMGL(my_id),  a->raw()->raw(), b->raw()->raw(), chunkSize*sizeof(x10_double));" +
             "x10::lang::Runtime::increaseParallelism();" +
             "while (!__pgasrt_tspcoll_isdone(r)) x10rt_probe();" +
             "x10::lang::Runtime::decreaseParallelism(1);") {}

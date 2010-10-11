@@ -11,7 +11,7 @@ public final class BlockedArray implements (Int,Int)=>Double {
         public val max_y:Int;
         private val delta:Int;
         private val offset:Int;
-        public val raw:Rail[Double];
+        public val raw:Array[Double](1);
     
         public def this(I:Int, J:Int, bx:Int, by:Int, rand:Random) {
             min_x = I*bx;
@@ -20,17 +20,17 @@ public final class BlockedArray implements (Int,Int)=>Double {
             max_y = (J+1)*by-1;
             delta = by;
             offset = (I*bx+J)*by;
-            val raw = Rail.make[Double](bx*by);
+            val raw = new Array[Double](bx*by);
             for(var i:Int = 0; i < bx*by; i++) raw(i) = rand.nextDouble()*10;
             this.raw = raw;
         }
     
-        @Native("c++", "(*(#0)->FMGL(raw))[-(#0)->FMGL(offset) + (#2) * (#0)->FMGL(delta) + (#3)] = (#1)")
-        public def set(val:Double, i:Int, j:Int) {
-            raw(i*delta+j-offset) = val;
+        //@Native("c++", "(*(#0)->FMGL(raw))[-(#0)->FMGL(offset) + (#2) * (#0)->FMGL(delta) + (#3)] = (#1)")
+        public def set(v:Double, i:Int, j:Int) {
+            raw(i*delta+j-offset) = v;
         }
     
-        @Native("c++", "(*(#0)->FMGL(raw))[-(#0)->FMGL(offset) + (#1) * (#0)->FMGL(delta) + (#2)]")
+        //@Native("c++", "(*(#0)->FMGL(raw))[-(#0)->FMGL(offset) + (#1) * (#0)->FMGL(delta) + (#2)]")
         public def apply(i:Int, j:Int) = raw(i*delta+j-offset);
     }
 
@@ -62,7 +62,7 @@ public final class BlockedArray implements (Int,Int)=>Double {
     private val min_x:Int;
     private val min_y:Int;
     private val ny:Int;
-    private val data:ValRail[Block];
+    private val data:Array[Block](1);
 
     public def this(M:Int, N:Int, bx:Int, by:Int, px:Int, py:Int) {
         this.bx = bx;
@@ -77,7 +77,7 @@ public final class BlockedArray implements (Int,Int)=>Double {
         this.min_y = min_y;
         this.ny = ny;
         val rand = new Random(here.id*1000);
-        data = ValRail.make[Block](nx*ny, (k:Int)=>new Block(k/ny*px+min_x, k%ny*py+min_y, bx, by, rand));
+        data = new Array[Block](nx*ny, (k:Int)=>new Block(k/ny*px+min_x, k%ny*py+min_y, bx, by, rand));
     }
 
     public def apply(i:Int, j:Int) = blockOf(i, j)(i, j);
@@ -100,7 +100,8 @@ public final class BlockedArray implements (Int,Int)=>Double {
         return ArrayView(view_min_x, view_min_y, view_max_x, view_max_y, b);
     }
 
-    public def getRow(row:Int, min_y:Int, max_y:Int, rail:Rail[Double]) {
+    // inputs are global coordinates
+    public def getRow(row:Int, min_y:Int, max_y:Int, rail:Array[Double](1)) {
         val brow = row/bx;
         val view = blocks(brow, brow, min_y/by, max_y/by);
         var n:Int = 0;
@@ -113,7 +114,7 @@ public final class BlockedArray implements (Int,Int)=>Double {
         return n;
     }
 
-    public def setRow(row:Int, min_y:Int, max_y:Int, rail:Rail[Double]) {
+    public def setRow(row:Int, min_y:Int, max_y:Int, rail:Array[Double](1)) {
         val brow = row / bx;
         val view = blocks(brow, brow, min_y/by, max_y/by);
         var n:Int = 0;
@@ -125,7 +126,7 @@ public final class BlockedArray implements (Int,Int)=>Double {
         }
     }
 
-    public def swapRow(row:Int, min_y:Int, max_y:Int, rail:Rail[Double]) {
+    public def swapRow(row:Int, min_y:Int, max_y:Int, rail:Array[Double](1)) {
         val brow = row / bx;
         val view = blocks(brow, brow, min_y/by, max_y/by);
         var n:Int = 0;

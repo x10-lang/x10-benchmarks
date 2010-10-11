@@ -1,12 +1,12 @@
 package rc7;
 
 final public class Timer {
-    public val total:Rail[Long];
-    public val count:Rail[Long];
+    public val total:Array[Long](1);
+    public val count:Array[Long](1);
 
     public def this(n:Int) {
-        total = Rail.make[Long](n, (Int)=>0L);
-        count = Rail.make[Long](n, (Int)=>0L);
+        total = new Array[Long](n, (Int)=>0 as Long);
+        count = new Array[Long](n, (Int)=>0 as Long);
     }
 
     public def start(id:Int) { total(id) -= System.nanoTime(); }

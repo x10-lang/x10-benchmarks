@@ -7,24 +7,24 @@ import x10.util.Team;
 @NativeCPPCompilationUnit("essl_natives.cc")
 class LU {
 
-    @Native("c++", "blockTriSolve((#1)->raw(), (#2)->raw(), #3)")
-        native static def blockTriSolve(me:Rail[Double], diag:Rail[Double], B:Int):Void;
+    @Native("c++", "blockTriSolve((#1)->raw()->raw(), (#2)->raw()->raw(), #3)")
+        native static def blockTriSolve(me:Array[Double], diag:Array[Double], B:Int):Void;
 
-    @Native("c++", "blockBackSolve((#1)->raw(), (#2)->raw(), #3)")
-        native static def blockBackSolve(me:Rail[Double], diag:Rail[Double], B:Int):Void;
+    @Native("c++", "blockBackSolve((#1)->raw()->raw(), (#2)->raw()->raw(), #3)")
+        native static def blockBackSolve(me:Array[Double], diag:Array[Double], B:Int):Void;
 
-    @Native("c++", "blockMulSub((#1)->raw(), (#2)->raw(), (#3)->raw(), #4)")
-        native static def blockMulSub(me:Rail[Double], left:Rail[Double], upper:Rail[Double], B:Int):Void;
+    @Native("c++", "blockMulSub((#1)->raw()->raw(), (#2)->raw()->raw(), (#3)->raw()->raw(), #4)")
+        native static def blockMulSub(me:Array[Double], left:Array[Double], upper:Array[Double], B:Int):Void;
 
-    @Native("c++", "blockMulSubRow((#1)->raw(), (#2)->raw(), #3, #4, #5)")
-        native static def blockMulSubRow(me:Rail[Double], diag:Rail[Double], B:Int, j:Int, cond:boolean):Void;
+    @Native("c++", "blockMulSubRow((#1)->raw()->raw(), (#2)->raw()->raw(), #3, #4, #5)")
+        native static def blockMulSubRow(me:Array[Double], diag:Array[Double], B:Int, j:Int, cond:boolean):Void;
     
     static def runAt(id:Int, c:()=>Void) {
          x10.lang.Runtime.runAtNative(id, c);
          x10.lang.Runtime.dealloc(c);
     }
 
-    const unique = Dist.makeUnique();
+    static unique = Dist.makeUnique();
 
     val M:Int;
     val N:Int;
@@ -40,17 +40,17 @@ class LU {
     val col:Team;
     val row:Team;
     var ready:Boolean;
-    val pivot:Rail[Int];
-    val rowForBroadcast:Rail[Double];
-    val rowBuffer:Rail[Double];
-    val colBuffer:Rail[Double];
-    val colBuffers:ValRail[Rail[Double]];
-    val rowBuffers:ValRail[Rail[Double]];
-    val buffer:Rail[Double];
-    val buffers:PlaceLocalHandle[Rail[Double]];
+    val pivot:Array[Int](1);
+    val rowForBroadcast:Array[Double](1);
+    val rowBuffer:Array[Double];
+    val colBuffer:Array[Double];
+    val colBuffers:Array[Array[Double]](1);
+    val rowBuffers:Array[Array[Double]](1);
+    val buffer:Array[Double];
+    val buffers:PlaceLocalHandle[Array[Double](1)];
 
     def computeRowSum() {
-        val sum = Rail.make[Double](B);
+        val sum = new Array[Double](B);
 
         for (var I:Int = 0; I <= MB; ++I) if (A_here.hasRow(I)) {
             val IB = I * B;
@@ -92,17 +92,21 @@ class LU {
     def exchange(row1:Int, row2:Int, min:Int, max:Int, dest:Int) {
         val source = here; 
         ready = false;
-        val size = A_here.getRow(row1, min, max, buffer);
-        val _buffers = buffers;
+        val size = A_here.getRow(row1, min, max, buffer);        
+        val remoteBuffer = new RemoteArray(buffer);
+        val _buffers = buffers; // this is done so that we don't serialize the object that contains buffers
         val _A = A;
-        buffers.copyTo[Double](Place.places(dest), size, ()=>{
-            val size = _A().swapRow(row2, min, max, _buffers());
-            _buffers.copyTo[Double](source, size, ()=>{
-                A_here.setRow(row1, min, max, buffer);
-                atomic ready=true;
-            });
-        });
-        await ready;
+        
+        finish{
+        	at (Place(dest)){
+        		finish{
+        			Array.asyncCopy[Double](remoteBuffer, 0, _buffers(), 0, size);
+        		}
+        		val size2 = _A().swapRow(row2, min, max, _buffers());
+       			Array.asyncCopy[Double](_buffers(), 0, remoteBuffer, 0, size2);
+        	}        	
+        }
+        A_here.setRow(row1, min, max, buffer);
     }
 
     def panel(J:Int, timer:Timer) {
@@ -139,7 +143,7 @@ class LU {
                 timer.stop(6);
                 timer.start(7);
                 timer.start(11);
-                col.bcast(colRole, J%px, rowForBroadcast, 0, rowForBroadcast, 0, rowForBroadcast.length);
+                col.bcast(colRole, J%px, rowForBroadcast, 0, rowForBroadcast, 0, rowForBroadcast.size);
                 timer.stop(11);
                 timer.stop(7);
                 if(!A_panel_j.empty()) {
@@ -156,7 +160,7 @@ class LU {
     
     def swapRows(J:Int, timer:Timer) {
         timer.start(10);
-        row.bcast(rowRole, J%py, pivot, 0, pivot, 0, pivot.length);
+        row.bcast(rowRole, J%py, pivot, 0, pivot, 0, pivot.size);
         timer.stop(10);
 
         val row_panel = A_here.blocks(J, J, J + 1, NB);
@@ -187,11 +191,11 @@ class LU {
 
     def triSolve(J:Int, timer:Timer) {
         if (A_here.hasRow(J)) {
-            var tmp:Rail[Double];
+            var tmp:Array[Double];
             if (A_here.hasCol(J)) tmp = A_here.block(J, J).raw; else tmp = colBuffer;
             val diag = tmp;
             timer.start(10);
-            row.bcast(rowRole, J%py, diag, 0, diag, 0, diag.length);
+            row.bcast(rowRole, J%py, diag, 0, diag, 0, diag.size);
             timer.stop(10);
             for (var cj:Int = J + 1; cj <= NB; ++cj) if (A_here.hasCol(cj)) {
                 blockTriSolve(A_here.block(J, cj).raw, diag, B);
@@ -205,7 +209,7 @@ class LU {
             for (var cj:Int = A_U.min_y; cj <= A_U.max_y; cj += py) {
                 val block = A_here.hasBlock(J, cj) ? A_U.block(J, cj).raw : colBuffers(cj/py);
                 timer.start(11);
-                col.bcast(colRole, J%px, block, 0, block, 0, block.length);
+                col.bcast(colRole, J%px, block, 0, block, 0, block.size);
                 timer.stop(11);
             }
         }
@@ -217,7 +221,7 @@ class LU {
             for (var ci:Int = A_L.min_x; ci <= A_L.max_x; ci += px) {
                 val block = A_here.hasBlock(ci, J) ? A_L.block(ci, J).raw : rowBuffers(ci/px);
                 timer.start(10);
-                row.bcast(rowRole, J%py, block, 0, block, 0, block.length);
+                row.bcast(rowRole, J%py, block, 0, block, 0, block.size);
                 timer.stop(10);
             }
         }
@@ -254,7 +258,7 @@ class LU {
             /* Progress meter */
             if(0 == here.id && J > nextJ) {
                 timer.stop(9);
-                Console.OUT.println(J + " of " + NB + " complete " + 
+                Console.OUT.println("" + J + " of " + NB + " complete " + 
                         "last " + progressInc + " iterations took " + 
                         (timer.total(9) as Double)/1e9 + " seconds");
                 nextJ += progressInc;
@@ -271,14 +275,13 @@ class LU {
             val source = here;
             ready = false;
             val _A = A;
-            val _rowBuffer = rowBuffer;
+            val remoteRowBuffer = new RemoteArray(rowBuffer);
             val _B = B;
-            runAt(A_here.placeOfBlock(I, J), ()=>{
-                _A().block(I, J).raw.copyTo(0, _rowBuffer, 0, _B * _B, ()=>{
-                    atomic ready=true;
-                });
-            });
-            await ready;
+	    	finish{
+				at(Place(A_here.placeOfBlock(I, J))){
+					Array.asyncCopy(_A().block(I, J).raw, 0, remoteRowBuffer, 0, _B * _B);
+				}
+	    	}
             return rowBuffer;
         }
     }
@@ -290,10 +293,10 @@ class LU {
                 if (A_here.hasRow(I)) {
                     blockBackSolve(A_here.block(I, NB).raw, memget(I, I), B);
                 }
-                var tmp:Rail[Double];
+                var tmp:Array[Double];
                 if (A_here.hasRow(I)) tmp = A_here.block(I, NB).raw; else tmp = colBuffer;
                 val bufferY = tmp;
-                col.bcast(colRole, I%px, bufferY, 0, bufferY, 0, bufferY.length);
+                col.bcast(colRole, I%px, bufferY, 0, bufferY, 0, bufferY.size);
                 for (var ci:Int = 0; ci < I; ++ci) if (A_here.hasRow(ci)) {
                     blockMulSub(A_here.block(ci, NB).raw, memget(ci, I), bufferY, B);
                 }
@@ -315,27 +318,27 @@ class LU {
         return col.allreduce(colRole,max,Team.MAX);
     }
 
-    public static def main(args:Rail[String]) {
-        if (args.length < 4) {
+    public static def main(args:Array[String](1)) {
+        if (args.size < 4) {
             Console.OUT.println("Usage: LU M B (px py)");
             Console.OUT.println("M = Matrix size,");
             Console.OUT.println("B = Block size, where B should perfectly divide M");
             Console.OUT.println("px py = Processor grid, where px*py = nplaces");
             return;
         }
-        val M = Int.parseInt(args(0));
-        val B = Int.parseInt(args(1));
+        val M = Int.parse(args(0));
+        val B = Int.parse(args(1));
         val N = M + B;
-        val px = Int.parseInt(args(2));
-        val py = Int.parseInt(args(3));
+        val px = Int.parse(args(2));
+        val py = Int.parse(args(3));
         val A = BlockedArray.make(M, N, B, B, px, py);
-        val buffers = PlaceLocalHandle.make[Rail[Double]](unique, ()=>Rail.make[Double](N));        
-        val lus = PlaceLocalHandle.make[LU](unique, ()=>new LU(M, N, B, px, py, A, buffers));
+        val buffers = PlaceLocalHandle.make[Array[Double](1)](Dist.makeUnique(), ()=>new Array[Double](N));        
+        val lus = PlaceLocalHandle.make[LU](Dist.makeUnique(), ()=>new LU(M, N, B, px, py, A, buffers));
         Console.OUT.println ("LU Starting: M " + M + " B " + B + " px " + px + " py " + py);
         start(lus);
     }
 
-    def this(M:Int, N:Int, B:Int, px:Int, py:Int, A:PlaceLocalHandle[BlockedArray], buffers:PlaceLocalHandle[Rail[Double]]) { 
+    def this(M:Int, N:Int, B:Int, px:Int, py:Int, A:PlaceLocalHandle[BlockedArray], buffers:PlaceLocalHandle[Array[Double](1)]) { 
         this.M = M; this.N = N; this.B = B; this.px = px; this.py = py;
         this.A = A; A_here = A();
         this.buffers = buffers; buffer = buffers();
@@ -345,10 +348,10 @@ class LU {
         rowRole = here.id % py;
         col = Team.WORLD.split(here.id, rowRole, colRole);
         row = Team.WORLD.split(here.id, colRole, rowRole);
-        pivot = Rail.make[Int](B);
-        rowForBroadcast = Rail.make[Double](B);
-        val rowBuffers = ValRail.make[Rail[Double]](M / B / px + 1, (Int)=>Rail.make[Double](B * B));
-        val colBuffers = ValRail.make[Rail[Double]](N / B / py + 1, (Int)=>Rail.make[Double](B * B));
+        pivot = new Array[Int](B);
+        rowForBroadcast = new Array[Double](B);
+        val rowBuffers = new Array[Array[Double]](M / B / px + 1, (Int)=>new Array[Double](B * B));
+        val colBuffers = new Array[Array[Double]](N / B / py + 1, (Int)=>new Array[Double](B * B));
         this.rowBuffers = rowBuffers;
         this.colBuffers = colBuffers;
         rowBuffer = rowBuffers(0);
