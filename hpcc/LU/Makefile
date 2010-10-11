@@ -1,6 +1,7 @@
 PACKAGE := rc7
 
-SRCS = ${PACKAGE}/*.x10 ../util/*.x10
+#SRCS = ${PACKAGE}/*.x10 ../util/*.x10
+SRCS = ${PACKAGE}/*.x10
 NATIVES = ${PACKAGE}/essl_natives.cc ${PACKAGE}/essl_natives.h
 
 all: lu-opt lu-dbg
