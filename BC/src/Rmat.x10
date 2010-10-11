@@ -39,10 +39,10 @@ public final class Rmat {
   }
 
   /**
-   * A function that mimics the MATLAB function "ones".
+   * A function that mimics the MATLAB function "zeros".
    */
-  private final def ones (numElements:Int):Rail[Brandes.VertexType] =
-                      Rail.make[Brandes.VertexType] (numElements, (Int)=>1);
+  private final def zeros (numElements:Int):Rail[Brandes.VertexType] =
+                      Rail.make[Brandes.VertexType] (numElements, (Int)=>0);
 
   /**
    *  A function that mimics the MATLAB function rand (M,1). It generates a 
@@ -107,7 +107,7 @@ public final class Rmat {
   /**
    * This function prints out the adjacency list in a pretty fashion.
    */
-  private final def printAdjacencyList 
+  public final def printAdjacencyList 
                   (adjacencyList:HashMap[Brandes.VertexType, 
                                          HashMap[Brandes.VertexType, Int]]) {
 
@@ -160,8 +160,6 @@ public final class Rmat {
       }
     }
 
-    printAdjacencyList (adjacencyList);
-
     return adjacencyList;
   }
 
@@ -175,8 +173,8 @@ public final class Rmat {
     val rng = new Random(this.seed);
 
     // Create index arrays
-    var ii:Rail[Brandes.VertexType] = this.ones(M);
-    var jj:Rail[Brandes.VertexType] = this.ones(M);
+    var ii:Rail[Brandes.VertexType] = this.zeros(M);
+    var jj:Rail[Brandes.VertexType] = this.zeros(M);
 
     // Loop over each order of bit
     val ab = a+b;

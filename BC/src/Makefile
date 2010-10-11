@@ -49,7 +49,8 @@ X10CXXFLAGS=-report \
 
 X10_CLASSES=Brandes.x10 \
             Rmat.x10 \
-            TestRandom.x10
+            TestRandom.x10 \
+            NaivePriorityQueue.x10
 X10_CLASSES_CC=$(X10_CLASSES:.x10=.cc)
 X10_CLASSES_H=$(X10_CLASSES:.x10=.h)
 
@@ -57,15 +58,8 @@ TARGET=brandes
 
 all: ${TARGET}
 
-brandes: ${X10_CLASSES} \
-         ${X10_STRUCTS} \
-         PriorityQueue.x10 \
-         PriorityQueue.cc \
-         PriorityQueue.h \
-         PriorityQueue.struct_h
-	touch PriorityQueue.inc
-	${X10CXX} ${X10CXXFLAGS} $< -o $@ 
-	rm -f PriorityQueue.inc
+brandes: ${X10_CLASSES} 
+	${X10CXX} ${X10CXXFLAGS} -MAIN_CLASS=Brandes $< -o $@ 
 
 run-brandes: brandes
 	mpirun -np 1 -hostfile host.list ./brandes
@@ -75,6 +69,9 @@ testrng: TestRandom.x10
 
 run-rng: testrng
 	mpirun -np 1 -hostfile host.list ./testrng
+
+test-pq: NaivePriorityQueue.x10
+	${X10CXX} ${X10CXXFLAGS} $< -o $@ 
 
 clean:
 	rm -rf core*.* *.dSYM *.inc 
