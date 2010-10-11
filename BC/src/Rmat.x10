@@ -146,17 +146,20 @@ public final class Rmat {
       val sourceVertex = row(i);
       val destVertex = col(i);
 
-      if (!adjacencyList.containsKey (sourceVertex)) {
-        adjacencyList.put (sourceVertex, new HashMap[Int, Int]());
-      }
-
-      val sourceAdjacencies = (adjacencyList.get (sourceVertex)).value();
-
-      if (sourceAdjacencies.containsKey (destVertex)) {
-        sourceAdjacencies.put (destVertex, 
-                               ((sourceAdjacencies.get (destVertex)).value())+1);
-      } else {
-        sourceAdjacencies.put (destVertex, 1);
+      // Generate only non-self edges. Self-edges are useless.
+      if (sourceVertex != destVertex) {
+        if (!adjacencyList.containsKey (sourceVertex)) {
+          adjacencyList.put (sourceVertex, new HashMap[Int, Int]());
+        }
+       
+        val sourceAdjacencies = (adjacencyList.get (sourceVertex)).value();
+       
+        if (sourceAdjacencies.containsKey (destVertex)) {
+          sourceAdjacencies.put 
+            (destVertex, ((sourceAdjacencies.get (destVertex)).value())+1);
+        } else {
+          sourceAdjacencies.put (destVertex, 1);
+        }
       }
     }
 

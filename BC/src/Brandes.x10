@@ -45,14 +45,12 @@ public final class Brandes {
   private def sequentialBrandes (graph:adjacencyType, n:Int) : 
                                      HashMap[Brandes.VertexType, Double] {
 
-    val betweennessMap = new HashMap[Brandes.VertexType, Double] ();
-    for (vertex in graph.keySet()) betweennessMap.put (vertex, 0.0);
-
-
-
     // Remember that the vertices are numbered from (0, N], where N=(2^n).
-    // So, to iterate over all the vertices, we can iterate over (0, N].
     val N = Math.pow (2, n) as Brandes.VertexType;
+    val betweennessMap = new HashMap[Brandes.VertexType, Double] ();
+    for (var vertex:Int=0; vertex<N; ++vertex) betweennessMap.put (vertex, 0.0);
+
+    // So, to iterate over all the vertices, we can iterate over (0, N].
     for (var s:Int=0; s<N; ++s) {
       val vertexStack = new Stack[Brandes.VertexType] ();
       val predecessorMap = 
@@ -64,7 +62,7 @@ public final class Brandes {
         new NaivePriorityQueue [Brandes.VertexType] (priorityQueueComparator);
 
       // Zero initialize all the maps
-      for (vertex in graph.keySet()) {
+      for (var vertex:Int=0; vertex<N; ++vertex) { 
         predecessorMap.put (vertex, new HashSet [Brandes.VertexType]());
         distanceMap.put (vertex, Int.MAX_VALUE);
         sigmaMap.put (vertex, 0);
@@ -85,35 +83,38 @@ public final class Brandes {
                                   this.getEdgeWeight (graph, v, w));
 
           // Update the distance if its a new low
-          if (distanceThroughV < (distanceMap.get (w)).value()) {
+          if (distanceThroughV < distanceMap.get (w).value()) {
             distanceMap.put (w, distanceThroughV);
             priorityQueue.push (w);
-            sigmaMap.put (w, (sigmaMap.get(w)).value() + 1);
+            sigmaMap.put (w, sigmaMap.get(w).value() + sigmaMap.get(v).value());
             predecessorMap.get (w).value().add(v);
           }
         }
-
-        val deltaMap = new HashMap [Brandes.VertexType, Double] ();
-        for (vertex in graph.keySet()) deltaMap.put (vertex, 0.0);
-
-        // Return vertices in order of non-increasing distances from "s"
-        while (!vertexStack.isEmpty()) {
-          val w = vertexStack.pop ();
-          for (predecessor in (predecessorMap.get (w)).value()) {
-            val deltaUpdate = deltaMap.get (predecessor).value () +
-                      ((sigmaMap.get (predecessor).value() as Double / 
-                        sigmaMap.get (w).value() as Double) * 
-                          (1 + deltaMap.get (w).value()));
-            deltaMap.put (predecessor, deltaUpdate);
-          }
-
-          if (w != s) {
-            betweennessMap.put (w, betweennessMap.get (w).value() + 
-                                   deltaMap.get (w).value());
-          }
-        } // vertexStack not empty
       } // while priorityQueue not empty
-    }
+
+      val deltaMap = new HashMap [Brandes.VertexType, Double] ();
+      for (var vertex:Int=0; vertex<N; ++vertex) deltaMap.put (vertex, 0.0);
+
+      // Return vertices in order of non-increasing distances from "s"
+      while (!vertexStack.isEmpty()) {
+        val w = vertexStack.pop ();
+        for (v in (predecessorMap.get (w)).value()) {
+          val deltaUpdate = deltaMap.get (v).value () +
+                            ((sigmaMap.get (v).value() as Double / 
+                              sigmaMap.get (w).value() as Double) * 
+                            (1 + deltaMap.get (w).value()));
+          Console.OUT.println ("Delta update for " + v + " is " + 
+                               deltaUpdate);
+          deltaMap.put (v, deltaUpdate);
+        }
+
+        if (w != s) {
+          betweennessMap.put (w, betweennessMap.get (w).value() + 
+                                 deltaMap.get (w).value());
+        }
+      } // vertexStack not empty
+    } // vertexStack not empty
+
     return betweennessMap;
   }
 
