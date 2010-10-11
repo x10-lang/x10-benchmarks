@@ -9,9 +9,8 @@ import x10.lang.Math;
 
 public final class Brandes {
   public static type VertexType = Int;
-  public static type adjacencyType = 
-    HashMap [Brandes.VertexType, HashMap[Brandes.VertexType, Int]];
-  private val makeNonIncreasingComparator = 
+
+  private static val makeNonIncreasingComparator = 
     (distanceMap:HashMap[Int, Int]) => { return (x:Int, y:Int) => {
         val dx = distanceMap.get(x).value();
         val dy = distanceMap.get(y).value();
@@ -19,34 +18,14 @@ public final class Brandes {
       };
     };
 
-  private def printHello() = Console.OUT.println ("Hello from Brandes");
-
-  /**
-   * Returns the weight of an edge
-   */
-  private def getEdgeWeight (graph:adjacencyType,
-                             source:Brandes.VertexType,
-                             sink:Brandes.VertexType) : Int {
-    return ((graph.get (source)).value()).get (sink).value();
-  }
-
-  /**
-   * Returns the neighbors for a given vertex
-   */
-  private def getNeighbors(graph:adjacencyType, 
-                           vertex:Brandes.VertexType):Set [Brandes.VertexType]{
-    return ((graph.get (vertex)).value()).keySet();
-  }
-
   /**
    * Sequential version to calculate the betweenness centrality. The algorithm
    * is found in Brandes' 2004 work.
    */
-  private def sequentialBrandes (graph:adjacencyType, n:Int) : 
-                                     HashMap[Brandes.VertexType, Double] {
+  public static def sequentialBrandes(graph:AdjacencyGraph [Brandes.VertexType]){
 
     // Remember that the vertices are numbered from (0, N], where N=(2^n).
-    val N = Math.pow (2, n) as Brandes.VertexType;
+    val N = graph.numVertices ();
     val betweennessMap = new HashMap[Brandes.VertexType, Double] ();
     for (var vertex:Int=0; vertex<N; ++vertex) betweennessMap.put (vertex, 0.0);
 
@@ -78,9 +57,9 @@ public final class Brandes {
         val v = priorityQueue.pop();
         vertexStack.push (v);
 
-        for (w in this.getNeighbors(graph, v)) {
-          val distanceThroughV = ((distanceMap.get (v)).value() + 
-                                  this.getEdgeWeight (graph, v, w));
+        for (w in graph.getNeighbors(v).keySet()) {
+          val distanceThroughV = (distanceMap.get (v)).value() + 
+                                  graph.getEdgeWeight (v, w);
 
           // Update the distance if its a new low
           if (distanceThroughV < distanceMap.get (w).value()) {
@@ -103,8 +82,6 @@ public final class Brandes {
                             ((sigmaMap.get (v).value() as Double / 
                               sigmaMap.get (w).value() as Double) * 
                             (1 + deltaMap.get (w).value()));
-          Console.OUT.println ("Delta update for " + v + " is " + 
-                               deltaUpdate);
           deltaMap.put (v, deltaUpdate);
         }
 
@@ -145,27 +122,17 @@ public final class Brandes {
 
 
       val numPlaces = Place.MAX_PLACES;
-      val brandesHandle = PlaceLocalHandle.make[Brandes]
-                           (Dist.makeUnique(), ()=>new Brandes());
 
-      val recursiveMatrixGenerator = new Rmat (seed, n, a, b, c, d);
-      val adjacencyList = recursiveMatrixGenerator.generate ();
+      val recursiveMatrixGenerator = Rmat (seed, n, a, b, c, d);
+      val graph = recursiveMatrixGenerator.generate ();
 
-      recursiveMatrixGenerator.printAdjacencyList (adjacencyList);
+      Console.OUT.println (graph);
 
-      val betweennessMap = 
-                brandesHandle().sequentialBrandes (adjacencyList, n);
+      val betweennessMap = Brandes.sequentialBrandes (graph);
 
       for (vertex in betweennessMap.keySet()) {
         Console.OUT.println ("" + vertex + " = " + 
                              betweennessMap.get (vertex).value());
-      }
-
-      finish {
-        for (var place:Int=0; place<numPlaces; ++place) {
-          val thisPlace = place;
-          async at (Place(thisPlace)) brandesHandle().printHello();
-        }
       }
     } catch (e:Throwable) {
       e.printStackTrace(Console.ERR);

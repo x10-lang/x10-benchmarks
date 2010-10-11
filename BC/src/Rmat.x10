@@ -16,9 +16,10 @@ import x10.lang.Math;
  * properties of the graph. For a more detailed description of the parameters
  * and their influence, please refer to Chakrabarti et al.
  */
-public final class Rmat {
+public final struct Rmat {
   private val seed:Long; // seed to the random number generator
   private val n:Int; // the log of the number of verties. I.e., N = 2^n
+  private val N:Int; // the number of vertices.
   private val a:Double; // The next 4 parameters determine the shape of 
   private val b:Double; // the graph. A detailed description of the 
   private val c:Double; // parameters is out of scope here. Briefly,
@@ -32,6 +33,7 @@ public final class Rmat {
                    d:Double) {
     this.seed = seed;
     this.n = n;
+    this.N = Math.pow (2, n) as Int;
     this.a = a;
     this.b = b;
     this.c = c;
@@ -105,74 +107,40 @@ public final class Rmat {
 
 
   /**
-   * This function prints out the adjacency list in a pretty fashion.
-   */
-  public final def printAdjacencyList 
-                  (adjacencyList:HashMap[Brandes.VertexType, 
-                                         HashMap[Brandes.VertexType, Int]]) {
-
-    for (sourceVertex in adjacencyList.keySet()) {
-      val sourceAdjacencies = (adjacencyList.get (sourceVertex)).value();
-
-      for (destVertex in sourceAdjacencies.keySet()) {
-        val edgeWeight = sourceAdjacencies.get (destVertex).value();
-        Console.OUT.println ("(" + sourceVertex +
-                              ", " + destVertex + ")" +
-                              " => " + edgeWeight);
-      }
-    }
-  }
-
-  /**
    * This function mimics the behavior of the MATLAB function sparse(i,j,s).
    * Basically, we are given two vectors. The LHS vector stands for the row 
    * indices, and is hence called "row". Similarly, the RHS vector contains 
    * the column indices. By default, the edge weight of an edge is considered
    * to be 1. However, if the (row,col) values repeat, you add 1 to the edge 
    * weight --- this is a way to deal with duplicate edges.
-   *
-   * The structure chosen to represent the graph is a HashMap of HashMaps. 
-   * The outer HashMap is indexed by the source vertices. The inner HashMap
-   * is indexed by the destination vertices, and contains as value, the 
-   * edge weight.
    */
   private final def sparse (row:Rail[Brandes.VertexType],
                             col:Rail[Brandes.VertexType]) {
-    val adjacencyList = new HashMap [Brandes.VertexType, 
-                                     HashMap[Brandes.VertexType, Int]]();
+    val adjacencyGraph = 
+           AdjacencyGraph[Brandes.VertexType] (this.N);
     val numElements = row.length(); 
 
     for (var i:Int=0; i<numElements; ++i) {
-      val sourceVertex = row(i);
-      val destVertex = col(i);
+      val v = row(i);
+      val w = col(i);
 
-      // Generate only non-self edges. Self-edges are useless.
-      if (sourceVertex != destVertex) {
-        if (!adjacencyList.containsKey (sourceVertex)) {
-          adjacencyList.put (sourceVertex, new HashMap[Int, Int]());
-        }
-       
-        val sourceAdjacencies = (adjacencyList.get (sourceVertex)).value();
-       
-        if (sourceAdjacencies.containsKey (destVertex)) {
-          sourceAdjacencies.put 
-            (destVertex, ((sourceAdjacencies.get (destVertex)).value())+1);
-        } else {
-          sourceAdjacencies.put (destVertex, 1);
-        }
-      }
+      // Add an edge from (v,w). If the edge exists, increase its weight.
+      // Note that Int.MIN_VALUE being returned from getEdgeWeight() 
+      // implies that there was no edge existing between (v,w) apriori.
+      val d = adjacencyGraph.getEdgeWeight (v,w);
+      if (Int.MIN_VALUE == d) adjacencyGraph.addEdge (v, w, 1);
+      else adjacencyGraph.addEdge (v, w, d+1);
     }
 
-    return adjacencyList;
+    return adjacencyGraph;
   }
 
   /**
    * TODO: Explain the code --- too late in the night now. Sleepy!
    */
   public def generate () {
-    // Initialize N, M, and rng
-    val N = Math.pow (2.0, n) as Int;
-    val M = 8*N;
+    // Initialize M, and rng
+    val M = 8*this.N;
     val rng = new Random(this.seed);
 
     // Create index arrays
