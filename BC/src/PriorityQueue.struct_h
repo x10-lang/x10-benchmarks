@@ -12,10 +12,10 @@
 #include <x10aux/struct_equals.h>
 
 template<class FMGL(T)> class PriorityQueue  {
-    /** instrumentation BEGIN */
-    private:
-    std::priority_queue<FMGL(T)> __priority_queue;
-    /** instrumentation END */
+   /** instrumentation BEGIN */
+   private:
+   std::priority_queue<FMGL(T)> __priority_queue;
+   /** instrumentation END */
 
     public:
     RTT_H_DECLS_STRUCT
@@ -51,7 +51,7 @@ template<class FMGL(T)> class PriorityQueue  {
     x10aux::ref<x10::lang::String> toString();
     
     x10_int hashCode();
-    
+
     /** instrumentation BEGIN */
     x10_boolean empty () { return this->__priority_queue.empty(); }
 

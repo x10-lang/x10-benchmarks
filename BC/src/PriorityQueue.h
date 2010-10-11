@@ -22,17 +22,13 @@ namespace x10 { namespace lang {
 class NullPointerException;
 } } 
 namespace x10 { namespace lang { 
-class Place;
+class String;
 } } 
-#include <x10/lang/Place.struct_h>
 namespace x10 { namespace compiler { 
 class Native;
 } } 
-namespace x10 { namespace lang { 
-class String;
-} } 
-namespace x10 { namespace lang { 
-class Object;
+namespace x10 { namespace compiler { 
+class NonEscaping;
 } } 
 #include <PriorityQueue.struct_h>
 
@@ -41,7 +37,10 @@ template<class FMGL(T)> class PriorityQueue_methods  {
     static void _instance_init(PriorityQueue<FMGL(T)>& this_);
     
     static void _constructor(PriorityQueue<FMGL(T)>& this_) {
-
+        {
+         
+        }
+        
     }
     inline static PriorityQueue<FMGL(T)> _make() {
         PriorityQueue<FMGL(T)> this_; 
@@ -51,7 +50,9 @@ template<class FMGL(T)> class PriorityQueue_methods  {
     
     static void _constructor(PriorityQueue<FMGL(T)>& this_, PriorityQueue<FMGL(T)> x)
     {
-      this_.__priority_queue = x.__priority_queue;
+        {
+         
+        }
         
     }
     inline static PriorityQueue<FMGL(T)> _make(
@@ -112,10 +113,9 @@ template<class FMGL(T)> class PriorityQueue;
 #include <x10/lang/Boolean.h>
 #include <x10/lang/Int.h>
 #include <x10/lang/NullPointerException.h>
-#include <x10/lang/Place.h>
-#include <x10/compiler/Native.h>
 #include <x10/lang/String.h>
-#include <x10/lang/Object.h>
+#include <x10/compiler/Native.h>
+#include <x10/compiler/NonEscaping.h>
 #ifndef PRIORITYQUEUE_H_GENERICS
 #define PRIORITYQUEUE_H_GENERICS
 #endif // PRIORITYQUEUE_H_GENERICS
@@ -129,20 +129,11 @@ template<class FMGL(T)> class PriorityQueue;
 template<class FMGL(T)> class PriorityQueue_ithunk0 : public PriorityQueue<FMGL(T)> {
 public:
     static x10::lang::Any::itable<PriorityQueue_ithunk0<FMGL(T)> > itable;
-    x10_boolean at(x10aux::ref<x10::lang::Object> arg0) {
-        return (x10aux::get_location(*this) == (arg0)->location);
-    }
-    x10_boolean at(x10::lang::Place arg0) {
-        return (x10aux::get_location(*this) == (arg0)->FMGL(id));
-    }
     x10_boolean equals(x10aux::ref<x10::lang::Any> arg0) {
         return PriorityQueue_methods<FMGL(T)>::equals(*this, arg0);
     }
     x10_int hashCode() {
         return PriorityQueue_methods<FMGL(T)>::hashCode(*this);
-    }
-    x10::lang::Place home() {
-        return x10::lang::Place_methods::place(x10aux::get_location(*this));
     }
     x10aux::ref<x10::lang::String> toString() {
         return PriorityQueue_methods<FMGL(T)>::toString(*this);
@@ -152,24 +143,15 @@ public:
     }
     
 };
-template<class FMGL(T)> x10::lang::Any::itable<PriorityQueue_ithunk0<FMGL(T)> >  PriorityQueue_ithunk0<FMGL(T)>::itable(&PriorityQueue_ithunk0<FMGL(T)>::at, &PriorityQueue_ithunk0<FMGL(T)>::at, &PriorityQueue_ithunk0<FMGL(T)>::equals, &PriorityQueue_ithunk0<FMGL(T)>::hashCode, &PriorityQueue_ithunk0<FMGL(T)>::home, &PriorityQueue_ithunk0<FMGL(T)>::toString, &PriorityQueue_ithunk0<FMGL(T)>::typeName);
+template<class FMGL(T)> x10::lang::Any::itable<PriorityQueue_ithunk0<FMGL(T)> >  PriorityQueue_ithunk0<FMGL(T)>::itable(&PriorityQueue_ithunk0<FMGL(T)>::equals, &PriorityQueue_ithunk0<FMGL(T)>::hashCode, &PriorityQueue_ithunk0<FMGL(T)>::toString, &PriorityQueue_ithunk0<FMGL(T)>::typeName);
 template<class FMGL(T)> class PriorityQueue_iboxithunk0 : public x10::lang::IBox<PriorityQueue<FMGL(T)> > {
 public:
     static x10::lang::Any::itable<PriorityQueue_iboxithunk0<FMGL(T)> > itable;
-    x10_boolean at(x10aux::ref<x10::lang::Object> arg0) {
-        return (x10aux::get_location(this->value) == (arg0)->location);
-    }
-    x10_boolean at(x10::lang::Place arg0) {
-        return (x10aux::get_location(this->value) == (arg0)->FMGL(id));
-    }
     x10_boolean equals(x10aux::ref<x10::lang::Any> arg0) {
         return PriorityQueue_methods<FMGL(T)>::equals(this->value, arg0);
     }
     x10_int hashCode() {
         return PriorityQueue_methods<FMGL(T)>::hashCode(this->value);
-    }
-    x10::lang::Place home() {
-        return x10::lang::Place_methods::place(x10aux::get_location(this->value));
     }
     x10aux::ref<x10::lang::String> toString() {
         return PriorityQueue_methods<FMGL(T)>::toString(this->value);
@@ -179,7 +161,7 @@ public:
     }
     
 };
-template<class FMGL(T)> x10::lang::Any::itable<PriorityQueue_iboxithunk0<FMGL(T)> >  PriorityQueue_iboxithunk0<FMGL(T)>::itable(&PriorityQueue_iboxithunk0<FMGL(T)>::at, &PriorityQueue_iboxithunk0<FMGL(T)>::at, &PriorityQueue_iboxithunk0<FMGL(T)>::equals, &PriorityQueue_iboxithunk0<FMGL(T)>::hashCode, &PriorityQueue_iboxithunk0<FMGL(T)>::home, &PriorityQueue_iboxithunk0<FMGL(T)>::toString, &PriorityQueue_iboxithunk0<FMGL(T)>::typeName);
+template<class FMGL(T)> x10::lang::Any::itable<PriorityQueue_iboxithunk0<FMGL(T)> >  PriorityQueue_iboxithunk0<FMGL(T)>::itable(&PriorityQueue_iboxithunk0<FMGL(T)>::equals, &PriorityQueue_iboxithunk0<FMGL(T)>::hashCode, &PriorityQueue_iboxithunk0<FMGL(T)>::toString, &PriorityQueue_iboxithunk0<FMGL(T)>::typeName);
 template<class FMGL(T)> x10aux::itable_entry PriorityQueue<FMGL(T)>::_itables[2] = {x10aux::itable_entry(&x10aux::getRTT<x10::lang::Any>, &PriorityQueue_ithunk0<FMGL(T)>::itable), x10aux::itable_entry(NULL, (void*)x10aux::getRTT<PriorityQueue<FMGL(T)> >())};
 template<class FMGL(T)> x10aux::itable_entry PriorityQueue<FMGL(T)>::_iboxitables[2] = {x10aux::itable_entry(&x10aux::getRTT<x10::lang::Any>, &PriorityQueue_iboxithunk0<FMGL(T)>::itable), x10aux::itable_entry(NULL, (void*)x10aux::getRTT<PriorityQueue<FMGL(T)> >())};
 template<class FMGL(T)> void PriorityQueue_methods<FMGL(T)>::_instance_init(PriorityQueue<FMGL(T)>& this_) {
@@ -188,125 +170,119 @@ template<class FMGL(T)> void PriorityQueue_methods<FMGL(T)>::_instance_init(Prio
 }
 
 
-//#line 11 "/Users/pkambadu/Projects/BC/src/PriorityQueue.x10": x10.ast.X10ConstructorDecl_c
+//#line 12 "/Users/pkambadu/Projects/BC/src/PriorityQueue.x10": x10.ast.X10ConstructorDecl_c
 
 
-//#line 14 "/Users/pkambadu/Projects/BC/src/PriorityQueue.x10": x10.ast.X10ConstructorDecl_c
+//#line 15 "/Users/pkambadu/Projects/BC/src/PriorityQueue.x10": x10.ast.X10ConstructorDecl_c
 
 
-//#line 22 "/Users/pkambadu/Projects/BC/src/PriorityQueue.x10": x10.ast.X10MethodDecl_c
+//#line 23 "/Users/pkambadu/Projects/BC/src/PriorityQueue.x10": x10.ast.X10MethodDecl_c
 template<class FMGL(T)> x10_boolean PriorityQueue_methods<FMGL(T)>::empty(
   PriorityQueue<FMGL(T)> this_) {
     
-    //#line 22 "/Users/pkambadu/Projects/BC/src/PriorityQueue.x10": x10.ast.X10Return_c
+    //#line 23 "/Users/pkambadu/Projects/BC/src/PriorityQueue.x10": x10.ast.X10Return_c
     return false;
+    
 }
 
-//#line 26 "/Users/pkambadu/Projects/BC/src/PriorityQueue.x10": x10.ast.X10MethodDecl_c
+//#line 27 "/Users/pkambadu/Projects/BC/src/PriorityQueue.x10": x10.ast.X10MethodDecl_c
 template<class FMGL(T)> x10_int PriorityQueue_methods<FMGL(T)>::size(PriorityQueue<FMGL(T)> this_) {
     
-    //#line 26 "/Users/pkambadu/Projects/BC/src/PriorityQueue.x10": x10.ast.X10Return_c
-    return 0;
+    //#line 27 "/Users/pkambadu/Projects/BC/src/PriorityQueue.x10": x10.ast.X10Return_c
+    return ((x10_int)0);
+    
 }
 
-//#line 30 "/Users/pkambadu/Projects/BC/src/PriorityQueue.x10": x10.ast.X10MethodDecl_c
+//#line 31 "/Users/pkambadu/Projects/BC/src/PriorityQueue.x10": x10.ast.X10MethodDecl_c
 template<class FMGL(T)> FMGL(T) PriorityQueue_methods<FMGL(T)>::top(PriorityQueue<FMGL(T)> this_) {
     
-    //#line 30 "/Users/pkambadu/Projects/BC/src/PriorityQueue.x10": polyglot.ast.Throw_c
-  return NULL;
+    //#line 31 "/Users/pkambadu/Projects/BC/src/PriorityQueue.x10": polyglot.ast.Throw_c
+    x10aux::throwException(x10aux::nullCheck(x10::lang::NullPointerException::_make()));
 }
 
-//#line 34 "/Users/pkambadu/Projects/BC/src/PriorityQueue.x10": x10.ast.X10MethodDecl_c
+//#line 35 "/Users/pkambadu/Projects/BC/src/PriorityQueue.x10": x10.ast.X10MethodDecl_c
 template<class FMGL(T)> void PriorityQueue_methods<FMGL(T)>::push(PriorityQueue<FMGL(T)> this_, FMGL(T) element) {
-  return;
+ 
 }
 
-//#line 38 "/Users/pkambadu/Projects/BC/src/PriorityQueue.x10": x10.ast.X10MethodDecl_c
+//#line 39 "/Users/pkambadu/Projects/BC/src/PriorityQueue.x10": x10.ast.X10MethodDecl_c
 template<class FMGL(T)> void PriorityQueue_methods<FMGL(T)>::pop(PriorityQueue<FMGL(T)> this_) {
-  /** Instrumentation BEGIN */
-  this_.__priority_queue.pop(); 
-  /** Instrumentation END */
+ 
 }
 
-//#line 9 "/Users/pkambadu/Projects/BC/src/PriorityQueue.x10": x10.ast.X10MethodDecl_c
+//#line 10 "/Users/pkambadu/Projects/BC/src/PriorityQueue.x10": x10.ast.X10MethodDecl_c
 
-//#line 9 "/Users/pkambadu/Projects/BC/src/PriorityQueue.x10": x10.ast.X10MethodDecl_c
-
-//#line 9 "/Users/pkambadu/Projects/BC/src/PriorityQueue.x10": x10.ast.X10MethodDecl_c
-
-//#line 9 "/Users/pkambadu/Projects/BC/src/PriorityQueue.x10": x10.ast.X10MethodDecl_c
-
-//#line 9 "/Users/pkambadu/Projects/BC/src/PriorityQueue.x10": x10.ast.X10MethodDecl_c
+//#line 10 "/Users/pkambadu/Projects/BC/src/PriorityQueue.x10": x10.ast.X10MethodDecl_c
 template<class FMGL(T)> x10aux::ref<x10::lang::String> PriorityQueue_methods<FMGL(T)>::toString(
   PriorityQueue<FMGL(T)> this_) {
     
-    //#line 9 "/Users/pkambadu/Projects/BC/src/PriorityQueue.x10": x10.ast.X10Return_c
-    return x10::lang::String::Lit("struct PriorityQueue");
+    //#line 10 "/Users/pkambadu/Projects/BC/src/PriorityQueue.x10": x10.ast.X10Return_c
+    return x10aux::string_utils::lit("struct PriorityQueue");
     
 }
 
-//#line 9 "/Users/pkambadu/Projects/BC/src/PriorityQueue.x10": x10.ast.X10MethodDecl_c
+//#line 10 "/Users/pkambadu/Projects/BC/src/PriorityQueue.x10": x10.ast.X10MethodDecl_c
 template<class FMGL(T)> x10_int PriorityQueue_methods<FMGL(T)>::hashCode(
   PriorityQueue<FMGL(T)> this_) {
     
-    //#line 9 "/Users/pkambadu/Projects/BC/src/PriorityQueue.x10": x10.ast.X10LocalDecl_c
+    //#line 10 "/Users/pkambadu/Projects/BC/src/PriorityQueue.x10": x10.ast.X10LocalDecl_c
     x10_int result = ((x10_int)0);
     
-    //#line 9 "/Users/pkambadu/Projects/BC/src/PriorityQueue.x10": x10.ast.X10Return_c
+    //#line 10 "/Users/pkambadu/Projects/BC/src/PriorityQueue.x10": x10.ast.X10Return_c
     return result;
     
 }
 
-//#line 9 "/Users/pkambadu/Projects/BC/src/PriorityQueue.x10": x10.ast.X10MethodDecl_c
+//#line 10 "/Users/pkambadu/Projects/BC/src/PriorityQueue.x10": x10.ast.X10MethodDecl_c
 template<class FMGL(T)> x10_boolean PriorityQueue_methods<FMGL(T)>::equals(
   PriorityQueue<FMGL(T)> this_, x10aux::ref<x10::lang::Any> other) {
     
-    //#line 9 "/Users/pkambadu/Projects/BC/src/PriorityQueue.x10": x10.ast.X10If_c
+    //#line 10 "/Users/pkambadu/Projects/BC/src/PriorityQueue.x10": x10.ast.X10If_c
     if ((!(x10aux::instanceof<PriorityQueue<FMGL(T)> >(other)))) {
         
-        //#line 9 "/Users/pkambadu/Projects/BC/src/PriorityQueue.x10": x10.ast.X10Return_c
+        //#line 10 "/Users/pkambadu/Projects/BC/src/PriorityQueue.x10": x10.ast.X10Return_c
         return false;
         
     }
     
-    //#line 9 "/Users/pkambadu/Projects/BC/src/PriorityQueue.x10": x10.ast.X10Return_c
+    //#line 10 "/Users/pkambadu/Projects/BC/src/PriorityQueue.x10": x10.ast.X10Return_c
     return PriorityQueue_methods<FMGL(T)>::equals(this_, x10aux::class_cast<PriorityQueue<FMGL(T)> >(other));
     
 }
 
-//#line 9 "/Users/pkambadu/Projects/BC/src/PriorityQueue.x10": x10.ast.X10MethodDecl_c
+//#line 10 "/Users/pkambadu/Projects/BC/src/PriorityQueue.x10": x10.ast.X10MethodDecl_c
 template<class FMGL(T)> x10_boolean PriorityQueue_methods<FMGL(T)>::equals(
   PriorityQueue<FMGL(T)> this_, PriorityQueue<FMGL(T)> other) {
     
-    //#line 9 "/Users/pkambadu/Projects/BC/src/PriorityQueue.x10": x10.ast.X10Return_c
+    //#line 10 "/Users/pkambadu/Projects/BC/src/PriorityQueue.x10": x10.ast.X10Return_c
     return true;
     
 }
 
-//#line 9 "/Users/pkambadu/Projects/BC/src/PriorityQueue.x10": x10.ast.X10MethodDecl_c
+//#line 10 "/Users/pkambadu/Projects/BC/src/PriorityQueue.x10": x10.ast.X10MethodDecl_c
 template<class FMGL(T)> x10_boolean PriorityQueue_methods<FMGL(T)>::_struct_equals(
   PriorityQueue<FMGL(T)> this_, x10aux::ref<x10::lang::Any> other) {
     
-    //#line 9 "/Users/pkambadu/Projects/BC/src/PriorityQueue.x10": x10.ast.X10If_c
+    //#line 10 "/Users/pkambadu/Projects/BC/src/PriorityQueue.x10": x10.ast.X10If_c
     if ((!(x10aux::instanceof<PriorityQueue<FMGL(T)> >(other))))
     {
         
-        //#line 9 "/Users/pkambadu/Projects/BC/src/PriorityQueue.x10": x10.ast.X10Return_c
+        //#line 10 "/Users/pkambadu/Projects/BC/src/PriorityQueue.x10": x10.ast.X10Return_c
         return false;
         
     }
     
-    //#line 9 "/Users/pkambadu/Projects/BC/src/PriorityQueue.x10": x10.ast.X10Return_c
+    //#line 10 "/Users/pkambadu/Projects/BC/src/PriorityQueue.x10": x10.ast.X10Return_c
     return PriorityQueue_methods<FMGL(T)>::_struct_equals(this_, 
              x10aux::class_cast<PriorityQueue<FMGL(T)> >(other));
     
 }
 
-//#line 9 "/Users/pkambadu/Projects/BC/src/PriorityQueue.x10": x10.ast.X10MethodDecl_c
+//#line 10 "/Users/pkambadu/Projects/BC/src/PriorityQueue.x10": x10.ast.X10MethodDecl_c
 template<class FMGL(T)> x10_boolean PriorityQueue_methods<FMGL(T)>::_struct_equals(
   PriorityQueue<FMGL(T)> this_, PriorityQueue<FMGL(T)> other) {
     
-    //#line 9 "/Users/pkambadu/Projects/BC/src/PriorityQueue.x10": x10.ast.X10Return_c
+    //#line 10 "/Users/pkambadu/Projects/BC/src/PriorityQueue.x10": x10.ast.X10Return_c
     return true;
     
 }
