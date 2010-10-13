@@ -8,7 +8,7 @@ all: lu-opt lu-dbg
 
 lu-opt: $(SRCS) $(NATIVES)
 	${MKDIR} opt-gen/${PACKAGE}
-	${X10CXX} -O -NO_CHECKS -d opt-gen ${X10CXXFLAGS} ${SRCS} -post '# ${POSTCOMPILE_CXXFLAGS} ${POSTCOMPILE_OPTFLAGS} # # ${POSTCOMPILE_LDFLAGS} ${BLAS_LIB}' -o $@
+	${X10CXX} -STATIC_CALLS -O -NO_CHECKS -d opt-gen ${X10CXXFLAGS} ${SRCS} -post '# ${POSTCOMPILE_CXXFLAGS} ${POSTCOMPILE_OPTFLAGS} # # ${POSTCOMPILE_LDFLAGS} ${BLAS_LIB}' -o $@
 ifeq ($(USE_MEDIUM_PAGES), 1)
 ifeq ($(shell uname -s), AIX)
 	ldedit -bnolpdata $@

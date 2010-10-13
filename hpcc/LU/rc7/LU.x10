@@ -46,7 +46,7 @@ class LU {
     val colBuffer:Array[Double];
     val colBuffers:Array[Array[Double]](1);
     val rowBuffers:Array[Array[Double]](1);
-    val buffer:Array[Double];
+    val buffer:Array[Double](1);
     val buffers:PlaceLocalHandle[Array[Double](1)];
 
     def computeRowSum() {
