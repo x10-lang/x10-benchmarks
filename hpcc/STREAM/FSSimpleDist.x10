@@ -27,7 +27,7 @@ public class FSSimpleDist {
 
                 val p = pp;
                 
-                async at(Place.places(p)) {
+                async at(Place.place(p)) {
                     val a = Rail.make[double](localSize);
                     val b = Rail.make[double](localSize);
                     val c = Rail.make[double](localSize);
@@ -56,8 +56,7 @@ public class FSSimpleDist {
                     // verification
                     for (var i:int=0; i<localSize; i++)
                         if (a(i) != b(i) + alpha*c(i)) 
-                            async at(verified)
-                                verified(false);
+                            verified.set(false);
                 }
             }
         }
