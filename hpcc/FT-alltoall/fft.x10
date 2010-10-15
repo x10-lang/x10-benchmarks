@@ -15,20 +15,20 @@ import x10.util.Team;
 @NativeCPPCompilationUnit("zfft1d.c")
 @NativeCPPCompilationUnit("ft_natives.cc")
 class fft {
-    @Native("c++", "execute_plan(#1, (double *) (#2)->raw(), (double *) (#3)->raw(), #4, #5, #6)")
-    native static def execute_plan(plan:Long, A:Rail[Double], B:Rail[Double], SQRTN:Int, i0:Int, i1:Int):Void;
+    @Native("c++", "execute_plan(#1, &(#2)->raw()[0], &(#3)->raw()[0], #4, #5, #6)")
+    native static def execute_plan(plan:Long, A:Array[Double](1), B:Array[Double](1), SQRTN:Int, i0:Int, i1:Int):Void;
 
     @Native("c++", "create_plan(#1, #2, #3)")
     native static def create_plan(SQRTN:Int, direction:Int, flags:Int):Long;
 
-    const unique = Dist.makeUnique();
+    static unique = Dist.makeUnique();
 
     static class Block {
-        val A:Rail[Double];
-        val B:Rail[Double];
-        val C:Rail[Double];
-        val Cs:PlaceLocalHandle[Rail[Double]];
-        val D:Rail[Double];
+        val A:Array[Double](1);
+        val B:Array[Double](1);
+        val C:Array[Double](1);
+        val Cs:PlaceLocalHandle[Array[Double](1)];
+        val D:Array[Double](1);
         val I:Int;
         val nRows:Int;
         val SQRTN:Int;
@@ -38,13 +38,13 @@ class fft {
         var nCopy:Int;
         var alltoall_timer:Long = 0;
  
-        def this(I:Int, nRows:Int, localSize:Int, N:Long, SQRTN:Int, verify:Boolean, Cs:PlaceLocalHandle[Rail[Double]]) {
+        def this(I:Int, nRows:Int, localSize:Int, N:Long, SQRTN:Int, verify:Boolean, Cs:PlaceLocalHandle[Array[Double](1)]) {
             this.I = I; this.nRows = nRows; this.N = N; this.SQRTN = SQRTN; this.Cs = Cs;
-            A = Rail.make[Double](localSize);
-            B = Rail.make[Double](localSize);
+            A = new Array[Double](localSize);
+            B = new Array[Double](localSize);
             //C = Rail.make[Double](localSize);
              C = Cs();
-            D = verify ? Rail.make[Double](localSize) : null;
+            D = verify ? new Array[Double](localSize) : null;
             fftwPlan = create_plan(SQRTN, -1, 0);
             fftwInversePlan = create_plan(SQRTN, 1, 0);
             nCopy = 0;
@@ -63,10 +63,10 @@ class fft {
             }
         }
 
-        static def make(I:Int, nRows:Int, localSize:Int, N:Long, SQRTN:Int, verify:Boolean, Cs:PlaceLocalHandle[Rail[Double]]):Block {
+        static def make(I:Int, nRows:Int, localSize:Int, N:Long, SQRTN:Int, verify:Boolean, Cs:PlaceLocalHandle[Array[Double](1)]):Block {
             val block = new Block(I, nRows, localSize, N, SQRTN, verify, Cs);
             block.init(localSize, verify);
-            /* finish */ ateach ((p) in unique) {} // initialize transport
+            /* finish */ ateach (p in unique) {} // initialize transport
             return block;
         }
 
@@ -95,7 +95,7 @@ class fft {
         def check() {
             val epsilon = 1.0e-15;
             val threshold = epsilon*Math.log(N as double)/Math.log(2.0)*16;
-            for (var q:Int=0; q<A.length; ++q) {
+            for (var q:Int=0; q<A.size; ++q) {
                 if (Math.abs(A(q)-D(q)) > threshold) Console.ERR.println("Error at "+q+" "+A(q).toString()+" "+D(q).toString());
             }
             Team.WORLD.barrier(here.id);
@@ -180,7 +180,7 @@ class fft {
     static def format(t:Long) = (t as Double) * 1.0e-9;
 
     static def compute(FFT:PlaceLocalHandle[Block], fwd:Boolean, N:Long) {
-        val timers = Rail.make[Long](7);
+        val timers = new Array[Long](7);
         timers(0)=System.nanoTime(); transpose_A(FFT);
         timers(1)=System.nanoTime(); rowFFTS_A(FFT, fwd);
         timers(2)=System.nanoTime(); transpose_A(FFT);
@@ -194,7 +194,7 @@ class fft {
         val Gigaflops = 1.0e-9*N*5*Math.log(N as double)/Math.log(2.0)/secs;
         if (here.id ==0) Console.OUT.println("execution time=" + secs + " secs" + " Gigaflops=" + Gigaflops);
         val steps = ["transpose1", "row_ffts1", "transpose2", "twiddle", "row_ffts2", "transpose3"];
-        if (here.id==0) for (var i:Int = 0; i < steps.length; ++i) {
+        if (here.id==0) for (var i:Int = 0; i < steps.size; ++i) {
             Console.OUT.println("Step " + steps(i) + " took " + format(timers(i+1) - timers(i)) + " s");
         }
         
@@ -205,9 +205,9 @@ class fft {
         /* finish  ateach ((p) in unique)*/ FFT().check();
     }
     
-    public static def main(args:Rail[String]) {
-        val M = (args.length > 0) ? Int.parseInt(args(0)) : 10;
-        val verify = (args.length > 1) ? Boolean.parseBoolean(args(1)) : true;
+    public static def main(args:Array[String](1)) {
+        val M = (args.size > 0) ? Int.parseInt(args(0)) : 10;
+        val verify = (args.size > 1) ? Boolean.parseBoolean(args(1)) : true;
         val SQRTN = 1 << M;
         val N = (SQRTN as Long) * (SQRTN as Long);
         val nRows = SQRTN / Place.MAX_PLACES;
@@ -224,31 +224,31 @@ class fft {
         }
 
         // Initialization
-        val Cs = PlaceLocalHandle.make[Rail[Double]](unique, ()=>Rail.make[Double](localSize));
+        val Cs = PlaceLocalHandle.make[Array[Double](1)](unique, ()=>new Array[Double](localSize));
         val FFT = PlaceLocalHandle.make[Block](unique, ()=>Block.make(here.id, nRows, localSize, N, SQRTN, verify, Cs));
 
-        finish ateach ((p) in unique) {
+        finish ateach (p in unique) {
             // FFT
-            if (p==0) Console.OUT.println("Start FFT");
+            if (unique(p).id==0) Console.OUT.println("Start FFT");
             var secs:Double = compute(FFT, true, N);
-            if (p==0) Console.OUT.println("alltoall: " + FFT().alltoall_timer/1e9 + " s");
-            if (p==0) Console.OUT.println("FFT complete");
+            if (unique(p).id==0) Console.OUT.println("alltoall: " + FFT().alltoall_timer/1e9 + " s");
+            if (unique(p).id==0) Console.OUT.println("FFT complete");
 
             // Reverse FFT
-            if (p==0) Console.OUT.println("Start reverse FFT");
+            if (unique(p).id==0) Console.OUT.println("Start reverse FFT");
             secs += compute(FFT, false, N);
-            if (p==0) Console.OUT.println("Reverse FFT complete");
+            if (unique(p).id==0) Console.OUT.println("Reverse FFT complete");
 
             // Output
-            if (p==0) Console.OUT.println("Now combining forward and inverse FTT measurements");
+            if (unique(p).id==0) Console.OUT.println("Now combining forward and inverse FTT measurements");
             val Gigaflops = 2.0e-9*N*5*Math.log(N as double)/Math.log(2.0)/secs;
-            if (p==0) Console.OUT.println("execution time=" + secs + " secs"+" Gigaflops="+Gigaflops);
+            if (unique(p).id==0) Console.OUT.println("execution time=" + secs + " secs"+" Gigaflops="+Gigaflops);
 
             // Verification
             if (verify) {        
-                if (p == 0) Console.OUT.println("Start verification");
+                if (unique(p).id == 0) Console.OUT.println("Start verification");
                 check(FFT);
-                if (p == 0) Console.OUT.println("Verification complete");
+                if (unique(p).id == 0) Console.OUT.println("Verification complete");
             }
         }
     }
