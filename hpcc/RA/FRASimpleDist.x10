@@ -8,7 +8,7 @@ class LocalTable {
 
     def this(size:int) {
         mask = size-1;
-        a = new Array[long](size, (p:Point(1))=>p(0) as long);
+        a = new Array[long](size, (i:int)=>i as long);
     }
     public def update(ran:long) {
         val index = (ran&mask) as int;
@@ -53,7 +53,7 @@ class FRASimpleDist {
         val local_updates = numUpdates / Place.MAX_PLACES;
         finish for (var p:int=0; p<Place.MAX_PLACES; p++) {
             val valp = p;
-            at (Place.places(p)) async {
+            at (Place.place(p)) async {
                 var ran:long = HPCC_starts(valp*(numUpdates/Place.MAX_PLACES));
                 val size = logLocalTableSize;
                 val mask1 = mask;
@@ -65,7 +65,7 @@ class FRASimpleDist {
                     val ran2 = ran;
 
                     //val dest = Place(place_id);
-                    @Immediate async at(Place.places(place_id)) {
+                    @Immediate async at(Place.place(place_id)) {
                         gtable().update(ran2);
                     } 
 
@@ -146,12 +146,12 @@ class FRASimpleDist {
         // print statistics
         val GUPs = (cpuTime > 0.0 ? 1.0 / cpuTime : -1.0) * numUpdates / 1e9;
         Console.OUT.println("CPU time used: "+cpuTime+" seconds");
-        Console.OUT.println(GUPs+" Billion(10^9) Updates per second (GUP/s)");
+        Console.OUT.println(""+GUPs+" Billion(10^9) Updates per second (GUP/s)");
 
         // repeat for testing.
         runBenchmark(gtable, logLocalTableSize, numUpdates);
         for (var i:int=0; i<Place.MAX_PLACES; i++) {
-            at(Place.places(i)) async {
+            at(Place.place(i)) async {
                 var err:int = 0;
                 val table = gtable();
                 for ([j] in table.a)
