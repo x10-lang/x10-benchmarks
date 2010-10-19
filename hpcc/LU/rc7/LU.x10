@@ -98,7 +98,7 @@ class LU {
         val _A = A;
         
         finish{
-        	at (Place(dest)){
+        	async at (Place(dest)){
         		finish{
         			Array.asyncCopy[Double](remoteBuffer, 0, _buffers(), 0, size);
         		}
@@ -278,7 +278,7 @@ class LU {
             val remoteRowBuffer = new RemoteArray(rowBuffer);
             val _B = B;
 	    	finish{
-				at(Place(A_here.placeOfBlock(I, J))){
+				async at(Place(A_here.placeOfBlock(I, J))){
 					Array.asyncCopy(_A().block(I, J).raw, 0, remoteRowBuffer, 0, _B * _B);
 				}
 	    	}
