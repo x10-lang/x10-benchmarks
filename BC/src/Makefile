@@ -43,7 +43,8 @@ X10CXXFLAGS=-report \
             -O  
 
 X10_STRUCTS=AdjacencyGraph.x10 \
-            Rmat.x10 
+            Rmat.x10 \
+            NetReader.x10
 X10_STRUCTS_CC=$(X10_STRUCTS:.x10=.cc)
 X10_STRUCTS_H=$(X10_STRUCTS:.x10=.h)
 X10_STRUCTS_STRUCTS_H=$(X10_STRUCTS:.x10=.struct_h)

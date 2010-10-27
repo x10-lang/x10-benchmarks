@@ -105,35 +105,55 @@ public final class Brandes {
                         Option("a", "", "Probability a"),
                         Option("b", "", "Probability b"),
                         Option("c", "", "Probability c"),
-                        Option("d", "", "Probability d")]);
+                        Option("f", "", "Graph file name"),
+                        Option("d", "", "Probability d"),
+                        Option("f", "", "Graph file name"),
+                        Option("t", "", "File type: 0: NWB, 1:NET"),
+                        Option("i", "", "Starting index of vertices")]);
+
       val seed:Long = cmdLineParams ("-s", 2);
       val n:Int = cmdLineParams ("-n", 2);
       val a:Double = cmdLineParams ("-a", 0.55);
       val b:Double = cmdLineParams ("-b", 0.1);
       val c:Double = cmdLineParams ("-c", 0.1);
       val d:Double = cmdLineParams ("-d", 0.25);
-
-      Console.OUT.println ("Running SSCA2 with the following parameters:");
-      Console.OUT.println ("seed = " + seed);
-      Console.OUT.println ("N = " + Math.pow(2, n) as Int);
-      Console.OUT.println ("a = " + a);
-      Console.OUT.println ("b = " + b);
-      Console.OUT.println ("c = " + c);
-      Console.OUT.println ("d = " + d);
-
+      val fileName:String = cmdLineParams ("-f", "NOFILE");
+      val fileType:Int = cmdLineParams ("-t", 0);
+      val startIndex:Int = cmdLineParams ("-i", 0);
 
       val numPlaces = Place.MAX_PLACES;
 
-      val recursiveMatrixGenerator = Rmat (seed, n, a, b, c, d);
-      val graph = recursiveMatrixGenerator.generate ();
+      Console.OUT.println ("Running SSCA2 with the following parameters:");
+      if (0 == fileName.compareTo("NOFILE")) {
+        Console.OUT.println ("seed = " + seed);
+        Console.OUT.println ("N = " + Math.pow(2, n) as Int);
+        Console.OUT.println ("a = " + a);
+        Console.OUT.println ("b = " + b);
+        Console.OUT.println ("c = " + c);
+        Console.OUT.println ("d = " + d);
 
-      Console.OUT.println (graph);
+        val recursiveMatrixGenerator = Rmat (seed, n, a, b, c, d);
+        val graph = recursiveMatrixGenerator.generate ();
+        Console.OUT.println (graph);
+        val betweennessMap = Brandes.sequentialBrandes (graph);
 
-      val betweennessMap = Brandes.sequentialBrandes (graph);
+        for (vertex in betweennessMap.keySet()) {
+          Console.OUT.println ("" + vertex + " = " + 
+                               betweennessMap.get (vertex).value());
+        }
+      } else {
+        Console.OUT.println ("f = " + fileName);
+        Console.OUT.println ("t = " + fileType);
+        Console.OUT.println ("i = " + startIndex);
 
-      for (vertex in betweennessMap.keySet()) {
-        Console.OUT.println ("" + vertex + " = " + 
-                             betweennessMap.get (vertex).value());
+        val graph = NetReader.readNetFile (fileName, startIndex);
+        val betweennessMap = Brandes.sequentialBrandes (graph);
+        Console.OUT.println (graph);
+
+        for (vertex in betweennessMap.keySet()) {
+          Console.OUT.println ("" + vertex + " = " + 
+                               betweennessMap.get (vertex).value());
+        }
       }
     } catch (e:Throwable) {
       e.printStackTrace(Console.ERR);

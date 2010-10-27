@@ -1,5 +1,9 @@
 import x10.util.HashMap;
 
+/*
+ * A class that represents an AdjacencyList. Note that this is a simple class 
+ * and hardcodes vertices to be numbered from 0 through N-1.
+ */
 public final struct AdjacencyGraph [VertexType] {
   private val N:Int;
   private val adjacencyList:HashMap[VertexType, 
