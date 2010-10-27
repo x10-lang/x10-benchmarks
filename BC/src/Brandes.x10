@@ -11,7 +11,7 @@ import x10.io.Printer;
 
 public final class Brandes {
   public static type VertexType = Int;
-  public static type Precision = Float;
+  public static type PrecisionType = Float;
 
   private static val makeNonIncreasingComparator = 
     (distanceMap:HashMap[Int, Int]) => { return (x:Int, y:Int) => {
@@ -26,9 +26,9 @@ public final class Brandes {
    * parallel, so we cover it with an atomic.
    */
   private static def updateBetweenness
-               (betweennessMap:HashMap[Brandes.VertexType, Brandes.Precision],
-                vertex:Brandes.VertexType,
-                newVal:Brandes.Precision) {
+          (betweennessMap:HashMap[Brandes.VertexType, Brandes.PrecisionType],
+           vertex:Brandes.VertexType,
+           newVal:Brandes.PrecisionType) {
     atomic betweennessMap.put (vertex, newVal);
   }
 
@@ -38,9 +38,9 @@ public final class Brandes {
    * betweenness for all the vertices based on this calculation.
    */
   public static def dijkstraShortestPaths 
-              (graph:AdjacencyGraph [Brandes.VertexType],
-               betweennessMap:HashMap[Brandes.VertexType, Brandes.Precision],
-               s:Brandes.VertexType) {
+          (graph:AdjacencyGraph [Brandes.VertexType],
+           betweennessMap:HashMap[Brandes.VertexType, Brandes.PrecisionType],
+           s:Brandes.VertexType) {
     val N = graph.numVertices ();
     val vertexStack = new Stack[Brandes.VertexType] ();
     val predecessorMap = 
@@ -82,17 +82,17 @@ public final class Brandes {
       }
     } // while priorityQueue not empty
 
-    val deltaMap = new HashMap [Brandes.VertexType, Brandes.Precision] ();
+    val deltaMap = new HashMap [Brandes.VertexType, Brandes.PrecisionType] ();
     for (var vertex:Int=0; vertex<N; ++vertex) 
-      deltaMap.put (vertex, 0.0 as Brandes.Precision);
+      deltaMap.put (vertex, 0.0 as Brandes.PrecisionType);
 
     // Return vertices in order of non-increasing distances from "s"
     while (!vertexStack.isEmpty()) {
       val w = vertexStack.pop ();
       for (v in (predecessorMap.get (w)).value()) {
         val deltaUpdate = deltaMap.get (v).value () +
-                          ((sigmaMap.get (v).value() as Brandes.Precision / 
-                            sigmaMap.get (w).value() as Brandes.Precision) * 
+                          ((sigmaMap.get (v).value() as Brandes.PrecisionType/ 
+                            sigmaMap.get (w).value() as Brandes.PrecisionType)* 
                           (1 + deltaMap.get (w).value()));
         deltaMap.put (v, deltaUpdate);
       }
@@ -111,9 +111,9 @@ public final class Brandes {
 
     // Remember that the vertices are numbered from (0, N], where N=(2^n).
     val N = graph.numVertices ();
-    val betweennessMap = new HashMap[Brandes.VertexType, Brandes.Precision] ();
+    val betweennessMap = new HashMap[Brandes.VertexType, Brandes.PrecisionType] ();
     for (var vertex:Int=0; vertex<N; ++vertex) 
-      betweennessMap.put (vertex, 0.0 as Brandes.Precision);
+      betweennessMap.put (vertex, 0.0 as Brandes.PrecisionType);
 
     // So, to iterate over all the vertices, we can iterate over (0, N].
     finish {
