@@ -6,6 +6,8 @@ import x10.util.Set;
 import x10.util.OptionsParser;
 import x10.util.Option;
 import x10.lang.Math;
+import x10.io.File;
+import x10.io.Printer;
 
 public final class Brandes {
   public static type VertexType = Int;
@@ -128,15 +130,16 @@ public final class Brandes {
    * Calls betweeness, prints out the statistics and what not.
    */
   private static def crunchNumbers 
-             (graph:AdjacencyGraph [Brandes.VertexType]) {
+             (graph:AdjacencyGraph [Brandes.VertexType],
+              printer:Printer) {
      var time:Long = System.nanoTime();
      val betweennessMap = Brandes.brandesBetweenness (graph);
      time = System.nanoTime() - time;
-     Console.OUT.println ("Betweenness calculation took " + 
+     printer.println ("Betweenness calculation took " + 
                           time/1E9 + " seconds");
 
      for (vertex in betweennessMap.keySet()) {
-       Console.OUT.println ("" + vertex + " = " + 
+       printer.println ("" + vertex + " = " + 
                             betweennessMap.get (vertex).value());
      }
   }
@@ -172,29 +175,33 @@ public final class Brandes {
 
       val numPlaces = Place.MAX_PLACES;
 
-      Console.OUT.println ("Running SSCA2 with the following parameters:");
+      /* Set the printer appropriate to where the user wants output */
+      val printer = (0 == outFileName.compareTo("STDOUT")) ? 
+        Console.OUT : (new File(outFileName)).printer();
+
+      printer.println ("Running SSCA2 with the following parameters:");
       if (0 == fileName.compareTo("NOFILE")) {
-        Console.OUT.println ("seed = " + seed);
-        Console.OUT.println ("N = " + Math.pow(2, n) as Int);
-        Console.OUT.println ("a = " + a);
-        Console.OUT.println ("b = " + b);
-        Console.OUT.println ("c = " + c);
-        Console.OUT.println ("d = " + d);
+        printer.println ("seed = " + seed);
+        printer.println ("N = " + Math.pow(2, n) as Int);
+        printer.println ("a = " + a);
+        printer.println ("b = " + b);
+        printer.println ("c = " + c);
+        printer.println ("d = " + d);
 
         val recursiveMatrixGenerator = Rmat (seed, n, a, b, c, d);
         val graph = recursiveMatrixGenerator.generate ();
-        Console.OUT.println (graph);
+        printer.println (graph);
 
-        crunchNumbers (graph);
+        crunchNumbers (graph, printer);
       } else {
-        Console.OUT.println ("f = " + fileName);
-        Console.OUT.println ("t = " + fileType);
-        Console.OUT.println ("i = " + startIndex);
+        printer.println ("f = " + fileName);
+        printer.println ("t = " + fileType);
+        printer.println ("i = " + startIndex);
 
         val graph = NetReader.readNetFile (fileName, startIndex);
-        Console.OUT.println (graph);
+        printer.println (graph);
 
-        crunchNumbers (graph);
+        crunchNumbers (graph, printer);
       }
     } catch (e:Throwable) {
       e.printStackTrace(Console.ERR);
