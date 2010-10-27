@@ -19,10 +19,12 @@ class LU {
     @Native("c++", "blockMulSubRow((#1)->raw()->raw(), (#2)->raw()->raw(), #3, #4, #5)")
         native static def blockMulSubRow(me:Array[Double], diag:Array[Double], B:Int, j:Int, cond:boolean):Void;
     
+    /*
     static def runAt(id:Int, c:()=>Void) {
-         x10.lang.Runtime.runAtNative(id, c);
+         x10.lang.Runtime.runClosureAt(id, c);
          x10.lang.Runtime.dealloc(c);
     }
+    */
 
     static unique = Dist.makeUnique();
 
