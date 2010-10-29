@@ -9,12 +9,13 @@ import x10.util.Option;
  * to make the backend queue a priority queue.
  */
 final class NaivePriorityQueue [T] {
-  private val elements = new ArrayList[T] ();
+  private val elements:ArrayList[T];
   private val comparator:(x:T,y:T)=>Int;
 
   // Constructor
-  public def this (comparator:(x:T,y:T)=>Int) {
+  public def this (comparator:(x:T,y:T)=>Int, N:Int) {
     this.comparator = comparator;
+    this.elements = new ArrayList[T] (N);
   }
 
   // See if the data structure is empty
@@ -71,7 +72,7 @@ final class NaivePriorityQueue [T] {
     val comparator = (1==isIncreasing) ? makeIncreasingComparator(distanceMap):
                                       makeNonIncreasingComparator(distanceMap);
 
-    val myQueue = new NaivePriorityQueue[Int] (comparator);
+    val myQueue = new NaivePriorityQueue[Int] (comparator, 10);
     
     distanceMap.put (1, 5);
     myQueue.push (1);
