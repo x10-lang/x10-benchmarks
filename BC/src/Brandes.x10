@@ -23,22 +23,23 @@ public final class Brandes {
     private var value:AtomicLong;
 
     // Construct the value with the requested initial.
-    public def this (init:Double) { value.set (init.toRawLongBits()); }
+    public def this (init:Double) { 
+      value = new AtomicLong(init.toRawLongBits()); 
+    }
 
     // Adjust the value by delta while holding the lock.
     public def adjust (delta:Double) { 
-      Console.ERR.println ("Adjusting " + value.doubleValue() + " by " + delta);
-      var oldValue:Double = value.doubleValue();
+      var oldValue:Double = Double.fromLongBits(value.get());
       var newValue:Double = oldValue + delta;
       while (!value.compareAndSet (oldValue.toRawLongBits(), 
                                    newValue.toRawLongBits())) {
-        oldValue = value.doubleValue();
+        oldValue = Double.fromLongBits(value.get());
         newValue = oldValue + delta;
       }
     }
 
     // Define a toString to print out stuff
-    public def toString () = "" + value.doubleValue();
+    public def toString () = "" + Double.fromLongBits(value.get());
   }
 
   /**
@@ -160,8 +161,7 @@ public final class Brandes {
 
     // Remember that the vertices are numbered from (0, N], where N=(2^n).
     val N = graph.numVertices ();
-    val betweennessMap = 
-      new HashMap[Brandes.VertexType, AtomicDouble] (N);
+    val betweennessMap = new HashMap[Brandes.VertexType, AtomicDouble] (N);
     for (var vertex:Int=0; vertex<N; ++vertex) 
       betweennessMap.put (vertex, new AtomicDouble(0.0)); 
 
