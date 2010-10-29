@@ -46,7 +46,8 @@ public final struct NetReader {
 
         val source:Brandes.VertexType = Int.parse (tokens(0)) - startIndex;
         val destination:Brandes.VertexType = Int.parse (tokens(1)) - startIndex;
-        val weight:Int = (2==tokens.length()) ? 0: Int.parse (tokens(2));
+        val weight:ULong = (2==tokens.length()) ? 0 as ULong: 
+                                                  ULong.parse (tokens(2));
 
         adjacencyGraph.addEdge (source, destination, weight);
       }

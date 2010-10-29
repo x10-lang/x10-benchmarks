@@ -35,23 +35,13 @@ public final class Brandes {
       lock.unlock();
     }
 
-    // Get the value --- hold the lock while doing so. Remember that this 
-    // value is just a snapshot. The value might change because someone 
-    // else updated it by the time you read the return value.
-    public def read(): PrecisionType {
-      lock.lock();
-      val shadowValue = value;
-      lock.unlock();
-      return shadowValue;
-    }
-
     // Define a toString to print out stuff
     public def toString () = "" + value;
   }
 
   // A comparator which orders the vertices by their distances.
   private static val makeNonIncreasingComparator = 
-    (distanceMap:HashMap[Int, Int]) => { return (x:Int, y:Int) => {
+    (distanceMap:HashMap[Int, ULong]) => { return (x:Int, y:Int) => {
         val dx = distanceMap.get(x).value();
         val dy = distanceMap.get(y).value();
         return (dx==dy) ? 0 : (dx<dy) ? +1 : -1;
@@ -71,7 +61,7 @@ public final class Brandes {
     val vertexStack = new Stack[Brandes.VertexType] ();
     val predecessorMap = 
            new HashMap[Brandes.VertexType, HashSet[Brandes.VertexType]](N);
-    val distanceMap = new HashMap [Brandes.VertexType, Int] (N);
+    val distanceMap = new HashMap [Brandes.VertexType, ULong] (N);
     val priorityQueueComparator = makeNonIncreasingComparator(distanceMap);
     val sigmaMap = new HashMap [Brandes.VertexType, Int] (N);
     val priorityQueue = 
@@ -83,7 +73,7 @@ public final class Brandes {
         predecessorMap.put (vertex, new HashSet [Brandes.VertexType]());
 
       async for (var vertex:Int=0; vertex<N; ++vertex) 
-        distanceMap.put (vertex, Int.MAX_VALUE);
+        distanceMap.put (vertex, ULong.MAX_VALUE);
 
       async for (var vertex:Int=0; vertex<N; ++vertex) 
         sigmaMap.put (vertex, 0);

@@ -7,7 +7,7 @@ import x10.util.HashMap;
 public final struct AdjacencyGraph [VertexType] {
   private val N:Int;
   private val adjacencyList:HashMap[VertexType, 
-                                    HashMap[VertexType, Int]];
+                                    HashMap[VertexType, ULong]];
 
   /**
    * Constructor: prepare all the data structures.
@@ -15,12 +15,12 @@ public final struct AdjacencyGraph [VertexType] {
   public def this (N:Int) { 
     this.N = N;
     this.adjacencyList = new HashMap[VertexType, 
-                                     HashMap[VertexType, Int]] ();
+                                     HashMap[VertexType, ULong]] ();
     
     // Set up each distance map
     for (var i:Int=0; i<N; ++i) {
       this.adjacencyList.put (i as VertexType, 
-                              new HashMap[VertexType, Int] ());
+                              new HashMap[VertexType, ULong] ());
     }
   }
 
@@ -39,13 +39,14 @@ public final struct AdjacencyGraph [VertexType] {
    *  Return the weight of the edge (if there is an edge).
    */
   public def getEdgeWeight (v:VertexType, w:VertexType) =
-    (this.existsEdge(v,w)) ? this.getNeighbors(v).get(w).value() : Int.MIN_VALUE;
+    (this.existsEdge(v,w)) ? 
+      this.getNeighbors(v).get(w).value() : ULong.MAX_VALUE;
 
   /**
    * Add an edge with a given weight. We do not check if the edge exists!
    * If an edge exists, its overwritten.
    */
-  public def addEdge (v:VertexType, w:VertexType, d:Int) =
+  public def addEdge (v:VertexType, w:VertexType, d:ULong) =
     this.getNeighbors(v).put (w, d);
 
   /**
