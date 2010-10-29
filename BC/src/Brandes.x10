@@ -10,26 +10,52 @@ import x10.io.File;
 import x10.io.Printer;
 import x10.lang.Cell;
 import x10.lang.Lock;
+import x10.util.concurrent.atomic.AtomicLong;
 
 public final class Brandes {
   public static type VertexType = Int;
-  public static type PrecisionType = Double;
 
   /**
-   * An call that contains a reference to a PrecisionType value. The 
+   * This is an atomic implementation of the LockedDouble.
+   * (See the next type below)
+   */
+  private final static class AtomicDouble {
+    private var value:AtomicLong;
+
+    // Construct the value with the requested initial.
+    public def this (init:Double) { value.set (init.toRawLongBits()); }
+
+    // Adjust the value by delta while holding the lock.
+    public def adjust (delta:Double) { 
+      Console.ERR.println ("Adjusting " + value.doubleValue() + " by " + delta);
+      var oldValue:Double = value.doubleValue();
+      var newValue:Double = oldValue + delta;
+      while (!value.compareAndSet (oldValue.toRawLongBits(), 
+                                   newValue.toRawLongBits())) {
+        oldValue = value.doubleValue();
+        newValue = oldValue + delta;
+      }
+    }
+
+    // Define a toString to print out stuff
+    public def toString () = "" + value.doubleValue();
+  }
+
+  /**
+   * An call that contains a reference to a Double value. The 
    * reason this is needed is that we need the updates to be atomic.
    * Since there are currently no atomic increments on arbitray 
-   * PrecisionTypes such as Doubles and Floats, we will fake it with locks
+   * Doubles such as Doubles and Floats, we will fake it with locks
    */
-  private final static class AtomicPrecisionType {
-    private var value:PrecisionType;
+  private final static class LockedDouble {
+    private var value:Double;
     private val lock = new Lock();
 
     // Construct the value with the requested initial.
-    public def this (init:PrecisionType) { value = init; }
+    public def this (init:Double) { value = init; }
 
     // Adjust the value by delta while holding the lock.
-    public def adjust (delta:PrecisionType) { 
+    public def adjust (delta:Double) { 
       lock.lock();
       value += delta;
       lock.unlock();
@@ -55,7 +81,7 @@ public final class Brandes {
    */
   public static def dijkstraShortestPaths 
           (graph:AdjacencyGraph [Brandes.VertexType],
-           betweennessMap:HashMap[Brandes.VertexType, AtomicPrecisionType],
+           betweennessMap:HashMap[Brandes.VertexType, AtomicDouble],
            s:Brandes.VertexType) {
     val N = graph.numVertices ();
     val vertexStack = new Stack[Brandes.VertexType] ();
@@ -63,7 +89,7 @@ public final class Brandes {
            new HashMap[Brandes.VertexType, HashSet[Brandes.VertexType]](N);
     val distanceMap = new HashMap [Brandes.VertexType, ULong] (N);
     val priorityQueueComparator = makeNonIncreasingComparator(distanceMap);
-    val sigmaMap = new HashMap [Brandes.VertexType, Int] (N);
+    val sigmaMap = new HashMap [Brandes.VertexType, ULong] (N);
     val priorityQueue = 
       new NaivePriorityQueue[Brandes.VertexType] (priorityQueueComparator, N);
 
@@ -76,7 +102,7 @@ public final class Brandes {
         distanceMap.put (vertex, ULong.MAX_VALUE);
 
       async for (var vertex:Int=0; vertex<N; ++vertex) 
-        sigmaMap.put (vertex, 0);
+        sigmaMap.put (vertex, 0 as ULong);
     }
 
     // Put the values for source vertex
@@ -103,17 +129,17 @@ public final class Brandes {
       }
     } // while priorityQueue not empty
 
-    val deltaMap = new HashMap [Brandes.VertexType, Brandes.PrecisionType] (N);
+    val deltaMap = new HashMap [Brandes.VertexType, Double] (N);
     for (var vertex:Int=0; vertex<N; ++vertex) 
-      deltaMap.put (vertex, 0.0 as Brandes.PrecisionType);
+      deltaMap.put (vertex, 0.0);
 
     // Return vertices in order of non-increasing distances from "s"
     while (!vertexStack.isEmpty()) {
       val w = vertexStack.pop ();
       for (v in (predecessorMap.get (w)).value()) {
         val deltaUpdate = deltaMap.get (v).value () +
-                          ((sigmaMap.get (v).value() as Brandes.PrecisionType/ 
-                            sigmaMap.get (w).value() as Brandes.PrecisionType)* 
+                          ((sigmaMap.get (v).value() as Double/ 
+                            sigmaMap.get (w).value() as Double)* 
                           (1 + deltaMap.get (w).value()));
         deltaMap.put (v, deltaUpdate);
       }
@@ -135,10 +161,9 @@ public final class Brandes {
     // Remember that the vertices are numbered from (0, N], where N=(2^n).
     val N = graph.numVertices ();
     val betweennessMap = 
-      new HashMap[Brandes.VertexType, AtomicPrecisionType] (N);
+      new HashMap[Brandes.VertexType, AtomicDouble] (N);
     for (var vertex:Int=0; vertex<N; ++vertex) 
-      betweennessMap.put (vertex, 
-                          new AtomicPrecisionType(0.0 as Brandes.PrecisionType)); 
+      betweennessMap.put (vertex, new AtomicDouble(0.0)); 
 
     // So, to iterate over all the vertices, we can iterate over (0, N].
     finish {

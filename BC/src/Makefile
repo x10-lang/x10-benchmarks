@@ -55,7 +55,8 @@ X10_CLASSES=Brandes.x10 \
 X10_CLASSES_CC=$(X10_CLASSES:.x10=.cc)
 X10_CLASSES_H=$(X10_CLASSES:.x10=.h)
 
-OTHER_CLASSES=Brandes__AtomicPrecisionType.x10
+OTHER_CLASSES=Brandes__AtomicDouble.x10 \
+              Brandes__LockedDouble.x10
 OTHER_CLASSES_CC=$(OTHER_CLASSES:.x10=.cc)
 OTHER_CLASSES_H=$(OTHER_CLASSES:.x10=.h)
 
