@@ -90,3 +90,4 @@ clean:
 	rm -rf ${X10_STRUCTS_CC} ${X10_STRUCTS_H} ${X10_STRUCTS_STRUCTS_H}
 	rm -rf ${OTHER_STRUCTS_CC} ${OTHER_STRUCTS_H} ${OTHER_STRUCTS_STRUCTS_H}
 	rm -rf ${OTHER_CLASSES_CC} ${OTHER_CLASSES_H} ${TARGET} *.out *.log
+	rm -rf test-pq test-st
