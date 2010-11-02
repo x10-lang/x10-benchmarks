@@ -1,19 +1,19 @@
 package ssca1;
 import x10.io.Printer;
 import x10.util.StringBuilder;
-import x10.util.ValRailBuilder;
+import x10.util.RailBuilder;
 /**
  * an instance is constructed by the winning Scorer: all a user needs
  * to know about the best match.
  */
 public class Output {
-   global val score:       Long;
-   global val shortBegins: Int;
-   global val longBegins:  Int;
-   global val shortEnds:   Int;
-   global val longEnds:    Int;
-   global val shortMatch:  String;
-   global val longMatch:   String;
+   val score:       Long;
+   val shortBegins: Int;
+   val longBegins:  Int;
+   val shortEnds:   Int;
+   val longEnds:    Int;
+   val shortMatch:  String;
+   val longMatch:   String;
 
    public def this() {
       score = 0L;
@@ -22,9 +22,9 @@ public class Output {
    }
    
    public def this(score_: Long,                        // the value calculated for the best aligned match
-		   shorter: Region!, longer: Region!,   // the starting and ending offsets for the matched substrings
-		   shortBuilder: ValRailBuilder[Byte]!, // the short aligned string, reversed
-		   longBuilder: ValRailBuilder[Byte]!   // the long aligned string, reversed
+		   shorter: Region, longer: Region,   // the starting and ending offsets for the matched substrings
+		   shortBuilder: RailBuilder[Byte], // the short aligned string, reversed
+		   longBuilder: RailBuilder[Byte]   // the long aligned string, reversed
 		  ){shorter.rank==1, longer.rank==1} {
       score = score_;
       shortBegins = shorter.min(0);  shortEnds = shorter.max(0);
@@ -42,20 +42,20 @@ public class Output {
     * parallelize this method.  Frankly, though, it is a low runner: the real cost is
     * the construction of the traceback moves matrix.
     * @param builderIn the Builder used to construct the traceback sequences
-    * @return the string corresponding to the bytes in the reversed input ValRail 
+    * @return the string corresponding to the bytes in the reversed input Rail 
     */
-   private static def cleanup(builderIn: ValRailBuilder[Byte]!) {
+   private static def cleanup(builderIn: RailBuilder[Byte]) {
       val source = builderIn.result();
       val builderOut = new StringBuilder();
       for(var i: Int = source.length-1; i>=0; i--) builderOut.add(source(i) as Char);
       return builderOut.result();
    }
    
-   public global def print(out: Printer) {
+   public def print(out: Printer) {
       out.println(this.toString());
    }
 		  
-   public global safe def toString() {
+   public def toString() {
       val builder = new StringBuilder();
       builder.add("Highest score: " + score +"\r\n");
       builder.add("Length of the aligned sequences: " + shortMatch.length()+"\r\n");

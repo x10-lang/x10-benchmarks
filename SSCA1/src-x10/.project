@@ -6,6 +6,11 @@
 	</projects>
 	<buildSpec>
 		<buildCommand>
+			<name>org.eclipse.imp.x10dt.ui.launch.java.X10JavaBuilder</name>
+			<arguments>
+			</arguments>
+		</buildCommand>
+		<buildCommand>
 			<name>org.eclipse.imp.x10dt.ui.launch.cpp.X10CppBuilder</name>
 			<arguments>
 			</arguments>
@@ -13,6 +18,10 @@
 		<buildCommand>
 			<name>org.eclipse.imp.smapifier.SmapieBuilder</name>
 			<arguments>
+				<dictionary>
+					<key>exten</key>
+					<value>x10</value>
+				</dictionary>
 			</arguments>
 		</buildCommand>
 	</buildSpec>
@@ -20,5 +29,6 @@
 		<nature>org.eclipse.imp.x10dt.ui.launch.cpp.x10nature</nature>
 		<nature>org.eclipse.imp.smapifier.smapinature</nature>
 		<nature>org.eclipse.jdt.core.javanature</nature>
+		<nature>org.eclipse.imp.x10dt.ui.launch.java.x10nature</nature>
 	</natures>
 </projectDescription>

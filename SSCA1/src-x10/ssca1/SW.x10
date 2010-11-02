@@ -7,7 +7,7 @@ import x10.util.HashMap;
 import x10.util.RailBuilder;
 import x10.util.StringBuilder;
 import x10.util.Timer;
-import x10.util.ValRailBuilder;
+import x10.util.RailBuilder;
 
 /**
  * This is the X10 implementation of the Smith-Waterman algorithm for string matching.
@@ -27,7 +27,7 @@ public class SW {
    
    private static phaseLeaders = ["Input phase:", "Scoring phase:", "Traceback phase:"];
    private static INPUT_PHASE = 0, SCORING_PHASE = 1, TRACEBACK_PHASE = 2;
-   private static timer: Timer! = new Timer(); // used to get the time at each phase end
+   private static timer: Timer = new Timer(); // used to get the time at each phase end
    private static DEBUG = true; // used to filter debugging output
    private static USAGE = 
 	      "Usage for SSCA1Main is \r\n\tx10 ... Main -s shortPath -l longPath -p paramPath [-r reps]";
@@ -46,13 +46,13 @@ public class SW {
     *    l, p, r and s.  The values are the corresponding arguments following those keys.
     * @return a boolean: true means we successfully parsed the arguments.
     */
-   private static def parseTheArgs(args: Rail[String]!, parsedArgs: HashMap[String, String]!) {
-      if (args.length%2 != 0) {
+   private static def parseTheArgs(args: Array[String](1), parsedArgs: HashMap[String, String]) {
+      if (args.size%2 != 0) {
          Console.ERR.println(USAGE);
          at(Place.FIRST_PLACE) System.setExitCode(24);
          return false;
       }
-      for(var n: Int = 0; n < args.length-1; n+=2) {
+      for(var n: Int = 0; n < args.size-1; n+=2) {
          val value = args(n+1);
          val key = args(n).substring(1,2); // only care about the key's prefix
          if("lprs".indexOf(key) >= 0) parsedArgs.put(key, value); 
@@ -63,12 +63,13 @@ public class SW {
          }
       }
       var missing: String = "";
-      for((n) in (0..2)) {
+      for([n] in 0..2) {
          val key = ["l","p","s"](n);
          if (!parsedArgs.containsKey(key)) missing += ","+key;
       }
-      if (missing.length() == 0) return true;
-      else {
+      if (missing.length() == 0) {
+    	  return true;
+      } else {
          Console.ERR.println("Missing command line argument(s): "+missing.substring(1,missing.length())+".\r\n"+USAGE);
          at(Place.FIRST_PLACE) System.setExitCode(26);
          return false;
@@ -95,7 +96,7 @@ public class SW {
     * @param builder used to accumulate the sequence of characters we really care about.
     * @param commentStart starts text to be ignored through the next LF or CR.
     */
-   private static def readInASequence(path:String, alphabetIndex: ValRail[Byte], builder: ValRailBuilder[Byte]!, commentStart: Char) {
+   private static def readInASequence(path:String, alphabetIndex: Rail[Byte], builder: RailBuilder[Byte], commentStart: Char) {
       try { 
          val reader = (new File(path)).openRead();
          try {
@@ -122,7 +123,7 @@ public class SW {
     *    is valid.
     * @param builder used to accumulate the sequence of characters we really care about.
     */
-   private static def readInASequence(path:String, alphabetIndex: ValRail[Byte], builder: ValRailBuilder[Byte]!) {
+   private static def readInASequence(path:String, alphabetIndex: Rail[Byte], builder: RailBuilder[Byte]) {
       readInASequence(path, alphabetIndex, builder, DEFAULT_COMMENT_START);
    }
    
@@ -145,7 +146,7 @@ public class SW {
     * inserted as needed so that one can directly see how the two align. 
     */
    
-   public static def main(args: Rail[String]!) {
+   public static def main(args: Array[String](1)) {
       val parsedArgs = new HashMap[String, String]();
       if (!parseTheArgs(args, parsedArgs)) return;
       val repetitions = Int.parseInt(parsedArgs.get("r").value);
@@ -155,7 +156,7 @@ public class SW {
       val scorers = DistArray.make[Scorer](Dist.makeUnique());
       val scores  = DistArray.make[Score](Dist.makeUnique(), (Point)=>Score(Long.MIN_VALUE, -1, -1, -1));
 
-      for((rep) in (0..repetitions-1)) {
+      for([rep] in 0..repetitions-1) {
          // Step 1: read in the parameters and data
          val startInput = timer.milliTime();
          val parms = Parameters(parsedArgs.get("p").value);
@@ -164,8 +165,8 @@ public class SW {
             at(Place.FIRST_PLACE) System.setExitCode(33);
             return;
          }
-         val shorterBuilder = new ValRailBuilder[Byte]();
-         val longerBuilder = new ValRailBuilder[Byte]();
+         val shorterBuilder = new RailBuilder[Byte]();
+         val longerBuilder = new RailBuilder[Byte]();
          finish {
             async readInASequence(parsedArgs.get("s").value, parms.alphabetIndex, shorterBuilder);
             async readInASequence(parsedArgs.get("l").value, parms.alphabetIndex, longerBuilder);
@@ -181,11 +182,11 @@ public class SW {
          // Step 2: find the best scores and initialize the traceback matrices
          val segInfo   = SegmentationInfo(parms, shorter, longer.length());
          if (rep == 0) Console.OUT.println("Places available: "+Place.MAX_PLACES+"\r\nPlaces used: "+segInfo.segmentCount);
-         val segmentedInput = ValRail.make[ValRail[Byte]](segInfo.segmentCount, (i:int) => segInfo.slice(i, longer));
-	 finish for ((p) in 0..segInfo.segmentCount-1) {
+         val segmentedInput = Rail.make[Rail[Byte]](segInfo.segmentCount, (i:int) => segInfo.slice(i, longer));
+	 finish for ([p] in 0..segInfo.segmentCount-1) {
              val mySegment = segmentedInput(p);  // extract the subsegment here to minimize captured state in async body.
 	     val capturedP = p;
-             async (Place.places(p)) {
+             async at (Place.place(p)) {
 	         val s = new Scorer(parms, shorter, mySegment, segInfo);
                  scorers(capturedP) = s;
                  scores(capturedP) = s.score;
@@ -196,14 +197,13 @@ public class SW {
          
          //Step 3: place 0 gets to pick the winning place: that place alone does a traceback
          val bestScore = scores.reduce((a:Score, b:Score) => (a.beats(b)?a:b), scores(0));
-         val p = Place.places(bestScore.where);
-         finalResult = at(p) (scorers(bestScore.where) as Scorer!).result();
+         val p = Place.place(bestScore.where);
+         finalResult = at(p) (scorers(bestScore.where) as Scorer).result();
          val tracebackDone = timer.milliTime();
          timings.add(TRACEBACK_PHASE, rep, tracebackDone- scoringDone);
       }
       timings.addTotalTime(timer.milliTime() - begin);
-      val fr = finalResult;
-      at(fr.home) fr.print(Console.OUT); 
+      finalResult.print(Console.OUT); 
       Console.OUT.println(timings);
       at(Place.FIRST_PLACE) System.setExitCode(0);
    }

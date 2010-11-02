@@ -1,6 +1,7 @@
 package ssca1;
+
 import x10.util.StringBuilder;
-import x10.util.ValRailBuilder;
+
 /**
  * instances manage an array of timings.  Times are recorded in milliseconds, so an Int
  * is sufficient to hold the values, even though the raw times are returned as Longs.
@@ -15,19 +16,19 @@ public class Timings {
    /** the number of time intervals into which the process has been divided */
    public val phases: Int;
    /** for each iteration and phase, the time in milliseconds it required */
-   public val timings: ValRail[Rail[Int]!];
+   public val timings: Array[Array[Int](1)](1);
    /** short descriptions of what each phase accomplishes */
-   public val phaseDescriptions: ValRail[String];
+   public val phaseDescriptions: Array[String](1);
    /** for each phase, the largest of the times it required */
-   public val maxs:    Rail[Int]!;
+   public val maxs:    Array[Int](1);
    /** for each phase, the average time that it required */
-   public val means:   Rail[Double]!;
+   public val means:   Array[Double](1);
    /** for each phase, the median of the times it required */
-   public val medians: Rail[Int]!;
+   public val medians: Array[Int](1);
    /** for each phase, the smallest of the times it required */
-   public val mins:    Rail[Int]!;
+   public val mins:    Array[Int](1);
    /** for each phase, the std deviation of the times it required */
-   public val sigmas:  Rail[Double]!;
+   public val sigmas:  Array[Double](1);
    /** if true, the current values of the stats reflect the current (complete) timings data */
    public var statsAreAvailable: Boolean = false;
    /** the end to end time for the whole set of iterations */
@@ -37,18 +38,18 @@ public class Timings {
     * builds an instance from the number of iterations and the array of descriptive
     * info about each of the phases.
     */
-   public def this(iterations_: Int, phaseDescriptions_: ValRail[String]) {
+   public def this(iterations_: Int, phaseDescriptions_: Array[String](1)) {
       phaseDescriptions = phaseDescriptions_;
-      val phaseCount = phases = phaseDescriptions_.length;
+      val phaseCount = phases = phaseDescriptions_.size;
       iterations = iterations_;
-      maxs = Rail.make[Int](phaseCount);
-      mins = Rail.make[Int](phaseCount);
-      medians = Rail.make[Int](phaseCount);
-      means = Rail.make[Double](phaseCount);
-      sigmas = Rail.make[Double](phaseCount);
+      maxs = new Array[Int](phaseCount);
+      mins = new Array[Int](phaseCount);
+      medians = new Array[Int](phaseCount);
+      means = new Array[Double](phaseCount);
+      sigmas = new Array[Double](phaseCount);
       if (DEBUG) Console.ERR.println("Timing "+iterations_+" iterations, each "+phaseCount+" phases");
-      timings = ValRail.make[Rail[Int]!](phaseCount, 
-          (n: Int)=> Rail.make[Int](iterations, (m:Int)=>GARBAGE_INITIAL_VALUE));
+      timings = new Array[Array[Int](1)](phaseCount, 
+          (n:Int)=> new Array[Int](iterations, (m:Int)=>GARBAGE_INITIAL_VALUE));
    }
    
    /** records the time required for the given phase during the given iteration
@@ -75,19 +76,19 @@ public class Timings {
     * the last attempt, we compute the maxs and so on.
     * @throws IllegalArgumentException if the timings data is incomplete
     */
-   public safe def computeStats() {
+   public def computeStats() {
       if (statsAreAvailable) return true;
       else if (!isComplete()) throw new IllegalArgumentException("timings not yet complete.");
       
       val oddMedian = (iterations%2 == 1);
       val mid = iterations/2;
       try {
-         for((pn) in (0..phases-1)) {
-            val sorted = Rail.make[Int](iterations, (n: Int)=>Timings.GARBAGE_INITIAL_VALUE);
+         for([pn] in 0..phases-1) {
+            val sorted = new Array[Int](iterations, (n: Int)=>Timings.GARBAGE_INITIAL_VALUE);
             var lastI: Int = -1;
             var total: Long = 0;
             try { 
-               for((i) in (0..iterations-1)) {
+               for([i] in 0..iterations-1) {
                   total += timings(pn)(i);
                   var j: Int;
                   for(j=0; j<i && timings(pn)(i)<=sorted(j); j++) { }
@@ -102,7 +103,7 @@ public class Timings {
             means(pn) = meanPN;
             var sumOfSquares: Double = 0.0;
             try {
-               for((i) in (0..iterations-1)) {
+               for([i] in 0..iterations-1) {
                   val delta = (timings(pn)(i) as Double) - meanPN;
                   sumOfSquares += delta*delta;
                }
@@ -123,7 +124,7 @@ public class Timings {
     * returns true if the garbage default value is not found in any timings entry
     */
    public def isComplete() { 
-      for((n) in (0..phases-1)) if (!isComplete(n)) return false;
+      for([n] in 0..phases-1) if (!isComplete(n)) return false;
       return true;
    }
    
@@ -134,7 +135,7 @@ public class Timings {
     */
    public def isComplete(n: Int) {
       val timing = timings(n);
-      for((m) in (0..iterations-1)) if (timing(m) == GARBAGE_INITIAL_VALUE) return false;
+      for([m] in 0..iterations-1) if (timing(m) == GARBAGE_INITIAL_VALUE) return false;
       return true;
    }
    
@@ -143,20 +144,20 @@ public class Timings {
     * that deals with the computed statistics
     * @returns a string suitable for direct display as plain text
     */
-   public safe def statsToString() {
+   public def statsToString() {
       if(!computeStats()) return "-- no stats --";
       val builder = new StringBuilder();
       if (iterations == 1) return "";
       else try {
          var leaderSize: Int = 0;
-         for((n) in (0..phases-1)) {
+         for([n] in 0..phases-1) {
             val length = phaseDescriptions(n).length();
             if (length>leaderSize) leaderSize = length; 
          }
          val delta = leaderSize%4 != 0 ? 4-leaderSize%4 : 0;
-         for((n) in (0..leaderSize+delta)) builder.add(" ");
+         for([n] in 0..leaderSize+delta) builder.add(" ");
          builder.add("   Min     Mean     Median     Max   Sigma\r\n");
-         for((n) in (0..phases-1)) {
+         for([n] in 0..phases-1) {
             val leader = new StringBuilder();
             leader.add(phaseDescriptions(n));
             var size:Int = leader.length();
@@ -173,16 +174,9 @@ public class Timings {
       return builder.result();
    }
 
-   public global safe def toString(): String {
-       if (here == home) {
-           return (this as Timings!).toStringInternal();
-       } else {
-           return "non-local Timings object";
-       }
-   }
-
+   public def toString(): String = toStringInternal();
    
-   private safe def toStringInternal(): String {
+   private def toStringInternal(): String {
       val builder = new StringBuilder();
       try { 
       if (iterations > 1) {
@@ -192,7 +186,7 @@ public class Timings {
     	  builder.add("Individual timings:\r\n\r\n");
       }
       var leaderSize: Int = 0;
-      for((n) in (0..phases-1)) {
+      for([n] in 0..phases-1) {
           val length = phaseDescriptions(n).length();
           if (length>leaderSize) leaderSize = length; 
        }

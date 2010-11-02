@@ -27,7 +27,7 @@ import x10.util.StringBuilder;
    /**  the number of characters in the alphabet */ 
    val alphabetSize: Int;      
    /**  maps the ASCII code for a character in the alphabet to its position in the alphabet */
-   val alphabetIndex: ValRail[Byte];
+   val alphabetIndex: Rail[Byte];
    /** 
     * entries are the values assigned to matching one character against another: the
     * rows and columns are indexed by the positions in the alphabet (starting with index 0).
@@ -35,7 +35,7 @@ import x10.util.StringBuilder;
     * (probably negative in this case!) if a 'B' is matched against a 'D' in the two test
     * strings.
     */ 
-   val scoringMatrix: ValRail[Int];
+   val scoringMatrix: Rail[Int];
    
    /** if the parameters cannot be read in correctly, a message is left here */   
    val error: String;
@@ -58,27 +58,27 @@ import x10.util.StringBuilder;
          openGapPenalty = extendGapPenalty = alphabetSize = 0;
          alphabet = "";
          alphabetIndex = alphabetIndex_;
-         scoringMatrix = [0]; // bug: should allow []
+         scoringMatrix = Rail.make[Int](1, 0); // bug: should allow []
          return;
       }
       openGapPenalty = reader.getNumericProperty("openGap");
       extendGapPenalty = reader.getNumericProperty("extendGap");
       val rawAlphabet = reader.getStringProperty("alphabet");
       val builder = new StringBuilder();
-      for((n) in (0..rawAlphabet.length()-1)) {
+      for([n] in (0..rawAlphabet.length()-1)) {
          val c = rawAlphabet.charAt(n);
          if (!c.isSpaceChar()) builder.add(c);
       }
       val compressed = alphabet = builder.result();
       val size = alphabetSize = compressed.length();
-      for((j) in 0..size-1) alphabetIndex_(compressed.charAt(j).ord()) = j as Byte;
-      alphabetIndex = alphabetIndex_ as ValRail[Byte];
+      for([j] in 0..size-1) alphabetIndex_(compressed.charAt(j).ord()) = j as Byte;
+      alphabetIndex = alphabetIndex_ as Rail[Byte];
       val scoringMatrix_ = reader.getIntArrayProperty("scores");
       val expected = size*size;
       error = (scoringMatrix_.length == expected)  ? "" :
               "Scoring matrix size is "+scoringMatrix_.length+", but expected "+expected+"\r\n";
  
-      scoringMatrix = scoringMatrix_ as ValRail[Int];
+      scoringMatrix = scoringMatrix_ as Rail[Int];
       if (DEBUG) Console.OUT.println(asString(SHOW_SCORES));
    }
 
@@ -104,11 +104,11 @@ import x10.util.StringBuilder;
    private def showIndex() {
       val builder = new StringBuilder();
       var ellipsis: Boolean = false;
-      for((n) in (0..255)) {
+      for([n] in (0..255)) {
     	 if (alphabetIndex(n) == -1) {
     	    if(!ellipsis) { builder.add("..."); ellipsis = true; }
     	 }
-    	 else { builder.add((n as Char)+"("+alphabetIndex(n)+"), "); }
+    	 else { builder.add((n as Char).toString()+"("+alphabetIndex(n)+"), "); }
       }
       return builder.result();
    }
@@ -117,10 +117,10 @@ import x10.util.StringBuilder;
       val builder = new StringBuilder();
       val size = alphabet.length();
       val last = size - 1;
-      for((n) in (0..last)) {
+      for([n] in (0..last)) {
          builder.add("'"+alphabet(n)+"'\t");
-         for((m) in (0..last)) {
-            builder.add(scoringMatrix(n*size + m)+"\t");
+         for([m] in (0..last)) {
+            builder.add(scoringMatrix(n*size + m).toString()+"\t");
          }
          builder.add("\r\n");
       }

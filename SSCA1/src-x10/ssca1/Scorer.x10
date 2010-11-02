@@ -1,7 +1,7 @@
 package ssca1;
 import x10.util.RailBuilder;
 import x10.util.StringBuilder;
-import x10.util.ValRailBuilder;
+import x10.util.RailBuilder;
 
 /**
  * Instances compute the traceback matrix and location of the ends of the winning
@@ -20,13 +20,13 @@ public class Scorer {
    /** the number of bytes this scorer is responsble for in the long sequence */
    val longSize: Int;
    /** a local copy of the segment of the longer sequence this scorer looks at */
-   val longRail: ValRail[Byte];
+   val longRail: Rail[Byte];
    /** a local copy of the shorter sequence */
-   val shortRail: ValRail[Byte];
+   val shortRail: Rail[Byte];
 
    // output
    /** how to work our way back through the two sequences to the aligned subsequence starts */
-   val tracebackMoves: Rail[Byte]!;
+   val tracebackMoves: Rail[Byte];
 
    /** 
     * all the info, other than the traceback matrix, that we need to compute the matched
@@ -85,7 +85,7 @@ public class Scorer {
     * on this form of the loop better in writing the MPI code, because it made the communication
     * among processors a lot easier to understand. 
     */
-   public def this(parms: Parameters, shorter: ValRail[Byte], longer: ValRail[Byte], segInfo: SegmentationInfo) {
+   public def this(parms: Parameters, shorter: Rail[Byte], longer: Rail[Byte], segInfo: SegmentationInfo) {
       longOffset = segInfo.firstInLonger(here.id);  // where to start if shortfall == 0
       longRail = longer;
       shortRail = shorter;
@@ -94,8 +94,8 @@ public class Scorer {
       val longSize_ = longSize;
       tracebackMoves = Rail.make[Byte]((shortSize+1)*(longSize_ + 1));
       val tracebackMoves_ = tracebackMoves;	
-      for ((i) in 1..shortSize-1) tracebackMoves_(i*(longSize_ + 1)) = STOP;
-      for ((j) in 0..longSize_-1)  tracebackMoves_(j) = STOP;
+      for ([i] in 1..shortSize-1) tracebackMoves_(i*(longSize_ + 1)) = STOP;
+      for ([j] in 0..longSize_-1)  tracebackMoves_(j) = STOP;
       val bestScoreUpTo_I_J = Rail.make[Int](longSize_ + 1);
       var winningScore : Long = 0;
       var shorterLast: Int = -1;
@@ -108,10 +108,10 @@ public class Scorer {
       val extendGapPenalty = parms.extendGapPenalty;
       val openGapPenalty = parms.openGapPenalty;
 
-      for((i) in 1..shortSize) {
+      for([i] in 1..shortSize) {
          var previousBestScore: Int = 0;
          val short_i_minus_1: Byte = shorter(i-1);
-         for((j) in 1..longSize_) { // try {
+         for([j] in 1..longSize_) { // try {
             //if (j-1 >= longSize_) throw new IllegalArgumentException("long rail access fails: "+j+" versus "+longSize_);
             val long_j:Byte = longer(j-1);
 
@@ -170,8 +170,8 @@ public class Scorer {
       if(DEBUG) Console.ERR.println("long winner ends at "+longerLast+",  array ends at "+longRail.length);
       var i: Int = shorterLast; // i now marks the end of the winning subsequence of the shorter sequence 
       var j: Int = longerLast;  // j marks the end of the winning subsequence of the longer sequence
-      val shortBuilder = new ValRailBuilder[Byte]();
-      val longBuilder  = new ValRailBuilder[Byte]();
+      val shortBuilder = new RailBuilder[Byte]();
+      val longBuilder  = new RailBuilder[Byte]();
       var done: Boolean = false;
       while(!done) { try { //  until we are at the tracebackMove matrix boundary marked by the STOP sentinels
     	  nextMove = getTracebackMove(i, j);
@@ -199,12 +199,12 @@ public class Scorer {
           }
       } catch(e: Exception) {throw new ArrayIndexOutOfBoundsException("i="+i+", j="+j+" vs "+longRail.length);}}
       try {return new Output(score.score,  
-    		  (i+1..shorterLast) as Region!{self.rank == 1}, 
-    		  (j+1+longOffset..longOffset+longerLast) as Region!{self.rank == 1}, 
+    		  (i+1..shorterLast) as Region{self.rank == 1}, 
+    		  (j+1+longOffset..longOffset+longerLast) as Region{self.rank == 1}, 
     		  shortBuilder, 
     		  longBuilder);
       } catch(e: Exception) {
-    	  return new Output(0L, (0..0) as Region!{self.rank == 1}, (0..0) as Region!{self.rank == 1}, shortBuilder, longBuilder);
+    	  return new Output(0L, (0..0) as Region{self.rank == 1}, (0..0) as Region{self.rank == 1}, shortBuilder, longBuilder);
       }
    }
    

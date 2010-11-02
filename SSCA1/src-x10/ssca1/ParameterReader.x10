@@ -5,7 +5,7 @@ import x10.io.FileReader;
 import x10.io.IOException;
 import x10.util.RailBuilder;
 import x10.util.StringBuilder;
-import x10.util.ValRailBuilder;
+import x10.util.RailBuilder;
 
 /**
  * An instance reads an ASCII character file in order to extract key value pairs.
@@ -46,8 +46,8 @@ public struct ParameterReader {
     */
    public static DEFAULT_COMMENT_START = '#';
    
-   val keys:   ValRail[String];
-   val values: ValRail[String];
+   val keys:   Rail[String];
+   val values: Rail[String];
    val commentStart: Int;
    val errors: String;
          
@@ -65,8 +65,8 @@ public struct ParameterReader {
      */
    public def this(path: String, commentStartChar_: Char) {
       var status: String;
-      val keys_ = new ValRailBuilder[String]();
-      val values_ = new ValRailBuilder[String]();
+      val keys_ = new RailBuilder[String]();
+      val values_ = new RailBuilder[String]();
       val commentStart_ = commentStartChar_.ord();
       try {
          val relative = new File(path);
@@ -86,7 +86,7 @@ public struct ParameterReader {
    
    /**
     * returns an array integers that, in our case, will be the scoring matrix, laid
-    * out as a ValRail in row-major order, for the match.
+    * out as a Rail in row-major order, for the match.
     * @param key the left hand side of the assignment from the parameter file, normally
     *      "scores" for this particular call: see Parameters.x10.
     * @return 
@@ -96,9 +96,9 @@ public struct ParameterReader {
     */
    public def getIntArrayProperty(key: String) {
       val raw = getRawValue(key);
-      val builder = new ValRailBuilder[Int]();
+      val builder = new RailBuilder[Int]();
       var start: Int = -1;
-      for((i) in (0..raw.length()-1)) { // implements raw.split(/[^0-9-]/) the hard way.
+      for([i] in 0..raw.length()-1) { // implements raw.split(/[^0-9-]/) the hard way.
          var c: Char = raw.charAt(i);
          var b: Int= c.ord();
          if ((b>=0x30 && b<=0x39) || b==0x2D) {
@@ -142,7 +142,7 @@ public struct ParameterReader {
     * @throws IllegalArgumentException if the key is not found.
     */
    private def getRawValue(key: String) {
-      for((n) in (0..keys.length-1)) {
+      for([n] in 0..keys.length-1) {
          if(keys(n).equals(key)) return values(n);
       }
       throw new IllegalArgumentException("Key, "+key+", not found.");
@@ -170,7 +170,7 @@ public struct ParameterReader {
     * @throws EOFException when attempting to read beyond the end of the file.
     * @throws IOException more generally if the reader fails.
     */
-   private static def readNonEmptyLine(reader: FileReader!, commentStart: Int): String throws IOException {
+   private static def readNonEmptyLine(reader: FileReader, commentStart: Int): String {
       val builder = new StringBuilder();
       // skip leading white space
       //Console.ERR.println("available? "+reader.available()); // !BUG
@@ -205,7 +205,7 @@ public struct ParameterReader {
     * @return the empty string normally, an error message otherwise
     * @throws IOException if a read attempt fails for any reason other than EOF
     */
-   private static def readString(reader: FileReader!, values_:ValRailBuilder[String]!, initialSegment: String, commentStart: Int) {
+   private static def readString(reader: FileReader, values_:RailBuilder[String], initialSegment: String, commentStart: Int) {
       var endString: Int = initialSegment.indexOf("'");
       if (endString >= 0) {
          values_.add(initialSegment.substring(0, endString));
@@ -237,7 +237,7 @@ public struct ParameterReader {
      * @return the empty string normally, an error message otherwise
      * @throws IOException if a read attempt fails for any reason other than EOF
      */
-   private static def readDecimal(reader: FileReader!, values_:ValRailBuilder[String]!, initialSegment: String, commentStart: Int) {
+   private static def readDecimal(reader: FileReader, values_:RailBuilder[String], initialSegment: String, commentStart: Int) {
       var line: String = initialSegment;
       try { 
          if(line.length() == 0) line = readNonEmptyLine(reader, commentStart);
@@ -264,7 +264,7 @@ public struct ParameterReader {
     * @return the empty string normally, an error message otherwise
     * @throws IOException if a read attempt fails for any reason other than EOF
     */
-   private static def readArray(reader: FileReader!, values_:ValRailBuilder[String]!, initialSegment: String, commentStart: Int) {
+   private static def readArray(reader: FileReader, values_:RailBuilder[String], initialSegment: String, commentStart: Int) {
       val buffer = new StringBuilder();
       var line: String = initialSegment;
       try {
@@ -297,7 +297,7 @@ public struct ParameterReader {
     * @return a completion code: empty string means "everything ok", 'EOF' means "end of
     *   file".
     */
-   private static def readAParameter(reader: FileReader!, keys_: ValRailBuilder[String]!, values_: ValRailBuilder[String]!, commentStart: Int) {
+   private static def readAParameter(reader: FileReader, keys_: RailBuilder[String], values_: RailBuilder[String], commentStart: Int) {
       try {
          var line: String = readNonEmptyLine(reader, commentStart);
          val firstEqual = line.indexOf("=");

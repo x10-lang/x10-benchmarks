@@ -62,10 +62,10 @@ public struct SegmentationInfo {
    /** the remainder when the segment count is divided into (long sequence length - overlap) */
    val shortfall: Int;
    
-   public def this(parms: Parameters, shorter: ValRail[Byte], longLength: Int) {
+   public def this(parms: Parameters, shorter: Rail[Byte], longLength: Int) {
       var maxScoreOnMatch: Int = 0;
       val shortLength = shorter.length();
-      for((i) in (0..shortLength-1)) {
+      for([i] in (0..shortLength-1)) {
          val entry = shorter(i);
          maxScoreOnMatch += parms.getScore(entry, entry);
       }
@@ -84,7 +84,7 @@ public struct SegmentationInfo {
       return (placeId < shortfall) ? baseOffset + placeId:  baseOffset + shortfall;
    }
    
-   public def slice(placeId: Int, whole:ValRail[Byte]) {
+   public def slice(placeId: Int, whole:Rail[Byte]) {
       val first = firstInLonger(placeId);
       val last = first + (placeId < shortfall ? baseSegmentLength + 2 :  baseSegmentLength + 1);
 
@@ -94,11 +94,11 @@ public struct SegmentationInfo {
       //                of String's native code wasn't doing bounds checking in substring and the ways strings
       //                were constructed made it ok to have the substring ending in an extra \0 character 
       //                (it disappeared when doing the strlen/strdup operations to construct the String).
-      //                When switching to ValRail[Byte], this problem was no longer masked.
+      //                When switching to Rail[Byte], this problem was no longer masked.
       //                I think there is probabbly a more principled adjustment in the calculations that feed into
       //                last, but am leaving that for Jonathan to investigate.  
       val last2 = last < whole.length() ? last : whole.length();
 
-      return ValRail.make[Byte](last2-first, (i:int)=>{ whole(first+i) });
+      return Rail.make[Byte](last2-first, (i:int)=>{ whole(first+i) });
    }
 }
