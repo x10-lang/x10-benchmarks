@@ -18,7 +18,7 @@ public final class Brandes(N:Int) {
 	def this(g:AdjacencyGraph[Int], debug:Boolean) {
 		property(g.numVertices());
 		this.graph=g;
-		this.debug=true;
+		this.debug=debug;
 	}
 	// A comparator which orders the vertices by their distances.
 	private static val makeNonIncreasingComparator = 
