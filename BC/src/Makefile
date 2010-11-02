@@ -2,7 +2,7 @@
 
 # <BEGIN> user settings #
 
-export X10CXX 		?= ~/Software/src/x10/x10-trunk/x10.dist/bin/x10c++
+export X10CXX 		?= /opt/x10-2.1.0/bin/x10c++
 
 #leave blank by default, X10 automatically chooses a transport for you. To
 #force a particular implementation, please uncheck one of the other options.
@@ -65,7 +65,7 @@ TARGET=brandes
 all: ${TARGET}
 
 brandes: ${X10_CLASSES} ${X10_STRUCTS}
-	${X10CXX} ${X10CXXFLAGS} -MAIN_CLASS=Brandes $< -o $@ 
+	${X10CXX} ${X10CXXFLAGS} ${X10RTTRANSPORT} -MAIN_CLASS=Brandes $< -o $@ 
 
 run-brandes: brandes
 	mpirun -np 1 -hostfile host.list ./brandes
