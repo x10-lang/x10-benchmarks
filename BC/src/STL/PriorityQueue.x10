@@ -1,3 +1,4 @@
+package STL;
 import x10.compiler.Native;
 import x10.compiler.NativeRep;
 import x10.compiler.NativeCPPInclude;
@@ -12,7 +13,7 @@ public final struct PriorityQueue[T, Compare] {
   public def this () { }
 
   // Constructor #2 -> copy constructor
-  public def this (x: PriorityQueue[T]) {}
+  public def this (x: PriorityQueue[T,Compare]) {}
 
   // Constructor #3 -> constructor that takes in compare argument
   public def this (c: Compare) {}

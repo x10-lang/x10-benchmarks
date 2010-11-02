@@ -27,13 +27,13 @@ final class NaivePriorityQueue [T] {
   // Add an element, putting it in its right order
   public def push (newElement:T) : Void {
     this.elements.add (newElement);
-    this.elements.sort (this.comparator);
+   // this.elements.sort (this.comparator);
   }
 
   // Remove the top element from the queue
   public def pop () : T {
-    val element = this.elements.removeFirst();
     this.elements.sort (this.comparator);
+    val element = this.elements.removeFirst();
     return element;
   }
 

@@ -7,7 +7,7 @@ public final struct NetReader {
   /* The function that reads in stuff from a file and populates it */
   public static def readNetFile (fileName:String,
                                  startIndex:Int) : 
-                                AdjacencyGraph[Brandes.VertexType] {
+                                AdjacencyGraph {
 
     val inputFile:File = new File(fileName);
     val inputFileReader:Reader = inputFile.openRead();
@@ -21,7 +21,7 @@ public final struct NetReader {
 
     if (0 > N) throw new Exception ("Incorrect File Format");
 
-    val adjacencyGraph = AdjacencyGraph[Brandes.VertexType](N);
+    val adjacencyGraph = AdjacencyGraph(N);
 
     /* Iterate over the lines and construct the graph */
     var foundEdges:Boolean = false;
@@ -44,8 +44,8 @@ public final struct NetReader {
         if (3 != tokens.length() && 2 != tokens.length()) 
           throw new Exception ("Format not \"src dest weight\"");
 
-        val source:Brandes.VertexType = Int.parse (tokens(0)) - startIndex;
-        val destination:Brandes.VertexType = Int.parse (tokens(1)) - startIndex;
+        val source= Int.parse (tokens(0)) - startIndex;
+        val destination = Int.parse (tokens(1)) - startIndex;
         val weight:ULong = (2==tokens.length()) ? 0 as ULong: 
                                                   ULong.parse (tokens(2));
 
