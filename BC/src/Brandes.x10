@@ -36,7 +36,7 @@ public final class Brandes(N:Int) {
 			var vertexTime:Long = 0L;
 			val vertexStack = new Stack[Int] ();
 			val predecessorMap = Rail.make(N, (Int)=> new HashSet[Int]());
-			val distanceMap = Rail.make[ULong](N, ULong.MAX_VALUE);
+			val distanceMap = Rail.make[ULong](N, -1);
 			val sigmaMap = Rail.make(N, 0 as ULong);
 			val priorityQueueComparator = makeNonIncreasingComparator(distanceMap);
 			val priorityQueue = new NaivePriorityQueue[Int] (priorityQueueComparator, N);
@@ -58,17 +58,19 @@ public final class Brandes(N:Int) {
 				vertexTime += (System.nanoTime()-timer1)/M;
 				
 				for (w in graph.getNeighbors(v).keySet()) {
+					val dw = distanceMap(w);
+					if (dw < 0) { // this is the first time....
+						start = -System.nanoTime();
+						priorityQueue.push (w);
+						start += System.nanoTime();
+						pCount += start;
+						distanceMap(w)=ULong.MAX_VALUE;
+					}
 					val distanceThroughV = distanceMap(v) + graph.getEdgeWeight (v, w);
         
 					// Update the distance if its a new low
 					if (distanceThroughV < distanceMap(w)) {
 						distanceMap(w) = distanceThroughV;
-						
-						start = -System.nanoTime();
-						priorityQueue.push (w);
-						start += System.nanoTime();
-						pCount += start;
-						
 						sigmaMap(w) += sigmaMap(v);
 						predecessorMap(w).add(v);
 					}
