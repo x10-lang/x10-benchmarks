@@ -32,58 +32,97 @@ public final class Brandes(N:Int) {
 		 * betweenness for all the vertices based on this calculation.
 		 */
 		public  def dijkstraShortestPaths (s:Int) {	
+			var taskTime:Long = -System.nanoTime();
 			val vertexStack = new Stack[Int] ();
 			val predecessorMap = Rail.make(N, (Int)=> new HashSet[Int]());
 			val distanceMap = Rail.make[ULong](N, ULong.MAX_VALUE);
-			val sigmaMap = Rail.make[ULong](N, 0 as ULong);
+			val sigmaMap = Rail.make(N, 0 as ULong);
 			val priorityQueueComparator = makeNonIncreasingComparator(distanceMap);
 			val priorityQueue = new NaivePriorityQueue[Int] (priorityQueueComparator, N);
-			
+			val myBetweennessMap= Rail.make[Double] (N, 0.0D);
 			// Put the values for source vertex
 			distanceMap(s)=0;
 			sigmaMap(s)=1;
 			priorityQueue.push (s);
-			
+			var pCount:Long=0;
 			// Loop until there are no elements left in the priority queue
 			while (!priorityQueue.isEmpty()) {
+				var start:Long = -System.nanoTime();
 				val v = priorityQueue.pop();
+				start += System.nanoTime();
+				pCount += start;
+				
 				vertexStack.push (v);
+				
 				for (w in graph.getNeighbors(v).keySet()) {
 					val distanceThroughV = distanceMap(v) + graph.getEdgeWeight (v, w);
-					
+        
 					// Update the distance if its a new low
 					if (distanceThroughV < distanceMap(w)) {
 						distanceMap(w) = distanceThroughV;
+						
+						start = -System.nanoTime();
 						priorityQueue.push (w);
+						start += System.nanoTime();
+						pCount += start;
+						
 						sigmaMap(w) += sigmaMap(v);
 						predecessorMap(w).add(v);
 					}
 				}
 			} // while priorityQueue not empty
+			val vertexStackSizeMax = vertexStack.size();
+			pCount = pCount/(1000*1000);
+		
+			
 			
 			val deltaMap = Rail.make[Double](N, 0.0D);
-			
 			// Return vertices in order of non-increasing distances from "s"
 			while (!vertexStack.isEmpty()) {
 				val w = vertexStack.pop ();
 				for (v in predecessorMap(w)) 
 					deltaMap(v) += (sigmaMap(v) as Double/sigmaMap(w) as Double)*(1 + deltaMap(w));
-				// Update the betweenness map if we are dealing with a 3rd party vertex.
+				// Accumulate updates locally 
 				if (w != s) {
-					betweennessMap(w).adjust (deltaMap(w));  
+					myBetweennessMap(w) += deltaMap(w);  
 				}
 			} // vertexStack not empty
+			
+			// update global shared state once, atomically.
+			for (var i:Int=0; i < N; i++) {
+				val result = myBetweennessMap(i);
+				if (result != 0.0D)
+					betweennessMap(i).adjust(result);
+			}
+			taskTime += System.nanoTime();
+			taskTime = taskTime/(1000*1000);
+			Console.OUT.println("VertexStack s=" + s+ " size=" 
+					+ vertexStackSizeMax + " time = " + taskTime + " ms " + 
+					(taskTime>0? "(" + safeSubstring("" + (pCount*1.0/taskTime)*100, 0, 3)
+							+ "% priorityQ)."  : ""));
 		}
-		
+		public static def safeSubstring(str:String, start:Int, end:Int) 
+		= str.substring(start, Math.min(end, str.length()));
 		/**
 		 * Sequential version to calculate the betweenness centrality. The algorithm
 		 * is found in Brandes' 2004 work.
 		 */
-		public  def brandesBetweenness () {	
+		public  def brandesBetweenness (P:Int) {	
+			/*val chunk = N/P;
 			finish 
-			for (var s:Int=0; s<N; ++s) {
-				val thisVertex = s;
-				async dijkstraShortestPaths (thisVertex);
+			for ([i] in 0..P-1) async {
+				val start = chunk*i;
+				val end = i == P-1 ? N-1 : start +chunk - 1;
+				for ([s] in start..end) 
+				 dijkstraShortestPaths (s, i);
+				Console.OUT.println("Async " + i + " done at "+ System.nanoTime()/(1000*1000));
+			}*/
+			finish 
+			for ([s] in 0..N-1) 
+				async {
+				
+				dijkstraShortestPaths(s);
+				
 			}
 		}
 		
@@ -92,14 +131,17 @@ public final class Brandes(N:Int) {
 		 */
 		private def crunchNumbers (printer:Printer) {
 			var time:Long = System.nanoTime();
-			brandesBetweenness ();
+			brandesBetweenness (Runtime.INIT_THREADS);
 			time = System.nanoTime() - time;
-			printer.println ("Betweenness calculation took " + time/1E9 + " seconds");
+			printer.println ("Betweenness calculation took " + time/1E9 + " seconds.");
 			
 			/*for (vertex in betweennessMap.keySet()) {
 			 * printer.println ("" + vertex + " = " + 
 			 * betweennessMap.getOrElse(vertex,null));
 			 * }*/
+			var sum:Int=0;
+			for ([i] in 0..N-1) sum += betweennessMap(i).count();
+			printer.println("Number of updates =" + sum);
 		}
 		
 		/**
