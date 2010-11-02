@@ -13,10 +13,12 @@ import x10.lang.Cell;
 public final class Brandes(N:Int) {
 	static val M=1000*1000;
 	val graph:AdjacencyGraph[Int];
+	val debug:Boolean;
 	val betweennessMap= Rail.make (N, (Int)=> new LockedDouble(0.0));
-	def this(g:AdjacencyGraph[Int]) {
+	def this(g:AdjacencyGraph[Int], debug:Boolean) {
 		property(g.numVertices());
 		this.graph=g;
+		this.debug=true;
 	}
 	// A comparator which orders the vertices by their distances.
 	private static val makeNonIncreasingComparator = 
@@ -101,6 +103,7 @@ public final class Brandes(N:Int) {
 			}
 			taskTime += System.nanoTime();
 			taskTime = taskTime/(1000*1000);
+			if (debug)
 			Console.OUT.println("VertexStack s=" + s+ " size=" 
 					+ vertexStackSizeMax + " time = " + taskTime + " ms " 
 					+ (taskTime>0? "(" + safeSubstring("" + (pCount*1.0/taskTime)*100, 0, 3)
@@ -147,6 +150,7 @@ public final class Brandes(N:Int) {
 			 * }*/
 			var sum:Int=0;
 			for ([i] in 0..N-1) sum += betweennessMap(i).count();
+			if (debug)
 			printer.println("Number of updates =" + sum);
 		}
 		
@@ -166,6 +170,7 @@ public final class Brandes(N:Int) {
 						 Option("f", "", "Graph file name"),
 						 Option("t", "", "File type: 0: NWB, 1:NET"),
 						 Option("i", "", "Starting index of vertices"),
+						 Option("debug", "", "Debug"),
 						 Option("o", "", "Output file name")]);
 				
 				val seed:Long = cmdLineParams ("-s", 2);
@@ -178,6 +183,7 @@ public final class Brandes(N:Int) {
 				val fileType:Int = cmdLineParams ("-t", 0);
 				val startIndex:Int = cmdLineParams ("-i", 0);
 				val outFileName:String = cmdLineParams ("-o", "STDOUT");
+				val debug:Boolean = 0==cmdLineParams ("-debug", 1); // off by default
 				
 				val numPlaces = Place.MAX_PLACES;
 				
@@ -197,7 +203,7 @@ public final class Brandes(N:Int) {
 					printer.println ("" + P + " workers.");
 					val recursiveMatrixGenerator = Rmat (seed, n, a, b, c, d);
 					val graph = recursiveMatrixGenerator.generate ();
-					val brandes = new Brandes(graph);
+					val brandes = new Brandes(graph, debug);
 					//printer.println (graph);
 					
 					brandes.crunchNumbers (printer);
@@ -208,7 +214,7 @@ public final class Brandes(N:Int) {
 					printer.println ("" + P + " workers.");
 					
 					val graph = NetReader.readNetFile (fileName, startIndex);
-					val brandes = new Brandes(graph);
+					val brandes = new Brandes(graph, debug);
 					//printer.println (graph);
 					
 					brandes.crunchNumbers (printer);
