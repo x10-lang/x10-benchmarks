@@ -11,7 +11,7 @@ import x10.io.Printer;
 import x10.lang.Cell;
 
 public final class Brandes(N:Int) {
-	
+	static val M=1000*1000;
 	val graph:AdjacencyGraph[Int];
 	val betweennessMap= Rail.make (N, (Int)=> new LockedDouble(0.0));
 	def this(g:AdjacencyGraph[Int]) {
@@ -33,6 +33,7 @@ public final class Brandes(N:Int) {
 		 */
 		public  def dijkstraShortestPaths (s:Int) {	
 			var taskTime:Long = -System.nanoTime();
+			var vertexTime:Long = 0L;
 			val vertexStack = new Stack[Int] ();
 			val predecessorMap = Rail.make(N, (Int)=> new HashSet[Int]());
 			val distanceMap = Rail.make[ULong](N, ULong.MAX_VALUE);
@@ -52,7 +53,9 @@ public final class Brandes(N:Int) {
 				start += System.nanoTime();
 				pCount += start;
 				
+				val timer1 = System.nanoTime();
 				vertexStack.push (v);
+				vertexTime += (System.nanoTime()-timer1)/M;
 				
 				for (w in graph.getNeighbors(v).keySet()) {
 					val distanceThroughV = distanceMap(v) + graph.getEdgeWeight (v, w);
@@ -72,7 +75,7 @@ public final class Brandes(N:Int) {
 				}
 			} // while priorityQueue not empty
 			val vertexStackSizeMax = vertexStack.size();
-			pCount = pCount/(1000*1000);
+			pCount = pCount/M;
 		
 			
 			
@@ -97,9 +100,10 @@ public final class Brandes(N:Int) {
 			taskTime += System.nanoTime();
 			taskTime = taskTime/(1000*1000);
 			Console.OUT.println("VertexStack s=" + s+ " size=" 
-					+ vertexStackSizeMax + " time = " + taskTime + " ms " + 
-					(taskTime>0? "(" + safeSubstring("" + (pCount*1.0/taskTime)*100, 0, 3)
-							+ "% priorityQ)."  : ""));
+					+ vertexStackSizeMax + " time = " + taskTime + " ms " 
+					+ (taskTime>0? "(" + safeSubstring("" + (pCount*1.0/taskTime)*100, 0, 3)
+							+ "% priorityQ)."  : "")
+							+ "vertexTime=" + vertexTime + "ms.");
 		}
 		public static def safeSubstring(str:String, start:Int, end:Int) 
 		= str.substring(start, Math.min(end, str.length()));
