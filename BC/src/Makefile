@@ -51,13 +51,14 @@ X10_STRUCTS_STRUCTS_H=$(X10_STRUCTS:.x10=.struct_h)
 
 X10_CLASSES=Brandes.x10 \
             FixedBinaryHeap.x10 \
-            NaiveStack.x10 \
+            FixedRailStack.x10 \
+            AtomicDouble.x10 \
+            LockedDouble.x10 \
             TestRandom.x10 
 X10_CLASSES_CC=$(X10_CLASSES:.x10=.cc)
 X10_CLASSES_H=$(X10_CLASSES:.x10=.h)
 
-OTHER_CLASSES=Brandes__AtomicDouble.x10 \
-              Brandes__LockedDouble.x10
+OTHER_CLASSES=
 OTHER_CLASSES_CC=$(OTHER_CLASSES:.x10=.cc)
 OTHER_CLASSES_H=$(OTHER_CLASSES:.x10=.h)
 
@@ -78,6 +79,9 @@ run-rng: testrng
 	mpirun -np 1 -hostfile host.list ./testrng
 
 test-pq: FixedBinaryHeap.x10
+	${X10CXX} ${X10CXXFLAGS} ${X10RTTRANSPORT} $< -o $@ 
+
+test-st: FixedRailStack.x10
 	${X10CXX} ${X10CXXFLAGS} ${X10RTTRANSPORT} $< -o $@ 
 
 clean:

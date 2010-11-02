@@ -10,9 +10,13 @@ import x10.lang.Cell;
 
 public final class Brandes(N:Int) {
 	static val M=1000*1000;
+  static type AtomicType=LockedDouble;
+
 	val graph:AdjacencyGraph[Int];
 	val debug:Boolean;
-	val betweennessMap= Rail.make (N, (Int)=> new LockedDouble(0.0));
+	val betweennessMap=Rail.make[AtomicType] (N, (Int)=> new AtomicType(0.0));
+
+  // Constructor
 	def this(g:AdjacencyGraph[Int], debug:Boolean) {
 		property(g.numVertices());
 		this.graph=g;
@@ -35,8 +39,8 @@ public final class Brandes(N:Int) {
 		public  def dijkstraShortestPaths (s:Int) {	
 			var taskTime:Long = -System.nanoTime();
 			var vertexTime:Long = 0L;
-			val vertexStack = new NaiveStack[Int] (N);
-			val predecessorMap = Rail.make(N, (Int)=> new HashSet[Int]());
+			val vertexStack = new FixedRailStack[Int] (N);
+			val predecessorMap=Rail.make[HashSet[Int]](N, (Int)=> new HashSet[Int]());
 			val distanceMap = Rail.make[ULong](N, -1);
 			val sigmaMap = Rail.make(N, 0 as ULong);
 			val binaryHeapComparator = makeNonIncreasingComparator(distanceMap);
@@ -82,8 +86,6 @@ public final class Brandes(N:Int) {
 			} // while priorityQueue not empty
 			val vertexStackSizeMax = vertexStack.size();
 			pCount = pCount/M;
-		
-			
 			
 			val deltaMap = Rail.make[Double](N, 0.0D);
 			// Return vertices in order of non-increasing distances from "s"
@@ -99,9 +101,9 @@ public final class Brandes(N:Int) {
 			// update global shared state once, atomically.
 			for (var i:Int=0; i < N; i++) {
 				val result = myBetweennessMap(i);
-				if (result != 0.0D)
-					betweennessMap(i).adjust(result);
+				if (result != 0.0D) betweennessMap(i).adjust(result);
 			}
+
 			taskTime += System.nanoTime();
 			taskTime = taskTime/(1000*1000);
 			if (debug)
@@ -131,15 +133,6 @@ public final class Brandes(N:Int) {
 			brandesBetweenness (Runtime.INIT_THREADS);
 			time = System.nanoTime() - time;
 			printer.println ("Betweenness calculation took " + time/1E9 + " seconds.");
-			
-			/*for (vertex in betweennessMap.keySet()) {
-			 * printer.println ("" + vertex + " = " + 
-			 * betweennessMap.getOrElse(vertex,null));
-			 * }*/
-			var sum:Int=0;
-			for ([i] in 0..N-1) sum += betweennessMap(i).count();
-			if (debug)
-			printer.println("Number of updates =" + sum);
 		}
 		
 		/**
