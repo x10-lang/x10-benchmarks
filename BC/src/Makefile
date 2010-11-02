@@ -50,7 +50,8 @@ X10_STRUCTS_H=$(X10_STRUCTS:.x10=.h)
 X10_STRUCTS_STRUCTS_H=$(X10_STRUCTS:.x10=.struct_h)
 
 X10_CLASSES=Brandes.x10 \
-            NaivePriorityQueue.x10 \
+            FixedBinaryHeap.x10 \
+            NaiveStack.x10 \
             TestRandom.x10 
 X10_CLASSES_CC=$(X10_CLASSES:.x10=.cc)
 X10_CLASSES_H=$(X10_CLASSES:.x10=.h)
@@ -76,8 +77,8 @@ testrng: TestRandom.x10
 run-rng: testrng
 	mpirun -np 1 -hostfile host.list ./testrng
 
-test-pq: NaivePriorityQueue.x10
-	${X10CXX} ${X10CXXFLAGS} $< -o $@ 
+test-pq: FixedBinaryHeap.x10
+	${X10CXX} ${X10CXXFLAGS} ${X10RTTRANSPORT} $< -o $@ 
 
 clean:
 	rm -rf core*.* *.dSYM *.inc 

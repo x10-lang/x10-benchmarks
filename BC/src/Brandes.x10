@@ -1,8 +1,6 @@
 import x10.util.Random;
 import x10.util.HashMap;
 import x10.util.HashSet;
-import x10.util.Stack;
-import x10.util.Set;
 import x10.util.OptionsParser;
 import x10.util.Option;
 import x10.lang.Math;
@@ -20,6 +18,7 @@ public final class Brandes(N:Int) {
 		this.graph=g;
 		this.debug=debug;
 	}
+
 	// A comparator which orders the vertices by their distances.
 	private static val makeNonIncreasingComparator = 
 		(distanceMap:Rail[ULong]) =>  (x:Int, y:Int) => {
@@ -36,18 +35,21 @@ public final class Brandes(N:Int) {
 		public  def dijkstraShortestPaths (s:Int) {	
 			var taskTime:Long = -System.nanoTime();
 			var vertexTime:Long = 0L;
-			val vertexStack = new Stack[Int] ();
+			val vertexStack = new NaiveStack[Int] (N);
 			val predecessorMap = Rail.make(N, (Int)=> new HashSet[Int]());
 			val distanceMap = Rail.make[ULong](N, -1);
 			val sigmaMap = Rail.make(N, 0 as ULong);
-			val priorityQueueComparator = makeNonIncreasingComparator(distanceMap);
-			val priorityQueue = new NaivePriorityQueue[Int] (priorityQueueComparator, N);
+			val binaryHeapComparator = makeNonIncreasingComparator(distanceMap);
+			val priorityQueue = 
+                    new FixedBinaryHeap[Int] (binaryHeapComparator, N);
 			val myBetweennessMap= Rail.make[Double] (N, 0.0D);
+
 			// Put the values for source vertex
 			distanceMap(s)=0;
 			sigmaMap(s)=1;
 			priorityQueue.push (s);
 			var pCount:Long=0;
+
 			// Loop until there are no elements left in the priority queue
 			while (!priorityQueue.isEmpty()) {
 				var start:Long = -System.nanoTime();
@@ -88,11 +90,10 @@ public final class Brandes(N:Int) {
 			while (!vertexStack.isEmpty()) {
 				val w = vertexStack.pop ();
 				for (v in predecessorMap(w)) 
-					deltaMap(v) += (sigmaMap(v) as Double/sigmaMap(w) as Double)*(1 + deltaMap(w));
+					deltaMap(v) += (sigmaMap(v) as Double/sigmaMap(w) as Double)*
+                         (1 + deltaMap(w));
 				// Accumulate updates locally 
-				if (w != s) {
-					myBetweennessMap(w) += deltaMap(w);  
-				}
+				if (w != s) myBetweennessMap(w) += deltaMap(w);  
 			} // vertexStack not empty
 			
 			// update global shared state once, atomically.
@@ -110,29 +111,16 @@ public final class Brandes(N:Int) {
 							+ "% priorityQ)."  : "")
 							+ "vertexTime=" + vertexTime + "ms.");
 		}
+
 		public static def safeSubstring(str:String, start:Int, end:Int) 
 		= str.substring(start, Math.min(end, str.length()));
+
 		/**
-		 * Sequential version to calculate the betweenness centrality. The algorithm
-		 * is found in Brandes' 2004 work.
+     * Sequential version to calculate the betweenness centrality. The
+     * algorithm is found in Brandes' 2004 work.
 		 */
-		public  def brandesBetweenness (P:Int) {	
-			/*val chunk = N/P;
-			finish 
-			for ([i] in 0..P-1) async {
-				val start = chunk*i;
-				val end = i == P-1 ? N-1 : start +chunk - 1;
-				for ([s] in start..end) 
-				 dijkstraShortestPaths (s, i);
-				Console.OUT.println("Async " + i + " done at "+ System.nanoTime()/(1000*1000));
-			}*/
-			finish 
-			for ([s] in 0..N-1) 
-				async {
-				
-				dijkstraShortestPaths(s);
-				
-			}
+		public def brandesBetweenness (P:Int) {	
+			finish for ([s] in 0..N-1) async { dijkstraShortestPaths(s); }
 		}
 		
 		/**
