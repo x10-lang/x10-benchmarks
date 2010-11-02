@@ -125,8 +125,12 @@ public final struct Rmat {
 			// Note that Int.MIN_VALUE being returned from getEdgeWeight() 
 			// implies that there was no edge existing between (v,w) apriori.
 			val d = adjacencyGraph.getEdgeWeight (v,w);
-			if (ULong.MAX_VALUE == d) adjacencyGraph.addEdge (v, w, 1 as ULong);
-			else adjacencyGraph.addEdge (v, w, d+1 as ULong);
+			if (ULong.MAX_VALUE == d) {
+        adjacencyGraph.addEdge (v, w, 1 as ULong);
+        adjacencyGraph.incrementInDegree (w);
+      } else {
+        adjacencyGraph.addEdge (v, w, d+1 as ULong);
+      }
 		}
 		
 		return adjacencyGraph;

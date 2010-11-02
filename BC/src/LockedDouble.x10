@@ -20,6 +20,9 @@ public final  class LockedDouble {
 		lock.unlock();
 	}
 
+  // Get the value
+  public def get () = this.value;
+
 	// Define a toString to print out stuff
 	public def toString () = "" + value;
 }

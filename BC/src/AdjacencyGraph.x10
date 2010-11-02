@@ -7,19 +7,23 @@ import x10.util.HashMap;
 public final struct AdjacencyGraph  {
   private val N:Int;
   private val adjacencyList:Rail[HashMap[Int, ULong]];
+  private val inDegreeMap:Rail[Int];
 
   /**
    * Constructor: prepare all the data structures.
    */
   public def this (N:Int) { 
     this.N = N;
-    this.adjacencyList = Rail.make[HashMap[Int, ULong]] (N, (Int)=> new HashMap[Int, ULong]());
+    this.adjacencyList = 
+     Rail.make[HashMap[Int, ULong]] (N, (Int)=> new HashMap[Int, ULong]());
+    this.inDegreeMap = Rail.make[Int] (N, (Int) => 0);
   }
 
   /**
    * Return the neighbors of a particular vertex.
    */
   public def getNeighbors (v:Int) = this.adjacencyList(v);
+
   /**
    * Check if an edge exists between a pair of vertices.
    */
@@ -42,6 +46,16 @@ public final struct AdjacencyGraph  {
    * Return the number of vertices in the graph.
    */
   public def numVertices () = this.N;
+
+  /**
+   * Add to the inDegree of a vertex.
+   */
+  public def incrementInDegree (v:Int) { ++this.inDegreeMap(v); }
+
+  /**
+   * Get a vertex's inDegree.
+   */
+  public def getInDegree (v:Int) { return this.inDegreeMap(v); }
 
   public def toString () {
     var outString:String = "";

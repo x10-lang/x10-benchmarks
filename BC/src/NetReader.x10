@@ -46,10 +46,11 @@ public final struct NetReader {
 
         val source= Int.parse (tokens(0)) - startIndex;
         val destination = Int.parse (tokens(1)) - startIndex;
-        val weight:ULong = (2==tokens.length()) ? 0 as ULong: 
+        val weight:ULong = (2==tokens.length()) ? 1 as ULong: 
                                                   ULong.parse (tokens(2));
 
         adjacencyGraph.addEdge (source, destination, weight);
+        adjacencyGraph.incrementInDegree (destination);
       }
     }
     return adjacencyGraph;

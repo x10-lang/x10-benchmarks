@@ -1,6 +1,6 @@
 import x10.util.Random;
 import x10.util.HashMap;
-import x10.util.HashSet;
+import x10.util.ArrayList;
 import x10.util.OptionsParser;
 import x10.util.Option;
 import x10.lang.Math;
@@ -47,12 +47,15 @@ public final class Brandes(N:Int) {
 
     // These are the per-vertex data structures.
     val vertexStack = new FixedRailStack[Int] (N);
-    val predecessorMap=Rail.make[HashSet[Int]](N, (Int)=> new HashSet[Int]());
+    val predecessorMap= Rail.make[FixedRailStack[Int]](N, (i:Int)=> 
+                        new FixedRailStack[Int](graph.getInDegree(i)));
     val distanceMap = Rail.make[ULong](N);
     val sigmaMap = Rail.make(N, 0 as ULong);
     val binaryHeapComparator = makeNonIncreasingComparator(distanceMap);
     val priorityQueue = new FixedBinaryHeap[Int] (binaryHeapComparator, N);
     val deltaMap = Rail.make[Double](N);
+
+    Console.OUT.println ("Starting processing from : " + startVertex);
 
     // Iterate over each of the vertices in my portion.
     for ([s] in startVertex..endVertex) { 
@@ -60,22 +63,27 @@ public final class Brandes(N:Int) {
       // Reset all the per-vertex structures without freeing the memory!
       vertexStack.clear();
       for ([i] in 0..N-1) predecessorMap(i).clear();
-      for ([i] in 0..N-1) distanceMap(i) = -1;
+      for ([i] in 0..N-1) distanceMap(i) = ULong.MAX_VALUE;
       for ([i] in 0..N-1) sigmaMap(i) = 0 as ULong;
       for ([i] in 0..N-1) deltaMap(i) = 0.0 as Double;
       priorityQueue.clear();
 
       // Put the values for source vertex
-      distanceMap(s)=0;
-      sigmaMap(s)=1;
+      distanceMap(s)=0 as ULong;
+      sigmaMap(s)=1 as ULong;
       priorityQueue.push (s);
      
       // Loop until there are no elements left in the priority queue
       while (!priorityQueue.isEmpty()) {
+        // Pop the node with the least distance
         val v = priorityQueue.pop();
-        
         vertexStack.push (v);
         
+/*
+   This is Vijay's version. The only other thing that needs to be done to 
+   use this version is that distanceMap() should be initialized to -1
+   and not ULong.MAX_VALUE.
+
         for (w in graph.getNeighbors(v).keySet()) {
           val dw = distanceMap(w);
           if (dw < 0) { // this is the first time....
@@ -83,7 +91,7 @@ public final class Brandes(N:Int) {
             distanceMap(w)=ULong.MAX_VALUE;
           }
           val distanceThroughV = distanceMap(v) + graph.getEdgeWeight (v, w);
-        
+
           // Update the distance if its a new low
           if (distanceThroughV < distanceMap(w)) {
             distanceMap(w) = distanceThroughV;
@@ -92,16 +100,39 @@ public final class Brandes(N:Int) {
           }
         }
       } // while priorityQueue not empty
+*/
+
+        // Iterate over all its neighbors
+        for (w in graph.getNeighbors(v).keySet()) {
+          val distanceThroughV = distanceMap(v) + graph.getEdgeWeight (v, w);
+
+          // Update the distance and push it in the priorityQueue
+          // if a new low distance has been found.
+          if (distanceThroughV < distanceMap(w)) {
+            distanceMap(w) = distanceThroughV;
+            priorityQueue.push (w);
+          }
+
+          // If v relaxed the distance to w, we can update the sigmaMap and add
+          // v to the predecessorMap of w.
+          if (distanceThroughV == distanceMap(w)) {
+            sigmaMap(w) += sigmaMap(v);
+            predecessorMap(w).push(v);
+          }
+        }
+      } // while priorityQueue not empty
       
       // Return vertices in order of non-increasing distances from "s"
       while (!vertexStack.isEmpty()) {
         val w = vertexStack.pop ();
-        for (v in predecessorMap(w)) 
+        while (!(predecessorMap(w).isEmpty())) {
+          val v = predecessorMap(w).pop();
           deltaMap(v) += (sigmaMap(v) as Double/sigmaMap(w) as Double)*
                          (1 + deltaMap(w));
+        }
      
         // Accumulate updates locally 
-        if (w != s) myBetweennessMap(w) += deltaMap(w);  
+        if (w != s) myBetweennessMap(w) += deltaMap(w); 
       } // vertexStack not empty
     } // All vertices from (startVertex, endVertex)
 
@@ -109,7 +140,7 @@ public final class Brandes(N:Int) {
     for (var i:Int=0; i < N; i++) {
       val result = myBetweennessMap(i);
       if (result != 0.0D) betweennessMap(i).adjust(result);
-    } 
+    }
   }
 
   /**
@@ -132,6 +163,13 @@ public final class Brandes(N:Int) {
 
     time = System.nanoTime() - time;
     printer.println ("Betweenness calculation took " + time/1E9 + " seconds.");
+
+/*
+    for ([i] in 0..N-1) {
+      if (betweennessMap(i).get() != 0.0) 
+        printer.println ("(" + i + ") ->" + betweennessMap(i));
+    }
+*/
   }
   
   /**
