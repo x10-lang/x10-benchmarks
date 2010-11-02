@@ -47,6 +47,9 @@ public class FixedRailStack[T] {
     return this.internalStorage((this.size-1));
   }
 
+  /** Clear everything, but retain the size  */
+  public def clear() = this.size=0;
+
   /** Output the contents of the queue in the order they are stored */
   public def print () {
     Console.OUT.print ("[");

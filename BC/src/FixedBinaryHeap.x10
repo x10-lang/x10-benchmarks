@@ -92,6 +92,9 @@ public final class FixedBinaryHeap[T] {
 
     return element;
   } 
+
+  /** Clear everything but retain the space */
+  public def clear () = this.size=0;
       
   // Output the contents of the queue in the order they are stored
   public def print () {
