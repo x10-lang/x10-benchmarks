@@ -13,6 +13,10 @@
 		<buildCommand>
 			<name>org.eclipse.imp.smapifier.SmapieBuilder</name>
 			<arguments>
+				<dictionary>
+					<key>exten</key>
+					<value>x10</value>
+				</dictionary>
 			</arguments>
 		</buildCommand>
 	</buildSpec>
