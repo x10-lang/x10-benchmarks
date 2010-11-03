@@ -105,7 +105,7 @@ public final class Brandes(N:Int) {
           // If v relaxed the distance to w, we can update the sigmaMap and add
           // v to the predecessorMap of w.
           if (distanceThroughV == distanceMap(w)) {
-            sigmaMap(w) += sigmaMap(v);
+            sigmaMap(w) = sigmaMap(w) + sigmaMap(v);// XTENLANG-2027
             predecessorMap(w).push(v);
           }
         }
