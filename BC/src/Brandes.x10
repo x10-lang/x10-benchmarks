@@ -52,7 +52,7 @@ public final class Brandes(N:Int) {
     val distanceMap = Rail.make[ULong](N);
     val sigmaMap = Rail.make(N, 0 as ULong);
     val binaryHeapComparator = makeNonIncreasingComparator(distanceMap);
-    val priorityQueue = new FixedBinaryHeap[Int] (binaryHeapComparator, N);
+    val priorityQueue = new FixedBinaryHeap (binaryHeapComparator, N);
     val deltaMap = Rail.make[Double](N);
 
     Console.OUT.println ("Starting processing from : " + startVertex);
@@ -97,7 +97,7 @@ public final class Brandes(N:Int) {
             if (firstTimeRelaxation) {
               priorityQueue.push (w); 
             } else { // Decrease the key and remove the previous predecessors
-              // priorityQueue.decreaseKey (w);
+              priorityQueue.decreaseKey (w);
               while (!predecessorMap(w).isEmpty()) predecessorMap(w).pop();
             }
           }

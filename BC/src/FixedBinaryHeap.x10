@@ -14,16 +14,18 @@ import x10.util.HashMap;
 import x10.util.OptionsParser;
 import x10.util.Option;
 
-public final class FixedBinaryHeap[T] {
+public final class FixedBinaryHeap {
   /* the internal storage is a Rail */
-  private val internalHeap:Rail[T];
-  private val comparator:(x:T,y:T)=>Int;
+  private val internalHeap:Rail[Int];
+  private val indexMap:Rail[Int];
+  private val comparator:(x:Int,y:Int)=>Int;
   private var size:Int;
 
   // Constructor
-  public def this (comparator:(x:T,y:T)=>Int, N:Int) {
+  public def this (comparator:(x:Int,y:Int)=>Int, N:Int) {
     this.comparator = comparator;
-    this.internalHeap = Rail.make[T] (N+1);
+    this.internalHeap = Rail.make[Int] (N+1);
+    this.indexMap = Rail.make[Int] (N);
     this.size = 0;
   } 
     
@@ -35,13 +37,20 @@ public final class FixedBinaryHeap[T] {
   private def swapElements (indexOne:Int, indexTwo:Int) {
     assert (indexOne<this.size && indexTwo<this.size);
 
-    val tempElement = this.internalHeap (indexOne);
+    // Swap the indices
+    val indexOneShadow = this.indexMap(this.internalHeap(indexOne));
+    this.indexMap (this.internalHeap(indexOne)) = 
+                    this.indexMap(this.internalHeap(indexTwo));
+    this.indexMap (this.internalHeap(indexTwo)) = indexOneShadow;
+
+    // Swap the elements
+    val shadowElement = this.internalHeap (indexOne);
     this.internalHeap(indexOne) = this.internalHeap(indexTwo);
-    this.internalHeap(indexTwo) = tempElement;
+    this.internalHeap(indexTwo) = shadowElement;
   }
       
   // Add an element, putting it in its right order
-  public def push (newElement:T) : Void {
+  public def push (newElement:Int) : Void {
     // check if this is still within our Rail bounds
     // length() returns an index beyond the last point we can write.
     // we are writing to (this.size+1), so when we increment it, it should
@@ -52,24 +61,28 @@ public final class FixedBinaryHeap[T] {
     ++this.size;
 
     // insert the element at the end of the current rail.
+    this.indexMap (newElement) = this.size;
     this.internalHeap(this.size) = newElement;
 
     // sift up to put this in the right place
     for (var i:Int=this.size; 
          i>1 && (1!=comparator(this.internalHeap(i/2),this.internalHeap(i)));
-         i=(i/2)) this.swapElements (i, i/2);
+         i=(i/2)) {
+      this.swapElements (i, i/2);
+    }
   } 
 
   // Remove the top element from the queue
-  public def pop () : T {
+  public def pop () : Int {
     // check that there is an element to be popped
     assert (this.size > 0);
 
     // The element to be returned is the first one.
-    val element:T = this.internalHeap(1);
+    val element = this.internalHeap(1);
 
     // There is one less element now. Swap the first and last element,
     // reduce the size and see the magic trickle down.
+    this.indexMap(this.internalHeap(this.size)) = 1;
     this.internalHeap(1) = this.internalHeap(this.size);
     --this.size;
 
@@ -93,6 +106,27 @@ public final class FixedBinaryHeap[T] {
     return element;
   } 
 
+  /** 
+   * The key value for element has changed --- so update it. We assume that
+   * the comparator already has the new value for the distance map. Note that 
+   * decreaseKey() is similar to inserting the element again. We always assume
+   * that the value will propagate up! If it can go both ways, we need a more 
+   * sophisticated algorithm.
+   */
+  public def decreaseKey (element:Int) {
+    val currentPositionInHeap = this.indexMap(element);
+
+    // Now, note that the heap property is true for all elements below 
+    // currentPositionInHeap. The only violations might be between element
+    // and its ancestors --- this is ONLY because we strictly decrease.
+    // sift up to put this in the right place
+    for (var i:Int=currentPositionInHeap; 
+         i>1 && (1!=comparator(this.internalHeap(i/2),this.internalHeap(i)));
+         i=(i/2)) {
+      this.swapElements (i, i/2);
+    }
+  }
+
   /** Clear everything but retain the space */
   public def clear () = this.size=0;
       
@@ -100,7 +134,8 @@ public final class FixedBinaryHeap[T] {
   public def print () {
     Console.OUT.print ("[");
     for (var i:Int=1; i<=this.size; ++i) {
-      Console.OUT.print (((i==0)?"":",") + this.internalHeap(i));
+      Console.OUT.print (((i==1)?"":",") + 
+          this.internalHeap(i) + ":" + this.indexMap(this.internalHeap(i)));
     }
     Console.OUT.println ("]");
   }
@@ -133,26 +168,27 @@ public final class FixedBinaryHeap[T] {
 
     val myQueue = new FixedBinaryHeap[Int] (comparator, 10);
     
-    distanceMap.put (1, 5);
+    distanceMap.put (0, 0);
+    myQueue.push (0);
+
+    distanceMap.put (1, 1);
     myQueue.push (1);
 
-    distanceMap.put (2, 4);
+    distanceMap.put (2, 2);
     myQueue.push (2);
 
     distanceMap.put (3, 3);
     myQueue.push (3);
 
-    distanceMap.put (4, 2);
+    distanceMap.put (4, 4);
     myQueue.push (4);
 
-    distanceMap.put (5, 1);
-    myQueue.push (5);
-
     myQueue.print ();
 
     myQueue.pop ();
-    myQueue.pop ();
-
     myQueue.print ();
+    myQueue.pop ();
+    myQueue.print ();
+
   }
 }
