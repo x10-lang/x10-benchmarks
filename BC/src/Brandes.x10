@@ -13,10 +13,6 @@ public final class Brandes(N:Int) {
   static val M=1000*1000;
   static type AtomicType=LockedDouble;
 
-  static val WHITE:Char = 1 as Char;
-  static val GREY:Char = 2 as Char;
-  static val BLACK:Char = 3 as Char;
-
   val graph:AdjacencyGraph[Int];
   val debug:Boolean;
   val betweennessMap=Rail.make[AtomicType] (N, (Int)=> new AtomicType(0.0));
@@ -58,7 +54,6 @@ public final class Brandes(N:Int) {
     val binaryHeapComparator = makeNonIncreasingComparator(distanceMap);
     val priorityQueue = new FixedBinaryHeap[Int] (binaryHeapComparator, N);
     val deltaMap = Rail.make[Double](N);
-    val colorMap = Rail.make[Char] (N); 
 
     Console.OUT.println ("Starting processing from : " + startVertex);
 
@@ -71,7 +66,6 @@ public final class Brandes(N:Int) {
       for ([i] in 0..N-1) distanceMap(i) = ULong.MAX_VALUE;
       for ([i] in 0..N-1) sigmaMap(i) = 0 as ULong;
       for ([i] in 0..N-1) deltaMap(i) = 0.0 as Double;
-      for ([i] in 0..N-1) colorMap(i) = WHITE;
       priorityQueue.clear();
 
       // Put the values for source vertex
@@ -92,14 +86,19 @@ public final class Brandes(N:Int) {
           // Update the distance and push it in the priorityQueue
           // if a new low distance has been found.
           if (distanceThroughV < distanceMap(w)) {
+            // Check if this is the first time "w" was found.
+            val firstTimeRelaxation = 
+              (distanceMap(w)==ULong.MAX_VALUE)? true:false;
+
+            // Update the distance map
             distanceMap(w) = distanceThroughV;
 
-            if (WHITE==colorMap(w)) {
-              colorMap(w) = GREY;
-              priorityQueue.push (w);
-            } else if (GREY==colorMap(w)) {
-              // TO BE IMPLEMENTED
-              //priorityQueue.decreaseKey (w);
+            // If this is the first time for "w", add it to the queue.
+            if (firstTimeRelaxation) {
+              priorityQueue.push (w); 
+            } else { // Decrease the key and remove the previous predecessors
+              // priorityQueue.decreaseKey (w);
+              while (!predecessorMap(w).isEmpty()) predecessorMap(w).pop();
             }
           }
 
@@ -110,7 +109,6 @@ public final class Brandes(N:Int) {
             predecessorMap(w).push(v);
           }
         }
-        colorMap(v) = BLACK;
       } // while priorityQueue not empty
       
       // Return vertices in order of non-increasing distances from "s"
@@ -137,7 +135,7 @@ public final class Brandes(N:Int) {
   /**
    * Calls betweeness, prints out the statistics and what not.
    */
-  private def crunchNumbers (printer:Printer) {
+  private def crunchNumbers (printer:Printer, debug:Boolean) {
     var time:Long = System.nanoTime();
 
     // Divide the iteration space equally amongst the P processes and 
@@ -155,12 +153,12 @@ public final class Brandes(N:Int) {
     time = System.nanoTime() - time;
     printer.println ("Betweenness calculation took " + time/1E9 + " seconds.");
 
-/*
-    for ([i] in 0..N-1) {
-      if (betweennessMap(i).get() != 0.0) 
-        printer.println ("(" + i + ") ->" + betweennessMap(i));
+    if (debug) {
+      for ([i] in 0..N-1) {
+        if (betweennessMap(i).get() != 0.0) 
+          printer.println ("(" + i + ") ->" + betweennessMap(i));
+      }
     }
-*/
   }
   
   /**
@@ -214,7 +212,7 @@ public final class Brandes(N:Int) {
         val graph = recursiveMatrixGenerator.generate ();
         val brandes = new Brandes(graph, debug);
         
-        brandes.crunchNumbers (printer);
+        brandes.crunchNumbers (printer, debug);
       } else {
         printer.println ("f = " + fileName);
         printer.println ("t = " + fileType);
@@ -224,7 +222,7 @@ public final class Brandes(N:Int) {
         val graph = NetReader.readNetFile (fileName, startIndex);
         val brandes = new Brandes(graph, debug);
         
-        brandes.crunchNumbers (printer);
+        brandes.crunchNumbers (printer, debug);
       }
       
     } catch (e:Throwable) {
