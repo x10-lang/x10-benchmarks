@@ -13,6 +13,10 @@ public final class Brandes(N:Int) {
   static val M=1000*1000;
   static type AtomicType=LockedDouble;
 
+  static val WHITE:Char = 1 as Char;
+  static val GREY:Char = 2 as Char;
+  static val BLACK:Char = 3 as Char;
+
   val graph:AdjacencyGraph[Int];
   val debug:Boolean;
   val betweennessMap=Rail.make[AtomicType] (N, (Int)=> new AtomicType(0.0));
@@ -54,6 +58,7 @@ public final class Brandes(N:Int) {
     val binaryHeapComparator = makeNonIncreasingComparator(distanceMap);
     val priorityQueue = new FixedBinaryHeap[Int] (binaryHeapComparator, N);
     val deltaMap = Rail.make[Double](N);
+    val colorMap = Rail.make[Char] (N); 
 
     Console.OUT.println ("Starting processing from : " + startVertex);
 
@@ -66,6 +71,7 @@ public final class Brandes(N:Int) {
       for ([i] in 0..N-1) distanceMap(i) = ULong.MAX_VALUE;
       for ([i] in 0..N-1) sigmaMap(i) = 0 as ULong;
       for ([i] in 0..N-1) deltaMap(i) = 0.0 as Double;
+      for ([i] in 0..N-1) colorMap(i) = WHITE;
       priorityQueue.clear();
 
       // Put the values for source vertex
@@ -79,29 +85,6 @@ public final class Brandes(N:Int) {
         val v = priorityQueue.pop();
         vertexStack.push (v);
         
-/*
-   This is Vijay's version. The only other thing that needs to be done to 
-   use this version is that distanceMap() should be initialized to -1
-   and not ULong.MAX_VALUE.
-
-        for (w in graph.getNeighbors(v).keySet()) {
-          val dw = distanceMap(w);
-          if (dw < 0) { // this is the first time....
-            priorityQueue.push (w);
-            distanceMap(w)=ULong.MAX_VALUE;
-          }
-          val distanceThroughV = distanceMap(v) + graph.getEdgeWeight (v, w);
-
-          // Update the distance if its a new low
-          if (distanceThroughV < distanceMap(w)) {
-            distanceMap(w) = distanceThroughV;
-            sigmaMap(w) += sigmaMap(v);
-            predecessorMap(w).add(v);
-          }
-        }
-      } // while priorityQueue not empty
-*/
-
         // Iterate over all its neighbors
         for (w in graph.getNeighbors(v).keySet()) {
           val distanceThroughV = distanceMap(v) + graph.getEdgeWeight (v, w);
@@ -110,7 +93,14 @@ public final class Brandes(N:Int) {
           // if a new low distance has been found.
           if (distanceThroughV < distanceMap(w)) {
             distanceMap(w) = distanceThroughV;
-            priorityQueue.push (w);
+
+            if (WHITE==colorMap(w)) {
+              colorMap(w) = GREY;
+              priorityQueue.push (w);
+            } else if (GREY==colorMap(w)) {
+              // TO BE IMPLEMENTED
+              //priorityQueue.decreaseKey (w);
+            }
           }
 
           // If v relaxed the distance to w, we can update the sigmaMap and add
@@ -120,6 +110,7 @@ public final class Brandes(N:Int) {
             predecessorMap(w).push(v);
           }
         }
+        colorMap(v) = BLACK;
       } // while priorityQueue not empty
       
       // Return vertices in order of non-increasing distances from "s"
