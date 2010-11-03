@@ -10,11 +10,11 @@ import x10.lang.Cell;
 import x10.util.concurrent.atomic.AtomicLong;
 
 public final class Brandes(N:Int) {
-  static val M=1000*1000;
   static type AtomicType=LockedDouble;
 
   val graph:AdjacencyGraph[Int];
   val debug:Boolean;
+  val verticesToWorkOn=Rail.make[Int] (N, (i:Int)=>i);
   val betweennessMap=Rail.make[AtomicType] (N, (Int)=> new AtomicType(0.0));
 
   // Constructor
@@ -41,7 +41,8 @@ public final class Brandes(N:Int) {
    * [startVertex, endVertex) as we are used to!
    */
   public def dijkstraShortestPaths (val startVertex:Int,
-                                    val endVertex:Int) { 
+                                    val endVertex:Int,
+                                    debug:Boolean) { 
     // Per-thread structure --- initialize once.
     val myBetweennessMap = Rail.make[Double] (N, 0.0 as Double);
 
@@ -55,10 +56,15 @@ public final class Brandes(N:Int) {
     val priorityQueue = new FixedBinaryHeap (binaryHeapComparator, N);
     val deltaMap = Rail.make[Double](N);
 
-    Console.OUT.println ("Starting processing from : " + startVertex);
+    if (debug) {
+      Console.OUT.println ("Starting processing from : " + 
+                            this.verticesToWorkOn(startVertex));
+    }
+    val processingTime:Long = -System.nanoTime();
 
     // Iterate over each of the vertices in my portion.
-    for ([s] in startVertex..endVertex) { 
+    for ([vertexIndex] in startVertex..endVertex) { 
+      val s:Int = this.verticesToWorkOn(vertexIndex);
 
       // Reset all the per-vertex structures without freeing the memory!
       vertexStack.clear();
@@ -125,28 +131,59 @@ public final class Brandes(N:Int) {
       } // vertexStack not empty
     } // All vertices from (startVertex, endVertex)
 
+    if (debug) {
+      Console.OUT.println ("Processing Time: " +
+                                   ((processingTime+System.nanoTime())/1e9));
+    }
+
     // update global shared state once, atomically.
+    val mergeTime:Long = -System.nanoTime();
     for (var i:Int=0; i < N; i++) {
       val result = myBetweennessMap(i);
       if (result != 0.0D) betweennessMap(i).adjust(result);
+    } 
+
+    if (debug) {
+      Console.OUT.println ("Merge Time: " + 
+                            ((mergeTime+System.nanoTime())/1e9));
+    }
+  }
+
+  /**
+   * A function to shuffle the vertices randomly to give better work dist.
+   */
+  private def permuteVertices () {
+    val prng = new Random();
+    val maxIndex = N-1;
+    val unshuffledVertices:Rail[Int] = Rail.make[Int] (N, (i:Int)=>i);
+    for ([i] in 0..maxIndex) {
+      val indexToPick = prng.nextInt (maxIndex-i);
+      this.verticesToWorkOn(i) = unshuffledVertices(i+indexToPick);
+      unshuffledVertices(i+indexToPick) = unshuffledVertices(i);
     }
   }
 
   /**
    * Calls betweeness, prints out the statistics and what not.
    */
-  private def crunchNumbers (printer:Printer, debug:Boolean) {
+  private def crunchNumbers (printer:Printer, 
+                             permute:Boolean,
+                             chunk:Int,
+                             debug:Boolean) {
     var time:Long = System.nanoTime();
 
-    // Divide the iteration space equally amongst the P processes and 
-    // hand out the chunks to each worker.
-    val NThreads = Runtime.INIT_THREADS;
-		val chunkSize = N/NThreads;
+    // Permutate the vertices if asked for
+    if (permute) permuteVertices ();
+   
+    // Evaluate after splitting up the tasks based on the scheduling policy
+    // A "-1" indicates that the user wants to split evenly acc all threads.
+		val numChunks = (-1==chunk) ? Runtime.INIT_THREADS: chunk;
+    val chunkSize = N/numChunks;
 		finish  {
-			for ([i] in 0..NThreads-1) async {
+			for ([i] in 0..numChunks-1) async {
 				val startVertex = chunkSize*i;
-				val endVertex = (i==NThreads-1) ? N-1 : (startVertex+chunkSize-1);
-				dijkstraShortestPaths (startVertex, endVertex);
+				val endVertex = (i==numChunks-1) ? N-1 : (startVertex+chunkSize-1);
+				dijkstraShortestPaths (startVertex, endVertex, debug);
 			}
     }
 
@@ -155,7 +192,7 @@ public final class Brandes(N:Int) {
 
     if (debug) {
       for ([i] in 0..N-1) {
-        if (betweennessMap(i).get() != 0.0) 
+        if (betweennessMap(i).get() != 0.0 as Double) 
           printer.println ("(" + i + ") ->" + betweennessMap(i));
       }
     }
@@ -178,6 +215,8 @@ public final class Brandes(N:Int) {
            Option("t", "", "File type: 0: NWB, 1:NET"),
            Option("i", "", "Starting index of vertices"),
            Option("debug", "", "Debug"),
+           Option("chunk", "", "Chunk size, defaults to 100"),
+           Option("permute", "", "true, false"),
            Option("o", "", "Output file name")]);
       
       val seed:Long = cmdLineParams ("-s", 2);
@@ -191,6 +230,8 @@ public final class Brandes(N:Int) {
       val startIndex:Int = cmdLineParams ("-i", 0);
       val outFileName:String = cmdLineParams ("-o", "STDOUT");
       val debug:Boolean = 0==cmdLineParams ("-debug", 1); // off by default
+      val permute:Boolean = 0==cmdLineParams ("-permute", 1); // off by default
+      val chunk:Int = cmdLineParams ("-chunk", -1); 
       
       val numPlaces = Place.MAX_PLACES;
       
@@ -208,21 +249,25 @@ public final class Brandes(N:Int) {
         printer.println ("c = " + c);
         printer.println ("d = " + d);
         printer.println ("" + Runtime.INIT_THREADS + " workers.");
+        printer.println ("Permuting: " + permute);
+        printer.println ("Chunk size: " + chunk);
         val recursiveMatrixGenerator = Rmat (seed, n, a, b, c, d);
         val graph = recursiveMatrixGenerator.generate ();
         val brandes = new Brandes(graph, debug);
         
-        brandes.crunchNumbers (printer, debug);
+        brandes.crunchNumbers (printer, permute, chunk, debug);
       } else {
         printer.println ("f = " + fileName);
         printer.println ("t = " + fileType);
         printer.println ("i = " + startIndex);
         printer.println ("" + Runtime.INIT_THREADS + " workers.");
+        printer.println ("Permuting: " + permute);
+        printer.println ("Chunk size: " + chunk);
         
         val graph = NetReader.readNetFile (fileName, startIndex);
         val brandes = new Brandes(graph, debug);
         
-        brandes.crunchNumbers (printer, debug);
+        brandes.crunchNumbers (printer, permute, chunk, debug);
       }
       
     } catch (e:Throwable) {
