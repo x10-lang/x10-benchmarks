@@ -13,12 +13,12 @@ public final class Brandes(N:Int) {
   static type AtomicType=LockedDouble;
 
   val graph:AdjacencyGraph[Int];
-  val debug:Boolean;
+  val debug:Int;
   val verticesToWorkOn=Rail.make[Int] (N, (i:Int)=>i);
   val betweennessMap=Rail.make[AtomicType] (N, (Int)=> new AtomicType(0.0));
 
   // Constructor
-  def this(g:AdjacencyGraph[Int], debug:Boolean) {
+  def this(g:AdjacencyGraph[Int], debug:Int) {
     property(g.numVertices());
     this.graph=g;
     this.debug=debug;
@@ -42,7 +42,7 @@ public final class Brandes(N:Int) {
    */
   public def dijkstraShortestPaths (val startVertex:Int,
                                     val endVertex:Int,
-                                    debug:Boolean) { 
+                                    debug:Int) { 
     // Per-thread structure --- initialize once.
     val myBetweennessMap = Rail.make[Double] (N, 0.0 as Double);
 
@@ -56,7 +56,7 @@ public final class Brandes(N:Int) {
     val priorityQueue = new FixedBinaryHeap (binaryHeapComparator, N);
     val deltaMap = Rail.make[Double](N);
 
-    if (debug) {
+    if (debug > 0) {
       Console.OUT.println ("Starting processing from : " + 
                             this.verticesToWorkOn(startVertex));
     }
@@ -131,7 +131,7 @@ public final class Brandes(N:Int) {
       } // vertexStack not empty
     } // All vertices from (startVertex, endVertex)
 
-    if (debug) {
+    if (debug > 0) {
       Console.OUT.println ("Processing Time: " +
                                    ((processingTime+System.nanoTime())/1e9));
     }
@@ -143,7 +143,7 @@ public final class Brandes(N:Int) {
       if (result != 0.0D) betweennessMap(i).adjust(result);
     } 
 
-    if (debug) {
+    if (debug > 0) {
       Console.OUT.println ("Merge Time: " + 
                             ((mergeTime+System.nanoTime())/1e9));
     }
@@ -169,7 +169,7 @@ public final class Brandes(N:Int) {
   private def crunchNumbers (printer:Printer, 
                              permute:Boolean,
                              chunk:Int,
-                             debug:Boolean) {
+                             debug:Int) {
     var time:Long = System.nanoTime();
 
     // Permutate the vertices if asked for
@@ -190,7 +190,7 @@ public final class Brandes(N:Int) {
     time = System.nanoTime() - time;
     printer.println ("Betweenness calculation took " + time/1E9 + " seconds.");
 
-    if (debug) {
+    if (debug > 1) {
       for ([i] in 0..N-1) {
         if (betweennessMap(i).get() != 0.0 as Double) 
           printer.println ("(" + i + ") ->" + betweennessMap(i));
@@ -229,7 +229,7 @@ public final class Brandes(N:Int) {
       val fileType:Int = cmdLineParams ("-t", 0);
       val startIndex:Int = cmdLineParams ("-i", 0);
       val outFileName:String = cmdLineParams ("-o", "STDOUT");
-      val debug:Boolean = 0==cmdLineParams ("-debug", 1); // off by default
+      val debug:Int = cmdLineParams ("-debug", 0); // off by default
       val permute:Boolean = 0==cmdLineParams ("-permute", 1); // off by default
       val chunk:Int = cmdLineParams ("-chunk", -1); 
       
