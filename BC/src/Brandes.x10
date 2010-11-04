@@ -75,7 +75,7 @@ public final class Brandes(N:Int) {
       priorityQueue.clear();
 
       // 2. Pop off the processedVerticesStack and reset their values.
-      while (!(processedVerticesStack.isEmpty()) {
+      while (!(processedVerticesStack.isEmpty())) {
         val processedVertex = processedVerticesStack.pop();
         predecessorMap(processedVertex).clear();
         distanceMap(processedVertex) = ULong.MAX_VALUE;
@@ -87,7 +87,6 @@ public final class Brandes(N:Int) {
       distanceMap(s)=0 as ULong;
       sigmaMap(s)=1 as ULong;
       priorityQueue.push (s);
-      numVerticesProcessed = 0;
      
       // Loop until there are no elements left in the priority queue
       while (!priorityQueue.isEmpty()) {
