@@ -2,7 +2,11 @@
 
 # <BEGIN> user settings #
 
-export X10CXX 		?= /opt/x10/bin/x10c++
+ifeq ($(shell uname -s),Darwin)
+  export X10CXX?=/Users/pkamabdu/Software/src/x10/x10-trunk/x10.dist/bin/x10c++
+else
+  export X10CXX?=/opt/x10/bin/x10c++
+endif
 
 #leave blank by default, X10 automatically chooses a transport for you. To
 #force a particular implementation, please uncheck one of the other options.

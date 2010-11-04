@@ -50,11 +50,12 @@ public final class Brandes(N:Int) {
     val vertexStack = new FixedRailStack[Int] (N);
     val predecessorMap= Rail.make[FixedRailStack[Int]](N, (i:Int)=> 
                         new FixedRailStack[Int](graph.getInDegree(i)));
-    val distanceMap = Rail.make[ULong](N);
+    val distanceMap = Rail.make[ULong](N, ULong.MAX_VALUE);
     val sigmaMap = Rail.make(N, 0 as ULong);
     val binaryHeapComparator = makeNonIncreasingComparator(distanceMap);
     val priorityQueue = new FixedBinaryHeap (binaryHeapComparator, N);
-    val deltaMap = Rail.make[Double](N);
+    val deltaMap = Rail.make[Double](N, 0.0 as Double);
+    val processedVerticesStack = new FixedRailStack[Int](N);
 
     if (debug > 0) {
       Console.OUT.println ("Starting processing from : " + 
@@ -66,24 +67,34 @@ public final class Brandes(N:Int) {
     for ([vertexIndex] in startVertex..endVertex) { 
       val s:Int = this.verticesToWorkOn(vertexIndex);
 
-      // Reset all the per-vertex structures without freeing the memory!
+      // Reset the values of those vertices that were touched in the previous
+      // iteration. This might save some computation.
+
+      // 1. Clear the vertexStack and the priorityQueue --- O(1) operation.
       vertexStack.clear();
-      for ([i] in 0..N-1) predecessorMap(i).clear();
-      for ([i] in 0..N-1) distanceMap(i) = ULong.MAX_VALUE;
-      for ([i] in 0..N-1) sigmaMap(i) = 0 as ULong;
-      for ([i] in 0..N-1) deltaMap(i) = 0.0 as Double;
       priorityQueue.clear();
+
+      // 2. Pop off the processedVerticesStack and reset their values.
+      while (!(processedVerticesStack.isEmpty()) {
+        val processedVertex = processedVerticesStack.pop();
+        predecessorMap(processedVertex).clear();
+        distanceMap(processedVertex) = ULong.MAX_VALUE;
+        sigmaMap(processedVertex) = 0 as ULong;
+        deltaMap(processedVertex) = 0.0 as Double;
+      }
 
       // Put the values for source vertex
       distanceMap(s)=0 as ULong;
       sigmaMap(s)=1 as ULong;
       priorityQueue.push (s);
+      numVerticesProcessed = 0;
      
       // Loop until there are no elements left in the priority queue
       while (!priorityQueue.isEmpty()) {
         // Pop the node with the least distance
         val v = priorityQueue.pop();
         vertexStack.push (v);
+        processedVerticesStack.push (v);
         
         // Iterate over all its neighbors
         for (w in graph.getNeighbors(v).keySet()) {
