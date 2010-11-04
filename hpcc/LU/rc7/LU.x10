@@ -99,9 +99,9 @@ class LU {
         val _buffers = buffers; // this is done so that we don't serialize the object that contains buffers
         val _A = A;
         
-        finish{
+        @Pragma(Pragma.FINISH_ASYNC_AND_BACK) finish{
         	async at (Place(dest)){
-        		finish{
+        	    @Pragma(Pragma.FINISH_ASYNC) finish{
         			Array.asyncCopy[Double](remoteBuffer, 0, _buffers(), 0, size);
         		}
         		val size2 = _A().swapRow(row2, min, max, _buffers());
@@ -279,7 +279,7 @@ class LU {
             val _A = A;
             val remoteRowBuffer = new RemoteArray(rowBuffer);
             val _B = B;
-	    	finish{
+            @Pragma(Pragma.FINISH_ASYNC_AND_BACK) finish{
 				async at(Place(A_here.placeOfBlock(I, J))){
 					Array.asyncCopy(_A().block(I, J).raw, 0, remoteRowBuffer, 0, _B * _B);
 				}
@@ -365,7 +365,7 @@ class LU {
 
         var t:Long = -System.nanoTime();
 
-        finish ateach (p in unique) {
+        @Pragma(Pragma.FINISH_ATEACH_UNIQUE) finish ateach (p in unique) {
             val lu = lus();
             val timer = new Timer(15);
 
