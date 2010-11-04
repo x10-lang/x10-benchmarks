@@ -334,8 +334,8 @@ class LU {
         val px = Int.parse(args(2));
         val py = Int.parse(args(3));
         val A = BlockedArray.make(M, N, B, B, px, py);
-        val buffers = PlaceLocalHandle.make[Array[Double](1)](Dist.makeUnique(), ()=>new Array[Double](N));        
-        val lus = PlaceLocalHandle.make[LU](Dist.makeUnique(), ()=>new LU(M, N, B, px, py, A, buffers));
+        val buffers = PlaceLocalHandle.makeFlat[Array[Double](1)](Dist.makeUnique(), ()=>new Array[Double](N));        
+        val lus = PlaceLocalHandle.makeFlat[LU](Dist.makeUnique(), ()=>new LU(M, N, B, px, py, A, buffers));
         Console.OUT.println ("LU Starting: M " + M + " B " + B + " px " + px + " py " + py);
         start(lus);
     }
