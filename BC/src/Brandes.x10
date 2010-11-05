@@ -11,6 +11,7 @@ import x10.util.concurrent.atomic.AtomicLong;
 
 public final class Brandes(N:Int) {
   static type AtomicType=LockedDouble;
+  static val Meg = (1000*1000); // not Whitman, she is history
 
   val graph:AdjacencyGraph[Int];
   val debug:Int;
@@ -43,7 +44,8 @@ public final class Brandes(N:Int) {
   public def dijkstraShortestPaths (val startVertex:Int,
                                     val endVertex:Int,
                                     debug:Int) { 
-    // Per-thread structure --- initialize once.
+    var allocTime:Long= -System.nanoTime();
+	  // Per-thread structure --- initialize once.
     val myBetweennessMap = Rail.make[Double] (N, 0.0 as Double);
 
     // These are the per-vertex data structures.
@@ -57,12 +59,16 @@ public final class Brandes(N:Int) {
     val deltaMap = Rail.make[Double](N, 0.0 as Double);
     val processedVerticesStack = new FixedRailStack[Int](N);
 
+    allocTime += System.nanoTime();
+    allocTime /= Meg; // ms
+    
     if (debug > 0) {
       Console.OUT.println ("Starting processing from : " + 
                             this.verticesToWorkOn(startVertex));
     }
-    val processingTime:Long = -System.nanoTime();
-
+   
+    var processingTime:Long = 0;
+    var resetTime:Long = 0;
     // Iterate over each of the vertices in my portion.
     for ([vertexIndex] in startVertex..endVertex) { 
       val s:Int = this.verticesToWorkOn(vertexIndex);
@@ -71,6 +77,8 @@ public final class Brandes(N:Int) {
       // iteration. This might save some computation.
 
       // 1. Clear the vertexStack and the priorityQueue --- O(1) operation.
+    
+      var resetCounter:Long = System.nanoTime();
       vertexStack.clear();
       priorityQueue.clear();
 
@@ -83,10 +91,14 @@ public final class Brandes(N:Int) {
         deltaMap(processedVertex) = 0.0 as Double;
       }
 
+      resetTime += (System.nanoTime() - resetCounter)/Meg;
+    	  
+      val processingCounter:Long = System.nanoTime();
       // Put the values for source vertex
       distanceMap(s)=0 as ULong;
       sigmaMap(s)=1 as ULong;
       priorityQueue.push (s);
+     
      
       // Loop until there are no elements left in the priority queue
       while (!priorityQueue.isEmpty()) {
@@ -138,24 +150,33 @@ public final class Brandes(N:Int) {
      
         // Accumulate updates locally 
         if (w != s) myBetweennessMap(w) += deltaMap(w); 
+        processingTime  += (System.nanoTime() - processingCounter)/Meg;
       } // vertexStack not empty
     } // All vertices from (startVertex, endVertex)
 
+    processingTime += System.nanoTime();
+    processingTime /= Meg;
     if (debug > 0) {
       Console.OUT.println ("Processing Time: " +
                                    ((processingTime+System.nanoTime())/1e9));
     }
 
     // update global shared state once, atomically.
-    val mergeTime:Long = -System.nanoTime();
+    var mergeTime:Long = -System.nanoTime();
     for (var i:Int=0; i < N; i++) {
       val result = myBetweennessMap(i);
       if (result != 0.0D) betweennessMap(i).adjust(result);
     } 
-
+    mergeTime += System.nanoTime();
+    mergeTime /= Meg;
+    
     if (debug > 0) {
-      Console.OUT.println ("Merge Time: " + 
-                            ((mergeTime+System.nanoTime())/1e9));
+      Console.OUT.println ("[" + Runtime.workerId() + "] "
+    		  + " Alloc= " + allocTime
+    		  + " Reset= " + resetTime
+    		  + " Proc= " + processingTime
+    		  + " Merge= " + mergeTime
+    		);
     }
   }
 
