@@ -59,12 +59,11 @@ public final class Brandes(N:Int) {
     val deltaMap = Rail.make[Double](N, 0.0 as Double);
     val processedVerticesStack = new FixedRailStack[Int](N);
 
-    allocTime += System.nanoTime();
-    allocTime /= Meg; // ms
+    allocTime = (System.nanoTime() - allocTime)/Meg;
     
     if (debug > 0) {
-      Console.OUT.println ("Starting processing from : " + 
-                            this.verticesToWorkOn(startVertex));
+      Console.OUT.println ("[" + Runtime.workerId() + "] Started processing at  " + 
+                            (System.nanoTime()/Meg));
     }
    
     var processingTime:Long = 0;
@@ -154,13 +153,6 @@ public final class Brandes(N:Int) {
       } // vertexStack not empty
     } // All vertices from (startVertex, endVertex)
 
-    processingTime += System.nanoTime();
-    processingTime /= Meg;
-    if (debug > 0) {
-      Console.OUT.println ("Processing Time: " +
-                                   ((processingTime+System.nanoTime())/1e9));
-    }
-
     // update global shared state once, atomically.
     var mergeTime:Long = -System.nanoTime();
     for (var i:Int=0; i < N; i++) {
@@ -201,8 +193,11 @@ public final class Brandes(N:Int) {
                              permute:Boolean,
                              chunk:Int,
                              debug:Int) {
+	  
     var time:Long = System.nanoTime();
-
+ 	if (debug > 0 ) {
+ 		printer.println("Started computation at " + time/Meg);
+ 	}
     // Permutate the vertices if asked for
     if (permute) permuteVertices ();
    
