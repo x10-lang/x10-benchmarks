@@ -82,7 +82,7 @@ public final class AdjacencyGraph  {
   /**
    * Get the adjacency node for a given index.
    */
-  public def getAdjancencyNode (index:Int) {
+  public def getAdjacencyNode (index:Int) {
     assert (index<this.M);
     return this.adjacencyMap(index);
   }

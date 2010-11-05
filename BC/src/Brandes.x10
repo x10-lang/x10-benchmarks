@@ -114,7 +114,7 @@ public final class Brandes(N:Int) {
           //val distanceThroughV = distanceMap(v) + graph.getEdgeWeight (v, w);
         for (var wIndex:Int=edgeStart; wIndex<edgeEnd; ++wIndex) {
           // Get the target of the current edge and its weight.
-          val adjacencyNode:AdjacencyNode = graph.getAdjancencyNode(wIndex);
+          val adjacencyNode:AdjacencyNode = graph.getAdjacencyNode(wIndex);
           val w:Int = adjacencyNode.getTargetVertex();
           val distanceThroughV = distanceMap(v) + adjacencyNode.getEdgeWeight();
 
@@ -228,6 +228,8 @@ public final class Brandes(N:Int) {
     }
 
     time = System.nanoTime() - time;
+    printer.println ("Graph details: N=" + graph.numVertices() + 
+                     ", M=" + graph.numEdges());
     printer.println ("Betweenness calculation took " + time/1E9 + " seconds.");
 
     if (debug > 1) {
