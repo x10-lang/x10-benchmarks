@@ -44,7 +44,7 @@ public final class Brandes(N:Int) {
   public def dijkstraShortestPaths (val startVertex:Int,
                                     val endVertex:Int,
                                     debug:Int) { 
-    var allocTime:Long= -System.nanoTime();
+    var allocTime:Long= System.nanoTime();
 	  // Per-thread structure --- initialize once.
     val myBetweennessMap = Rail.make[Double] (N, 0.0 as Double);
 
@@ -151,16 +151,16 @@ public final class Brandes(N:Int) {
         if (w != s) myBetweennessMap(w) += deltaMap(w); 
         processingTime  += (System.nanoTime() - processingCounter)/Meg;
       } // vertexStack not empty
+      
     } // All vertices from (startVertex, endVertex)
 
     // update global shared state once, atomically.
-    var mergeTime:Long = -System.nanoTime();
+    var mergeTime:Long = System.nanoTime();
     for (var i:Int=0; i < N; i++) {
       val result = myBetweennessMap(i);
       if (result != 0.0D) betweennessMap(i).adjust(result);
     } 
-    mergeTime += System.nanoTime();
-    mergeTime /= Meg;
+    mergeTime = (System.nanoTime() - mergeTime)/Meg;
     
     if (debug > 0) {
       Console.OUT.println ("[" + Runtime.workerId() + "] "
