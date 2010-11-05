@@ -77,7 +77,7 @@ public final class Brandes(N:Int) {
 
       // 1. Clear the vertexStack and the priorityQueue --- O(1) operation.
     
-      var resetCounter:Long = System.nanoTime();
+      val resetCounter:Long = System.nanoTime();
       vertexStack.clear();
       priorityQueue.clear();
 
@@ -149,9 +149,9 @@ public final class Brandes(N:Int) {
      
         // Accumulate updates locally 
         if (w != s) myBetweennessMap(w) += deltaMap(w); 
-        processingTime  += (System.nanoTime() - processingCounter)/Meg;
+       
       } // vertexStack not empty
-      
+      processingTime  += (System.nanoTime() - processingCounter)/Meg;
     } // All vertices from (startVertex, endVertex)
 
     // update global shared state once, atomically.
