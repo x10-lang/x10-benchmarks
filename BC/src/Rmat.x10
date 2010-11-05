@@ -114,7 +114,7 @@ public final struct Rmat {
 	 * weight --- this is a way to deal with duplicate edges.
 	 */
 	private final def sparse (row:Rail[Int], col:Rail[Int]) {
-		val adjacencyGraph = AdjacencyGraph  (this.N);
+		val adjacencyGraph = new AdjacencyGraph  (this.N);
 		val numElements = row.length(); 
 		
 		for (var i:Int=0; i<numElements; ++i) {

@@ -59,11 +59,10 @@ public final class Brandes(N:Int) {
     val deltaMap = Rail.make[Double](N, 0.0 as Double);
     val processedVerticesStack = new FixedRailStack[Int](N);
 
-    allocTime = (System.nanoTime() - allocTime)/Meg;
+    allocTime = (System.nanoTime() - allocTime);
     
     if (debug > 0) {
-      Console.OUT.println ("[" + Runtime.workerId() + "] Started processing at  " + 
-                            (System.nanoTime()/Meg));
+      Console.OUT.println ("" + Runtime.workerId() + " started processing");
     }
    
     var processingTime:Long = 0;
@@ -90,7 +89,7 @@ public final class Brandes(N:Int) {
         deltaMap(processedVertex) = 0.0 as Double;
       }
 
-      resetTime += (System.nanoTime() - resetCounter)/Meg;
+      resetTime += (System.nanoTime() - resetCounter);
     	  
       val processingCounter:Long = System.nanoTime();
       // Put the values for source vertex
@@ -105,10 +104,19 @@ public final class Brandes(N:Int) {
         val v = priorityQueue.pop();
         vertexStack.push (v);
         processedVerticesStack.push (v);
+
+        // Get the start and the end points for the edge list for "v"
+        val edgeStart:Int = graph.begin(v);
+        val edgeEnd:Int = graph.end(v);
         
         // Iterate over all its neighbors
-        for (w in graph.getNeighbors(v).keySet()) {
-          val distanceThroughV = distanceMap(v) + graph.getEdgeWeight (v, w);
+        //for (w in graph.getNeighbors(v).keySet()) {
+          //val distanceThroughV = distanceMap(v) + graph.getEdgeWeight (v, w);
+        for (var wIndex:Int=edgeStart; wIndex<edgeEnd; ++wIndex) {
+          // Get the target of the current edge and its weight.
+          val adjacencyNode:AdjacencyNode = graph.getAdjancencyNode(wIndex);
+          val w:Int = adjacencyNode.getTargetVertex();
+          val distanceThroughV = distanceMap(v) + adjacencyNode.getEdgeWeight();
 
           // Update the distance and push it in the priorityQueue
           // if a new low distance has been found.
@@ -151,7 +159,7 @@ public final class Brandes(N:Int) {
         if (w != s) myBetweennessMap(w) += deltaMap(w); 
        
       } // vertexStack not empty
-      processingTime  += (System.nanoTime() - processingCounter)/Meg;
+      processingTime  += (System.nanoTime() - processingCounter);
     } // All vertices from (startVertex, endVertex)
 
     // update global shared state once, atomically.
@@ -160,14 +168,14 @@ public final class Brandes(N:Int) {
       val result = myBetweennessMap(i);
       if (result != 0.0D) betweennessMap(i).adjust(result);
     } 
-    mergeTime = (System.nanoTime() - mergeTime)/Meg;
+    mergeTime = (System.nanoTime() - mergeTime);
     
     if (debug > 0) {
       Console.OUT.println ("[" + Runtime.workerId() + "] "
-    		  + " Alloc= " + allocTime
-    		  + " Reset= " + resetTime
-    		  + " Proc= " + processingTime
-    		  + " Merge= " + mergeTime
+    		  + " Alloc= " + allocTime/1e9
+    		  + " Reset= " + resetTime/1e9
+    		  + " Proc= " + processingTime/1e9
+    		  + " Merge= " + mergeTime/1e9
     		);
     }
   }
@@ -193,11 +201,17 @@ public final class Brandes(N:Int) {
                              permute:Boolean,
                              chunk:Int,
                              debug:Int) {
-	  
+
+    // Convert graph to compressed format
+    val compressTime:Long = -System.nanoTime();
+    this.graph.compressGraph();
+ 	  if (debug > 0 ) {
+ 		  printer.println("Graph compression took " + 
+                      ((System.nanoTime()+compressTime)/1e9) + " seconds");
+ 	  }
+
     var time:Long = System.nanoTime();
- 	if (debug > 0 ) {
- 		printer.println("Started computation at " + time/Meg);
- 	}
+
     // Permutate the vertices if asked for
     if (permute) permuteVertices ();
    

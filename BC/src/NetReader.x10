@@ -21,7 +21,7 @@ public final struct NetReader {
 
     if (0 > N) throw new Exception ("Incorrect File Format");
 
-    val adjacencyGraph = AdjacencyGraph(N);
+    val adjacencyGraph = new AdjacencyGraph(N);
 
     /* Iterate over the lines and construct the graph */
     var foundEdges:Boolean = false;

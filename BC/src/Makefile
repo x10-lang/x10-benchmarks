@@ -5,13 +5,13 @@
 ifeq ($(shell uname -s),Darwin)
   export X10CXX?=/Users/pkamabdu/Software/src/x10/x10-trunk/x10.dist/bin/x10c++
 else
-  export X10CXX?=/opt/x10/bin/x10c++
+  export X10CXX?=${HOME}/Software/src/x10/x10-trunk/x10.dist/bin/x10c++
 endif
 
 #leave blank by default, X10 automatically chooses a transport for you. To
 #force a particular implementation, please uncheck one of the other options.
-#export X10RTTRANSPORT	?= 
-export X10RTTRANSPORT	?= -x10rt mpi
+export X10RTTRANSPORT	?= 
+#export X10RTTRANSPORT	?= -x10rt mpi
 #export X10RTTRANSPORT ?= -x10rt standalone
 #export X10RTTRANSPORT ?= -x10rt pgas_lapi
 #export X10RTTRANSPORT ?= -x10rt pgas_bgp
@@ -46,14 +46,15 @@ X10CXXFLAGS=-report \
             -NO_CHECKS \
             -O  
 
-X10_STRUCTS=AdjacencyGraph.x10 \
-            Rmat.x10 \
-            NetReader.x10
+X10_STRUCTS=Rmat.x10 \
+            NetReader.x10 \
+            AdjacencyNode.x10 
 X10_STRUCTS_CC=$(X10_STRUCTS:.x10=.cc)
 X10_STRUCTS_H=$(X10_STRUCTS:.x10=.h)
 X10_STRUCTS_STRUCTS_H=$(X10_STRUCTS:.x10=.struct_h)
 
 X10_CLASSES=Brandes.x10 \
+            AdjacencyGraph.x10 \
             FixedBinaryHeap.x10 \
             FixedRailStack.x10 \
             AtomicDouble.x10 \
