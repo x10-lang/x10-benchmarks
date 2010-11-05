@@ -8,6 +8,7 @@ import x10.io.File;
 import x10.io.Printer;
 import x10.lang.Cell;
 import x10.util.concurrent.atomic.AtomicLong;
+import x10.util.Team;
 
 public final class Brandes(N:Int) {
   static type AtomicType=LockedDouble;
@@ -62,7 +63,8 @@ public final class Brandes(N:Int) {
     allocTime = (System.nanoTime() - allocTime);
     
     if (debug > 0) {
-      Console.OUT.println ("" + Runtime.workerId() + " started processing");
+      Console.OUT.println ("" + here.id + ":" +  
+                           Runtime.workerId() + " started processing");
     }
    
     var processingTime:Long = 0;
@@ -163,19 +165,19 @@ public final class Brandes(N:Int) {
     } // All vertices from (startVertex, endVertex)
 
     // update global shared state once, atomically.
-    var mergeTime:Long = System.nanoTime();
+    var localMergeTime:Long = System.nanoTime();
     for (var i:Int=0; i < N; i++) {
       val result = myBetweennessMap(i);
       if (result != 0.0D) betweennessMap(i).adjust(result);
     } 
-    mergeTime = (System.nanoTime() - mergeTime);
+    localMergeTime = (System.nanoTime() - localMergeTime);
     
     if (debug > 0) {
-      Console.OUT.println ("[" + Runtime.workerId() + "] "
+      Console.OUT.println ("[" + here.id + ":" + Runtime.workerId() + "] "
     		  + " Alloc= " + allocTime/1e9
     		  + " Reset= " + resetTime/1e9
     		  + " Proc= " + processingTime/1e9
-    		  + " Merge= " + mergeTime/1e9
+    		  + " Merge= " + localMergeTime/1e9
     		);
     }
   }
@@ -195,16 +197,112 @@ public final class Brandes(N:Int) {
   }
 
   /**
+   * Merge the betweenness map. Don't quite know if everyone receives the 
+   * results. Only the root needs the results and there is no clear way to 
+   * specify this in the Team interface.
+   */
+  private def mergeBetweennessMap () {
+    // Copy the local betweennessMap into a Double array.
+    val unlockedBetweennessMap = Rail.make[Double]
+          (this.N, (i:Int) => this.betweennessMap(i).get());
+
+    // Merge the results globally
+    Team.WORLD.allreduce (here.id, // My ID.
+                          unlockedBetweennessMap, // Source buffer.
+                          0, // Offset into the source buffer.
+                          //mergedunlockedBetweennessMap, // Destination buffer.
+                          unlockedBetweennessMap, // Destination buffer.
+                          0, // Offset into the destination buffer.
+                          this.N, // Number of elements.
+                          Team.ADD); // Operation to be performed.
+    
+    // Copy the results back into the locked double. This has been done 
+    // purely for elegance. You don't need to copy this back. Also, we 
+    // can replace the LockedDouble with two arrays. One holding the Doubles
+    // and another holding the locks to each Double. This way, we already 
+    // have a Double values array ready to be globally reduced.
+    for ([i] in 0..this.N-1) {
+      this.betweennessMap(i).set(unlockedBetweennessMap(i));
+    }
+  }
+
+  /**
+   * Place local version of crunchNumbers.
+   */
+  private def crunchNumbersLocally (printer:Printer,
+                                    permute:Boolean,
+                                    chunk:Int,
+                                    vertexBeginIndex:Int,
+                                    vertexEndIndex:Int,
+                                    debug:Int) {
+    // Permutate the vertices if asked for
+    if (permute) permuteVertices ();
+   
+    // Evaluate after splitting up the tasks based on the scheduling policy
+    // A "-1" indicates that the user wants to split evenly acc all threads.
+    val myTotalWorkLoad = (vertexEndIndex-vertexBeginIndex);
+		val numChunks = (-1==chunk) ? Runtime.INIT_THREADS: chunk;
+    val chunkSize = myTotalWorkLoad/numChunks;
+
+		finish  {
+			for ([i] in 0..numChunks-1) async {
+				val startVertex = vertexBeginIndex + chunkSize*i;
+				val endVertex = (i==numChunks-1) ? vertexEndIndex-1: 
+                                           (startVertex+chunkSize-1);
+				dijkstraShortestPaths (startVertex, endVertex, debug);
+			}
+    }
+
+    // Merge the results back with each place.
+    val globalMergeTime:Long = -System.nanoTime();
+    mergeBetweennessMap ();
+    if (debug > 0) {
+      Console.OUT.println ("[" + here.id +  "] " 
+    		  + " Global merge time= " + ((globalMergeTime+System.nanoTime())/1e9));
+    }
+  }
+
+  /**
+   * Dump the betweenness map.
+   */
+  private def printBetweennessMap (printer:Printer) {
+    for ([i] in 0..graph.numVertices()-1) {
+      if (betweennessMap(i).get() != 0.0 as Double) 
+        printer.println ("(" + i + ") ->" + betweennessMap(i));
+    }
+  }
+
+  /**
+   * A simple one dimensional partition of nodes.
+   */
+  private static def getLinearPartition (totalWork:Int,
+                                         numChunks:Int) {
+    val workPartition:Rail[Int] = Rail.make[Int] (numChunks+1);
+    val chunkSize = totalWork/numChunks;
+
+    // The first (numChunks-1) are equal
+    for ([parition] in 0..numChunks-1) {
+      workPartition(parition) = chunkSize*parition;
+    }
+
+    // The last person gets whatever is remaining
+    workPartition(numChunks) = totalWork;
+
+    return workPartition;
+  }
+
+  /**
    * Calls betweeness, prints out the statistics and what not.
    */
-  private def crunchNumbers (printer:Printer, 
-                             permute:Boolean,
-                             chunk:Int,
-                             debug:Int) {
+  private static def crunchNumbers (graph:AdjacencyGraph,
+                                    printer:Printer, 
+                                    permute:Boolean,
+                                    chunk:Int,
+                                    debug:Int) {
 
     // Convert graph to compressed format
     val compressTime:Long = -System.nanoTime();
-    this.graph.compressGraph();
+    graph.compressGraph();
  	  if (debug > 0 ) {
  		  printer.println("Graph compression took " + 
                       ((System.nanoTime()+compressTime)/1e9) + " seconds");
@@ -212,19 +310,28 @@ public final class Brandes(N:Int) {
 
     var time:Long = System.nanoTime();
 
-    // Permutate the vertices if asked for
-    if (permute) permuteVertices ();
-   
-    // Evaluate after splitting up the tasks based on the scheduling policy
-    // A "-1" indicates that the user wants to split evenly acc all threads.
-		val numChunks = (-1==chunk) ? Runtime.INIT_THREADS: chunk;
-    val chunkSize = N/numChunks;
-		finish  {
-			for ([i] in 0..numChunks-1) async {
-				val startVertex = chunkSize*i;
-				val endVertex = (i==numChunks-1) ? N-1 : (startVertex+chunkSize-1);
-				dijkstraShortestPaths (startVertex, endVertex, debug);
-			}
+    // Determine the number of places.
+    val numPlaces = Place.MAX_PLACES;
+
+    // Get a rail of partitions
+    val workPartition = getLinearPartition (graph.numVertices(), numPlaces);
+
+    // Create a place local handle at each place.
+    val brandesHandles = PlaceLocalHandle.make[Brandes] 
+          (Dist.makeUnique(), ()=> new Brandes (graph, debug));
+
+    // Loop over all the places and crunch the numbers.
+    finish {
+      for ([place] in 0..numPlaces-1) {
+        async at(Place(place)) {
+          brandesHandles().crunchNumbersLocally (printer, 
+                                                 permute, 
+                                                 chunk, 
+                                                 workPartition(place), 
+                                                 workPartition(place+1), 
+                                                 debug);
+        }
+      }
     }
 
     time = System.nanoTime() - time;
@@ -232,11 +339,8 @@ public final class Brandes(N:Int) {
                      ", M=" + graph.numEdges());
     printer.println ("Betweenness calculation took " + time/1E9 + " seconds.");
 
-    if (debug > 1) {
-      for ([i] in 0..N-1) {
-        if (betweennessMap(i).get() != 0.0 as Double) 
-          printer.println ("(" + i + ") ->" + betweennessMap(i));
-      }
+    if (debug>1) {
+      brandesHandles().printBetweennessMap(printer);
     }
   }
   
@@ -290,14 +394,14 @@ public final class Brandes(N:Int) {
         printer.println ("b = " + b);
         printer.println ("c = " + c);
         printer.println ("d = " + d);
-        printer.println ("" + Runtime.INIT_THREADS + " workers.");
+        printer.println ("" + Place.MAX_PLACES + " places and " + 
+                         Runtime.INIT_THREADS + " workers per-place");
         printer.println ("Permuting: " + permute);
         printer.println ("Chunk size: " + chunk);
         val recursiveMatrixGenerator = Rmat (seed, n, a, b, c, d);
         val graph = recursiveMatrixGenerator.generate ();
-        val brandes = new Brandes(graph, debug);
         
-        brandes.crunchNumbers (printer, permute, chunk, debug);
+        crunchNumbers (graph, printer, permute, chunk, debug);
       } else {
         printer.println ("f = " + fileName);
         printer.println ("t = " + fileType);
@@ -305,11 +409,11 @@ public final class Brandes(N:Int) {
         printer.println ("" + Runtime.INIT_THREADS + " workers.");
         printer.println ("Permuting: " + permute);
         printer.println ("Chunk size: " + chunk);
+        printer.println ("" + Place.MAX_PLACES + " places and " + 
+                         Runtime.INIT_THREADS + " workers per-place");
         
         val graph = NetReader.readNetFile (fileName, startIndex);
-        val brandes = new Brandes(graph, debug);
-        
-        brandes.crunchNumbers (printer, permute, chunk, debug);
+        crunchNumbers (graph, printer, permute, chunk, debug);
       }
       
     } catch (e:Throwable) {

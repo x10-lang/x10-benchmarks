@@ -23,6 +23,9 @@ public final  class LockedDouble {
   // Get the value
   public def get () = this.value;
 
+  // Set the value
+  public def set (newValue:Double) { this.value = newValue; }
+
 	// Define a toString to print out stuff
 	public def toString () = "" + value;
 }

@@ -25,6 +25,9 @@ public final class AtomicDouble {
   // Get the value
   public def get ():Double = Double.fromLongBits(value.get());
 
+  // Set the value
+  public def set (newValue:Double) { this.value = newValue.toRawLongBits(); }
+
 	// Define a toString to print out stuff
 	public def toString () = "" + Double.fromLongBits(value.get());
 }
