@@ -3,7 +3,7 @@ import x10.io.Reader;
 import x10.io.ReaderIterator;
 
 /* A class to read the NET format by Pajek */
-public final struct NetReader {
+public  struct NetReader {
   /* The function that reads in stuff from a file and populates it */
   public static def readNetFile (fileName:String,
                                  startIndex:Int) : 

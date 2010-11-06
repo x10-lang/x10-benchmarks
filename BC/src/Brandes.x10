@@ -14,18 +14,18 @@ public final class Brandes(N:Int) {
   static type AtomicType=LockedDouble;
   static val Meg = (1000*1000); // not Whitman, she is history
 
-  val graph:AdjacencyGraph[Int];
+  val graph:AdjacencyGraph;
   val debug:Int;
   val verticesToWorkOn=Rail.make[Int] (N, (i:Int)=>i);
   val betweennessMap=Rail.make[AtomicType] (N, (Int)=> new AtomicType(0.0));
 
   // Constructor
-  def this(g:AdjacencyGraph[Int], debug:Int) {
+  def this(g:AdjacencyGraph, debug:Int) {
     property(g.numVertices());
     this.graph=g;
     this.debug=debug;
   }
-
+def graph()=graph;
   // A comparator which orders the vertices by their distances.
   private static val makeNonIncreasingComparator = 
     (distanceMap:Rail[ULong]) =>  (x:Int, y:Int) => {
@@ -281,8 +281,8 @@ public final class Brandes(N:Int) {
     val chunkSize = totalWork/numChunks;
 
     // The first (numChunks-1) are equal
-    for ([parition] in 0..numChunks-1) {
-      workPartition(parition) = chunkSize*parition;
+    for ([partition] in 0..numChunks-1) {
+      workPartition(partition) = chunkSize*partition;
     }
 
     // The last person gets whatever is remaining
@@ -294,51 +294,50 @@ public final class Brandes(N:Int) {
   /**
    * Calls betweeness, prints out the statistics and what not.
    */
-  private static def crunchNumbers (graph:AdjacencyGraph,
+  private static def crunchNumbers (graphMaker:GraphMaker,
                                     printer:Printer, 
                                     permute:Boolean,
                                     chunk:Int,
                                     debug:Int) {
 
-    // Convert graph to compressed format
-    val compressTime:Long = -System.nanoTime();
-    graph.compressGraph();
- 	  if (debug > 0 ) {
- 		  printer.println("Graph compression took " + 
-                      ((System.nanoTime()+compressTime)/1e9) + " seconds");
- 	  }
-
-    var time:Long = System.nanoTime();
-
     // Determine the number of places.
     val numPlaces = Place.MAX_PLACES;
 
-    // Get a rail of partitions
-    val workPartition = getLinearPartition (graph.numVertices(), numPlaces);
-
+  
+    var time:Long = System.nanoTime();
     // Create a place local handle at each place.
     val brandesHandles = PlaceLocalHandle.make[Brandes] 
-          (Dist.makeUnique(), ()=> new Brandes (graph, debug));
-
+                                               (Dist.makeUnique(), ()=> {
+                                            	   val graph = graphMaker.make();
+                                            	   graph.compressGraph();
+                                            	   new Brandes (graph, debug)
+                                               });
+    val myGraph = brandesHandles().graph();
+    val N= myGraph.numVertices();
+    val M= myGraph.numEdges();
+    printer.println ("Graph details: N=" + N + ", M=" + M);
+    // Get a rail of partitions
+    val workPartition = getLinearPartition (N, numPlaces);
+    
     val distTime = (System.nanoTime()-time)/1e9;
     time = System.nanoTime();
     // Loop over all the places and crunch the numbers.
     finish {
       for ([place] in 0..numPlaces-1) {
+    	  val start = workPartition(place);
+    	  val end = workPartition(place+1);
         async at(Place(place)) {
           brandesHandles().crunchNumbersLocally (printer, 
                                                  permute, 
                                                  chunk, 
-                                                 workPartition(place), 
-                                                 workPartition(place+1), 
+                                                 start, 
+                                                 end, 
                                                  debug);
         }
       }
     }
 
     time = System.nanoTime() - time;
-    printer.println ("Graph details: N=" + graph.numVertices() + 
-                     ", M=" + graph.numEdges());
     printer.println ("Betweenness calculation took distTime=" + distTime 
     		+ " procTime=" + time/1E9 + " seconds.");
 
@@ -346,7 +345,24 @@ public final class Brandes(N:Int) {
       brandesHandles().printBetweennessMap(printer);
     }
   }
-  
+  static interface GraphMaker {
+	  def make():AdjacencyGraph;
+  }
+  static struct RmatGraphMaker(seed:Long, n:Int, a:Double, b:Double, c:Double, d:Double) 
+  implements GraphMaker{
+	  public def make() {
+		  val recursiveMatrixGenerator = Rmat (seed, n, a, b, c, d);
+	        val graph = recursiveMatrixGenerator.generate ();
+	        return graph;
+	  }
+  }
+  static struct NetMaker(fileName:String, startIndex:Int) 
+  implements GraphMaker{
+	  public def make() {
+		  val graph = NetReader.readNetFile (fileName, startIndex);
+	        return graph;
+	  }
+  }
   /**
    * The big cahuna --- read in all the options and calculate betweenness.
    */
@@ -397,14 +413,12 @@ public final class Brandes(N:Int) {
         printer.println ("b = " + b);
         printer.println ("c = " + c);
         printer.println ("d = " + d);
-        printer.println ("" + Place.MAX_PLACES + " places and " + 
-                         Runtime.INIT_THREADS + " workers/place");
         printer.println ("Permuting: " + permute);
         printer.println ("Chunk size: " + chunk);
-        val recursiveMatrixGenerator = Rmat (seed, n, a, b, c, d);
-        val graph = recursiveMatrixGenerator.generate ();
+        printer.println ("" + Place.MAX_PLACES + " places and " + 
+                Runtime.INIT_THREADS + " workers/place");
         
-        crunchNumbers (graph, printer, permute, chunk, debug);
+        crunchNumbers (RmatGraphMaker(seed,n,a,b,c,d), printer, permute, chunk, debug);
       } else {
         printer.println ("f = " + fileName);
         printer.println ("t = " + fileType);
@@ -415,8 +429,7 @@ public final class Brandes(N:Int) {
         printer.println ("" + Place.MAX_PLACES + " places and " + 
                          Runtime.INIT_THREADS + " workers per-place");
         
-        val graph = NetReader.readNetFile (fileName, startIndex);
-        crunchNumbers (graph, printer, permute, chunk, debug);
+        crunchNumbers (NetMaker(fileName, startIndex), printer, permute, chunk, debug);
       }
       
     } catch (e:Throwable) {
