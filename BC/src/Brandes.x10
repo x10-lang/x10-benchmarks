@@ -320,6 +320,8 @@ public final class Brandes(N:Int) {
     val brandesHandles = PlaceLocalHandle.make[Brandes] 
           (Dist.makeUnique(), ()=> new Brandes (graph, debug));
 
+    val distTime = (System.nanoTime()-time)/1e9;
+    time = System.nanoTime();
     // Loop over all the places and crunch the numbers.
     finish {
       for ([place] in 0..numPlaces-1) {
@@ -337,7 +339,8 @@ public final class Brandes(N:Int) {
     time = System.nanoTime() - time;
     printer.println ("Graph details: N=" + graph.numVertices() + 
                      ", M=" + graph.numEdges());
-    printer.println ("Betweenness calculation took " + time/1E9 + " seconds.");
+    printer.println ("Betweenness calculation took distTime=" + distTime 
+    		+ " procTime=" + time/1E9 + " seconds.");
 
     if (debug>1) {
       brandesHandles().printBetweennessMap(printer);
@@ -395,7 +398,7 @@ public final class Brandes(N:Int) {
         printer.println ("c = " + c);
         printer.println ("d = " + d);
         printer.println ("" + Place.MAX_PLACES + " places and " + 
-                         Runtime.INIT_THREADS + " workers per-place");
+                         Runtime.INIT_THREADS + " workers/place");
         printer.println ("Permuting: " + permute);
         printer.println ("Chunk size: " + chunk);
         val recursiveMatrixGenerator = Rmat (seed, n, a, b, c, d);
