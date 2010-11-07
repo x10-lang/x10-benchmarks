@@ -307,8 +307,11 @@ public final class Brandes(N:Int) {
     } // finish
     
     time = System.nanoTime() - time;
-    printer.println ("Betweenness calculation took distTime=" + distTime 
-        + " procTime=" + time/1E9 + " seconds.");
+    val procTime = time/1E9;
+    val totalTime = distTime + procTime;
+    val procPct = procTime*100.0/totalTime;
+    printer.println ("Betweenness calculation took time=" + totalTime 
+        + " s (proc: " + procPct  +  "%).");
     
     if (debug>1) {
       brandesHandles().printBetweennessMap(printer);
@@ -375,8 +378,11 @@ public final class Brandes(N:Int) {
       
       printer.println ("Permuting: " + permute);
       printer.println ("Chunk size: " + chunk);
-      printer.println ("" + Place.MAX_PLACES + " places and " + 
-          Runtime.INIT_THREADS + " workers/place");
+      printer.println ("" + Place.MAX_PLACES + " place" 
+    		  + (Place.MAX_PLACES > 1 ? "s" : "")
+    		  + " and " + 
+          Runtime.INIT_THREADS + " worker" 
+          + (Runtime.INIT_THREADS > 1 ? "s" : "") + "/place");
       
       crunchNumbers (gm, printer, permute, chunk, debug);
       
