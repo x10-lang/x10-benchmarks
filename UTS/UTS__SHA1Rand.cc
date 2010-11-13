@@ -4,20 +4,11 @@
 class UTS__SHA1Rand_ithunk0 : public UTS__SHA1Rand {
 public:
     static x10::lang::Any::itable<UTS__SHA1Rand_ithunk0 > itable;
-    x10_boolean at(x10aux::ref<x10::lang::Object> arg0) {
-        return UTS__SHA1Rand_methods::at(*this, arg0);
-    }
-    x10_boolean at(x10::lang::Place arg0) {
-        return UTS__SHA1Rand_methods::at(*this, arg0);
-    }
     x10_boolean equals(x10aux::ref<x10::lang::Any> arg0) {
         return UTS__SHA1Rand_methods::equals(*this, arg0);
     }
     x10_int hashCode() {
         return UTS__SHA1Rand_methods::hashCode(*this);
-    }
-    x10::lang::Place home() {
-        return UTS__SHA1Rand_methods::home(*this);
     }
     x10aux::ref<x10::lang::String> toString() {
         return UTS__SHA1Rand_methods::toString(*this);
@@ -27,24 +18,15 @@ public:
     }
     
 };
-x10::lang::Any::itable<UTS__SHA1Rand_ithunk0 >  UTS__SHA1Rand_ithunk0::itable(&UTS__SHA1Rand_ithunk0::at, &UTS__SHA1Rand_ithunk0::at, &UTS__SHA1Rand_ithunk0::equals, &UTS__SHA1Rand_ithunk0::hashCode, &UTS__SHA1Rand_ithunk0::home, &UTS__SHA1Rand_ithunk0::toString, &UTS__SHA1Rand_ithunk0::typeName);
+x10::lang::Any::itable<UTS__SHA1Rand_ithunk0 >  UTS__SHA1Rand_ithunk0::itable(&UTS__SHA1Rand_ithunk0::equals, &UTS__SHA1Rand_ithunk0::hashCode, &UTS__SHA1Rand_ithunk0::toString, &UTS__SHA1Rand_ithunk0::typeName);
 class UTS__SHA1Rand_iboxithunk0 : public x10::lang::IBox<UTS__SHA1Rand> {
 public:
     static x10::lang::Any::itable<UTS__SHA1Rand_iboxithunk0 > itable;
-    x10_boolean at(x10aux::ref<x10::lang::Object> arg0) {
-        return UTS__SHA1Rand_methods::at(this->value, arg0);
-    }
-    x10_boolean at(x10::lang::Place arg0) {
-        return UTS__SHA1Rand_methods::at(this->value, arg0);
-    }
     x10_boolean equals(x10aux::ref<x10::lang::Any> arg0) {
         return UTS__SHA1Rand_methods::equals(this->value, arg0);
     }
     x10_int hashCode() {
         return UTS__SHA1Rand_methods::hashCode(this->value);
-    }
-    x10::lang::Place home() {
-        return UTS__SHA1Rand_methods::home(this->value);
     }
     x10aux::ref<x10::lang::String> toString() {
         return UTS__SHA1Rand_methods::toString(this->value);
@@ -54,7 +36,7 @@ public:
     }
     
 };
-x10::lang::Any::itable<UTS__SHA1Rand_iboxithunk0 >  UTS__SHA1Rand_iboxithunk0::itable(&UTS__SHA1Rand_iboxithunk0::at, &UTS__SHA1Rand_iboxithunk0::at, &UTS__SHA1Rand_iboxithunk0::equals, &UTS__SHA1Rand_iboxithunk0::hashCode, &UTS__SHA1Rand_iboxithunk0::home, &UTS__SHA1Rand_iboxithunk0::toString, &UTS__SHA1Rand_iboxithunk0::typeName);
+x10::lang::Any::itable<UTS__SHA1Rand_iboxithunk0 >  UTS__SHA1Rand_iboxithunk0::itable(&UTS__SHA1Rand_iboxithunk0::equals, &UTS__SHA1Rand_iboxithunk0::hashCode, &UTS__SHA1Rand_iboxithunk0::toString, &UTS__SHA1Rand_iboxithunk0::typeName);
 x10aux::itable_entry UTS__SHA1Rand::_itables[2] = {x10aux::itable_entry(x10aux::getRTT<x10::lang::Any>(), &UTS__SHA1Rand_ithunk0::itable), x10aux::itable_entry(NULL, (void*)x10aux::getRTT<UTS__SHA1Rand>())};
 x10aux::itable_entry UTS__SHA1Rand::_iboxitables[2] = {x10aux::itable_entry(x10aux::getRTT<x10::lang::Any>(), &UTS__SHA1Rand_iboxithunk0::itable), x10aux::itable_entry(NULL, (void*)x10aux::getRTT<UTS__SHA1Rand>())};
 void UTS__SHA1Rand_methods::_instance_init(UTS__SHA1Rand& this_) {
