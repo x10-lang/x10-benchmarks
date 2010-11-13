@@ -1,3 +1,4 @@
+package examples.UTS;
 /*
  *  This file is part of the X10 project (http://x10-lang.org).
  *
@@ -14,6 +15,7 @@
  */
 
 import x10.util.Stack;
+import global.lb.*;
 public class Geometric(b0:UInt, a:UInt, d:UInt) extends TaskFrame[TreeNode, UInt]{
 	static type Constants = UTS.Constants;
 	public static def usageLine(b0:UInt, r:UInt, a:UInt, d:UInt, seq:UInt, w:UInt, nu:UInt, l:UInt, z:UInt) {
@@ -29,12 +31,12 @@ public class Geometric(b0:UInt, a:UInt, d:UInt) extends TaskFrame[TreeNode, UInt
 				(l==3U ?" base=" + NetworkGenerator.findW(Place.MAX_PLACES, z) : ""));
 	}
 	
-	public def runRootTask(s:TreeNode, stack:Stack[TreeNode]!):Void offers UInt {
+	public def runRootTask(s:TreeNode, stack:Stack[TreeNode]):Void offers UInt {
 		runTask(s, stack);
 	}
 	public def runTask  (
 			node:TreeNode, 
-			stack:Stack[TreeNode]!) offers UInt { 
+			stack:Stack[TreeNode]) offers UInt { 
 		/* compute branching factor at this node */
 		var curNodeBranchingFactor:double;
 

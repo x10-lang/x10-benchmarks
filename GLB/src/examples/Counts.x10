@@ -1,3 +1,4 @@
+package examples;
 /*
  *  This file is part of the X10 project (http://x10-lang.org).
  *
@@ -15,18 +16,19 @@ import x10.util.Option;
 import x10.lang.Math;
 import x10.util.Random;
 import x10.util.Stack;
+import global.lb.*;
 
-public class Counts implements TaskFrame[UInt, UInt] {
+public class Counts extends TaskFrame[UInt, UInt] {
     var c:UInt=0;
-    public def runTask(t:UInt, s:Stack[UInt]!):Void offers UInt {
+    public def runTask(t:UInt, s:Stack[UInt]):Void offers UInt {
 	   offer t;
 	   c += t;
     }
-    public def runRootTask(t:UInt, s:Stack[UInt]!):Void offers UInt {
+    public def runRootTask(t:UInt, s:Stack[UInt]):Void offers UInt {
 	   for (var i:UInt=0u; i < t; i++) 
 	   s.push(2);
     }
-    public static def main (args : Rail[String]!) {
+    public static def main (args: Array[String](1)) {
         try {
 	        val opts = new OptionsParser(args, null, [
 			      Option("s", "", "Sequential"),
@@ -36,14 +38,13 @@ public class Counts implements TaskFrame[UInt, UInt] {
             Console.OUT.println("Places="+Place.MAX_PLACES 
 				+ " x=" + x + " seq=" + seq);
             val reducer = new Reducible[UInt]() {
-                global safe public def zero()=0u;
-                global safe public def apply(a:UInt, b:UInt)=a+b;
+                public def zero()=0u;
+                public def apply(a:UInt, b:UInt)=a+b;
             };
-	        val counts = ValRail.make[Counts](Place.MAX_PLACES, 
-			      (i:Int)=> at(Place(i)) new Counts());
-	        val runner = seq ? new SeqRunner[UInt,UInt](new Counts()) as Runner[UInt,UInt]!
-		                     : new GlobalRunner[UInt, UInt](args, 
-		                         ():TaskFrame[UInt,UInt]=> counts(here.id)) as Runner[UInt,UInt]!;
+	        val counts = Rail.make(Place.MAX_PLACES, 
+			      (i:Int)=> at(Place(i)) GlobalRef[TaskFrame[UInt,UInt]](new Counts()));
+	        val runner = seq ? new SeqRunner[UInt,UInt](new Counts()) as Runner[UInt,UInt]
+		                     : new GlobalRunner[UInt, UInt](args, ()=> counts(here.id));
 	        Console.OUT.println("Starting...");
 	        var time:Long = System.nanoTime();
 	        val result=runner(x, reducer);
@@ -53,7 +54,7 @@ public class Counts implements TaskFrame[UInt, UInt] {
             Console.OUT.println("--------");
 	        for (count in counts) {
 		        at (count) 
-		          Console.OUT.println("Count(" + here.id +")=" + count.c);
+		          Console.OUT.println("Count(" + here.id +")=" + (count() as Counts).c);
 	        }
         } catch (e:Throwable) {
             e.printStackTrace(Console.ERR);
