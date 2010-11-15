@@ -238,7 +238,6 @@ public final class Brandes(N:Int) {
     Team.WORLD.allreduce (here.id, // My ID.
         betweennessMap, // Source buffer.
         0, // Offset into the source buffer.
-        //mergedunlockedBetweennessMap, // Destination buffer.
         betweennessMap, // Destination buffer.
         0, // Offset into the destination buffer.
         this.N, // Number of elements.

@@ -3,7 +3,7 @@
 # <BEGIN> user settings #
 
 ifeq ($(shell uname -s),Darwin)
-  export X10CXX?=/Users/pkamabdu/Software/src/x10/x10-trunk/x10.dist/bin/x10c++
+  export X10CXX?=/Users/pkambadu/Software/src/x10/x10-trunk/x10.dist/bin/x10c++
 else
   export X10CXX?=${HOME}/Software/src/x10/x10-trunk/x10.dist/bin/x10c++
 endif

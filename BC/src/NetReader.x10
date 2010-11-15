@@ -4,6 +4,35 @@ import x10.io.ReaderIterator;
 
 /* A class to read the NET format by Pajek */
 public  struct NetReader {
+
+  /* 
+   * The function that reads the binary format by Guojing -- this is an 
+   * unweighted graph. 
+   */
+  public static def readGuojingFile (fileName:String,
+                                     startIndex:Int) {
+    val inputFile:File = new File(fileName);
+    val inputFileReader:Reader = inputFile.openRead();
+
+    /* Find out the number of vertices --- this is needed to initialize */
+    val N = inputFileReader.readInt();
+    if (0 > N) throw new Exception ("Incorrect File Format");
+
+    /* Declare the adjacency graph */
+    val adjacencyGraph = new AdjacencyGraph(N);
+
+    /* Now, read the graph in */
+    for ([i] in 0..(N-1)) {
+      val numNeighbors = inputFileReader.readInt();
+
+      for ([j] in 0..(numNeighbors-1)) {
+        adjacencyGraph.addEdge (i, inputFileReader.readInt(), 1 as ULong);
+      }
+    }
+
+    return adjacencyGraph;
+  }
+
   /* The function that reads in stuff from a file and populates it */
   public static def readNetFile (fileName:String,
                                  startIndex:Int) : 
