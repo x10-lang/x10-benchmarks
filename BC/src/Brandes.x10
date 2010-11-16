@@ -331,7 +331,7 @@ public final class Brandes(N:Int) {
            Option("c", "", "Probability c"),
            Option("d", "", "Probability d"),
            Option("f", "", "Graph file name"),
-           Option("t", "", "File type: 0: NWB, 1:NET"),
+           Option("t", "", "File type: 0: NWB, 1:NET, 2:GUOJING"),
            Option("i", "", "Starting index of vertices"),
            Option("debug", "", "Debug"),
            Option("chunk", "", "Chunk size, defaults to 100"),
@@ -372,7 +372,20 @@ public final class Brandes(N:Int) {
         printer.println ("f = " + fileName);
         printer.println ("t = " + fileType);
         printer.println ("i = " + startIndex);
-        gm=()=>NetReader.readNetFile (fileName, startIndex);
+
+        if (0==fileType) {
+          gm=()=>NetReader.readNetFile (fileName, startIndex);
+        } else if (1==fileType) {
+          gm=()=>NetReader.readNwbFile (fileName, startIndex);
+        } else if (2==fileType) {
+          gm=()=>NetReader.readGuojingFile (fileName, startIndex);
+        } else {
+          printer.println ("The only file types supported are:");
+          printer.println (".NET format --> -t 0 (default)");
+          printer.println (".NWB format --> -t 1");
+          printer.println ("GUOJING binary format --> -t 2");
+          return;
+        }
       }
       
       printer.println ("Permuting: " + permute);

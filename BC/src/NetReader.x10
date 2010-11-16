@@ -7,7 +7,7 @@ public  struct NetReader {
 
   /* 
    * The function that reads the binary format by Guojing -- this is an 
-   * unweighted graph. 
+   * unweighted graph. Start index is not used here.
    */
   public static def readGuojingFile (fileName:String,
                                      startIndex:Int) {
@@ -33,7 +33,119 @@ public  struct NetReader {
     return adjacencyGraph;
   }
 
-  /* The function that reads in stuff from a file and populates it */
+  private static def getNextLine(inputFileIterator:ReaderIterator[String]){
+    var line:String = "EOF";
+    while (inputFileIterator.hasNext()) {
+      line = inputFileIterator.next().toLowerCase().trim();
+      if (0>line.indexOf("#") && 
+          0>line.indexOf("source") &&
+          0>line.indexOf("id") &&
+          0>line.indexOf("target")) break;
+      else {} /* We found a comment line, move on to the next */
+    }
+
+    return line;
+  }
+
+  /* 
+   * Removes all the empty strings --- this is needed because split() does 
+   * not allow us to split on a regex. Consequently, all multiple spaces are
+   * parsed as a bunch of empty strings.
+   */
+  private static def tokenize(line:String, splitter:String) {
+    var numNonEmptyTokens:Int = 0;
+    val tokens:Rail[String] = line.split(splitter);
+    
+    /* First count the number of non-empty tokens */
+    for ([i] in 0..(tokens.length()-1)) {
+      if (0<(tokens(i).length())) ++numNonEmptyTokens;
+    }
+
+    /* Now create the Rail */
+    val nonEmptyTokens:Rail[String] = Rail.make[String] (numNonEmptyTokens);
+    var nonEmptyTokenIndex:Int = 0;
+    for ([i] in 0..(tokens.length()-1)) {
+      if (0<(tokens(i).length())) {
+        nonEmptyTokens(nonEmptyTokenIndex++) = tokens(i);
+      }
+    }
+
+    return nonEmptyTokens;
+  }
+
+  /* The function that reads in a .NWB file */
+  public static def readNwbFile (fileName:String,
+                                 startIndex:Int) : 
+                                AdjacencyGraph {
+
+    val inputFile:File = new File(fileName);
+    val inputFileReader:Reader = inputFile.openRead();
+    val inputFileIterator:ReaderIterator[String] = inputFileReader.lines();
+
+    /* Find out the number of vertices --- this is needed to initialize */
+    val firstLine:String = getNextLine(inputFileIterator);
+    val N:Int = (0 > firstLine.lastIndexOf ("*nodes")) ? 
+                      -1: /* error --- first line has to be "*Vertices" */
+                      Int.parse(tokenize(firstLine, " ")(1));
+
+    if (0 > N) throw new Exception ("Incorrect File Format");
+
+    val adjacencyGraph = new AdjacencyGraph(N);
+
+    /* Iterate over the lines and construct the graph */
+    var foundDirectedEdges:Boolean = false;
+    var foundUnDirectedEdges:Boolean = false;
+    for (var thisLine:String=getNextLine(inputFileIterator);
+         !thisLine.equals("EOF");
+         thisLine=getNextLine(inputFileIterator)) {
+
+      if (0 <= thisLine.indexOf("*directededges")) {
+        foundUnDirectedEdges = false;
+        foundDirectedEdges = true;
+        continue; 
+      } else if (0 <= thisLine.indexOf("*undirectededges")) {
+        foundUnDirectedEdges = true;
+        foundDirectedEdges = false;
+        continue; 
+      }
+
+      /* Process the edges or edgelist remaining --- assume ULong weights */
+      if (foundDirectedEdges) {
+        val tokens:Rail[String] = tokenize(thisLine," ");
+
+        if (2 > tokens.length()) 
+          throw new Exception ("Format not \"src dest weight\"");
+
+        val source= Int.parse (tokens(0)) - startIndex;
+        val destination = Int.parse (tokens(1)) - startIndex;
+        val weight:ULong = (2==tokens.length()) ? 1 as ULong: 
+                                                  ULong.parse (tokens(2));
+
+        adjacencyGraph.addEdge (source, destination, weight);
+        adjacencyGraph.incrementInDegree (destination);
+      } else if (foundDirectedEdges) {
+        val tokens:Rail[String] = tokenize(thisLine," ");
+
+        if (2 > tokens.length()) 
+          throw new Exception ("Format not \"src dest weight\"");
+
+        val source= Int.parse (tokens(0)) - startIndex;
+        val destination = Int.parse (tokens(1)) - startIndex;
+        val weight:ULong = (2==tokens.length()) ? 1 as ULong: 
+                                                  ULong.parse (tokens(2));
+
+        adjacencyGraph.addEdge (source, destination, weight);
+        adjacencyGraph.addEdge (destination, source, weight);
+        adjacencyGraph.incrementInDegree (source);
+        adjacencyGraph.incrementInDegree (destination);
+      } else {
+        /* Do nothing */
+      }
+    }
+    return adjacencyGraph;
+  }
+
+  /* The function that reads in .NET format */
   public static def readNetFile (fileName:String,
                                  startIndex:Int) : 
                                 AdjacencyGraph {
@@ -46,7 +158,7 @@ public  struct NetReader {
     val firstLine:String = inputFileIterator.next().toLowerCase();
     val N:Int = (0 > firstLine.lastIndexOf ("*vertices")) ? 
                       -1: /* error --- first line has to be "*Vertices" */
-                      Int.parse(firstLine.split (" ")(1));
+                      Int.parse(tokenize(firstLine," ")(1));
 
     if (0 > N) throw new Exception ("Incorrect File Format");
 
@@ -68,9 +180,9 @@ public  struct NetReader {
 
       /* Process the edges or edgelist remaining */
       if (foundEdges) {
-        val tokens:Rail[String] = thisLine.split(" ");
+        val tokens:Rail[String] = tokenize(thisLine," ");
 
-        if (3 != tokens.length() && 2 != tokens.length()) 
+        if (2 < tokens.length())
           throw new Exception ("Format not \"src dest weight\"");
 
         val source= Int.parse (tokens(0)) - startIndex;
