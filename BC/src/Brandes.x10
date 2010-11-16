@@ -200,7 +200,7 @@ public final class Brandes(N:Int) {
   /**
    * Place local version of crunchNumbers.
    */
-  private def crunchNumbersLocally (printer:Printer,
+  private def crunchNumbersLocally (/*printer:Printer,*/
                                     permute:Boolean,
                                     chunk:Int,
                                     vertexBeginIndex:Int,
@@ -290,14 +290,14 @@ public final class Brandes(N:Int) {
     finish {
       for ([place] in 1..numPlaces-1) 
         async at(Place(place)) 
-      brandesHandles().crunchNumbersLocally (printer, 
+      brandesHandles().crunchNumbersLocally (/*printer,*/ 
           permute, 
           chunk, 
           place*chunkSize, 
           place == numPlaces -1 ? N-1 : (place+1)*chunkSize-1, 
               debug);
       val place=0;
-      brandesHandles().crunchNumbersLocally (printer, 
+      brandesHandles().crunchNumbersLocally (/*printer,*/ 
           permute, 
           chunk, 
           place*chunkSize, 
