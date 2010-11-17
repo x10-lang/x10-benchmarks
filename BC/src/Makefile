@@ -89,6 +89,9 @@ test-pq: FixedBinaryHeap.x10
 test-st: FixedRailStack.x10
 	${X10CXX} ${X10CXXFLAGS} ${X10RTTRANSPORT} $< -o $@ 
 
+test-q: FixedRailQueue.x10
+	${X10CXX} ${X10CXXFLAGS} ${X10RTTRANSPORT} $< -o $@ 
+
 clean:
 	rm -rf core*.* *.dSYM *.inc 
 	rm -rf ${X10_CLASSES_CC} ${X10_CLASSES_H} ${TARGET}
