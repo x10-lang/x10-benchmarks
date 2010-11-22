@@ -81,7 +81,7 @@ public final class BlockedArray implements (Int,Int)=>Double {
     }
 
     public def apply(i:Int, j:Int) = blockOf(i, j)(i, j);
-    public def set(val:Double, i:Int, j:Int) = blockOf(i, j)(i, j) = val;
+    public def set(v:Double, i:Int, j:Int) = blockOf(i, j)(i, j) = v;
 
     public def block(I:Int, J:Int) = data((I-min_x)/px*ny+(J-min_y)/py);
     public def blockOf(i:Int, j:Int) = block(i/bx, j/by);
