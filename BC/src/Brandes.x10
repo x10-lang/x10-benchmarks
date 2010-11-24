@@ -22,19 +22,155 @@ public final class Brandes(N:Int) {
   val betweennessMapLocks = Rail.make[Lock](N, (Int)=> new Lock());
   
   // Constructor
-  def this(g:AdjacencyGraph, debug:Int) {
+  public def this(g:AdjacencyGraph, debug:Int) {
     property(g.numVertices());
     this.graph=g;
     this.debug=debug;
   }
-  def graph()=graph;
+
+  private def graph()=graph;
+
   // A comparator which orders the vertices by their distances.
   private static val makeNonIncreasingComparator = 
     (distanceMap:Rail[ULong]) =>  (x:Int, y:Int) => {
       val dx = distanceMap(x);
       val dy = distanceMap(y);
       return (dx==dy) ? 0 : (dx<dy) ? +1 : -1;
-    };
+  };
+
+  /**
+  * Helper function that processes one single vertex --- i.e, calculates 
+  * the single souce shortest path for all destinations and updates the 
+  * betweenness for all the vertices based on this calculation.
+  * 
+  * <p>Note that the vertex numbers are [startVertex, endVertex], not 
+  * [startVertex, endVertex) as we are used to!
+  */
+  public def bfsShortestPaths (val startVertex:Int,
+                               val endVertex:Int,
+                               debug:Int) { 
+    var allocTime:Long= System.nanoTime();
+    // Per-thread structure --- initialize once.
+    val myBetweennessMap = Rail.make[Double] (N, 0.0 as Double);
+
+    // These are the per-vertex data structures.
+    val vertexStack = new FixedRailStack[Int] (N);
+    val predecessorMap= Rail.make[FixedRailStack[Int]](N, (i:Int)=> 
+          new FixedRailStack[Int](graph.getInDegree(i)));
+    val distanceMap = Rail.make[ULong](N, ULong.MAX_VALUE);
+    val sigmaMap = Rail.make(N, 0 as ULong);
+    val regularQueue = new FixedRailQueue[Int] (N);
+    val deltaMap = Rail.make[Double](N, 0.0 as Double);
+    val processedVerticesStack = new FixedRailStack[Int](N);
+
+    allocTime = (System.nanoTime() - allocTime);
+    
+    var processingTime:Long = 0;
+    var resetTime:Long = 0;
+    // Iterate over each of the vertices in my portion.
+    for ([vertexIndex] in startVertex..endVertex) { 
+      val s:Int = this.verticesToWorkOn(vertexIndex);
+      
+      // Reset the values of those vertices that were touched in the previous
+      // iteration. This might save some computation.
+
+      // 1. Clear the vertexStack and the priorityQueue --- O(1) operation.
+      val resetCounter:Long = System.nanoTime();
+      vertexStack.clear();
+      regularQueue.clear();
+
+      // 2. Pop off the processedVerticesStack and reset their values.
+      while (!(processedVerticesStack.isEmpty())) {
+        val processedVertex = processedVerticesStack.pop();
+        predecessorMap(processedVertex).clear();
+        distanceMap(processedVertex) = ULong.MAX_VALUE;
+        sigmaMap(processedVertex) = 0 as ULong;
+        deltaMap(processedVertex) = 0.0 as Double;
+      }
+
+      resetTime += (System.nanoTime() - resetCounter);
+      
+      val processingCounter:Long = System.nanoTime();
+      // Put the values for source vertex
+      distanceMap(s)=0 as ULong;
+      sigmaMap(s)=1 as ULong;
+      regularQueue.push (s);
+     
+     
+      // Loop until there are no elements left in the priority queue
+      while (!regularQueue.isEmpty()) {
+        // Pop the node with the least distance
+        val v = regularQueue.pop();
+        vertexStack.push (v);
+        processedVerticesStack.push (v);
+
+        // Get the start and the end points for the edge list for "v"
+        val edgeStart:Int = graph.begin(v);
+        val edgeEnd:Int = graph.end(v);
+        
+        // Iterate over all its neighbors
+        for (var wIndex:Int=edgeStart; wIndex<edgeEnd; ++wIndex) {
+          // Get the target of the current edge and its weight.
+          val adjacencyNode:AdjacencyNode = graph.getAdjacencyNode(wIndex);
+          val w:Int = adjacencyNode.getTargetVertex();
+          val distanceThroughV = distanceMap(v) + 1 as ULong;
+
+          // In BFS, the minimum distance will only be found once --- the 
+          // first time that a node is discovered. So, add it to the queue.
+          if (distanceMap(w)==ULong.MAX_VALUE) {
+            regularQueue.push (w);
+            distanceMap(w) = distanceThroughV;
+          }
+
+          // If the distance through "v" for "w" from "s" was the same as its 
+          // current distance, we found another shortest path. So, add 
+          // "v" to predecessorMap of "w" and update other maps.
+          if (distanceThroughV == distanceMap(w)) {
+            sigmaMap(w) = sigmaMap(w) + sigmaMap(v);// XTENLANG-2027
+            predecessorMap(w).push(v);
+          }
+        }
+      } // while priorityQueue not empty
+      
+      // Return vertices in order of non-increasing distances from "s"
+      while (!vertexStack.isEmpty()) {
+        val w = vertexStack.pop ();
+        while (!(predecessorMap(w).isEmpty())) {
+          val v = predecessorMap(w).pop();
+          deltaMap(v) += (sigmaMap(v) as Double/sigmaMap(w) as Double)*
+          (1 + deltaMap(w));
+        }
+     
+        // Accumulate updates locally 
+        if (w != s) myBetweennessMap(w) += deltaMap(w); 
+       
+      } // vertexStack not empty
+      processingTime  += (System.nanoTime() - processingCounter);
+    } // All vertices from (startVertex, endVertex)
+
+    // update shared state at the place once, atomically.
+    var localMergeTime:Long = System.nanoTime();
+    for (var i:Int=0; i < N; i++) {
+      val result = myBetweennessMap(i);
+      if (result != 0.0D) {
+        val lock = betweennessMapLocks(i);
+        lock.lock();
+        betweennessMap(i) += result;
+        lock.unlock();
+      }
+    } 
+    localMergeTime = (System.nanoTime() - localMergeTime);
+    
+    if (debug > 0) {
+      Console.OUT.println ("[" + here.id + ":" + Runtime.workerId() + "] "
+          + " Alloc= " + allocTime/1e9
+          + " Reset= " + resetTime/1e9
+          + " Proc= " + processingTime/1e9
+          + " Merge= " + localMergeTime/1e9
+      );
+    }
+  }
+
   /**
   * Helper function that processes one single vertex --- i.e, calculates 
   * the single souce shortest path for all destinations and updates the 
@@ -73,7 +209,6 @@ public final class Brandes(N:Int) {
       // iteration. This might save some computation.
 
       // 1. Clear the vertexStack and the priorityQueue --- O(1) operation.
-
       val resetCounter:Long = System.nanoTime();
       vertexStack.clear();
       priorityQueue.clear();
@@ -108,8 +243,6 @@ public final class Brandes(N:Int) {
         val edgeEnd:Int = graph.end(v);
         
         // Iterate over all its neighbors
-        //for (w in graph.getNeighbors(v).keySet()) {
-          //val distanceThroughV = distanceMap(v) + graph.getEdgeWeight (v, w);
         for (var wIndex:Int=edgeStart; wIndex<edgeEnd; ++wIndex) {
           // Get the target of the current edge and its weight.
           val adjacencyNode:AdjacencyNode = graph.getAdjacencyNode(wIndex);
@@ -200,12 +333,13 @@ public final class Brandes(N:Int) {
   /**
    * Place local version of crunchNumbers.
    */
-  private def crunchNumbersLocally (/*printer:Printer,*/
-                                    permute:Boolean,
+  private def crunchNumbersLocally (permute:Boolean,
+                                    weighted:Boolean,
                                     chunk:Int,
                                     vertexBeginIndex:Int,
                                     vertexEndIndex:Int,
                                     debug:Int) {
+
     // Permutate the vertices if asked for
     if (permute) permuteVertices ();
    
@@ -217,19 +351,21 @@ public final class Brandes(N:Int) {
     val chunkSize = myTotalWorkLoad/numChunks;
     
     finish  {
-      // spawn work for other workers
-      for ([i] in 1..numChunks-1) async {
+      // spawn work 
+      for ([i] in 0..numChunks-1) async {
         val startVertex = vertexBeginIndex + chunkSize*i;
         val endVertex = (i==numChunks-1) ? vertexEndIndex-1: 
           (startVertex+chunkSize-1);
-        dijkstraShortestPaths (startVertex, endVertex, debug);
+
+        // We can lift this condition out so that its not checked everytime,
+        // but considering how much work is involved in each BFS/DFS 
+        // calculation, I don't think this will be a major time saver.
+        if (weighted==true) {
+          dijkstraShortestPaths (startVertex, endVertex, debug);
+        } else {
+          bfsShortestPaths (startVertex, endVertex, debug);
+        }
       }
-      // do your own work
-      val i=0;
-      val startVertex = vertexBeginIndex + chunkSize*i;
-      val endVertex = (i==numChunks-1) ? vertexEndIndex-1: 
-        (startVertex+chunkSize-1);
-      dijkstraShortestPaths (startVertex, endVertex, debug);
     }
     
     // Merge the results in this place with the results in other places.
@@ -257,15 +393,18 @@ public final class Brandes(N:Int) {
         printer.println ("(" + i + ") ->" + betweennessMap(i));
     }
   }
+
   /**
    * Calls betweeness, prints out the statistics and what not.
    */
   private static def crunchNumbers (graphMaker:()=>AdjacencyGraph,
       printer:Printer, 
       permute:Boolean,
+      weighted:Boolean,
       chunk:Int,
       debug:Int) {
     var time:Long = System.nanoTime();
+
     // Create a place local handle at each place.
     val brandesHandles = PlaceLocalHandle.make[Brandes] 
                  (Dist.makeUnique(), ()=> {
@@ -283,26 +422,21 @@ public final class Brandes(N:Int) {
     
     // Determine the number of places.
     val numPlaces = Place.MAX_PLACES;
+
     // Get a rail of partitions
     val chunkSize = N/numPlaces;
     
     // Loop over all the places and crunch the numbers.
     finish {
-      for ([place] in 1..numPlaces-1) 
+      for ([place] in 0..numPlaces-1) 
         async at(Place(place)) 
-      brandesHandles().crunchNumbersLocally (/*printer,*/ 
-          permute, 
-          chunk, 
-          place*chunkSize, 
-          place == numPlaces -1 ? N-1 : (place+1)*chunkSize-1, 
-              debug);
-      val place=0;
-      brandesHandles().crunchNumbersLocally (/*printer,*/ 
-          permute, 
-          chunk, 
-          place*chunkSize, 
-          place == numPlaces -1 ? N-1 : (place+1)*chunkSize -1, 
-              debug);
+          brandesHandles().crunchNumbersLocally (
+                       permute, 
+                       weighted,
+                       chunk, 
+                       place*chunkSize, 
+                       place == numPlaces -1 ? N-1 : (place+1)*chunkSize-1, 
+                       debug);
     } // finish
     
     time = System.nanoTime() - time;
@@ -336,6 +470,7 @@ public final class Brandes(N:Int) {
            Option("debug", "", "Debug"),
            Option("chunk", "", "Chunk size, defaults to 100"),
            Option("permute", "", "true, false"),
+           Option("weighted", "", "true, false"),
            Option("o", "", "Output file name")]);
       
       val seed:Long = cmdLineParams ("-s", 2);
@@ -349,9 +484,10 @@ public final class Brandes(N:Int) {
       val startIndex:Int = cmdLineParams ("-i", 0);
       val outFileName:String = cmdLineParams ("-o", "STDOUT");
       val debug:Int = cmdLineParams ("-debug", 0); // off by default
-      val permute:Boolean = 0==cmdLineParams ("-permute", 1); // off by default
+      val permute:Boolean = 1==cmdLineParams ("-permute", 0); // def: off
+      val weighted:Boolean = 1==cmdLineParams ("-weighted", 0); //def: off
       val chunk:Int = cmdLineParams ("-chunk", -1); 
-      
+
       val numPlaces = Place.MAX_PLACES;
       
       /* Set the printer appropriate to where the user wants output */
@@ -396,7 +532,7 @@ public final class Brandes(N:Int) {
           Runtime.INIT_THREADS + " worker" 
           + (Runtime.INIT_THREADS > 1 ? "s" : "") + "/place");
       
-      crunchNumbers (gm, printer, permute, chunk, debug);
+      crunchNumbers (gm, printer, permute, weighted, chunk, debug);
       
       
     } catch (e:Throwable) {
