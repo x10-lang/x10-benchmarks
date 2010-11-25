@@ -60,8 +60,8 @@ class FRASimpleDist {
                 val mask2 = Place.MAX_PLACES - 1;
                 val poly = POLY;
                 //Team.WORLD.barrier(here.id);
-                for (var i:long=0 ; i<local_updates ; i+=1L) {
-                    val place_id = ((ran>>size) as int) & mask2;
+                for (var i:Long=0 ; i<local_updates ; i++) {
+                    val place_id = ((ran>>size) as Int) & mask2;
                     val ran2 = ran;
 
                     //val dest = Place(place_id);

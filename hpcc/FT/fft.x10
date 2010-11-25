@@ -14,20 +14,20 @@ import x10.compiler.NativeCPPOutputFile;
 @NativeCPPCompilationUnit("zfft1d.c")
 @NativeCPPCompilationUnit("ft_natives.cc")
 class fft {
-    @Native("c++", "execute_plan(#1, (double *) (#2)->raw(), (double *) (#3)->raw(), #4, #5, #6)")
-    native static def execute_plan(plan:Long, A:Rail[Double], B:Rail[Double], SQRTN:Int, i0:Int, i1:Int):Void;
+    @Native("c++", "execute_plan(#1, (double *) (#2)->raw().data, (double *) (#3)->raw().data, #4, #5, #6)")
+    native static def execute_plan(plan:Long, A:Array[Double](1), B:Array[Double](1), SQRTN:Int, i0:Int, i1:Int):Void;
 
     @Native("c++", "create_plan(#1, #2, #3)")
     native static def create_plan(SQRTN:Int, direction:Int, flags:Int):Long;
 
-    const unique = Dist.makeUnique();
+    static unique = Dist.makeUnique();
 
     static class Block {
-        val A:Rail[Double];
-        val B:Rail[Double];
-        val C:Rail[Double];
-        val Cs:PlaceLocalHandle[Rail[Double]];
-        val D:Rail[Double];
+        val A:Array[Double](1);
+        val B:Array[Double](1);
+        val C:Array[Double](1);
+        val Cs:PlaceLocalHandle[Array[Double](1)];
+        val D:Array[Double](1);
         val I:Int;
         val nRows:Int;
         val SQRTN:Int;
@@ -35,12 +35,12 @@ class fft {
         val fftwPlan:Long;
         val fftwInversePlan:Long;
 
-        def this(I:Int, nRows:Int, localSize:Int, N:Long, SQRTN:Int, verify:Boolean, Cs:PlaceLocalHandle[Rail[Double]]) {
+        def this(I:Int, nRows:Int, localSize:Int, N:Long, SQRTN:Int, verify:Boolean, Cs:PlaceLocalHandle[Array[Double](1)]) {
             this.I = I; this.nRows = nRows; this.N = N; this.SQRTN = SQRTN; this.Cs = Cs;
-            A = Rail.make[Double](localSize);
-            B = Rail.make[Double](localSize);
+            A = new Array[Double](localSize);
+            B = new Array[Double](localSize);
             C = Cs();
-            D = verify ? Rail.make[Double](localSize) : null;
+            D = verify ? new Array[Double](localSize) : null;
             fftwPlan = create_plan(SQRTN, -1, 0);
             fftwInversePlan = create_plan(SQRTN, 1, 0);
         }
@@ -58,10 +58,10 @@ class fft {
             }
         }
 
-        static def make(I:Int, nRows:Int, localSize:Int, N:Long, SQRTN:Int, verify:Boolean, Cs:PlaceLocalHandle[Rail[Double]]):Block {
+        static def make(I:Int, nRows:Int, localSize:Int, N:Long, SQRTN:Int, verify:Boolean, Cs:PlaceLocalHandle[Array[Double](1)]):Block {
             val block = new Block(I, nRows, localSize, N, SQRTN, verify, Cs);
             block.init(localSize, verify);
-            finish ateach ((p) in unique) {} // initialize transport
+            finish ateach ([p] in unique) {} // initialize transport
             return block;
         }
 
@@ -88,7 +88,7 @@ class fft {
         def check() {
             val epsilon = 1.0e-15;
             val threshold = epsilon*Math.log(N as double)/Math.log(2.0)*16;
-            for (var q:Int=0; q<A.length; ++q) {
+            for (var q:Int=0; q<A.size; ++q) {
                 if (Math.abs(A(q)-D(q)) > threshold) Console.ERR.println("Error at "+q+" "+A(q).toString()+" "+D(q).toString());
             }
         }
@@ -118,9 +118,9 @@ class fft {
                     }
                 }
 //           x10.io.Console.OUT.println("before copyto");
-           if (Place.places(k) != here) B.copyTo(k * chunkSize, Place.places(k), Cs, dstIndex, chunkSize);
+           if (Place.place(k) != here) B.copyTo(k * chunkSize, Place.place(k), Cs, dstIndex, chunkSize);
            else {
-             for ((i): Point in [k*chunkSize..(k+1)*chunkSize-1]) {
+             for ([i]: Point in (k*chunkSize)..((k+1)*chunkSize-1)) {
                 C(i) = B(i); 
              }
            }
@@ -157,25 +157,25 @@ class fft {
     static def transpose_A(FFT:PlaceLocalHandle[Block]) {
 //        x10.io.Console.OUT.println("before FFT()" );
 //        x10.io.Console.OUT.println(FFT());
-        finish ateach((p) in Dist.makeUnique()) FFT().transpose();
+        finish ateach([p] in Dist.makeUnique()) FFT().transpose();
 //        x10.io.Console.OUT.println("after FFT()" );
-        finish ateach ((p) in unique) FFT().transpose();
-        finish ateach ((p) in unique) FFT().scatter();
+        finish ateach ([p] in unique) FFT().transpose();
+        finish ateach ([p] in unique) FFT().scatter();
 //        x10.io.Console.OUT.println("after transpose");
     }
 
     static def bytwiddle_A(FFT:PlaceLocalHandle[Block], sign:Int) {
-        finish ateach ((p) in unique) FFT().bytwiddle(sign);
+        finish ateach ([p] in unique) FFT().bytwiddle(sign);
     }
 
     static def rowFFTS_A(FFT:PlaceLocalHandle[Block], fwd:Boolean) { 
-        finish ateach ((p) in unique) FFT().rowFFTS(fwd);
+        finish ateach ([p] in unique) FFT().rowFFTS(fwd);
     }
 
     static def format(t:Long) = (t as Double) * 1.0e-9;
 
     static def compute(FFT:PlaceLocalHandle[Block], fwd:Boolean, N:Long) {
-        val timers = Rail.make[Long](7);
+        val timers = new Array[Long](7);
         timers(0)=System.nanoTime(); transpose_A(FFT);
         timers(1)=System.nanoTime(); rowFFTS_A(FFT, fwd);
         timers(2)=System.nanoTime(); transpose_A(FFT);
@@ -189,7 +189,7 @@ class fft {
         val Gigaflops = 1.0e-9*N*5*Math.log(N as double)/Math.log(2.0)/secs;
         Console.OUT.println("execution time=" + secs + " secs" + " Gigaflops=" + Gigaflops);
         val steps = ["transpose1", "row_ffts1", "transpose2", "twiddle", "row_ffts2", "transpose3"];
-        for (var i:Int = 0; i < steps.length; ++i) {
+        for (var i:Int = 0; i < steps.size; ++i) {
             Console.OUT.println("Step " + steps(i) + " took " + format(timers(i+1) - timers(i)) + " s");
         }
         
@@ -197,12 +197,12 @@ class fft {
     }
         
     static def check(FFT:PlaceLocalHandle[Block]) { 
-        finish ateach ((p) in unique) FFT().check();
+        finish ateach ([p] in unique) FFT().check();
     }
     
-    public static def main(args:Rail[String]) {
-        val M = (args.length > 0) ? Int.parseInt(args(0)) : 10;
-        val verify = (args.length > 1) ? Boolean.parseBoolean(args(1)) : true;
+    public static def main(args:Array[String](1)) {
+        val M = (args.size > 0) ? Int.parseInt(args(0)) : 10;
+        val verify = (args.size > 1) ? Boolean.parseBoolean(args(1)) : true;
         val SQRTN = 1 << M;
         val N = (SQRTN as Long) * (SQRTN as Long);
         val nRows = SQRTN / Place.MAX_PLACES;
@@ -219,7 +219,7 @@ class fft {
         }
 
         // Initialization
-        val Cs = PlaceLocalHandle.make[Rail[Double]](unique, ()=>Rail.make[Double](localSize));
+        val Cs = PlaceLocalHandle.make[Array[Double](1)](unique, ()=>new Array[Double](localSize));
         val FFT = PlaceLocalHandle.make[Block](unique, ()=>Block.make(here.id, nRows, localSize, N, SQRTN, verify, Cs));
 
         // FFT
