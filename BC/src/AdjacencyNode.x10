@@ -6,6 +6,12 @@ public struct AdjacencyNode {
   /** constructor --- the only way to initialize */
   public def this (targetVertex:Int, edgeWeight:Long) {
     this.targetVertex = targetVertex;
+    this.edgeWeight = edgeWeight as ULong;
+  }
+
+  /** constructor --- the only way to initialize */
+  public def this (targetVertex:Int, edgeWeight:ULong) {
+    this.targetVertex = targetVertex;
     this.edgeWeight = edgeWeight;
   }
 
