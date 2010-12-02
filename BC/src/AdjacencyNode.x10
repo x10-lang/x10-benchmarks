@@ -1,18 +1,12 @@
 /** A struct that encapsulates the target vertex and the edge weight */
 public struct AdjacencyNode {
   private val targetVertex:Int;
-  private val edgeWeight:ULong;
+  private val edgeWeight:Long;
 
   /** constructor --- the only way to initialize */
   public def this (targetVertex:Int, edgeWeight:Long) {
     this.targetVertex = targetVertex;
-    this.edgeWeight = edgeWeight as ULong;
-  }
-
-  /** constructor --- the only way to initialize */
-  public def this (targetVertex:Int, edgeWeight:ULong) {
-    this.targetVertex = targetVertex;
-    this.edgeWeight = edgeWeight;
+    this.edgeWeight = edgeWeight as Long;
   }
 
   /** getters for both the edgeWeight and targetVertex */

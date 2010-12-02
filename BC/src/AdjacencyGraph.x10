@@ -7,7 +7,7 @@ import x10.util.HashMap;
 public final class AdjacencyGraph  {
   private val N:Int; // number of vertices
   private var M:Int; // number of edges
-  private val adjacencyList:Rail[HashMap[Int, ULong]];
+  private val adjacencyList:Rail[HashMap[Int, Long]];
   private val inDegreeMap:Rail[Int];
 
   /** 
@@ -27,7 +27,7 @@ public final class AdjacencyGraph  {
     this.N = N;
     this.M = 0;
     this.adjacencyList = 
-     Rail.make[HashMap[Int, ULong]] (N, (Int)=> new HashMap[Int, ULong]());
+     Rail.make[HashMap[Int, Long]] (N, (Int)=> new HashMap[Int, Long]());
     this.inDegreeMap = Rail.make[Int] (N, (Int) => 0);
     this.offsetMap = Rail.make[Int](N+1);
   }
@@ -102,13 +102,13 @@ public final class AdjacencyGraph  {
    */
   public def getEdgeWeight (v:Int, w:Int) =
     (this.existsEdge(v,w)) ? 
-      this.getNeighbors(v).getOrElse(w, 0 as ULong) : ULong.MAX_VALUE;
+      this.getNeighbors(v).getOrElse(w, 0 as Long) : Long.MAX_VALUE;
 
   /**
    * Add an edge with a given weight. We do not check if the edge exists!
    * If an edge exists, its overwritten.
    */
-  public def addEdge (v:Int, w:Int, d:ULong) = this.getNeighbors(v).put (w, d);
+  public def addEdge (v:Int, w:Int, d:Long) = this.getNeighbors(v).put (w, d);
 
   /**
    * Return the number of vertices in the graph.

@@ -26,7 +26,7 @@ public  struct NetReader {
       val numNeighbors = inputFileReader.readInt();
 
       for ([j] in 0..(numNeighbors-1)) {
-        adjacencyGraph.addEdge (i, inputFileReader.readInt(), 1 as ULong);
+        adjacencyGraph.addEdge (i, inputFileReader.readInt(), 1 as Long);
       }
     }
 
@@ -109,7 +109,7 @@ public  struct NetReader {
         continue; 
       }
 
-      /* Process the edges or edgelist remaining --- assume ULong weights */
+      /* Process the edges or edgelist remaining --- assume Long weights */
       if (foundDirectedEdges) {
         val tokens:Rail[String] = tokenize(thisLine," ");
 
@@ -118,8 +118,8 @@ public  struct NetReader {
 
         val source= Int.parse (tokens(0)) - startIndex;
         val destination = Int.parse (tokens(1)) - startIndex;
-        val weight:ULong = (2==tokens.length()) ? 1 as ULong: 
-                                                  ULong.parse (tokens(2));
+        val weight:Long = (2==tokens.length()) ? 1 as Long: 
+                                                  Long.parse (tokens(2));
 
         adjacencyGraph.addEdge (source, destination, weight);
         adjacencyGraph.incrementInDegree (destination);
@@ -131,8 +131,8 @@ public  struct NetReader {
 
         val source= Int.parse (tokens(0)) - startIndex;
         val destination = Int.parse (tokens(1)) - startIndex;
-        val weight:ULong = (2==tokens.length()) ? 1 as ULong: 
-                                                  ULong.parse (tokens(2));
+        val weight:Long = (2==tokens.length()) ? 1 as Long: 
+                                                  Long.parse (tokens(2));
 
         adjacencyGraph.addEdge (source, destination, weight);
         adjacencyGraph.addEdge (destination, source, weight);
@@ -187,8 +187,8 @@ public  struct NetReader {
 
         val source= Int.parse (tokens(0)) - startIndex;
         val destination = Int.parse (tokens(1)) - startIndex;
-        val weight:ULong = (2==tokens.length()) ? 1 as ULong: 
-                                                  ULong.parse (tokens(2));
+        val weight:Long = (2==tokens.length()) ? 1 as Long: 
+                                                  Long.parse (tokens(2));
 
         adjacencyGraph.addEdge (source, destination, weight);
         adjacencyGraph.incrementInDegree (destination);

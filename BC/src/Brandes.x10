@@ -32,7 +32,7 @@ public final class Brandes(N:Int) {
 
   // A comparator which orders the vertices by their distances.
   private static val makeNonIncreasingComparator = 
-    (distanceMap:Rail[ULong]) =>  (x:Int, y:Int) => {
+    (distanceMap:Rail[Long]) =>  (x:Int, y:Int) => {
       val dx = distanceMap(x);
       val dy = distanceMap(y);
       return (dx==dy) ? 0 : (dx<dy) ? +1 : -1;
@@ -57,8 +57,8 @@ public final class Brandes(N:Int) {
     val vertexStack = new FixedRailStack[Int] (N);
     val predecessorMap= Rail.make[FixedRailStack[Int]](N, (i:Int)=> 
           new FixedRailStack[Int](graph.getInDegree(i)));
-    val distanceMap = Rail.make[ULong](N, ULong.MAX_VALUE);
-    val sigmaMap = Rail.make(N, 0 as ULong);
+    val distanceMap = Rail.make[Long](N, Long.MAX_VALUE);
+    val sigmaMap = Rail.make(N, 0 as Long);
     val regularQueue = new FixedRailQueue[Int] (N);
     val deltaMap = Rail.make[Double](N, 0.0 as Double);
     val processedVerticesStack = new FixedRailStack[Int](N);
@@ -83,8 +83,8 @@ public final class Brandes(N:Int) {
       while (!(processedVerticesStack.isEmpty())) {
         val processedVertex = processedVerticesStack.pop();
         predecessorMap(processedVertex).clear();
-        distanceMap(processedVertex) = ULong.MAX_VALUE;
-        sigmaMap(processedVertex) = 0 as ULong;
+        distanceMap(processedVertex) = Long.MAX_VALUE;
+        sigmaMap(processedVertex) = 0 as Long;
         deltaMap(processedVertex) = 0.0 as Double;
       }
 
@@ -92,8 +92,8 @@ public final class Brandes(N:Int) {
       
       val processingCounter:Long = System.nanoTime();
       // Put the values for source vertex
-      distanceMap(s)=0 as ULong;
-      sigmaMap(s)=1 as ULong;
+      distanceMap(s)=0 as Long;
+      sigmaMap(s)=1 as Long;
       regularQueue.push (s);
      
      
@@ -113,11 +113,11 @@ public final class Brandes(N:Int) {
           // Get the target of the current edge and its weight.
           val adjacencyNode:AdjacencyNode = graph.getAdjacencyNode(wIndex);
           val w:Int = adjacencyNode.getTargetVertex();
-          val distanceThroughV = distanceMap(v) + 1 as ULong;
+          val distanceThroughV = distanceMap(v) + 1 as Long;
 
           // In BFS, the minimum distance will only be found once --- the 
           // first time that a node is discovered. So, add it to the queue.
-          if (distanceMap(w)==ULong.MAX_VALUE) {
+          if (distanceMap(w)==Long.MAX_VALUE) {
             regularQueue.push (w);
             distanceMap(w) = distanceThroughV;
           }
@@ -190,8 +190,8 @@ public final class Brandes(N:Int) {
     val vertexStack = new FixedRailStack[Int] (N);
     val predecessorMap= Rail.make[FixedRailStack[Int]](N, (i:Int)=> 
           new FixedRailStack[Int](graph.getInDegree(i)));
-    val distanceMap = Rail.make[ULong](N, ULong.MAX_VALUE);
-    val sigmaMap = Rail.make(N, 0 as ULong);
+    val distanceMap = Rail.make[Long](N, Long.MAX_VALUE);
+    val sigmaMap = Rail.make(N, 0 as Long);
     val binaryHeapComparator = makeNonIncreasingComparator(distanceMap);
     val priorityQueue = new FixedBinaryHeap (binaryHeapComparator, N);
     val deltaMap = Rail.make[Double](N, 0.0 as Double);
@@ -217,8 +217,8 @@ public final class Brandes(N:Int) {
       while (!(processedVerticesStack.isEmpty())) {
         val processedVertex = processedVerticesStack.pop();
         predecessorMap(processedVertex).clear();
-        distanceMap(processedVertex) = ULong.MAX_VALUE;
-        sigmaMap(processedVertex) = 0 as ULong;
+        distanceMap(processedVertex) = Long.MAX_VALUE;
+        sigmaMap(processedVertex) = 0 as Long;
         deltaMap(processedVertex) = 0.0 as Double;
       }
 
@@ -226,8 +226,8 @@ public final class Brandes(N:Int) {
       
       val processingCounter:Long = System.nanoTime();
       // Put the values for source vertex
-      distanceMap(s)=0 as ULong;
-      sigmaMap(s)=1 as ULong;
+      distanceMap(s)=0 as Long;
+      sigmaMap(s)=1 as Long;
       priorityQueue.push (s);
      
      
@@ -254,7 +254,7 @@ public final class Brandes(N:Int) {
           if (distanceThroughV < distanceMap(w)) {
             // Check if this is the first time "w" was found.
             val firstTimeRelaxation = 
-              (distanceMap(w)==ULong.MAX_VALUE)? true:false;
+              (distanceMap(w)==Long.MAX_VALUE)? true:false;
 
             // Update the distance map
             distanceMap(w) = distanceThroughV;
