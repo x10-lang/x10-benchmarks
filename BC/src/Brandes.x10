@@ -15,14 +15,14 @@ public final class Brandes(N:Int) {
   static type AtomicType=LockedDouble;
   static val Meg = (1000*1000); // not Whitman, she is history
 
-  val graph:AdjacencyGraph;
+  val graph:AbstractCSRGraph;
   val debug:Int;
   val verticesToWorkOn=Rail.make[Int] (N, (i:Int)=>i);
   val betweennessMap=Rail.make[Double] (N, (Int)=> 0.0D);
   val betweennessMapLocks = Rail.make[Lock](N, (Int)=> new Lock());
   
   // Constructor
-  public def this(g:AdjacencyGraph, debug:Int) {
+  public def this(g:AbstractCSRGraph, debug:Int) {
     property(g.numVertices());
     this.graph=g;
     this.debug=debug;
@@ -111,9 +111,8 @@ public final class Brandes(N:Int) {
         // Iterate over all its neighbors
         for (var wIndex:Int=edgeStart; wIndex<edgeEnd; ++wIndex) {
           // Get the target of the current edge and its weight.
-          val adjacencyNode:AdjacencyNode = graph.getAdjacencyNode(wIndex);
-          val w:Int = adjacencyNode.getTargetVertex();
-          val distanceThroughV = distanceMap(v) + 1 as Long;
+          val w:Int = graph.getAdjacentVertexFromIndex(wIndex);
+          val distanceThroughV:Long = distanceMap(v) + 1 as Long;
 
           // In BFS, the minimum distance will only be found once --- the 
           // first time that a node is discovered. So, add it to the queue.
@@ -245,9 +244,10 @@ public final class Brandes(N:Int) {
         // Iterate over all its neighbors
         for (var wIndex:Int=edgeStart; wIndex<edgeEnd; ++wIndex) {
           // Get the target of the current edge and its weight.
-          val adjacencyNode:AdjacencyNode = graph.getAdjacencyNode(wIndex);
-          val w:Int = adjacencyNode.getTargetVertex();
-          val distanceThroughV = distanceMap(v) + adjacencyNode.getEdgeWeight();
+          val w:Int = graph.getAdjacentVertexFromIndex(wIndex);
+          val edgeWeight:Long = 
+      (graph as AbstractWeightedCSRGraph).getEdgeWeightFromIndex(wIndex);
+          val distanceThroughV = distanceMap(v) + edgeWeight;
 
           // Update the distance and push it in the priorityQueue
           // if a new low distance has been found.
@@ -397,12 +397,12 @@ public final class Brandes(N:Int) {
   /**
    * Calls betweeness, prints out the statistics and what not.
    */
-  private static def crunchNumbers (graphMaker:()=>AdjacencyGraph,
-      printer:Printer, 
-      permute:Boolean,
-      weighted:Boolean,
-      chunk:Int,
-      debug:Int) {
+  private static def crunchNumbers (graphMaker:()=>AbstractCSRGraph,
+                                    printer:Printer, 
+                                    permute:Boolean,
+                                    weighted:Boolean,
+                                    chunk:Int,
+                                    debug:Int) {
     var time:Long = System.nanoTime();
 
     // Create a place local handle at each place.
@@ -498,7 +498,7 @@ public final class Brandes(N:Int) {
           Console.OUT : (new File(outFileName)).printer();
       
       printer.println ("Running SSCA2 with the following parameters:");
-      val gm:()=>AdjacencyGraph;
+      val gm:()=>AbstractCSRGraph;
       if (0 == fileName.compareTo("NOFILE")) {
         printer.println ("seed = " + seed);
         printer.println ("N = " + Math.pow(2, n) as Int);
@@ -506,18 +506,18 @@ public final class Brandes(N:Int) {
         printer.println ("b = " + b);
         printer.println ("c = " + c);
         printer.println ("d = " + d);
-        gm = ()=>Rmat(seed, n,a,b,c,d).generate();
+        gm = ()=>Rmat(seed, n,a,b,c,d).generate(weighted);
       } else {
         printer.println ("f = " + fileName);
         printer.println ("t = " + fileType);
         printer.println ("i = " + startIndex);
 
         if (0==fileType) {
-          gm=()=>NetReader.readNetFile (fileName, startIndex);
+          gm=()=>NetReader.readNetFile (fileName, startIndex, weighted);
         } else if (1==fileType) {
-          gm=()=>NetReader.readNwbFile (fileName, startIndex);
+          gm=()=>NetReader.readNwbFile (fileName, startIndex, weighted);
         } else if (2==fileType) {
-          gm=()=>NetReader.readGuojingFile (fileName, startIndex);
+          gm=()=>NetReader.readGuojingFile (fileName, startIndex, weighted);
         } else {
           printer.println ("The only file types supported are:");
           printer.println (".NET format --> -t 0 (default)");

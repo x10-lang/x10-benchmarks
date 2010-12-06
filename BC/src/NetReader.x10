@@ -10,7 +10,8 @@ public  struct NetReader {
    * unweighted graph. Start index is not used here.
    */
   public static def readGuojingFile (fileName:String,
-                                     startIndex:Int) {
+                                     startIndex:Int,
+                                     weighted:Boolean):AbstractCSRGraph {
     val inputFile:File = new File(fileName);
     val inputFileReader:Reader = inputFile.openRead();
 
@@ -19,14 +20,21 @@ public  struct NetReader {
     if (0 > N) throw new Exception ("Incorrect File Format");
 
     /* Declare the adjacency graph */
-    val adjacencyGraph = new AdjacencyGraph(N);
+    val adjacencyGraph:AbstractCSRGraph = weighted? 
+                          new WeightedGraph(N): new UnweightedGraph(N);
 
     /* Now, read the graph in */
     for ([i] in 0..(N-1)) {
       val numNeighbors = inputFileReader.readInt();
 
       for ([j] in 0..(numNeighbors-1)) {
-        adjacencyGraph.addEdge (i, inputFileReader.readInt(), 1 as Long);
+        if (adjacencyGraph instanceof AbstractWeightedCSRGraph) {
+          (adjacencyGraph as AbstractWeightedCSRGraph).addEdge 
+                                  (i, inputFileReader.readInt(), 1 as Long);
+        }else if(adjacencyGraph instanceof AbstractUnweightedCSRGraph){
+          (adjacencyGraph as AbstractUnweightedCSRGraph).addEdge 
+                                  (i, inputFileReader.readInt());
+        }
       }
     }
 
@@ -75,8 +83,8 @@ public  struct NetReader {
 
   /* The function that reads in a .NWB file */
   public static def readNwbFile (fileName:String,
-                                 startIndex:Int) : 
-                                AdjacencyGraph {
+                                 startIndex:Int,
+                                 weighted:Boolean): AbstractCSRGraph {
 
     val inputFile:File = new File(fileName);
     val inputFileReader:Reader = inputFile.openRead();
@@ -90,7 +98,9 @@ public  struct NetReader {
 
     if (0 > N) throw new Exception ("Incorrect File Format");
 
-    val adjacencyGraph = new AdjacencyGraph(N);
+    /* Declare the adjacency graph */
+    val adjacencyGraph:AbstractCSRGraph = weighted? 
+                          new WeightedGraph(N): new UnweightedGraph(N);
 
     /* Iterate over the lines and construct the graph */
     var foundDirectedEdges:Boolean = false;
@@ -121,9 +131,15 @@ public  struct NetReader {
         val weight:Long = (2==tokens.length()) ? 1 as Long: 
                                                   Long.parse (tokens(2));
 
-        adjacencyGraph.addEdge (source, destination, weight);
+        if (adjacencyGraph instanceof AbstractWeightedCSRGraph) {
+          (adjacencyGraph as AbstractWeightedCSRGraph).addEdge 
+                                          (source, destination, weight);
+        }else if(adjacencyGraph instanceof AbstractUnweightedCSRGraph){
+          (adjacencyGraph as AbstractUnweightedCSRGraph).addEdge 
+                                          (source, destination);
+        }
         adjacencyGraph.incrementInDegree (destination);
-      } else if (foundDirectedEdges) {
+      } else if (foundUnDirectedEdges) {
         val tokens:Rail[String] = tokenize(thisLine," ");
 
         if (2 > tokens.length()) 
@@ -134,8 +150,17 @@ public  struct NetReader {
         val weight:Long = (2==tokens.length()) ? 1 as Long: 
                                                   Long.parse (tokens(2));
 
-        adjacencyGraph.addEdge (source, destination, weight);
-        adjacencyGraph.addEdge (destination, source, weight);
+        if (adjacencyGraph instanceof AbstractWeightedCSRGraph) {
+          (adjacencyGraph as AbstractWeightedCSRGraph).addEdge 
+                                          (source, destination, weight);
+          (adjacencyGraph as AbstractWeightedCSRGraph).addEdge 
+                                          (destination, source, weight);
+        }else if(adjacencyGraph instanceof AbstractUnweightedCSRGraph){
+          (adjacencyGraph as AbstractUnweightedCSRGraph).addEdge 
+                                          (source, destination);
+          (adjacencyGraph as AbstractUnweightedCSRGraph).addEdge 
+                                          (destination, source);
+        }
         adjacencyGraph.incrementInDegree (source);
         adjacencyGraph.incrementInDegree (destination);
       } else {
@@ -147,8 +172,8 @@ public  struct NetReader {
 
   /* The function that reads in .NET format */
   public static def readNetFile (fileName:String,
-                                 startIndex:Int) : 
-                                AdjacencyGraph {
+                                 startIndex:Int,
+                                 weighted:Boolean): AbstractCSRGraph {
 
     val inputFile:File = new File(fileName);
     val inputFileReader:Reader = inputFile.openRead();
@@ -162,7 +187,9 @@ public  struct NetReader {
 
     if (0 > N) throw new Exception ("Incorrect File Format");
 
-    val adjacencyGraph = new AdjacencyGraph(N);
+    /* Declare the adjacency graph */
+    val adjacencyGraph:AbstractCSRGraph = weighted? 
+                          new WeightedGraph(N): new UnweightedGraph(N);
 
     /* Iterate over the lines and construct the graph */
     var foundEdges:Boolean = false;
@@ -190,7 +217,13 @@ public  struct NetReader {
         val weight:Long = (2==tokens.length()) ? 1 as Long: 
                                                   Long.parse (tokens(2));
 
-        adjacencyGraph.addEdge (source, destination, weight);
+        if (adjacencyGraph instanceof AbstractWeightedCSRGraph) {
+          (adjacencyGraph as AbstractWeightedCSRGraph).addEdge 
+                                          (source, destination, weight);
+        }else if(adjacencyGraph instanceof AbstractUnweightedCSRGraph){
+          (adjacencyGraph as AbstractUnweightedCSRGraph).addEdge 
+                                          (source, destination);
+        }
         adjacencyGraph.incrementInDegree (destination);
       }
     }

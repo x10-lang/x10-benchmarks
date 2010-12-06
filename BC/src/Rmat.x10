@@ -113,23 +113,36 @@ public final struct Rmat {
 	 * to be 1. However, if the (row,col) values repeat, you add 1 to the edge 
 	 * weight --- this is a way to deal with duplicate edges.
 	 */
-	private final def sparse (row:Rail[Int], col:Rail[Int]) {
-		val adjacencyGraph = new AdjacencyGraph  (this.N);
+	private final def sparse (row:Rail[Int], 
+                            col:Rail[Int], 
+                            weighted:Boolean): AbstractCSRGraph {
+    /* Declare the adjacency graph */
+    val adjacencyGraph:AbstractCSRGraph = weighted? 
+                      new WeightedGraph(this.N): new UnweightedGraph(this.N);
 		val numElements = row.length(); 
 		
 		for (var i:Int=0; i<numElements; ++i) {
 			val v = row(i);
 			val w = col(i);
 			
-			// Add an edge from (v,w). If the edge exists, increase its weight.
-			// Note that Int.MIN_VALUE being returned from getEdgeWeight() 
-			// implies that there was no edge existing between (v,w) apriori.
-			val d = adjacencyGraph.getEdgeWeight (v,w);
-			if (Long.MAX_VALUE == d) {
-        adjacencyGraph.addEdge (v, w, 1 as Long);
-        adjacencyGraph.incrementInDegree (w);
-      } else {
-        adjacencyGraph.addEdge (v, w, d+1 as Long);
+      if (adjacencyGraph instanceof AbstractWeightedCSRGraph) {
+				// Add an edge from (v,w). If the edge exists, increase its weight.
+				// Note that Int.MIN_VALUE being returned from getEdgeWeight() 
+				// implies that there was no edge existing between (v,w) apriori.
+
+        val d = 
+        (adjacencyGraph as AbstractWeightedCSRGraph).getEdgeWeight (v,w);
+				if (Long.MAX_VALUE == d) {
+        (adjacencyGraph as AbstractWeightedCSRGraph).addEdge 
+                                (v, w, 1 as Long);
+          adjacencyGraph.incrementInDegree (w);
+        } else {
+        (adjacencyGraph as AbstractWeightedCSRGraph).addEdge 
+                                (v, w, d+1 as Long);
+        }
+      } else if(adjacencyGraph instanceof AbstractUnweightedCSRGraph){
+        // Simply add the edge. This is an idempotent operation.
+        (adjacencyGraph as AbstractUnweightedCSRGraph).addEdge (v,w);
       }
 		}
 		
@@ -139,7 +152,7 @@ public final struct Rmat {
 	/**
 	 * TODO: Explain the code --- too late in the night now. Sleepy!
 	 */
-	public def generate () {
+	public def generate (weighted:Boolean) {
 		// Initialize M, and rng
 		val M = 8*this.N;
 		val rng = new Random(this.seed);
@@ -163,6 +176,6 @@ public final struct Rmat {
 			jj = this.add (jj, this.multiply (jjBit, exponent));
 		}
 		
-		return this.sparse(ii, jj);
+		return this.sparse(ii, jj, weighted);
 	}
 }

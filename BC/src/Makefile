@@ -47,18 +47,22 @@ X10CXXFLAGS=-report \
             -O  
 
 X10_STRUCTS=Rmat.x10 \
-            NetReader.x10 \
-            AdjacencyNode.x10 
+            NetReader.x10 
 X10_STRUCTS_CC=$(X10_STRUCTS:.x10=.cc)
 X10_STRUCTS_H=$(X10_STRUCTS:.x10=.h)
 X10_STRUCTS_STRUCTS_H=$(X10_STRUCTS:.x10=.struct_h)
 
 X10_CLASSES=Brandes.x10 \
-            AdjacencyGraph.x10 \
+            WeightedGraph.x10 \
+            UnweightedGraph.x10 \
             FixedBinaryHeap.x10 \
             FixedRailStack.x10 \
+            FixedRailQueue.x10 \
             AtomicDouble.x10 \
             LockedDouble.x10 \
+            AbstractCSRGraph.x10 \
+            AbstractWeightedCSRGraph.x10 \
+            AbstractUnweightedCSRGraph.x10 \
             TestRandom.x10 
 X10_CLASSES_CC=$(X10_CLASSES:.x10=.cc)
 X10_CLASSES_H=$(X10_CLASSES:.x10=.h)
