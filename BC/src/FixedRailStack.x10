@@ -22,7 +22,7 @@ public class FixedRailStack[T] {
   /** Add the element to the top of the stack. */
   public def push(v:T) {
     // check that we are not going to blow the stack.
-    assert ((this.size+1) < this.internalStorage.length());
+    assert (this.size < this.internalStorage.length());
 
     // Add the element and increase the size
     this.internalStorage(this.size) = v;
@@ -32,7 +32,7 @@ public class FixedRailStack[T] {
   /** Remove and return the top element of the stack. */
   public def pop():T {
     // check that we have something in the stack
-    assert ((this.size) > 0); 
+    assert (this.size > 0); 
 
     // Remove the last element and give it out
     return this.internalStorage(--this.size);
@@ -41,7 +41,7 @@ public class FixedRailStack[T] {
   /** Return, but do not remove, the top element of the stack. */
   public def peek() {
     // check that we have something in the stack
-    assert ((this.size) > 0); 
+    assert (this.size > 0); 
 
     // Remove the last element and give it out
     return this.internalStorage((this.size-1));
