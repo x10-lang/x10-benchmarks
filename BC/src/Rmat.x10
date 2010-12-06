@@ -143,6 +143,7 @@ public final struct Rmat {
       } else if(adjacencyGraph instanceof AbstractUnweightedCSRGraph){
         // Simply add the edge. This is an idempotent operation.
         (adjacencyGraph as AbstractUnweightedCSRGraph).addEdge (v,w);
+        adjacencyGraph.incrementInDegree (w);
       }
 		}
 		
