@@ -354,8 +354,8 @@ public final class Brandes(N:Int) {
       // spawn work 
       for ([i] in 0..numChunks-1) async {
         val startVertex = vertexBeginIndex + chunkSize*i;
-        val endVertex = (i==numChunks-1) ? vertexEndIndex-1: 
-          (startVertex+chunkSize-1);
+        val endVertex = (i==(numChunks-1)) ? vertexEndIndex: 
+                                           (startVertex+chunkSize-1);
 
         // We can lift this condition out so that its not checked everytime,
         // but considering how much work is involved in each BFS/DFS 
@@ -419,6 +419,9 @@ public final class Brandes(N:Int) {
     val N= myGraph.numVertices();
     val M= myGraph.numEdges();
     printer.println ("Graph details: N=" + N + ", M=" + M);
+    if (printer != Console.OUT) {
+      Console.OUT.println ("Graph details: N=" + N + ", M=" + M);
+    }
     
     // Determine the number of places.
     val numPlaces = Place.MAX_PLACES;
@@ -435,7 +438,7 @@ public final class Brandes(N:Int) {
                        weighted,
                        chunk, 
                        place*chunkSize, 
-                       place == numPlaces -1 ? N-1 : (place+1)*chunkSize-1, 
+                       (place==(numPlaces-1))? N-1: ((place+1)*chunkSize)-1, 
                        debug);
     } // finish
     
@@ -465,7 +468,7 @@ public final class Brandes(N:Int) {
            Option("c", "", "Probability c"),
            Option("d", "", "Probability d"),
            Option("f", "", "Graph file name"),
-           Option("t", "", "File type: 0: NWB, 1:NET, 2:GUOJING"),
+           Option("t", "", "File type: 0: NET, 1:NWB, 2:GUOJING"),
            Option("i", "", "Starting index of vertices"),
            Option("debug", "", "Debug"),
            Option("chunk", "", "Chunk size, defaults to 100"),

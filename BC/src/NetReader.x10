@@ -182,7 +182,7 @@ public  struct NetReader {
       if (foundEdges) {
         val tokens:Rail[String] = tokenize(thisLine," ");
 
-        if (2 < tokens.length())
+        if (2 > tokens.length())
           throw new Exception ("Format not \"src dest weight\"");
 
         val source= Int.parse (tokens(0)) - startIndex;
