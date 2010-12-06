@@ -102,6 +102,8 @@ public  struct NetReader {
     val adjacencyGraph:AbstractCSRGraph = weighted? 
                           new WeightedGraph(N): new UnweightedGraph(N);
 
+    Console.OUT.println ("Parsing graph with " + N + " vertices");
+
     /* Iterate over the lines and construct the graph */
     var foundDirectedEdges:Boolean = false;
     var foundUnDirectedEdges:Boolean = false;
@@ -110,10 +112,12 @@ public  struct NetReader {
          thisLine=getNextLine(inputFileIterator)) {
 
       if (0 <= thisLine.indexOf("*directededges")) {
+        Console.OUT.println (thisLine);
         foundUnDirectedEdges = false;
         foundDirectedEdges = true;
         continue; 
       } else if (0 <= thisLine.indexOf("*undirectededges")) {
+        Console.OUT.println (thisLine);
         foundUnDirectedEdges = true;
         foundDirectedEdges = false;
         continue; 
@@ -167,6 +171,8 @@ public  struct NetReader {
         /* Do nothing */
       }
     }
+
+    Console.OUT.println ("Done reading vertices");
     return adjacencyGraph;
   }
 

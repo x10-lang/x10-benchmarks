@@ -1,10 +1,10 @@
-import x10.util.HashSet;
+import x10.util.ArrayList;
 
 /**
  * A class that implements the unweighted graph interface.
  */
 public final class UnweightedGraph extends AbstractUnweightedCSRGraph {
-  private val adjacencyList:Rail[HashSet[Int]];
+  private val adjacencyList:Rail[ArrayList[Int]];
 
   /**
    * Constructor: prepare all the data structures.
@@ -12,7 +12,7 @@ public final class UnweightedGraph extends AbstractUnweightedCSRGraph {
   public def this (N:Int) { 
     super(N);
     this.adjacencyList = 
-     Rail.make[HashSet[Int]] (N, (Int)=> new HashSet[Int]());
+     Rail.make[ArrayList[Int]] (N, (Int)=> new ArrayList[Int]());
   }
 
   /**
