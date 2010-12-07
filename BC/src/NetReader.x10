@@ -4,6 +4,16 @@ import x10.io.ReaderIterator;
 
 /* A class to read the NET format by Pajek */
 public  struct NetReader {
+  static val spaceString:String = " ";
+  static val hashString:String = "#";
+  static val EOFString:String = "EOF";
+  static val sourceString:String = "source";
+  static val idString:String = "id";
+  static val targetString:String = "target";
+  static val verticesString:String = "*vertices";
+  static val nodesString:String = "*nodes";
+  static val undirectededgesString:String = "*undirectededges";
+  static val directededgesString:String = "*directededges";
 
   /* 
    * The function that reads the binary format by Guojing -- this is an 
@@ -42,13 +52,13 @@ public  struct NetReader {
   }
 
   private static def getNextLine(inputFileIterator:ReaderIterator[String]){
-    var line:String = "EOF";
+    var line:String = EOFString;
     while (inputFileIterator.hasNext()) {
       line = inputFileIterator.next().toLowerCase().trim();
-      if (0>line.indexOf("#") && 
-          0>line.indexOf("source") &&
-          0>line.indexOf("id") &&
-          0>line.indexOf("target")) break;
+      if (0>line.indexOf(hashString) && 
+          0>line.indexOf(sourceString) &&
+          0>line.indexOf(idString) &&
+          0>line.indexOf(targetString)) break;
       else {} /* We found a comment line, move on to the next */
     }
 
@@ -92,9 +102,9 @@ public  struct NetReader {
 
     /* Find out the number of vertices --- this is needed to initialize */
     val firstLine:String = getNextLine(inputFileIterator);
-    val N:Int = (0 > firstLine.lastIndexOf ("*nodes")) ? 
+    val N:Int = (0 > firstLine.lastIndexOf (nodesString)) ? 
                       -1: /* error --- first line has to be "*Vertices" */
-                      Int.parse(tokenize(firstLine, " ")(1));
+                      Int.parse(tokenize(firstLine, spaceString)(1));
 
     if (0 > N) throw new Exception ("Incorrect File Format");
 
@@ -108,15 +118,15 @@ public  struct NetReader {
     var foundDirectedEdges:Boolean = false;
     var foundUnDirectedEdges:Boolean = false;
     for (var thisLine:String=getNextLine(inputFileIterator);
-         !thisLine.equals("EOF");
+         !thisLine.equals(EOFString);
          thisLine=getNextLine(inputFileIterator)) {
 
-      if (0 <= thisLine.indexOf("*directededges")) {
+      if (0 <= thisLine.indexOf(directededgesString)) {
         Console.OUT.println (thisLine);
         foundUnDirectedEdges = false;
         foundDirectedEdges = true;
         continue; 
-      } else if (0 <= thisLine.indexOf("*undirectededges")) {
+      } else if (0 <= thisLine.indexOf(undirectededgesString)) {
         Console.OUT.println (thisLine);
         foundUnDirectedEdges = true;
         foundDirectedEdges = false;
@@ -171,7 +181,6 @@ public  struct NetReader {
         /* Do nothing */
       }
     }
-
     Console.OUT.println ("Done reading vertices");
     return adjacencyGraph;
   }
