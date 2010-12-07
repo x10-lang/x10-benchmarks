@@ -15,6 +15,13 @@ public final class UnweightedGraph extends AbstractUnweightedCSRGraph {
      Rail.make[ArrayList[Int]] (N, (Int)=> new ArrayList[Int]());
   }
 
+
+  /** Constructor: construct from the CSR format file */
+  public def this(csrFileName:String) {
+    super(csrFileName);
+    this.adjacencyList = Rail.make[ArrayList[Int]] (0);
+  }
+
   /**
    * @Override
    * Create the compressed representation. To be called only after all the 
@@ -23,6 +30,9 @@ public final class UnweightedGraph extends AbstractUnweightedCSRGraph {
    * offsetMap and the adjacencyMap.
    */
   public def compressGraph () { 
+    // The graph may be compressed already --- don't do anything in this case.
+    if (this.compressed) return;
+
     // Create as many elements as edges.
     this.adjacencyMap = Rail.make[Int](this.M);
 
@@ -44,13 +54,25 @@ public final class UnweightedGraph extends AbstractUnweightedCSRGraph {
 
     // set the offset of the sentinel
     this.offsetMap(N) = currentOffset;
+
+    // set compressed to be true
+    this.compressed = true;
+
+    // de-allocate anything that we don't need
+    for ([i] in 0..this.adjacencyList.length-1) {
+      Runtime.deallocObject(this.adjacencyList(i));
+    }
+    Runtime.deallocObject (this.adjacencyList);
   }
 
   /**
    * @Override
    * Check if an edge exists between a pair of vertices.
    */
-  public def existsEdge (v:Int, w:Int) = this.adjacencyList(v).contains(w); 
+  public def existsEdge (v:Int, w:Int) {
+    assert (this.compressed==false);
+    return this.adjacencyList(v).contains(w); 
+  }
 
   /**
    * @Override
@@ -58,6 +80,7 @@ public final class UnweightedGraph extends AbstractUnweightedCSRGraph {
    * If an edge exists, its overwritten.
    */
   public def addEdge (v:Int, w:Int): Void {
+    assert (this.compressed==false);
     this.adjacencyList(v).add (w);
   }
 

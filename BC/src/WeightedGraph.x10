@@ -25,6 +25,9 @@ public final class WeightedGraph extends AbstractWeightedCSRGraph {
    * offsetMap and the adjacencyMap.
    */
   public def compressGraph () { 
+    // The graph may be compressed already --- don't do anything in this case.
+    if (this.compressed) return;
+
     // Create as many elements as edges.
     this.adjacencyMap = Rail.make[Int](this.M);
     this.edgeWeightMap = Rail.make[Long](this.M);
@@ -48,22 +51,37 @@ public final class WeightedGraph extends AbstractWeightedCSRGraph {
 
     // set the offset of the sentinel
     this.offsetMap(N) = currentOffset;
+
+    // say that we are compressed
+    this.compressed = true;
+
+    // de-allocate anything that we don't need
+    for ([i] in 0..this.adjacencyList.length-1) {
+      Runtime.deallocObject(this.adjacencyList(i));
+    }
+    Runtime.deallocObject (this.adjacencyList);
   }
 
   /**
    * @Override
    * Check if an edge exists between a pair of vertices.
    */
-  public def existsEdge (v:Int, w:Int) = this.adjacencyList(v).containsKey(w); 
+  public def existsEdge (v:Int, w:Int) {
+    assert (this.compressed==false);
+    return this.adjacencyList(v).containsKey(w); 
+  }
 
   /**
    * @Override
    * Return the weight of the edge (if there is an edge). This function is 
-   * called both during construction and after construction of the graph.
+   * called during construction of the graph.
    */
-  public def getEdgeWeight (v:Int, w:Int) =
-    (this.existsEdge(v,w)) ? 
+  public def getEdgeWeight (v:Int, w:Int) {
+    assert (this.compressed==false);
+    val edgeWeight = this.existsEdge(v,w) ? 
       this.adjacencyList(v).getOrElse(w, 0 as Long) : Long.MAX_VALUE;
+    return edgeWeight;
+  }
 
   /**
    * @Override
@@ -71,6 +89,7 @@ public final class WeightedGraph extends AbstractWeightedCSRGraph {
    * TODO: Add a check for compression.
    */
   public def getEdgeWeightFromIndex(wIndex:Int): Long {
+    assert (this.compressed);
     return this.edgeWeightMap(wIndex);
   }
 
@@ -80,6 +99,7 @@ public final class WeightedGraph extends AbstractWeightedCSRGraph {
    * If an edge exists, its overwritten.
    */
   public def addEdge (v:Int, w:Int, d:Long): Void {
+    assert (this.compressed==false);
     this.adjacencyList(v).put (w, d);
   }
 

@@ -468,12 +468,13 @@ public final class Brandes(N:Int) {
            Option("c", "", "Probability c"),
            Option("d", "", "Probability d"),
            Option("f", "", "Graph file name"),
-           Option("t", "", "File type: 0: NET, 1:NWB, 2:GUOJING"),
+           Option("t", "", "File type: 0: NET, 1:NWB, 2:GUOJING, 3:CSR"),
            Option("i", "", "Starting index of vertices"),
            Option("debug", "", "Debug"),
            Option("chunk", "", "Chunk size, defaults to 100"),
            Option("permute", "", "true, false"),
            Option("weighted", "", "true, false"),
+           Option("dump", "", "true, false"),
            Option("o", "", "Output file name")]);
       
       val seed:Long = cmdLineParams ("-s", 2);
@@ -489,6 +490,7 @@ public final class Brandes(N:Int) {
       val debug:Int = cmdLineParams ("-debug", 0); // off by default
       val permute:Boolean = 1==cmdLineParams ("-permute", 0); // def: off
       val weighted:Boolean = 1==cmdLineParams ("-weighted", 0); //def: off
+      val dumpBinary:Boolean = 1==cmdLineParams ("-dump", 0); //def: off
       val chunk:Int = cmdLineParams ("-chunk", -1); 
 
       val numPlaces = Place.MAX_PLACES;
@@ -518,6 +520,14 @@ public final class Brandes(N:Int) {
           gm=()=>NetReader.readNwbFile (fileName, startIndex, weighted);
         } else if (2==fileType) {
           gm=()=>NetReader.readGuojingFile (fileName, startIndex, weighted);
+        } else if (3==fileType) {
+          if (weighted==true) {
+            printer.println ("Currently, the CSR format is supported only" +
+                             " for unweighted graphs!");
+            return;
+          } else {
+            gm=()=>new UnweightedGraph(fileName);
+          }
         } else {
           printer.println ("The only file types supported are:");
           printer.println (".NET format --> -t 0 (default)");
@@ -525,6 +535,14 @@ public final class Brandes(N:Int) {
           printer.println ("GUOJING binary format --> -t 2");
           return;
         }
+      }
+
+      // If a binary dump has been requested, then dump the file out.
+      if (dumpBinary) {
+        val graph = gm(); 
+        graph.compressGraph ();
+        graph.writeBinaryToFile(outFileName);
+        return;
       }
       
       printer.println ("Permuting: " + permute);
