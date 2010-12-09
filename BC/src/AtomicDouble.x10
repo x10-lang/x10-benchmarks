@@ -2,7 +2,7 @@
 	 * This is an atomic implementation of the LockedDouble.
 	 * (See the next type below)
 	 */
-import x10.util.concurrent.atomic.AtomicLong;
+import x10.util.concurrent.AtomicLong;
 public final class AtomicDouble {
 	private var value:AtomicLong;
 	

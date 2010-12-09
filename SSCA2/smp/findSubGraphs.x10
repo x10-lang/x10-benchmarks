@@ -1,7 +1,7 @@
 package ssca2;
 
 import x10.util.*;
-import x10.util.concurrent.atomic.AtomicBoolean;
+import x10.util.concurrent.AtomicBoolean;
 
 class findSubGraphs  {
 	

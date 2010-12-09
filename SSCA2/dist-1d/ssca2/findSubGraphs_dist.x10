@@ -4,7 +4,7 @@ import x10.util.*;
 
 import x10.compiler.Native;
 
-import x10.util.concurrent.atomic.AtomicBoolean;
+import x10.util.concurrent.AtomicBoolean;
 
 class findSubGraphs_dist  {
 

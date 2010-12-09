@@ -2,8 +2,8 @@ package ssca2;
 
 import x10.util.*;
 import x10.compiler.Native;
-import x10.util.concurrent.atomic.AtomicBoolean;
-import x10.util.concurrent.atomic.AtomicInteger;
+import x10.util.concurrent.AtomicBoolean;
+import x10.util.concurrent.AtomicInteger;
 
 class FindSubGraphs {
 	

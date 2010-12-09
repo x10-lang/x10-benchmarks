@@ -7,7 +7,7 @@ import x10.lang.Math;
 import x10.io.File;
 import x10.io.Printer;
 import x10.lang.Cell;
-import x10.util.concurrent.atomic.AtomicLong;
+import x10.util.concurrent.AtomicLong;
 import x10.util.Team;
 import x10.lang.Lock;
 
