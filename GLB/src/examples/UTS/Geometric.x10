@@ -16,9 +16,9 @@ package examples.UTS;
 
 import x10.util.Stack;
 import global.lb.*;
-public class Geometric(b0:UInt, a:UInt, d:UInt) extends TaskFrame[TreeNode, UInt]{
+public class Geometric(b0:Int, a:Int, d:Int) extends TaskFrame[TreeNode, Int]{
 	static type Constants = UTS.Constants;
-	public static def usageLine(b0:UInt, r:UInt, a:UInt, d:UInt, seq:UInt, w:UInt, nu:UInt, l:UInt, z:UInt) {
+	public static def usageLine(b0:Int, r:Int, a:Int, d:Int, seq:Int, w:Int, nu:Int, l:Int, z:Int) {
 		Console.OUT.println("b0=" + b0 +
 				"   r=" + r +
 				"   a=" + a +
@@ -28,19 +28,19 @@ public class Geometric(b0:UInt, a:UInt, d:UInt) extends TaskFrame[TreeNode, UInt
 				"   n=" + nu +
 				"   l=" + l + 
 				"   z=" + z +
-				(l==3U ?" base=" + NetworkGenerator.findW(Place.MAX_PLACES, z) : ""));
+				(l==3 ?" base=" + NetworkGenerator.findW(Place.MAX_PLACES, z) : ""));
 	}
 	
-	public def runRootTask(s:TreeNode, stack:Stack[TreeNode]):void offers UInt {
+	public def runRootTask(s:TreeNode, stack:Stack[TreeNode]):void offers Int {
 		runTask(s, stack);
 	}
 	public def runTask  (
 			node:TreeNode, 
-			stack:Stack[TreeNode]) offers UInt { 
+			stack:Stack[TreeNode]) offers Int { 
 		/* compute branching factor at this node */
 		var curNodeBranchingFactor:double;
 
-	if (0U == node.d) { /* root node */
+	if (0 == node.d) { /* root node */
 		curNodeBranchingFactor = b0;
 	} else { /* calculate the branching factor for this node */
 		if (Constants.EXPDEC == a) { /* Exponential decrease */
@@ -50,7 +50,7 @@ public class Geometric(b0:UInt, a:UInt, d:UInt) extends TaskFrame[TreeNode, UInt
 			Math.pow (node.d as double, 
 					tmpLogOne/tmpLogTwo);
 		} else if (Constants.CYCLIC == a) { /* Cyclic */
-			if (node.d > (5U*d)) {
+			if (node.d > (5*d)) {
 				curNodeBranchingFactor = 0.0;
 			} else {
 				val TWO = 2.0;
@@ -64,7 +64,7 @@ public class Geometric(b0:UInt, a:UInt, d:UInt) extends TaskFrame[TreeNode, UInt
 		} else if (Constants.FIXED == a) { /* Fixed */
 			curNodeBranchingFactor = (node.d < d) ? 
 					b0 : /* true */
-						0U; /* false */
+						0; /* false */
 		} else if (Constants.LINEAR == a) { /* Linear --- default */
 			curNodeBranchingFactor = b0 *
 			(1.0 - (node.d as double)/
@@ -79,12 +79,12 @@ public class Geometric(b0:UInt, a:UInt, d:UInt) extends TaskFrame[TreeNode, UInt
 	val probForCurNodeBranchingFactor = 1.0 / (1.0 + curNodeBranchingFactor);
 	val randomNumber = (node.r)() as double;
 	val normalizedRandomNumber = randomNumber / UTS.NORMALIZER;
-	val numChildren:UInt = Math.floor ((Math.log (1-normalizedRandomNumber)) /
+	val numChildren:Int = Math.floor ((Math.log (1-normalizedRandomNumber)) /
 			(Math.log 
-					(1-probForCurNodeBranchingFactor))) as UInt;
+					(1-probForCurNodeBranchingFactor))) as Int;
 
 	/* Push all the children onto the stack */
-	for (var i:UInt=0; i<numChildren; ++i) 
+	for (var i:Int=0; i<numChildren; ++i) 
 		stack.push(TreeNode (node.d+1, node.r));
 	offer numChildren;
 	}

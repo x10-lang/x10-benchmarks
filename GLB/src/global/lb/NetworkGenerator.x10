@@ -19,14 +19,14 @@ import x10.util.Random;
  * is requested. For example, it can currently generate a ring structure, and
  * a directed hypercube structure. All methods in this class are static.
  *
- * The output of this class is a ValRail[ValRail[Int]] -- essentially, one 
+ * The output of this class is a Rail[Rail[Int]] -- essentially, one 
  * array for each node, indicating the neighbors that each node can 
  * communicate with.
  */
 public final class NetworkGenerator {
   public static val INVALID_EDGE:Int = -1;
 
-  private static def countValidEdges (edgeList:ValRail[Int]) {
+  private static def countValidEdges (edgeList:Rail[Int]) {
     var numValidEdges:Int = 0;
     for (var i:Int=0; i<edgeList.length(); ++i) 
       if (INVALID_EDGE != edgeList(i)) ++numValidEdges;
@@ -40,8 +40,8 @@ public final class NetworkGenerator {
     // First, create a hypercube along with an overlay of a ring structure.
     // The ring structure is needed to ensure that there is always a linear
     // lifeline available to the system -- in case all else fails.
-    val mutableNetwork:ValRail[Rail[Int]] = 
-      ValRail.make[Rail[Int]] (nplaces, 
+    val mutableNetwork:Rail[Rail[Int]] = 
+      Rail.make[Rail[Int]] (nplaces, 
         (i:Int) => Rail.make[Int](x10.lang.Math.log2(nplaces)+1,
                               (j:Int) => 
           (0==j)?(i+1)%nplaces : 
@@ -76,8 +76,8 @@ public final class NetworkGenerator {
     }
 
     // Finally, create a new thingy based on what we just created.
-    val network:ValRail[ValRail[Int]] = ValRail.make[ValRail[Int]] 
-        (nplaces, (i:Int) => ValRail.make[Int] 
+    val network:Rail[Rail[Int]] = Rail.make[Rail[Int]] 
+        (nplaces, (i:Int) => Rail.make[Int] 
           (mutableNetwork(i).length, (j:Int) => mutableNetwork(i)(j)));
 
     // Return what we just created.
@@ -213,7 +213,7 @@ public final class NetworkGenerator {
     return network;
   }
 
-  public static def printMyEdges (myLifelines: ValRail[Int]) {
+  public static def printMyEdges (myLifelines: Rail[Int]) {
 		Console.OUT.print (""+ here.id + " =>");
 		val z = myLifelines.length();
 		for (var i:Int=0; i<z; ++i) 

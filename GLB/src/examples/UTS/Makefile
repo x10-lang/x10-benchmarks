@@ -47,7 +47,7 @@ X10CXXFLAGS=-report \
 HEADERS=sha_endian.h \
         types.h \
         sha1.h 
-        
+
 SOURCES=sha1.c
 
 OBJS=$(SOURCES:.c=.o)

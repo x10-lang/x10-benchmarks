@@ -57,9 +57,9 @@ public final class GlobalRunner[T, Z]  implements Runner[T,Z] {
 				 Option("z", "", "Dimension of the hypercube")
 				 ]);
 		val e = opts("-e", 0)==1;
-		val nu = opts("-n",200) as UInt;
-		val w = opts("-w", 1) as UInt;
-		val z = opts("-z", 1) as UInt;
+		val nu = opts("-n",200);
+		val w = opts("-w", 1);
+		val z = opts("-z", 1);
 		val verbose = opts("-v", 0) == 1;
 		Console.OUT.println("e=" + e +
 				" n=" + nu +

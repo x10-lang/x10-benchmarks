@@ -16,9 +16,9 @@ package examples.UTS;
  */
 import x10.util.Stack;
 import global.lb.*;
-public final class Binomial(b0:UInt, q:Double, m:UInt) extends TaskFrame[UTS.SHA1Rand, UInt]{
+public final class Binomial(b0:Int, q:Double, m:Int) extends TaskFrame[UTS.SHA1Rand, Int]{
 	static type SHA1Rand=UTS.SHA1Rand;
-	public static def usageLine(b0:UInt, r:UInt, mf:UInt, seq:UInt, w:UInt, nu:UInt, q:Double, l:UInt, z:UInt) {
+	public static def usageLine(b0:Int, r:Int, mf:Int, seq:Int, w:Int, nu:Int, q:Double, l:Int, z:Int) {
 		Console.OUT.println("b0=" + b0 +
 				"   r=" + r +
 				"   m=" + mf +
@@ -30,15 +30,15 @@ public final class Binomial(b0:UInt, q:Double, m:UInt) extends TaskFrame[UTS.SHA
                 "   z=" + z +
                 (l==3U ?" base=" + NetworkGenerator.findW(Place.MAX_PLACES, z) : ""));
 	}
-	public def runTask(s:SHA1Rand, stack:Stack[SHA1Rand]) offers UInt {
+	public def runTask(s:SHA1Rand, stack:Stack[SHA1Rand]) offers Int {
 		pushN(s, s() < q ? m : 0U, stack);
 	}
-	public def runRootTask(s:SHA1Rand, stack:Stack[SHA1Rand]) offers UInt {
+	public def runRootTask(s:SHA1Rand, stack:Stack[SHA1Rand]) offers Int {
 		pushN(s, b0, stack);
 	}
-	private def pushN(s:SHA1Rand, N:UInt, stack:Stack[SHA1Rand]) offers UInt {
+	private def pushN(s:SHA1Rand, N:Int, stack:Stack[SHA1Rand]) offers Int {
 		if (N == 0U ) return;
-		for (var i:UInt=0; i<N; ++i) 
+		for (var i:Int=0; i<N; ++i) 
 			stack.push(SHA1Rand(s, i));
 				offer N;
 	}

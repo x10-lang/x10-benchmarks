@@ -22,14 +22,14 @@ public class UTS {
 	static val NORMALIZER = 2147483648.0; // does not depend on input parameters
 	
 	public static struct Constants {
-		public static val BINOMIAL = 0U;
-		public static val GEOMETRIC = 1U;
-		public static val HYBRID = 2U;
+		public static val BINOMIAL = 0;
+		public static val GEOMETRIC = 1;
+		public static val HYBRID = 2;
 		
-		public static val LINEAR = 0U;
-		public static val EXPDEC = 1U;
-		public static val CYCLIC = 2U;
-		public static val FIXED = 3U;
+		public static val LINEAR = 0;
+		public static val EXPDEC = 1;
+		public static val CYCLIC = 2;
+		public static val FIXED = 3;
 	}
 	@NativeRep ("c++", "UTS__SHA1Rand", "UTS__SHA1Rand", null)
 	@NativeCPPCompilationUnit ("sha1.c")
@@ -55,29 +55,29 @@ public class UTS {
 					 Option("m", "", "BIN: number of children for non-leaf node")
 					 ]);
 			
-			val t = opts ("-t", 0) as UInt;	
-			val w = opts ("-w", 1) as UInt;	
-			val nu = opts ("-n", 511) as UInt;	
-			val b0 = opts ("-b", 4) as UInt;
-			val seq = opts("-s", 0) as UInt;
-			val r = opts ("-r", 0) as UInt;
+			val t = opts ("-t", 0);	
+			val w = opts ("-w", 1);	
+			val nu = opts ("-n", 511);	
+			val b0 = opts ("-b", 4);
+			val seq = opts("-s", 0);
+			val r = opts ("-r", 0);
 			val verbose = opts("-v",0)==1;
 			
 			// geometric options
-			val a = opts ("-a", 0) as UInt;
-			val d = opts ("-d", 6) as UInt;
+			val a = opts ("-a", 0);
+			val d = opts ("-d", 6);
 			
 			// binomial options
 			val q:Double = opts ("-q", 15.0/64.0);
-			val mf = opts ("-m", 4) as UInt;
-			val k = opts ("-k", 0) as UInt;
+			val mf = opts ("-m", 4);
+			val k = opts ("-k", 0);
 			
 			// hybrid options
 			val geo_to_bin_shift_depth_ratio:Double = opts ("-f", 0.5);
 			
 			// Figure out what kind of connectivity is needed.
-			val l = opts ("-l", 3) as UInt;
-			val z = opts ("-z", 1) as UInt;
+			val l = opts ("-l", 3);
+			val z = opts ("-z", 1);
 			
 			Console.OUT.println("--------");
 			Console.OUT.println("Places="+Place.MAX_PLACES);
@@ -89,19 +89,19 @@ public class UTS {
 				
 			}
 			val qq = (q*NORMALIZER) as Long;
-			val reducer = new Reducible[UInt]() {
-				public def zero()=0U;
-				public def apply(a:UInt, b:UInt)=a+b;
+			val reducer = new Reducible[Int]() {
+				public def zero()=0;
+				public def apply(a:Int, b:Int)=a+b;
 			};
-			if (seq != 0U) {
+			if (seq != 0) {
 				var result:Int;
 				Console.OUT.println("Starting...");
 				var time:Long = System.nanoTime();
 				if (Constants.BINOMIAL==t) {
-					val runner = new SeqRunner[SHA1Rand,UInt](new Binomial(b0,qq,mf));
+					val runner = new SeqRunner[SHA1Rand,Int](new Binomial(b0,qq,mf));
 					result=runner(SHA1Rand(r), reducer);
 				} else {
-					val runner = new SeqRunner[TreeNode,UInt](new Geometric(b0,a,d));
+					val runner = new SeqRunner[TreeNode,Int](new Geometric(b0,a,d));
 					result=runner(TreeNode(0, SHA1Rand( r)), reducer);
 				}
 				time = System.nanoTime() - time;
@@ -112,7 +112,7 @@ public class UTS {
 				return;
 			} 
 			if (Constants.BINOMIAL==t) {
-				val runner = new GlobalRunner[SHA1Rand, UInt](args, () => GlobalRef[TaskFrame[SHA1Rand, UInt]](new Binomial(b0, qq, mf)));
+				val runner = new GlobalRunner[SHA1Rand, Int](args, () => GlobalRef[TaskFrame[SHA1Rand, Int]](new Binomial(b0, qq, mf)));
 				Console.OUT.println("Starting...");
 				var time:Long = System.nanoTime();
 				val result = runner(SHA1Rand(r), reducer);
@@ -122,7 +122,7 @@ public class UTS {
 				Console.OUT.println("--------");
 				return;
 			} 
-			val runner =  new GlobalRunner[TreeNode, UInt](args, ()=> GlobalRef[TaskFrame[TreeNode,UInt]](new Geometric(b0, a,d)));
+			val runner =  new GlobalRunner[TreeNode, Int](args, ()=> GlobalRef[TaskFrame[TreeNode,Int]](new Geometric(b0, a,d)));
 			Console.OUT.println("Starting...");
 			var time:Long = System.nanoTime();
 			val result = runner(TreeNode(0,SHA1Rand(r)), reducer);
