@@ -183,7 +183,7 @@ public final class GlobalRunner[T, Z]  implements Runner[T,Z] {
 		
 		/** Process the current task.
 		 */
-		final def processSubtree (task:T):Void offers Z {
+		final def processSubtree (task:T):void offers Z {
 			++counter.nodesCounter;
 			frame.runTask(task, stack);
 		}
@@ -192,7 +192,7 @@ public final class GlobalRunner[T, Z]  implements Runner[T,Z] {
 		 * Process the loot - the Rail[T] of tasks received from the environment.
 		 * 
 		 */
-		final def processLoot(loot: Rail[T], lifeline:Boolean):Void offers Z {
+		final def processLoot(loot: Rail[T], lifeline:Boolean):void offers Z {
 			Event.event("Processing loot of size " + loot.length + " with stack "+ stack.size());
 			counter.incRx(lifeline, loot.length);
 			val time = System.nanoTime();
@@ -259,7 +259,7 @@ public final class GlobalRunner[T, Z]  implements Runner[T,Z] {
 		
 		/** Distribute loot to activated incoming lifelines.
 		 */
-		def distribute(st:PLH[T, Z], depth:Int):Void offers Z {
+		def distribute(st:PLH[T, Z], depth:Int):void offers Z {
 			val time = System.nanoTime();
 			val numThieves = thieves.size();
 			if (numThieves > 0)
@@ -377,7 +377,7 @@ public final class GlobalRunner[T, Z]  implements Runner[T,Z] {
 				init:Boolean, 
 				loot:Rail[T], 
 				depth:Int, 
-				source:Int):Void offers Z {
+				source:Int):void offers Z {
 			// assert loot != null;
 			try {
 				Event.event("Place (" + source + ") launches " 

@@ -8,5 +8,5 @@ public interface  Runner[T,Z] extends (T,Reducible[Z])=> Z {
 
     /**  Print statistics about execution.
      */
-     def stats(time:Long, verbose:Boolean):Void;
+     def stats(time:Long, verbose:Boolean):void;
 }

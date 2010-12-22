@@ -19,12 +19,12 @@ import x10.util.Stack;
 import global.lb.*;
 public class Ones extends TaskFrame[UInt, UInt] {
 	var c:UInt=0;
-	public def runTask(t:UInt, s:Stack[UInt]):Void offers UInt {
+	public def runTask(t:UInt, s:Stack[UInt]):void offers UInt {
 		//	offer t;
 		c += t;
 		
 	}
-	public def runRootTask(t:UInt, s:Stack[UInt]):Void offers UInt {
+	public def runRootTask(t:UInt, s:Stack[UInt]):void offers UInt {
 		for (var i:UInt=0u; i < t; i++) 
 			s.push(1);
 	}

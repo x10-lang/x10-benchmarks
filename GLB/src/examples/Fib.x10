@@ -21,7 +21,7 @@ import global.lb.*;
 public class Fib {
     static def fib(n:UInt):UInt = n < 2u ? n : fib(n-1)+fib(n-2);
     static final class Fib2 extends TaskFrame[UInt, UInt] {
-        public def runTask(t:UInt, s:Stack[UInt]):Void offers UInt {
+        public def runTask(t:UInt, s:Stack[UInt]):void offers UInt {
             if (t < 20u) 
                 offer fib(t);
             else {
@@ -29,7 +29,7 @@ public class Fib {
                 s.push(t-2);
             }
         }
-        public def runRootTask(t:UInt, s:Stack[UInt]):Void offers UInt {
+        public def runRootTask(t:UInt, s:Stack[UInt]):void offers UInt {
             runTask(t, s);
         }
     }
