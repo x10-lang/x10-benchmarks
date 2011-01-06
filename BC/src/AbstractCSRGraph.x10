@@ -64,7 +64,7 @@ public abstract class AbstractCSRGraph {
   }
 
   /** Compress the datastructures in the graph */
-  abstract public def compressGraph (): Void;
+  abstract public def compressGraph (): void;
 
   /** Get the adjacent node from index */
   public final def getAdjacentVertexFromIndex(wIndex:Int) {

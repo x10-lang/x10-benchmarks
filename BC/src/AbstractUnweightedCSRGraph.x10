@@ -10,5 +10,5 @@ public abstract class AbstractUnweightedCSRGraph extends AbstractCSRGraph {
   public def this(csrFileName:String) = super(csrFileName);
 
   /** Add an edge */
-  abstract public def addEdge (u:Int, v:Int): Void;
+  abstract public def addEdge (u:Int, v:Int): void;
 }

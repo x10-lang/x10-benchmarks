@@ -352,7 +352,7 @@ public final class Brandes(N:Int) {
     
     finish  {
       // spawn work 
-      for ([i] in 0..numChunks-1) async {
+      for ([i] in 0..(numChunks-1)) async {
         val startVertex = vertexBeginIndex + chunkSize*i;
         val endVertex = (i==(numChunks-1)) ? vertexEndIndex: 
                                            (startVertex+chunkSize-1);
@@ -388,7 +388,7 @@ public final class Brandes(N:Int) {
    * Dump the betweenness map.
    */
   private def printBetweennessMap (printer:Printer) {
-    for ([i] in 0..graph.numVertices()-1) {
+    for ([i] in 0..(graph.numVertices()-1)) {
       if (betweennessMap(i) != 0.0 as Double) 
         printer.println ("(" + i + ") ->" + betweennessMap(i));
     }
@@ -431,7 +431,7 @@ public final class Brandes(N:Int) {
     
     // Loop over all the places and crunch the numbers.
     finish {
-      for ([place] in 0..numPlaces-1) 
+      for ([place] in 0..(numPlaces-1)) 
         async at(Place(place)) 
           brandesHandles().crunchNumbersLocally (
                        permute, 

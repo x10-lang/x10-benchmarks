@@ -7,7 +7,7 @@ public abstract class AbstractWeightedCSRGraph extends AbstractCSRGraph {
   public def this(N:Int) = super(N);
 
   /** Add an edge */
-  abstract public def addEdge (u:Int, v:Int, d:Long): Void;
+  abstract public def addEdge (u:Int, v:Int, d:Long): void;
 
   /** Return the edge weight */
   abstract public def getEdgeWeight (v:Int, w:Int): Long;

@@ -72,17 +72,17 @@ public  struct NetReader {
    */
   private static def tokenize(line:String, splitter:String) {
     var numNonEmptyTokens:Int = 0;
-    val tokens:Rail[String] = line.split(splitter);
+    val tokens = line.split(splitter);
     
     /* First count the number of non-empty tokens */
-    for ([i] in 0..(tokens.length()-1)) {
+    for ([i] in 0..(tokens.size()-1)) {
       if (0<(tokens(i).length())) ++numNonEmptyTokens;
     }
 
     /* Now create the Rail */
     val nonEmptyTokens:Rail[String] = Rail.make[String] (numNonEmptyTokens);
     var nonEmptyTokenIndex:Int = 0;
-    for ([i] in 0..(tokens.length()-1)) {
+    for ([i] in 0..(tokens.size()-1)) {
       if (0<(tokens(i).length())) {
         nonEmptyTokens(nonEmptyTokenIndex++) = tokens(i);
       }

@@ -50,7 +50,7 @@ public final class FixedBinaryHeap {
   }
       
   // Add an element, putting it in its right order
-  public def push (newElement:Int) : Void {
+  public def push (newElement:Int) : void {
     // check if this is still within our Rail bounds
     // length() returns an index beyond the last point we can write.
     // we are writing to (this.size+1), so when we increment it, it should

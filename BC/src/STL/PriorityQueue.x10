@@ -36,9 +36,9 @@ public final struct PriorityQueue[T, Compare] {
 
   // void push (const value_type&)
   //@Native("c++", "(#0)->push(#1)")
-  public def push(val element:T) : Void {  }
+  public def push(val element:T) : void {  }
 
   // void pop ()
   //@Native("c++", "(#0)->pop()")
-  public def pop() : Void { }
+  public def pop() : void { }
 }

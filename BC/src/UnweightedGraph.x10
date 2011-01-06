@@ -38,7 +38,7 @@ public final class UnweightedGraph extends AbstractUnweightedCSRGraph {
 
     // Start copying over from the first vertex onwards.
     var currentOffset:Int = 0;
-    for ([v] in 0..this.N-1) {
+    for ([v] in 0..(this.N-1)) {
       // Put in the starting offset for this vertex.
       this.offsetMap(v) = currentOffset;
       
@@ -59,7 +59,7 @@ public final class UnweightedGraph extends AbstractUnweightedCSRGraph {
     this.compressed = true;
 
     // de-allocate anything that we don't need
-    for ([i] in 0..this.adjacencyList.length-1) {
+    for ([i] in 0..(this.adjacencyList.length-1)) {
       Runtime.deallocObject(this.adjacencyList(i));
     }
     Runtime.deallocObject (this.adjacencyList);
@@ -79,7 +79,7 @@ public final class UnweightedGraph extends AbstractUnweightedCSRGraph {
    * Add an edge with a given weight. We do not check if the edge exists!
    * If an edge exists, its overwritten.
    */
-  public def addEdge (v:Int, w:Int): Void {
+  public def addEdge (v:Int, w:Int): void {
     assert (this.compressed==false);
     this.adjacencyList(v).add (w);
   }
@@ -91,7 +91,7 @@ public final class UnweightedGraph extends AbstractUnweightedCSRGraph {
   public def toString (): String {
     var outString:String = "";
 
-    for ([v] in 0..N-1) {
+    for ([v] in 0..(N-1)) {
       val neighbors = this.adjacencyList (v);
 
       for (w in neighbors) {
