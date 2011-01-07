@@ -94,8 +94,8 @@ public class Scorer {
       val longSize_ = longSize;
       tracebackMoves = Rail.make[Byte]((shortSize+1)*(longSize_ + 1));
       val tracebackMoves_ = tracebackMoves;	
-      for ([i] in 1..shortSize-1) tracebackMoves_(i*(longSize_ + 1)) = STOP;
-      for ([j] in 0..longSize_-1)  tracebackMoves_(j) = STOP;
+      for ([i] in 1..(shortSize-1)) tracebackMoves_(i*(longSize_ + 1)) = STOP;
+      for ([j] in 0..(longSize_-1))  tracebackMoves_(j) = STOP;
       val bestScoreUpTo_I_J = Rail.make[Int](longSize_ + 1);
       var winningScore : Long = 0;
       var shorterLast: Int = -1;
@@ -199,8 +199,8 @@ public class Scorer {
           }
       } catch(e: Exception) {throw new ArrayIndexOutOfBoundsException("i="+i+", j="+j+" vs "+longRail.length);}}
       try {return new Output(score.score,  
-    		  (i+1..shorterLast) as Region{self.rank == 1}, 
-    		  (j+1+longOffset..longOffset+longerLast) as Region{self.rank == 1}, 
+    		  ((i+1)..shorterLast) as Region{self.rank == 1}, 
+    		  ((j+1+longOffset)..(longOffset+longerLast)) as Region{self.rank == 1}, 
     		  shortBuilder, 
     		  longBuilder);
       } catch(e: Exception) {

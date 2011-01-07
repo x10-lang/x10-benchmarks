@@ -65,7 +65,7 @@ public struct SegmentationInfo {
    public def this(parms: Parameters, shorter: Rail[Byte], longLength: Int) {
       var maxScoreOnMatch: Int = 0;
       val shortLength = shorter.length();
-      for([i] in (0..shortLength-1)) {
+      for([i] in 0..(shortLength-1)) {
          val entry = shorter(i);
          maxScoreOnMatch += parms.getScore(entry, entry);
       }

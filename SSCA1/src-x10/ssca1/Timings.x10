@@ -49,7 +49,7 @@ public class Timings {
       sigmas = new Array[Double](phaseCount);
       if (DEBUG) Console.ERR.println("Timing "+iterations_+" iterations, each "+phaseCount+" phases");
       timings = new Array[Array[Int](1)](phaseCount, 
-          (n:Int)=> new Array[Int](iterations, (m:Int)=>GARBAGE_INITIAL_VALUE));
+          (n:Int)=> new Array[Int](iterations_, GARBAGE_INITIAL_VALUE));
    }
    
    /** records the time required for the given phase during the given iteration
@@ -83,12 +83,12 @@ public class Timings {
       val oddMedian = (iterations%2 == 1);
       val mid = iterations/2;
       try {
-         for([pn] in 0..phases-1) {
+         for([pn] in 0..(phases-1)) {
             val sorted = new Array[Int](iterations, (n: Int)=>Timings.GARBAGE_INITIAL_VALUE);
             var lastI: Int = -1;
             var total: Long = 0;
             try { 
-               for([i] in 0..iterations-1) {
+               for([i] in 0..(iterations-1)) {
                   total += timings(pn)(i);
                   var j: Int;
                   for(j=0; j<i && timings(pn)(i)<=sorted(j); j++) { }
@@ -103,7 +103,7 @@ public class Timings {
             means(pn) = meanPN;
             var sumOfSquares: Double = 0.0;
             try {
-               for([i] in 0..iterations-1) {
+               for([i] in 0..(iterations-1)) {
                   val delta = (timings(pn)(i) as Double) - meanPN;
                   sumOfSquares += delta*delta;
                }
@@ -124,7 +124,7 @@ public class Timings {
     * returns true if the garbage default value is not found in any timings entry
     */
    public def isComplete() { 
-      for([n] in 0..phases-1) if (!isComplete(n)) return false;
+      for([n] in 0..(phases-1)) if (!isComplete(n)) return false;
       return true;
    }
    
@@ -135,7 +135,7 @@ public class Timings {
     */
    public def isComplete(n: Int) {
       val timing = timings(n);
-      for([m] in 0..iterations-1) if (timing(m) == GARBAGE_INITIAL_VALUE) return false;
+      for([m] in 0..(iterations-1)) if (timing(m) == GARBAGE_INITIAL_VALUE) return false;
       return true;
    }
    
@@ -150,14 +150,14 @@ public class Timings {
       if (iterations == 1) return "";
       else try {
          var leaderSize: Int = 0;
-         for([n] in 0..phases-1) {
+         for([n] in 0..(phases-1)) {
             val length = phaseDescriptions(n).length();
             if (length>leaderSize) leaderSize = length; 
          }
          val delta = leaderSize%4 != 0 ? 4-leaderSize%4 : 0;
-         for([n] in 0..leaderSize+delta) builder.add(" ");
+         for([n] in 0..(leaderSize+delta)) builder.add(" ");
          builder.add("   Min     Mean     Median     Max   Sigma\r\n");
-         for([n] in 0..phases-1) {
+         for([n] in 0..(phases-1)) {
             val leader = new StringBuilder();
             leader.add(phaseDescriptions(n));
             var size:Int = leader.length();
@@ -186,7 +186,7 @@ public class Timings {
     	  builder.add("Individual timings:\r\n\r\n");
       }
       var leaderSize: Int = 0;
-      for([n] in 0..phases-1) {
+      for([n] in 0..(phases-1)) {
           val length = phaseDescriptions(n).length();
           if (length>leaderSize) leaderSize = length; 
        }

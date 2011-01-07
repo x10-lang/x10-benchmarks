@@ -98,7 +98,7 @@ public struct ParameterReader {
       val raw = getRawValue(key);
       val builder = new RailBuilder[Int]();
       var start: Int = -1;
-      for([i] in 0..raw.length()-1) { // implements raw.split(/[^0-9-]/) the hard way.
+      for([i] in 0..(raw.length()-1)) { // implements raw.split(/[^0-9-]/) the hard way.
          var c: Char = raw.charAt(i);
          var b: Int= c.ord();
          if ((b>=0x30 && b<=0x39) || b==0x2D) {
@@ -142,7 +142,7 @@ public struct ParameterReader {
     * @throws IllegalArgumentException if the key is not found.
     */
    private def getRawValue(key: String) {
-      for([n] in 0..keys.length-1) {
+      for([n] in 0..(keys.length-1)) {
          if(keys(n).equals(key)) return values(n);
       }
       throw new IllegalArgumentException("Key, "+key+", not found.");

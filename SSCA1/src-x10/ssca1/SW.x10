@@ -156,7 +156,7 @@ public class SW {
       val scorers = DistArray.make[Scorer](Dist.makeUnique());
       val scores  = DistArray.make[Score](Dist.makeUnique(), (Point)=>Score(Long.MIN_VALUE, -1, -1, -1));
 
-      for([rep] in 0..repetitions-1) {
+      for([rep] in 0..(repetitions-1)) {
          // Step 1: read in the parameters and data
          val startInput = timer.milliTime();
          val parms = Parameters(parsedArgs.get("p").value);
@@ -183,7 +183,7 @@ public class SW {
          val segInfo   = SegmentationInfo(parms, shorter, longer.length());
          if (rep == 0) Console.OUT.println("Places available: "+Place.MAX_PLACES+"\r\nPlaces used: "+segInfo.segmentCount);
          val segmentedInput = Rail.make[Rail[Byte]](segInfo.segmentCount, (i:int) => segInfo.slice(i, longer));
-	 finish for ([p] in 0..segInfo.segmentCount-1) {
+	 finish for ([p] in 0..(segInfo.segmentCount-1)) {
              val mySegment = segmentedInput(p);  // extract the subsegment here to minimize captured state in async body.
 	     val capturedP = p;
              async at (Place.place(p)) {

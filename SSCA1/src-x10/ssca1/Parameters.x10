@@ -65,13 +65,13 @@ import x10.util.StringBuilder;
       extendGapPenalty = reader.getNumericProperty("extendGap");
       val rawAlphabet = reader.getStringProperty("alphabet");
       val builder = new StringBuilder();
-      for([n] in (0..rawAlphabet.length()-1)) {
+      for([n] in (0..(rawAlphabet.length()-1))) {
          val c = rawAlphabet.charAt(n);
          if (!c.isSpaceChar()) builder.add(c);
       }
       val compressed = alphabet = builder.result();
       val size = alphabetSize = compressed.length();
-      for([j] in 0..size-1) alphabetIndex_(compressed.charAt(j).ord()) = j as Byte;
+      for([j] in 0..(size-1)) alphabetIndex_(compressed.charAt(j).ord()) = j as Byte;
       alphabetIndex = alphabetIndex_ as Rail[Byte];
       val scoringMatrix_ = reader.getIntArrayProperty("scores");
       val expected = size*size;
