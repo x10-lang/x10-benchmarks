@@ -1,4 +1,4 @@
-SRCS	:= fft.x10 Random.x10 ../util/*.x10
+SRCS	:= fft.x10 Random.x10
 
 #NATIVE_HDR	:= ft_natives.h
 #NATIVE_SRC 	:= ft_natives.cc Comm.cc

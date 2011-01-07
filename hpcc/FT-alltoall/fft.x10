@@ -16,7 +16,7 @@ import x10.util.Team;
 @NativeCPPCompilationUnit("ft_natives.cc")
 class fft {
     @Native("c++", "execute_plan(#1, &(#2)->raw()[0], &(#3)->raw()[0], #4, #5, #6)")
-    native static def execute_plan(plan:Long, A:Array[Double](1), B:Array[Double](1), SQRTN:Int, i0:Int, i1:Int):Void;
+    native static def execute_plan(plan:Long, A:Array[Double](1), B:Array[Double](1), SQRTN:Int, i0:Int, i1:Int):void;
 
     @Native("c++", "create_plan(#1, #2, #3)")
     native static def create_plan(SQRTN:Int, direction:Int, flags:Int):Long;
