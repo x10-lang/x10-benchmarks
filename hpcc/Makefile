@@ -32,19 +32,15 @@ endif
 
 all: all_dbg all_opt
 
-all_dbg: FT-dbg \
-	LU-dbg \
+all_dbg: LU-dbg \
 	STREAM-dbg \
 	RA-dbg\
-        FT-alltoall-dbg \
-        FT-global-dbg
+        FT-alltoall-dbg
 
-all_opt: FT-opt \
-	LU-opt \
+all_opt: LU-opt \
 	STREAM-opt \
 	RA-opt \
-        FT-alltoall-opt\
-        FT-global-opt
+        FT-alltoall-opt
 
 FT: FT-opt FT-dbg
 
