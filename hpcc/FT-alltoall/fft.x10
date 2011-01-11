@@ -24,11 +24,11 @@ class fft {
     static unique = Dist.makeUnique();
 
     static class Block {
-        val A:Array[Double](1);
-        val B:Array[Double](1);
-        val C:Array[Double](1);
-        val Cs:PlaceLocalHandle[Array[Double](1)];
-        val D:Array[Double](1);
+        val A:Array[Double](1){rail};
+        val B:Array[Double](1){rail};
+        val C:Array[Double](1){rail};
+        val Cs:PlaceLocalHandle[Array[Double](1){rail}];
+        val D:Array[Double](1){rail};
         val I:Int;
         val nRows:Int;
         val SQRTN:Int;
@@ -38,7 +38,7 @@ class fft {
         var nCopy:Int;
         var alltoall_timer:Long = 0;
  
-        def this(I:Int, nRows:Int, localSize:Int, N:Long, SQRTN:Int, verify:Boolean, Cs:PlaceLocalHandle[Array[Double](1)]) {
+        def this(I:Int, nRows:Int, localSize:Int, N:Long, SQRTN:Int, verify:Boolean, Cs:PlaceLocalHandle[Array[Double](1){rail}]) {
             this.I = I; this.nRows = nRows; this.N = N; this.SQRTN = SQRTN; this.Cs = Cs;
             A = new Array[Double](localSize);
             B = new Array[Double](localSize);
@@ -63,7 +63,7 @@ class fft {
             }
         }
 
-        static def make(I:Int, nRows:Int, localSize:Int, N:Long, SQRTN:Int, verify:Boolean, Cs:PlaceLocalHandle[Array[Double](1)]):Block {
+        static def make(I:Int, nRows:Int, localSize:Int, N:Long, SQRTN:Int, verify:Boolean, Cs:PlaceLocalHandle[Array[Double](1){rail}]):Block {
             val block = new Block(I, nRows, localSize, N, SQRTN, verify, Cs);
             block.init(localSize, verify);
             /* finish */ ateach (p in unique) {} // initialize transport
@@ -224,7 +224,7 @@ class fft {
         }
 
         // Initialization
-        val Cs = PlaceLocalHandle.make[Array[Double](1)](unique, ()=>new Array[Double](localSize));
+        val Cs = PlaceLocalHandle.make[Array[Double](1){rail}](unique, ()=>new Array[Double](localSize));
         val FFT = PlaceLocalHandle.make[Block](unique, ()=>Block.make(here.id, nRows, localSize, N, SQRTN, verify, Cs));
 
         finish ateach (p in unique) {
