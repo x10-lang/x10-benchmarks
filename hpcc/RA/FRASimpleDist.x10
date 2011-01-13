@@ -38,9 +38,8 @@ class FRASimpleDist {
         return ran;
     }
 
-    static def runBenchmark(plhimc_: Any,
+    static def runBenchmark(plhimc: PlaceLocalHandle[Box[IndexedMemoryChunk[Long]]{self!=null}],
                             logLocalTableSize: Int, numUpdates: Long) {
-        val plhimc = plhimc_ as PlaceLocalHandle[Box[IndexedMemoryChunk[Long]]];
         val mask = (1<<logLocalTableSize)-1;
         val local_updates = numUpdates / Place.MAX_PLACES;
         finish for (p in Place.places()) async at (p) {
@@ -119,7 +118,7 @@ class FRASimpleDist {
         val numUpdates = updates_*tableSize;
 
         // create congruent array (same address at each place)
-        val plhimc = PlaceLocalHandle.make(Dist.makeUnique(), ()=>new Box(IndexedMemoryChunk.allocate[Long](localTableSize, 8, true, true)));
+        val plhimc = PlaceLocalHandle.make(Dist.makeUnique(), () => new Box(IndexedMemoryChunk.allocate[Long](localTableSize, 8, true, true)) as Box[IndexedMemoryChunk[Long]]{self!=null});
         finish for (p in Place.places()) async at (p) {
             for ([i] in 0..(localTableSize-1)) plhimc()()(i) = i as Long;
         }
