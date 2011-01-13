@@ -37,6 +37,7 @@ class fft {
         val fftwInversePlan:Long;
         var nCopy:Int;
         var alltoall_timer:Long = 0;
+        var twiddle_timer:Long = 0;
  
         def this(I:Int, nRows:Int, localSize:Int, N:Long, SQRTN:Int, verify:Boolean, Cs:PlaceLocalHandle[Array[Double](1){rail}]) {
             this.I = I; this.nRows = nRows; this.N = N; this.SQRTN = SQRTN; this.Cs = Cs;
@@ -76,6 +77,7 @@ class fft {
         }
 
         def bytwiddle(sign:Int) {
+            twiddle_timer -= System.nanoTime();
             val W_N = 2.0 * Math.PI / N;
             for (var i:Int = 0; i < nRows; ++i) {
                 for (var j:Int = 0; j < SQRTN; ++j) {
@@ -89,6 +91,7 @@ class fft {
                     A(idx+1) = ai * c - ar * s;
                 }
             }
+            twiddle_timer += System.nanoTime();
             Team.WORLD.barrier(here.id);
         }
 
@@ -232,6 +235,7 @@ class fft {
             if (unique(p).id==0) Console.OUT.println("Start FFT");
             var secs:Double = compute(FFT, true, N);
             if (unique(p).id==0) Console.OUT.println("alltoall: " + FFT().alltoall_timer/1e9 + " s");
+            if (unique(p).id==0) Console.OUT.println("twiddle: " + FFT().twiddle_timer/1e9 + " s");
             if (unique(p).id==0) Console.OUT.println("FFT complete");
 
             // Reverse FFT
