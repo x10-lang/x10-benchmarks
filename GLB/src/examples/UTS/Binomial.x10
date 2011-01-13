@@ -40,7 +40,7 @@ public final class Binomial(b0:Int, q:Double, m:Int) extends TaskFrame[UTS.SHA1R
 	private def pushN(s:SHA1Rand, N:Int, stack:Stack[SHA1Rand]) offers Int {
 		if (N == 0U ) return;
 		for (var i:Int=0; i<N; ++i) 
-			stack.push(SHA1Rand(s, i));
+			stack.push(SHA1Rand(s, i as Int));
 				offer N;
 	}
 	

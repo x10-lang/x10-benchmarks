@@ -19,9 +19,9 @@ import x10.util.Stack;
 import global.lb.*;
 
 public class Fib {
-    static def fib(n:UInt):UInt = n < 2u ? n : fib(n-1)+fib(n-2);
-    static final class Fib2 extends TaskFrame[UInt, UInt] {
-        public def runTask(t:UInt, s:Stack[UInt]):void offers UInt {
+    static def fib(n:Int):Int = n < 2u ? n : fib(n-1)+fib(n-2);
+    static final class Fib2 extends TaskFrame[Int, Int] {
+        public def runTask(t:Int, s:Stack[Int]):void offers Int {
             if (t < 20u) 
                 offer fib(t);
             else {
@@ -29,7 +29,7 @@ public class Fib {
                 s.push(t-2);
             }
         }
-        public def runRootTask(t:UInt, s:Stack[UInt]):void offers UInt {
+        public def runRootTask(t:Int, s:Stack[Int]):void offers Int {
             runTask(t, s);
         }
     }
@@ -39,16 +39,16 @@ public class Fib {
 			      Option("s", "", "Sequential"),
 			      Option("x", "", "Input")]);
 	        val seq = opts("-s", 0)==1;
-	        val x:UInt = opts("-x",40);
+	        val x = opts("-x",40);
             Console.OUT.println("Places="+Place.MAX_PLACES + " x=" + x + " seq=" + seq);
-            val reducer = new Reducible[UInt]() {
-                public def zero()=0u;
-                public def apply(a:UInt, b:UInt)=a+b;
+            val reducer = new Reducible[Int]() {
+                public def zero()=0;
+                public def apply(a:Int, b:Int)=a+b;
             };
 	        val runner
-		     = seq ? new SeqRunner[UInt,UInt](new Fib2()) as Runner[UInt,UInt]
-		       : new GlobalRunner[UInt, UInt](args, 
-			        ()=> GlobalRef[TaskFrame[UInt,UInt]](new Fib2()));
+		     = seq ? new SeqRunner[Int,Int](new Fib2()) as Runner[Int,Int]
+		       : new GlobalRunner[Int, Int](args, 
+			        ()=> GlobalRef[TaskFrame[Int,Int]](new Fib2()));
 	        Console.OUT.println("Starting...");
 	        var time:Long = System.nanoTime();
 	        val result=runner(x, reducer);

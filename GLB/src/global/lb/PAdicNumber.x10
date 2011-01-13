@@ -25,12 +25,12 @@ public class PAdicNumber(P:Int, K:Int) {
        while (n-- > 0) result *= w;
        return result;
     }
-	@NonEscaping public final def pow(n:Int) = pow(P, n);
+	
 	public def this(p:Int, k:Int, x:Int):PAdicNumber{self.P==p, self.K==k} {
 		property(p,k);
 		digits = Rail.make[Int](k);
                 for (var i:int =0; i<digits.length; i++) {
-                    val wi = pow(i); 
+                    val wi = pow(p, i); 
                     digits(i) = (x % (p*wi))/wi;
                 }
 	}

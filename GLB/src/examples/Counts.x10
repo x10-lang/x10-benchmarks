@@ -18,14 +18,14 @@ import x10.util.Random;
 import x10.util.Stack;
 import global.lb.*;
 
-public class Counts extends TaskFrame[UInt, UInt] {
-    var c:UInt=0;
-    public def runTask(t:UInt, s:Stack[UInt]):void offers UInt {
+public class Counts extends TaskFrame[Int, Int] {
+    var c:Int=0;
+    public def runTask(t:Int, s:Stack[Int]):void offers Int {
 	   offer t;
 	   c += t;
     }
-    public def runRootTask(t:UInt, s:Stack[UInt]):void offers UInt {
-	   for (var i:UInt=0u; i < t; i++) 
+    public def runRootTask(t:Int, s:Stack[Int]):void offers Int {
+	   for (var i:Int=0u; i < t; i++) 
 	   s.push(2);
     }
     public static def main (args: Array[String](1)) {
@@ -34,17 +34,17 @@ public class Counts extends TaskFrame[UInt, UInt] {
 			      Option("s", "", "Sequential"),
 			      Option("x", "", "Input")]);
 	        val seq = opts("-s", 0)==1;
-	        val x:UInt = opts("-x",40);
+	        val x = opts("-x",40);
             Console.OUT.println("Places="+Place.MAX_PLACES 
 				+ " x=" + x + " seq=" + seq);
-            val reducer = new Reducible[UInt]() {
-                public def zero()=0u;
-                public def apply(a:UInt, b:UInt)=a+b;
+            val reducer = new Reducible[Int]() {
+                public def zero()=0;
+                public def apply(a:Int, b:Int)=a+b;
             };
 	        val counts = Rail.make(Place.MAX_PLACES, 
-			      (i:Int)=> at(Place(i)) GlobalRef[TaskFrame[UInt,UInt]](new Counts()));
-	        val runner = seq ? new SeqRunner[UInt,UInt](new Counts()) as Runner[UInt,UInt]
-		                     : new GlobalRunner[UInt, UInt](args, ()=> counts(here.id));
+			      (i:Int)=> at(Place(i)) GlobalRef[TaskFrame[Int,Int]](new Counts()));
+	        val runner = seq ? new SeqRunner[Int,Int](new Counts()) as Runner[Int,Int]
+		                     : new GlobalRunner[Int, Int](args, ()=> counts(here.id));
 	        Console.OUT.println("Starting...");
 	        var time:Long = System.nanoTime();
 	        val result=runner(x, reducer);
