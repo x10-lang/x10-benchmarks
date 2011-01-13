@@ -2,7 +2,7 @@
 
 # <BEGIN> user settings #
 
-export X10CXX 		?= ~/x10-opt/x10.dist/bin/x10c++
+export X10CXX 		?= ~/ws/head5/x10.dist/bin/x10c++
 
 #leave blank by default, X10 automatically chooses a transport for you. To
 #force a particular implementation, please uncheck one of the other options.
@@ -38,7 +38,6 @@ X10CXXFLAGS=-report \
             postcompile=5 \
             -VERBOSE_CALLS \
             $(X10RT_TRANSPORT) \
-            -MAIN_CLASS=UTS \
             -v \
             -NO_CHECKS=true \
             -O \
@@ -67,16 +66,15 @@ X10_STRUCTS_STRUCTS_H=$(X10_STRUCTS:.x10=.struct_h)
 X10_CLASSES=UTS.x10\
             Binomial.x10 \
             Geometric.x10 \
-            GlobalRunner__LocalRunner.x10\
-            NetworkGenerator.x10\
-            PAdicNumber.x10\
-            SeqRunner.x10\
-            GlobalRunner.x10\
-            TreeNode.x10\
-            TaskFrame.x10\
-            Event.x10\
-            Counter.x10\
-            Runner.x10
+	    TreeNode.x10\
+            ../../global/lb/NetworkGenerator.x10\
+            ../../global/lb/PAdicNumber.x10\
+            ../../global/lb/SeqRunner.x10\
+            ../../global/lb/GlobalRunner.x10\
+	    ../../global/lb/TaskFrame.x10\
+            ../../global/lb/Event.x10\
+            ../../global/lb/Counter.x10\
+            ../../global/lb/Runner.x10
 
 X10_CLASSES_CC=$(X10_CLASSES:.x10=.cc)
 X10_CLASSES_H=$(X10_CLASSES:.x10=.h)
@@ -85,8 +83,8 @@ TARGET= UTS
 
 all: ${TARGET}
 
-UTS: Binomial.x10 Geometric.x10 UTS.x10
-	${X10CXX}  -v  ${X10CXXFLAGS} ${X10RTTRANSPORT} $< -o $@ 
+UTS: ${X10_CLASSES}
+	${X10CXX}  -v  ${X10CXXFLAGS} ${X10RTTRANSPORT} -MAIN_CLASS=examples.UTS.UTS $< -o $@ 
 
 
 test: Sha1Rand.cpp libsha1.a
@@ -96,3 +94,5 @@ clean:
 	rm -rf core*.* ${OBJS} ${TARGET} *.dSYM *.inc 
 	rm -rf ${X10_CLASSES_CC} ${X10_CLASSES_H}
 	rm -rf ${X10_STRUCTS_CC} ${X10_STRUCTS_H} ${X10_STRUCTS_STRUCTS_H}
+	rm -rf global
+	rm -rf examples
