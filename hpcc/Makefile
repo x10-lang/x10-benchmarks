@@ -30,7 +30,7 @@ ifeq ($(BGP_CROSS_COMPILE), 1)
 endif
 
 
-all: all_dbg all_opt
+all: all_dbg all_opt all_exp
 
 all_dbg: LU-dbg \
 	STREAM-dbg \
@@ -41,6 +41,11 @@ all_opt: LU-opt \
 	STREAM-opt \
 	RA-opt \
         FT-alltoall-opt
+
+all_exp: LU-exp \
+	STREAM-exp \
+	RA-exp \
+        FT-alltoall-exp
 
 FT: FT-opt FT-dbg
 
@@ -58,6 +63,9 @@ LU: LU-opt LU-dbg
 LU-opt:
 	$(MAKE) -C LU lu-opt
 
+LU-exp:
+	$(MAKE) -C LU lu-exp
+
 LU-dbg:
 	$(MAKE) -C LU lu-dbg
 
@@ -68,6 +76,9 @@ STREAM: STREAM-opt STREAM-dbg
 
 STREAM-opt:
 	$(MAKE) -C STREAM stream-opt
+
+STREAM-exp:
+	$(MAKE) -C STREAM stream-exp
 
 STREAM-dbg:
 	$(MAKE) -C STREAM stream-dbg
@@ -80,6 +91,9 @@ RA: RA-opt RA-dbg
 RA-opt:
 	$(MAKE) -C RA ra-opt
 
+RA-exp:
+	$(MAKE) -C RA ra-exp
+
 RA-dbg:
 	$(MAKE) -C RA ra-dbg
 
@@ -90,6 +104,9 @@ FT-alltoall: FT-alltoall-opt FT-alltoall-dbg
 
 FT-alltoall-opt:
 	$(MAKE) -C FT-alltoall fft-opt
+
+FT-alltoall-exp:
+	$(MAKE) -C FT-alltoall fft-exp
 
 FT-alltoall-dbg:
 	$(MAKE) -C FT-alltoall fft-dbg
