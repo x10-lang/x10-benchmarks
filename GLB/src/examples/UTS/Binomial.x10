@@ -1,3 +1,4 @@
+// -*- mode: java; c-file-style: "stroustrup" -*-
 package examples.UTS;
 /*
  *  This file is part of the X10 project (http://x10-lang.org).

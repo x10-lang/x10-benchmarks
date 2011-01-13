@@ -2,7 +2,11 @@
 
 # <BEGIN> user settings #
 
-export X10CXX 		?= ~/x10-opt/x10.dist/bin/x10c++
+ifeq ($(shell uname -s),Darwin)
+  export X10CXX?=/Users/vsaraswa/ws/head1/x10.dist/bin/x10c++
+else
+  export X10CXX?=/gsa/yktgsa-h1/08/pkambadu/Software/src/x10/x10-trunk/x10.dist/bin/x10c++
+endif
 
 #leave blank by default, X10 automatically chooses a transport for you. To
 #force a particular implementation, please uncheck one of the other options.
@@ -42,21 +46,19 @@ SOURCES=sha1.c
 
 OBJS=$(SOURCES:.c=.o)
 
-X10_STRUCTS= Counter__ValCounter.x10 \
-            Counter__Stat.x10 
+X10_STRUCTS= 
 X10_STRUCTS_CC=$(X10_STRUCTS:.x10=.cc)
 X10_STRUCTS_H=$(X10_STRUCTS:.x10=.h)
 X10_STRUCTS_STRUCTS_H=$(X10_STRUCTS:.x10=.struct_h)
 
-X10_CLASSES=GlobalRunner.x10 \
-            GlobalRunner__FixedSizeStack.x10 \
-            GlobalRunner__LocalRunner.x10 \
-            Counter.x10 \
-            SeqRunner.x10 \
-            NetworkGenerator.x10 \
-            PAdicNumber.x10 \
-            Event.x10 \
-            TaskFrame.x10 
+X10_CLASSES=global/lb/GlobalRunner.x10 \
+            global/lb/Counter.x10 \
+            global/lb/SeqRunner.x10 \
+            global/lb/Runner.x10 \
+            global/lb/NetworkGenerator.x10 \
+            global/lb/PAdicNumber.x10 \
+            global/lb/Event.x10 \
+            global/lb/TaskFrame.x10 
 X10_CLASSES_CC=$(X10_CLASSES:.x10=.cc)
 X10_CLASSES_H=$(X10_CLASSES:.x10=.h)
 
@@ -64,8 +66,15 @@ TARGET= GlobalRunner
 
 all: ${TARGET}
 
-GlobalRunner: GlobalRunner.x10 TaskFrame.x10  Counter.x10 SeqRunner.x10 NetworkGenerator.x10 PAdicNumber.x10 Event.x10 
-	${X10CXX}  -v -NO_CHECKS -O  ${X10CXXFLAGS} ${X10RTTRANSPORT} $< -o $@ 
+GlobalRunner: global/lb/GlobalRunner.x10 \
+            global/lb/Counter.x10 \
+            global/lb/SeqRunner.x10 \
+            global/lb/Runner.x10 \
+            global/lb/NetworkGenerator.x10 \
+            global/lb/PAdicNumber.x10 \
+            global/lb/Event.x10 \
+            global/lb/TaskFrame.x10 
+	${X10CXX} ${X10CXXFLAGS} ${X10RTTRANSPORT} $< -o $@ 
 
 
 test: Sha1Rand.cpp libsha1.a

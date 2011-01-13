@@ -157,9 +157,9 @@ public class PAdicNumber(P:Int, K:Int) {
 	  Console.OUT.println("P=" + P + " w="  + w + " k=" + k);
 	  
 	  val m = NetworkGenerator.generateSparseEmbedding(P,k);
-	  for ([r] in 0..P-1) {
+	  for ([r] in 0..(P-1)) {
 		  Console.OUT.print("Place " + r + ":" + new PAdicNumber(w,k, r) + "=> " );
-		  for ([i] in 0..k-1) {
+		  for ([i] in 0..(k-1)) {
 			  Console.OUT.print(" " + m(r)(i) + ":" 
 					  + (m(r)(i) == -1 ? "-1" : new PAdicNumber(w, k, m(r)(i)).toString()));
 		  }
