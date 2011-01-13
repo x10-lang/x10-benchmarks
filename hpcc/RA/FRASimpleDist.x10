@@ -1,20 +1,11 @@
 import x10.util.Timer;
-import x10.util.Team;
 import x10.compiler.Immediate;
+import x10.compiler.Native;
+import x10.compiler.NativeCPPInclude;
+import x10.util.IndexedMemoryChunk;
+import x10.util.Box;
 
-class LocalTable {
-    val a: Array[long](1);
-    val mask: int;
-
-    def this(size:int) {
-        mask = size-1;
-        a = new Array[long](size, (i:int)=>i as long);
-    }
-    public def update(ran:long) {
-        val index = (ran&mask) as int;
-        a(index) = a(index) ^ ran;
-    }
-}
+@NativeCPPInclude("pgas_collectives.h")
 
 class FRASimpleDist {
 
@@ -22,20 +13,20 @@ class FRASimpleDist {
     static PERIOD = 1317624576693539401L;
 
     // Utility routine to start random number generator at Nth step
-    static def HPCC_starts(var n:long): long {
-        var i:int, j:int;
-        val m2 = new Array[long](64);
+    static def HPCC_starts(var n:Long): Long {
+        var i:Int, j:Int;
+        val m2 = new Array[Long](64);
         while (n < 0) n += PERIOD;
         while (n > PERIOD) n -= PERIOD;
         if (n == 0) return 0x1L;
-        var temp:long = 0x1;
+        var temp:Long = 0x1;
         for (i=0; i<64; i++) {
             m2(i) = temp;
             temp = (temp << 1) ^ (temp < 0 ? POLY : 0L);
             temp = (temp << 1) ^ (temp < 0 ? POLY : 0L);
         }
         for (i=62; i>=0; i--) if (((n >> i) & 1) != 0) break;
-        var ran:long = 0x2;
+        var ran:Long = 0x2;
         while (i > 0) {
             temp = 0;
             for (j=0; j<64; j++) if (((ran >> j) & 1) != 0) temp ^= m2(j);
@@ -47,31 +38,23 @@ class FRASimpleDist {
         return ran;
     }
 
-    static def runBenchmark(gtable: PlaceLocalHandle[LocalTable],
-        logLocalTableSize: int, numUpdates: long) {
+    static def runBenchmark(plhimc: PlaceLocalHandle[Box[IndexedMemoryChunk[Long]]],
+                            logLocalTableSize: Int, numUpdates: Long) {
         val mask = (1<<logLocalTableSize)-1;
         val local_updates = numUpdates / Place.MAX_PLACES;
-        finish for (var p:int=0; p<Place.MAX_PLACES; p++) {
-            val valp = p;
-            at (Place.place(p)) async {
-                var ran:long = HPCC_starts(valp*(numUpdates/Place.MAX_PLACES));
-                val size = logLocalTableSize;
-                val mask1 = mask;
-                val mask2 = Place.MAX_PLACES - 1;
-                val poly = POLY;
-                //Team.WORLD.barrier(here.id);
-                for (var i:Long=0 ; i<local_updates ; i++) {
-                    val place_id = ((ran>>size) as Int) & mask2;
-                    val ran2 = ran;
-
-                    //val dest = Place(place_id);
-                    @Immediate async at(Place.place(place_id)) {
-                        gtable().update(ran2);
-                    } 
-
-                    ran = (ran << 1) ^ (ran<0L ? poly : 0L);
-                }
-                //Team.WORLD.barrier(here.id);
+        finish for (p in Place.places()) async at (p) {
+            var ran:Long = HPCC_starts(here.id*(numUpdates/Place.MAX_PLACES));
+            val imc = plhimc()();
+            val size = logLocalTableSize;
+            val mask1 = mask;
+            val mask2 = Place.MAX_PLACES - 1;
+            val poly = POLY;
+            for (var i:Long=0 ; i<local_updates ; i+=1L) {
+                val place_id = ((ran>>size) as Int) & mask2;
+                val index = (ran as Int) & mask1;
+                val update = ran;
+                imc.getCongruentSibling(Place(place_id)).remoteXor(index, update);
+                ran = (ran << 1) ^ (ran<0L ? poly : 0L);
             }
         }
     }
@@ -85,36 +68,36 @@ class FRASimpleDist {
         out.println("   <updates> is the number of updates per element (default 4)");
     }
 
-    public static def main(args:Array[String](1)) {
+    public static def main (args:Array[String]{rank==1}) {
 
         if ((Place.MAX_PLACES & (Place.MAX_PLACES-1)) > 0) {
             Console.ERR.println("The number of places must be a power of 2.");
             return;
         }
 
-        var logLocalTableSize_ : int = 12;
-        var updates_ : int = 4;
+        var logLocalTableSize_ : Int = 12;
+        var updates_ : Int = 4;
 
         // parse arguments
-        for (var i:int=0 ; i<args.size ; ) {
+        for (var i:Int=0 ; i<args.size() ; ) {
             if (args(i).equals("-m")) {
                 i++;
-                if (i >= args.size) {
+                if (i >= args.size()) {
                     if (here.id==0)
                         Console.ERR.println("Too few cmdline params.");
                     help(true);
                     return;
                 }
-                logLocalTableSize_ = int.parse(args(i++));
+                logLocalTableSize_ = Int.parseInt(args(i++));
             } else if (args(i).equals("-u")) {
                 i++;
-                if (i >= args.size) {
+                if (i >= args.size()) {
                     if (here.id==0)
                         Console.ERR.println("Too few cmdline params.");
                     help(true);
                     return;
                 }
-                updates_ = int.parse(args(i++));
+                updates_ = Int.parseInt(args(i++));
             } else {
                 if (here.id==0)
                     Console.ERR.println("Unrecognised cmdline param: \""+args(i)+"\"");
@@ -126,11 +109,14 @@ class FRASimpleDist {
         // calculate the size of update array (must be a power of 2)
         val logLocalTableSize = logLocalTableSize_;
         val localTableSize = 1<<logLocalTableSize;
-        val tableSize = (localTableSize as long)*Place.MAX_PLACES;
+        val tableSize = (localTableSize as Long)*Place.MAX_PLACES;
         val numUpdates = updates_*tableSize;
 
-        // create local rails
-        val gtable = PlaceLocalHandle.make[LocalTable](Dist.makeUnique(), ()=>new LocalTable(localTableSize));
+        // create congruent array (same address at each place)
+        val plhimc = PlaceLocalHandle.make(Dist.makeUnique(), ()=>new Box(IndexedMemoryChunk.allocate[Long](localTableSize, 8, true, true)));
+        finish for (p in Place.places()) async at (p) {
+            for ([i] in 0..(localTableSize-1)) plhimc()()(i) = i as Long;
+        }
 
         // print some info
         Console.OUT.println("Main table size:   2^"+logLocalTableSize+"*"+Place.MAX_PLACES
@@ -140,24 +126,21 @@ class FRASimpleDist {
 
         // time it
         var cpuTime:Double = -Timer.nanoTime() * 1e-9D;
-        runBenchmark(gtable, logLocalTableSize, numUpdates);
+        runBenchmark(plhimc, logLocalTableSize, numUpdates);
         cpuTime += Timer.nanoTime() * 1e-9D;
 
         // print statistics
         val GUPs = (cpuTime > 0.0 ? 1.0 / cpuTime : -1.0) * numUpdates / 1e9;
         Console.OUT.println("CPU time used: "+cpuTime+" seconds");
-        Console.OUT.println(""+GUPs+" Billion(10^9) Updates per second (GUP/s)");
+        Console.OUT.println(GUPs+" Billion(10^9) Updates per second (GUP/s)");
 
         // repeat for testing.
-        runBenchmark(gtable, logLocalTableSize, numUpdates);
-        for (var i:int=0; i<Place.MAX_PLACES; i++) {
-            at(Place.place(i)) async {
-                var err:int = 0;
-                val table = gtable();
-                for ([j] in table.a)
-                    if (table.a(j) != j) err++;
-                Console.OUT.println("Found " + err + " errors.");
-            }
+        runBenchmark(plhimc, logLocalTableSize, numUpdates);
+        finish for (p in Place.places()) async at (p) {
+            var err:Int = 0;
+            for ([i] in 0..(localTableSize-1)) 
+                if (plhimc()()(i) != i) err++;
+            Console.OUT.println(here+": Found " + err + " errors.");
         }
     }
 }
