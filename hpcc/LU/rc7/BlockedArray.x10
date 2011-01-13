@@ -11,7 +11,7 @@ public final class BlockedArray implements (Int,Int)=>Double {
         public val max_y:Int;
         private val delta:Int;
         private val offset:Int;
-        public val raw:Array[Double](1);
+        public val raw:Array[Double](1){rail};
     
         public def this(I:Int, J:Int, bx:Int, by:Int, rand:Random) {
             min_x = I*bx;
@@ -62,7 +62,7 @@ public final class BlockedArray implements (Int,Int)=>Double {
     private val min_x:Int;
     private val min_y:Int;
     private val ny:Int;
-    private val data:Array[Block](1);
+    private val data:Array[Block](1){rail};
 
     public def this(M:Int, N:Int, bx:Int, by:Int, px:Int, py:Int) {
         this.bx = bx;
@@ -101,7 +101,7 @@ public final class BlockedArray implements (Int,Int)=>Double {
     }
 
     // inputs are global coordinates
-    public def getRow(row:Int, min_y:Int, max_y:Int, rail:Array[Double](1)) {
+    public def getRow(row:Int, min_y:Int, max_y:Int, rail:Array[Double](1){self.rail}) {
         val brow = row/bx;
         val view = blocks(brow, brow, min_y/by, max_y/by);
         var n:Int = 0;
@@ -114,7 +114,7 @@ public final class BlockedArray implements (Int,Int)=>Double {
         return n;
     }
 
-    public def setRow(row:Int, min_y:Int, max_y:Int, rail:Array[Double](1)) {
+    public def setRow(row:Int, min_y:Int, max_y:Int, rail:Array[Double](1){self.rail}) {
         val brow = row / bx;
         val view = blocks(brow, brow, min_y/by, max_y/by);
         var n:Int = 0;
@@ -126,7 +126,7 @@ public final class BlockedArray implements (Int,Int)=>Double {
         }
     }
 
-    public def swapRow(row:Int, min_y:Int, max_y:Int, rail:Array[Double](1)) {
+    public def swapRow(row:Int, min_y:Int, max_y:Int, rail:Array[Double](1){self.rail}) {
         val brow = row / bx;
         val view = blocks(brow, brow, min_y/by, max_y/by);
         var n:Int = 0;
