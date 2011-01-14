@@ -10,8 +10,8 @@ endif
 
 #leave blank by default, X10 automatically chooses a transport for you. To
 #force a particular implementation, please uncheck one of the other options.
-export X10RTTRANSPORT	?= 
-#export X10RTTRANSPORT	?= -x10rt mpi
+#export X10RTTRANSPORT	?= 
+export X10RTTRANSPORT	?= -x10rt mpi
 #export X10RTTRANSPORT	?= -x10rt standalone
 #export X10RTTRANSPORT	?= -x10rt pgas_lapi
 #export X10RTTRANSPORT	?= -x10rt pgas_bgp
@@ -45,6 +45,7 @@ X10CXXFLAGS=-report \
             $(X10RT_TRANSPORT) \
             -v \
             -sourcepath .. \
+	    -post "\# \# -lpmi \#" \
             -d out
 
 HEADERS=
