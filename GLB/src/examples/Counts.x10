@@ -8,6 +8,7 @@
  *
  *  (C) Copyright IBM Corporation 2006-2010.
  */
+package examples;
 
 import x10.compiler.*;
 import x10.util.OptionsParser;
@@ -38,7 +39,7 @@ public class Counts extends TaskFrame[Int, Int] {
 				+ " x=" + x + " seq=" + seq);
             val reducer = new Reducible[Int]() {
                 public def zero()=0;
-                public def operator this(a:Int, b:Int)=a+b;
+                public operator this(a:Int, b:Int)=a+b;
             };
 	        val counts = Rail.make(Place.MAX_PLACES, 
 			      (i:Int)=> at(Place(i)) GlobalRef[TaskFrame[Int,Int]](new Counts()));

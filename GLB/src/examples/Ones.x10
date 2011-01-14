@@ -9,6 +9,8 @@
  *  (C) Copyright IBM Corporation 2006-2010.
  */
 
+package examples;
+
 import x10.compiler.*;
 import x10.util.OptionsParser;
 import x10.util.Option;
