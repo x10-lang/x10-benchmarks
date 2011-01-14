@@ -21,6 +21,7 @@ import x10.lang.Math;
 import x10.util.Random;
 import x10.util.Stack;
 import global.lb.*;
+
 public class UTS {
 	
     static val NORMALIZER = 2147483648.0; // does not depend on input parameters
@@ -36,7 +37,7 @@ public class UTS {
 	public static val FIXED = 3;
     }
     @NativeRep ("c++", "examples::UTS::UTS__SHA1Rand", "examples::UTS::UTS__SHA1Rand", null)
-	@NativeCPPCompilationUnit ("sha1.c")
+    @NativeCPPCompilationUnit ("sha1.c")
 	@NativeCPPCompilationUnit ("UTS__SHA1Rand.cc")
 	public static struct SHA1Rand {
 	public def this (seed:Int) { }
