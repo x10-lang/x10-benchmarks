@@ -110,7 +110,7 @@ Ones: examples/Ones.x10 ${GLB_CLASSES}
 Counts: examples/Counts.x10 ${GLB_CLASSES}
 	${X10CXX} -v  ${X10CXXFLAGS} -MAIN_CLASS=examples.Counts ${X10RTTRANSPORT} $< -o $@ 
 
-test: examples/UTS/Sha1Rand.cpp examples/UTS/libsha1.a
+test: examples/UTS/Sha1Rand.cc examples/UTS/libsha1.a
 	${CXX} ${CXXFLAGS} -DSHA1_TEST $< -o $@ -L. -lsha1
 
 clean:

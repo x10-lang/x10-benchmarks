@@ -11,6 +11,7 @@
  *  (C) Copyright IBM Corporation 2006-2010.
  */
 
+package examples.UTS;
 
 /**
  * A representation of the UTS Binomial tree benchmark.

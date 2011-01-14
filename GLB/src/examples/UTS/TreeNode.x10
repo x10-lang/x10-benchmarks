@@ -12,5 +12,6 @@
  *  (C) Copyright IBM Corporation 2006-2010.
  */
 
+package examples.UTS;
 
 struct TreeNode(d:Int, r:UTS.SHA1Rand) {}

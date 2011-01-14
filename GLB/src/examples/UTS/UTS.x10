@@ -12,6 +12,8 @@
  *  (C) Copyright IBM Corporation 2006-2010.
  */
 
+package examples.UTS;
+
 import x10.compiler.*;
 import x10.util.OptionsParser;
 import x10.util.Option;
@@ -33,14 +35,14 @@ public class UTS {
 	public static val CYCLIC = 2;
 	public static val FIXED = 3;
     }
-    @NativeRep ("c++", "UTS__SHA1Rand", "UTS__SHA1Rand", null)
+    @NativeRep ("c++", "examples::UTS::UTS__SHA1Rand", "examples::UTS::UTS__SHA1Rand", null)
 	@NativeCPPCompilationUnit ("sha1.c")
 	@NativeCPPCompilationUnit ("UTS__SHA1Rand.cc")
 	public static struct SHA1Rand {
 	public def this (seed:Int) { }
 	public def this (parent:SHA1Rand) { }
 	public def this (parent:SHA1Rand, spawnNumber:Int) { }
-	@Native ("c++", "UTS__SHA1Rand_methods::__apply(#0)")
+	@Native ("c++", "examples::UTS::UTS__SHA1Rand_methods::__apply(#0)")
 	    public operator this() : Int = 0;
     }
 	
@@ -93,7 +95,7 @@ public class UTS {
 	    val qq = (q*NORMALIZER) as Long;
 	    val reducer = new Reducible[Int]() {
 		public def zero()=0;
-		public def apply(a:Int, b:Int)=a+b;
+		public operator this(a:Int, b:Int)=a+b;
 	    };
 	    if (seq != 0) {
 		var result:Int;
