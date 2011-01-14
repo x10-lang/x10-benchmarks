@@ -79,7 +79,8 @@ public final class GlobalRunner[T, Z]  implements Runner[T,Z] {
 	 * across the places specified in the distribution supplied on creation of this object. On completion
 	 * of this method, the task has completed. 
 	 */
-	public def apply(t:T, reducer:Reducible[Z]):Z = st().main(st, t, reducer);
+	public operator this(t:T, reducer:Reducible[Z]):Z = st().main(st, t, reducer);
+
 	/**
 	 * Return the results of the computation. Should only be called after <code>run(t:T)</code>
 	 * has returned.

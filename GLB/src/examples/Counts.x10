@@ -38,7 +38,7 @@ public class Counts extends TaskFrame[Int, Int] {
 				+ " x=" + x + " seq=" + seq);
             val reducer = new Reducible[Int]() {
                 public def zero()=0;
-                public def apply(a:Int, b:Int)=a+b;
+                public def operator this(a:Int, b:Int)=a+b;
             };
 	        val counts = Rail.make(Place.MAX_PLACES, 
 			      (i:Int)=> at(Place(i)) GlobalRef[TaskFrame[Int,Int]](new Counts()));

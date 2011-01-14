@@ -9,6 +9,8 @@
  *  (C) Copyright IBM Corporation 2006-2010.
  */
 
+package examples;
+
 import x10.compiler.*;
 import x10.util.OptionsParser;
 import x10.util.Option;
@@ -42,7 +44,7 @@ public class Fib {
             Console.OUT.println("Places="+Place.MAX_PLACES + " x=" + x + " seq=" + seq);
             val reducer = new Reducible[Int]() {
                 public def zero()=0;
-                public def apply(a:Int, b:Int)=a+b;
+                public operator this(a:Int, b:Int)=a+b;
             };
 	        val runner
 		     = seq ? new SeqRunner[Int,Int](new Fib2()) as Runner[Int,Int]

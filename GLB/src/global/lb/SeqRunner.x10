@@ -28,7 +28,7 @@ public final class SeqRunner[T, Z] implements Runner[T,Z] {
 	 * Run the given task to completion, and return the number of tasks that 
 	 * have been executed in doing so. 
 	 */
-	public def apply (var task:T, reducer:Reducible[Z]):Z  {
+	public operator this(var task:T, reducer:Reducible[Z]):Z  {
 		val result = finish (reducer) {
 			stack.push(task);
 			while (stack.size() > 0) {

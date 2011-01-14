@@ -46,7 +46,7 @@ class UTS__SHA1Rand_methods  {
     }
     
     static x10_int
-      apply(
+      __apply(
       UTS__SHA1Rand this_) {
         
         //#line 17 "/Users/pkambadu/x10-trunk/x10.tests/examples/Benchmarks/UTS/UTS.x10": x10.ast.X10Return_c
