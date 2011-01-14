@@ -86,7 +86,6 @@ UTS_STRUCTS= examples/UTS/UTS__Constants.x10 \
             examples/UTS/TreeNode.x10\
             examples/UTS/UTS__Anonymous__0.x10 \
 
-            
 UTS_STRUCTS_CC=$(UTS_STRUCTS:.x10=.cc)
 UTS_STRUCTS_H=$(UTS_STRUCTS:.x10=.h)
 UTS_STRUCTS_STRUCTS_H=$(UTS_STRUCTS:.x10=.struct_h)
@@ -99,7 +98,7 @@ all: ${TARGET}
 
 
 UTS: ${UTS_CLASSES} ${GLB_CLASSES}
-	${X10CXX} -v  ${X10CXXFLAGS} -d . -MAIN_CLASS=examples.UTS.UTS ${X10RTTRANSPORT} $< -o $@ 
+	${X10CXX} -v  ${X10CXXFLAGS} -MAIN_CLASS=examples.UTS.UTS ${X10RTTRANSPORT} $< -o $@ 
 
 Fib: examples/Fib.x10 ${GLB_CLASSES}
 	${X10CXX} -v  ${X10CXXFLAGS} -MAIN_CLASS=examples.Fib ${X10RTTRANSPORT} $< -o $@ 
