@@ -11,7 +11,7 @@ package global.lb;
  */
 
 public class Event {
-	public static val logEvents=true;
+	public static val logEvents=false;
 	public static def event(s:String) {
 		event(logEvents, s);
 	}

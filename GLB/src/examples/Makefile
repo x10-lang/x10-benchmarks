@@ -2,7 +2,11 @@
 
 # <BEGIN> user settings #
 
-export X10CXX 		?= ~/ws/head5/x10.dist/bin/x10c++
+ifeq ($(shell uname -s),Darwin)
+  export X10CXX?=/Users/vsaraswa/ws/head1/x10.dist/bin/x10c++
+else
+  export X10CXX?=~/ws/head5/x10.dist/bin/x10c++
+endif
 
 #leave blank by default, X10 automatically chooses a transport for you. To
 #force a particular implementation, please uncheck one of the other options.
@@ -13,7 +17,6 @@ export X10RTTRANSPORT	?=
 #export X10RTTRANSPORT	?= -x10rt pgas_bgp
 #export X10RTTRANSPORT	?= -x10rt pgas_sockets
 
-export X10CXXFLAGS 	?= -report postcompile=5 -VERBOSE_CALLS
 
 # <END> user settings #
 
@@ -41,55 +44,83 @@ X10CXXFLAGS=-report \
             -NO_CHECKS=true \
             $(X10RT_TRANSPORT) \
             -v \
-            -sourcepath ..
+            -sourcepath .. \
+            -d out
 
 HEADERS=
         
-SOURCES=
+SOURCES=sha1.c
 
 OBJS=$(SOURCES:.c=.o)
 
-X10_STRUCTS= GlobalRunner__FixedSizeStack.x10 \
-	  Counter__Stat.x10 \
-	  Counter__ValCounter.x10\
-	  Counts__Anonymous__0.x10\
-	  Fib__Anonymous__0.x10\
-	  Fib__Fib2.x10\
-	  Ones__Anonymous__0.x10
-            
-X10_STRUCTS_CC=$(X10_STRUCTS:.x10=.cc)
-X10_STRUCTS_H=$(X10_STRUCTS:.x10=.h)
-X10_STRUCTS_STRUCTS_H=$(X10_STRUCTS:.x10=.struct_h)
+GLB_CLASSES=../global/lb/GlobalRunner.x10 \
+            ../global/lb/Counter.x10 \
+            ../global/lb/SeqRunner.x10 \
+            ../global/lb/Runner.x10 \
+            ../global/lb/NetworkGenerator.x10 \
+            ../global/lb/PAdicNumber.x10 \
+            ../global/lb/Event.x10 \
+            ../global/lb/TaskFrame.x10 
+GLB_CLASSES_CC=$(GLB_CLASSES:.x10=.cc)
+GLB_CLASSES_H=$(GLB_CLASSES:.x10=.h)
 
-X10_CLASSES=Fib.x10 \
-            GlobalRunner__LocalRunner.x10\
-            NetworkGenerator.x10\
-            PAdicNumber.x10\
-            SeqRunner.x10\
-            GlobalRunner.x10\
+GLB_STRUCTS=../global/lb/Counter__Stat.x10
+GLB_STRUCTS_CC=$(GLB_STRUCTS:.x10=.cc)
+GLB_STRUCTS_H=$(GLB_STRUCTS:.x10=.h)
+GLB_STRUCTS_STRUCTS_H=$(GLB_STRUCTS:.x10=.struct_h)
+
+OTHER_CLASSES=../global/lb/GlobalRunner__FixedSizeStack.x10\
+	       ../global/lb/GlobalRunner__LocalRunner.x10
+OTHER_CLASSES_CC=$(OTHER_CLASSES:.x10=.cc)
+OTHER_CLASSES_H=$(OTHER_CLASSES:.x10=.h)
+
+UTS_CLASSES=UTS.x10\
+	    Geometric.x10\
+	    Binomial.x10\
+	    TreeNode.x10 
+
+HEADERS=sha_endian.h \
+        types.h \
+        sha1.h 
+
+SOURCES=sha1.c
+
+OBJS=$(SOURCES:.c=.o)
+
+UTS_STRUCTS= UTS__Constants.x10 \
             TreeNode.x10\
-            TaskFrame.x10\
-            Event.x10\
-            Counter.x10 Ones.x10 Counts.x10
+            UTS__Anonymous__0.x10 
 
-X10_CLASSES_CC=$(X10_CLASSES:.x10=.cc)
-X10_CLASSES_H=$(X10_CLASSES:.x10=.h)
+UTS_STRUCTS_CC=$(UTS_STRUCTS:.x10=.cc)
+UTS_STRUCTS_H=$(UTS_STRUCTS:.x10=.h)
+UTS_STRUCTS_STRUCTS_H=$(UTS_STRUCTS:.x10=.struct_h)
+UTS_CLASSES_CC=$(UTS_CLASSES:.x10=.cc)
+UTS_CLASSES_H=$(UTS_CLASSES:.x10=.h)
 
-TARGET= Fib
+TARGET= UTS
 
 all: ${TARGET}
 
-Fib: Fib.x10
+
+UTS: ${UTS_CLASSES} ${GLB_CLASSES}
+	${X10CXX} -v  ${X10CXXFLAGS} -d . -MAIN_CLASS=UTS ${X10RTTRANSPORT} $< -o $@ 
+
+Fib: Fib.x10 ${GLB_CLASSES}
 	${X10CXX} -v  ${X10CXXFLAGS} -MAIN_CLASS=Fib ${X10RTTRANSPORT} $< -o $@ 
 
-Ones: Ones.x10
+Ones: Ones.x10 ${GLB_CLASSES}
 	${X10CXX} -v  ${X10CXXFLAGS} -MAIN_CLASS=Ones ${X10RTTRANSPORT} $< -o $@ 
-Counts: Counts.x10
+
+Counts: Counts.x10 ${GLB_CLASSES}
 	${X10CXX} -v  ${X10CXXFLAGS} -MAIN_CLASS=Counts ${X10RTTRANSPORT} $< -o $@ 
-test: 
+
+test: examples/UTS/Sha1Rand.cpp examples/UTS/libsha1.a
 	${CXX} ${CXXFLAGS} -DSHA1_TEST $< -o $@ -L. -lsha1
 
 clean:
 	rm -rf core*.* ${OBJS} ${TARGET} *.dSYM *.inc 
-	rm -rf ${X10_CLASSES_CC} ${X10_CLASSES_H}
-	rm -rf ${X10_STRUCTS_CC} ${X10_STRUCTS_H} ${X10_STRUCTS_STRUCTS_H}
+	rm -rf ${UTS_CLASSES_CC} ${UTS_CLASSES_H}
+	rm -rf ${UTS_STRUCTS_CC} ${UTS_STRUCTS_H} ${UTS_STRUCTS_STRUCTS_H}
+	rm -rf ${GLB_CLASSES_CC} ${GLB_CLASSES_H}
+	rm -rf ${GLB_STRUCTS_CC} ${GLB_STRUCTS_H} ${GLB_STRUCTS_STRUCTS_H}
+	rm -rf ${OTHER_CLASSES_CC} ${OTHER_CLASSES_H}

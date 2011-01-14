@@ -1,4 +1,3 @@
-package examples;
 /*
  *  This file is part of the X10 project (http://x10-lang.org).
  *
