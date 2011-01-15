@@ -9,6 +9,9 @@ import x10.util.Box;
 
 class FRASimpleDist {
 
+    @Native("c++", "__pgasrt_tsp_barrier()")
+    static def barrier() {}
+
     static POLY = 0x0000000000000007L;
     static PERIOD = 1317624576693539401L;
 
@@ -49,6 +52,7 @@ class FRASimpleDist {
             val mask1 = mask;
             val mask2 = Place.MAX_PLACES - 1;
             val poly = POLY;
+            barrier();
             for (var i:Long=0 ; i<local_updates ; i+=1L) {
                 val place_id = ((ran>>size) as Int) & mask2;
                 val index = (ran as Int) & mask1;
@@ -61,6 +65,7 @@ class FRASimpleDist {
                 }
                 ran = (ran << 1) ^ (ran<0L ? poly : 0L);
             }
+            barrier();
         }
     }
 
