@@ -69,7 +69,7 @@ class LU {
             for (var k:Int = 0; k < B; ++k) { 
                 // [DC] This probably ought to be optimised to sum the whole array, instead of each element with its own collective op
                 sum(k) = row.allreduce(rowRole,sum(k),Team.ADD);
-                if (A_here.hasCol(NB)) A_here(IB + k, M) = sum(k);
+                if (A_here.hasCol(NB)) A_here.set(sum(k), IB + k, M);
             }
         }
     }
@@ -132,8 +132,8 @@ class LU {
                             val b1 = A_ext_panel_j.blockOf(row2, LUCol);
                             for (var j:Int = J*B; j < J*B + B; ++j) {
                                 var tmp:Double = b0(row1, j); 
-                                b0(row1, j) =  b1(row2, j);
-                                b1(row2, j) =  tmp;
+                                b0.set(b1(row2, j), row1, j);
+                                b1.set(tmp, row2, j);
                             }
                         } else {
                             exchange(row1, row2, LUColStart, LUColStart + B - 1, dest);
@@ -179,8 +179,8 @@ class LU {
                             val b2 = A_here.blockOf(row2, j);
                             for (var k:Int = j; k < j + B; ++k) {
                                 var tmp:Double = b1(row1, k); 
-                                b1(row1, k) = b2(row2, k);
-                                b2(row2, k) = tmp;
+                                b1.set(b2(row2, k),row1, k);
+                                b2.set(tmp, row2, k);
                             }  
                         }
                     }

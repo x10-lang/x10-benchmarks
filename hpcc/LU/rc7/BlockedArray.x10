@@ -31,7 +31,7 @@ public final class BlockedArray implements (Int,Int)=>Double {
         }
     
         //@Native("c++", "(*(#0)->FMGL(raw))[-(#0)->FMGL(offset) + (#1) * (#0)->FMGL(delta) + (#2)]")
-        public def apply(i:Int, j:Int) = raw(i*delta+j-offset);
+        public operator this(i:Int, j:Int) = raw(i*delta+j-offset);
     }
 
     public static struct ArrayView {
@@ -51,7 +51,7 @@ public final class BlockedArray implements (Int,Int)=>Double {
 
         public def block(I:Int, J:Int) = array.block(I, J);
         public def blockOf(i:Int, j:Int) = array.blockOf(i, j);
-        public def apply(i:Int, j:Int) = array(i, j);
+        public operator this(i:Int, j:Int) = array(i, j);
         public def empty() = array == null;
     }
 
@@ -80,8 +80,8 @@ public final class BlockedArray implements (Int,Int)=>Double {
         data = new Array[Block](nx*ny, (k:Int)=>new Block(k/ny*px+min_x, k%ny*py+min_y, bx, by, rand));
     }
 
-    public def apply(i:Int, j:Int) = blockOf(i, j)(i, j);
-    public def set(v:Double, i:Int, j:Int) = blockOf(i, j)(i, j) = v;
+    public operator this(i:Int, j:Int) = blockOf(i, j)(i, j);
+    public def set(v:Double, i:Int, j:Int) = blockOf(i, j).set(v, i, j);
 
     public def block(I:Int, J:Int) = data((I-min_x)/px*ny+(J-min_y)/py);
     public def blockOf(i:Int, j:Int) = block(i/bx, j/by);
@@ -121,7 +121,7 @@ public final class BlockedArray implements (Int,Int)=>Double {
         for (var J:Int = view.min_y; J <= view.max_y; J += py) {
             val b = view.block(view.min_x, J);
             for (var j:Int = Math.max(min_y, b.min_y); j <= Math.min(max_y, b.max_y); j++) {
-                b(row, j) = rail(n++);
+                b.set(rail(n++), row, j);
             }
         }
     }
@@ -134,7 +134,7 @@ public final class BlockedArray implements (Int,Int)=>Double {
             val b = view.block(view.min_x, J);
             for (var j:Int = Math.max(min_y, b.min_y); j <= Math.min(max_y, b.max_y); j++) {
                 val v = b(row, j);
-                b(row, j) = rail(n);
+                b.set(rail(n), row, j);
                 rail(n++) = v;
             }
         }
