@@ -53,8 +53,9 @@ class FRASimpleDist {
             val mask2 = Place.MAX_PLACES - 1;
             val poly = POLY;
             val here_id = here.id;
+            val lu = local_updates;
             barrier();
-            for (var i:Long=0 ; i<local_updates ; i+=1L) {
+            for (var i:Long=0 ; i<lu ; i+=1L) {
                 val place_id = ((ran>>size) as Int) & mask2;
                 val index = (ran as Int) & mask1;
                 val update = ran;
