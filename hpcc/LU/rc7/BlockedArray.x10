@@ -26,7 +26,7 @@ public final class BlockedArray implements (Int,Int)=>Double {
         }
     
         //@Native("c++", "(*(#0)->FMGL(raw))[-(#0)->FMGL(offset) + (#2) * (#0)->FMGL(delta) + (#3)] = (#1)")
-        public def set(v:Double, i:Int, j:Int) {
+        public operator this(i:Int, j:Int) = (v:Double) {
             raw(i*delta+j-offset) = v;
         }
     
@@ -80,8 +80,10 @@ public final class BlockedArray implements (Int,Int)=>Double {
         data = new Array[Block](nx*ny, (k:Int)=>new Block(k/ny*px+min_x, k%ny*py+min_y, bx, by, rand));
     }
 
-    public operator this(i:Int, j:Int) = blockOf(i, j)(i, j);
-    public def set(v:Double, i:Int, j:Int) = blockOf(i, j).set(v, i, j);
+    public operator this(i:Int, j:Int)
+        = blockOf(i, j)(i, j);
+    public operator this(i:Int, j:Int) = (v:Double)
+        = blockOf(i, j)(i, j) = v;
 
     public def block(I:Int, J:Int) = data((I-min_x)/px*ny+(J-min_y)/py);
     public def blockOf(i:Int, j:Int) = block(i/bx, j/by);
@@ -121,7 +123,7 @@ public final class BlockedArray implements (Int,Int)=>Double {
         for (var J:Int = view.min_y; J <= view.max_y; J += py) {
             val b = view.block(view.min_x, J);
             for (var j:Int = Math.max(min_y, b.min_y); j <= Math.min(max_y, b.max_y); j++) {
-                b.set(rail(n++), row, j);
+                b(row, j) = rail(n++);
             }
         }
     }
@@ -134,7 +136,7 @@ public final class BlockedArray implements (Int,Int)=>Double {
             val b = view.block(view.min_x, J);
             for (var j:Int = Math.max(min_y, b.min_y); j <= Math.min(max_y, b.max_y); j++) {
                 val v = b(row, j);
-                b.set(rail(n), row, j);
+                b(row, j) = rail(n);
                 rail(n++) = v;
             }
         }
