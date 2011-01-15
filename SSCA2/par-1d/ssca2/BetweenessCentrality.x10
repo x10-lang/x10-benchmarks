@@ -130,7 +130,7 @@ import x10.compiler.NativeCPPInclude;
 		}
 		
 		
-		public abstract  global def compute_bc (source:Types.VERT_T, world: Comm!, nthreads: Int) : Void;
+		public abstract  global def compute_bc (source:Types.VERT_T, world: Comm!, nthreads: Int) : void;
 		
 		
 		/**

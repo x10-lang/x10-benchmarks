@@ -7,7 +7,7 @@ import x10.compiler.*;
 
 class Random {
 	@Native("c++", "srandom(#1)")
-	static native def srandom(seed:Int):Void;
+	static native def srandom(seed:Int):void;
 
 	@Native("c++", "random()")
 	native def random():Long;
@@ -35,7 +35,7 @@ public final class fft {
     static native def nativeSin(x:Double):Double;
  
     @Native("c++", "execute_plan(#1, (double*) (#2)->raw(), (double*) (#3)->raw(), #4, #5, #6)")
-    native static def execute_plan(plan:Long, A:Rail[Complex]!, B:Rail[Complex]!, SQRTN:Int, i0:Int, i1:Int):Void;
+    native static def execute_plan(plan:Long, A:Rail[Complex]!, B:Rail[Complex]!, SQRTN:Int, i0:Int, i1:Int):void;
 
     @Native("c++", "create_plan(#1, #2, #3)")
     native static def create_plan(SQRTN:Int, direction:Int, flags:Int):Long;

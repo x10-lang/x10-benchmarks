@@ -84,16 +84,16 @@ final class MyRail[T] {
     const tmp = new MyRail[Float]();
 
     @Native("c++", "#1 #4[#5]")
-    native static def declare[U](MyRail[U], size:Int):Void;
+    native static def declare[U](MyRail[U], size:Int):void;
 
     @Native("c++", "#4[#5]")
     native static def get[U](MyRail[U], index:Int):U;
 
     @Native("c++", "#4[#5] = #6")
-    native static def set[U](MyRail[U], index:Int, value:U):Void;
+    native static def set[U](MyRail[U], index:Int, value:U):void;
 
     @Native("c++", "#4[#5] += #6")
-    native static def incr[U](MyRail[U], index:Int, value:U):Void;
+    native static def incr[U](MyRail[U], index:Int, value:U):void;
 }
 
 
@@ -111,10 +111,10 @@ public class KMeansSPMDFast {
     }
     
     @Native("c++", "(#4)->_data[(#5)] = (#6)")
-    public native static def set[T](rail:Rail[T], index:Int, value:T):Void;
+    public native static def set[T](rail:Rail[T], index:Int, value:T):void;
     
     @Native("c++", "(#4)->_data[(#5)] += (#6)")
-    public native static def incr[T](rail:Rail[T], index:Int, value:T):Void;
+    public native static def incr[T](rail:Rail[T], index:Int, value:T):void;
     
     @Native("c++", "(#4)->_data[(#5)]")
     public native static def get[T](rail:Rail[T], index:Int):T;

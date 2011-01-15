@@ -52,15 +52,15 @@ class Timer {
         clear();
     }
 
-    def mark(): Void {
+    def mark(): void {
         base_time = System.nanoTime();
     }
 
-    def clear(): Void {
+    def clear(): void {
         elapsed_time = 0;
     }
 
-    def record(): Void {
+    def record(): void {
         elapsed_time += (System.nanoTime() - base_time);
     }
 
@@ -128,7 +128,7 @@ class GCTest {
 	return sum;
     }
     
-    public def start(pstream: Printer): Void {
+    public def start(pstream: Printer): void {
         var size: Int, which: Int;
         val RT = NativeRuntime.getRuntime();
 
@@ -183,7 +183,7 @@ class LoopTest {
     static val ITERATIONS = 1000000;
     var t: Timer!;
 
-    public def start(): Void {
+    public def start(): void {
         t = new Timer();
         t.mark();
         for (var i: Int = 0; i < ITERATIONS; i++)
@@ -191,7 +191,7 @@ class LoopTest {
         t.record();
     }
 
-    public def report(pstream: Printer): Void {
+    public def report(pstream: Printer): void {
 	StringHelper.bmfill(pstream, "Empty loop iterated " + ITERATIONS + " times: ", t.elapsed());
     }
 }
@@ -201,7 +201,7 @@ class ArrayTest {
     val arr = Rail.make[Int](ARRAY_INTS);
     var t: Timer!;
 
-    public def start(): Void {
+    public def start(): void {
         t = new Timer();
         
         t.mark();
@@ -221,7 +221,7 @@ class FieldTest {
     val fte: FieldTestElem! = new FieldTestElem();
     var t: Timer!;
 
-    public def start(): Void {
+    public def start(): void {
         var temp: Int;
 
         t = new Timer();
@@ -233,7 +233,7 @@ class FieldTest {
         t.record();
     }
 
-    public def report(pstream: Printer): Void {
+    public def report(pstream: Printer): void {
 	StringHelper.bmfill(pstream, FIELD_ACCESSES + " object int field accesses: ", t.elapsed());
     }
 }
@@ -254,7 +254,7 @@ class ArithmeticTest {
     val realnumber = new Random().nextDouble() * 43213.5752 + 1; // WGG - don't use int i
 
     // WGG - note that there are extra adds hidden in the loop counter
-    public def start(): Void {
+    public def start(): void {
         intaddtimer = new Timer();
         intmulttimer = new Timer();
         doubleaddtimer = new Timer();
@@ -285,7 +285,7 @@ class ArithmeticTest {
         doublemulttimer.record();
     }
 
-    public def report(pstream: Printer): Void {
+    public def report(pstream: Printer): void {
 	StringHelper.bmfill(pstream, "Added " + ADDS + " ints in loop: ", intaddtimer.elapsed());
 	StringHelper.bmfill(pstream, "Multipled " + MULTS + " ints in loop: ", intmulttimer.elapsed());
 	StringHelper.bmfill(pstream, "Added " + ADDS + " doubles in loop: ", doubleaddtimer.elapsed());
@@ -298,7 +298,7 @@ class MethodTest {
     var sametimer: Timer!, othertimer: Timer!;
     var mt: MethodTest!;
 
-    public def start(): Void {
+    public def start(): void {
         sametimer = new Timer();
         othertimer = new Timer();
         mt = new MethodTest();
@@ -316,7 +316,7 @@ class MethodTest {
         othertimer.record();
     }
 
-    public def report(pstream: Printer): Void {
+    public def report(pstream: Printer): void {
 	StringHelper.bmfill(pstream, METHOD_CALLS + " method calls in same object: ", sametimer.elapsed());
 	StringHelper.bmfill(pstream, METHOD_CALLS + " method calls in other object: ", othertimer.elapsed());
     }
@@ -330,7 +330,7 @@ class ExceptionTest {
     var t: Timer!;
     var exc: MyException;
 
-    public def start(): Void {
+    public def start(): void {
         t = new Timer();
         exc = new MyException();
 
@@ -344,7 +344,7 @@ class ExceptionTest {
         t.record();
     }
 
-    public def report(pstream: Printer): Void {
+    public def report(pstream: Printer): void {
 	StringHelper.bmfill(pstream, "Threw and caught " + THROWS + " exceptions: ", t.elapsed());
     }
 }
@@ -358,7 +358,7 @@ class ThreadTest {
     @NativeRep("java", "java.lang.Thread", null, null)
     final static class Thread {
 	@Native("java", "java.lang.Thread.yield()")
-	public static def yield(): Void { }
+	public static def yield(): void { }
     }
     
     static val THREADCNT = 3;
@@ -366,7 +366,7 @@ class ThreadTest {
     var t: Timer!;
     var i: Int;
 
-    public def start(): Void {
+    public def start(): void {
         t = new Timer();
 
         t.mark();
@@ -385,7 +385,7 @@ class ThreadTest {
         t.record();
     }
 
-    public def report(pstream: Printer): Void {
+    public def report(pstream: Printer): void {
 	StringHelper.bmfill(pstream,THREADCNT + " threads, switched " + SWITCHES + " times each: ", t.elapsed());
     }
 }
@@ -396,7 +396,7 @@ class IOTest {
     var buffer: Rail[Byte]!;
     var out: FileWriter;
 
-    public def start(pstream: Printer): Void {
+    public def start(pstream: Printer): void {
         bytetimer = new Timer();
         blocktimer = new Timer();
 
@@ -425,7 +425,7 @@ class IOTest {
         blocktimer.record();
     }
 
-    public def report(pstream: Printer): Void {
+    public def report(pstream: Printer): void {
 	StringHelper.bmfill(pstream, BUFSIZE + " writes of 1 byte: ", bytetimer.elapsed());
 	StringHelper.bmfill(pstream, "1 write of " + BUFSIZE + " bytes: ", blocktimer.elapsed());
     }
@@ -452,11 +452,11 @@ class StringHelper {
         return fill(numstr, "", numlen + (totalplaces - places), "0");
     }
 
-    public static def bmfill(ps: Printer, str1: String, str2: String): Void {
+    public static def bmfill(ps: Printer, str1: String, str2: String): void {
         ps.println(fill(str1, str2, 64, " "));
     }
 
-    public static def bmfill(ps: Printer, str1: String, num: Float): Void {
+    public static def bmfill(ps: Printer, str1: String, num: Float): void {
         ps.println(fill(str1, floatfill(num, 3), 64, " "));
     }
 
@@ -482,7 +482,7 @@ class Benchmark {
         optflags = (OptFlags != null) ? OptFlags : "unspecified";
     }
 
-    public static def main(args: Rail[String]!): Void {
+    public static def main(args: Rail[String]!): void {
         val bm = new Benchmark(x10.io.Console.OUT, false, "unspecified");
 
         if (args.length == 0)
@@ -493,7 +493,7 @@ class Benchmark {
         }
     }
 
-    public def runbenchmarks(): Void {
+    public def runbenchmarks(): void {
         while (nextTest())
             ;
     }
@@ -593,7 +593,7 @@ class Benchmark {
     @Native("java", "System.getProperty(\"java.version\", \"?\")")
     public static def getJavaVersion(): String { return "?"; }
     
-    public def runGetProperties(pstream: Printer): Void {
+    public def runGetProperties(pstream: Printer): void {
         var arch: String, os: String, osversion: String, javavendor: String, javaversion: String;
 
         pstream.println("\nSystem Configuration");

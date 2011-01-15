@@ -64,7 +64,7 @@ class BetweenessAlltoall extends BetweenessCentrality {
 	}
 	
 	
-	public global def compute_bc (val source: VERT_T, world:Comm!, ntheads: Int): Void {
+	public global def compute_bc (val source: VERT_T, world:Comm!, ntheads: Int): void {
 		val N = N_bfs(); 
 		val L = L_bfs();
 		
