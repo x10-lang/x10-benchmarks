@@ -52,13 +52,13 @@ class FRASimpleDist {
             val mask1 = mask;
             val mask2 = Place.MAX_PLACES - 1;
             val poly = POLY;
+            val here_id = here.id;
             barrier();
             for (var i:Long=0 ; i<local_updates ; i+=1L) {
                 val place_id = ((ran>>size) as Int) & mask2;
                 val index = (ran as Int) & mask1;
                 val update = ran;
-                val dest = Place(place_id);
-                if (dest==here) {
+                if (place_id==here_id) {
                     imc(index) ^= update;
                 } else {
                     imc.getCongruentSibling(Place(place_id)).remoteXor(index, update);
