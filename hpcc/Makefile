@@ -114,6 +114,20 @@ FT-alltoall-dbg:
 FT-alltoall-clean:
 	$(MAKE) -C FT-alltoall clean
 
+FT-comm: FT-comm-opt FT-comm-dbg
+
+FT-comm-opt:
+	$(MAKE) -C FT-comm fft-opt
+
+FT-comm-exp:
+	$(MAKE) -C FT-comm fft-exp
+
+FT-comm-dbg:
+	$(MAKE) -C FT-comm fft-dbg
+
+FT-comm-clean:
+	$(MAKE) -C FT-comm clean
+
 FT-global-opt:
 	$(MAKE) -C FT-global fft-opt
 
@@ -123,7 +137,7 @@ FT-global-dbg:
 FT-global-clean:
 	$(MAKE) -C FT-global clean
 
-clean: FT-clean LU-clean STREAM-clean RA-clean FT-alltoall-clean FT-global-clean
+clean: FT-clean LU-clean STREAM-clean RA-clean FT-alltoall-clean FT-comm-clean FT-global-clean
 
 .PHONY: FT LU STREAM RA
 .PHONY: clean
