@@ -26,7 +26,7 @@ public class Ones extends TaskFrame[Int, Int] {
 		
 	}
 	public def runRootTask(t:Int, s:Stack[Int]):void offers Int {
-		for (var i:Int=0u; i < t; i++) 
+		for (var i:Int=0; i < t; i++) 
 			s.push(1);
 	}
 	public static def main (args : Array[String](1)) {

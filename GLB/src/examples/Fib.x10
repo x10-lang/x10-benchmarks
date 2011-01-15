@@ -20,10 +20,10 @@ import x10.util.Stack;
 import global.lb.*;
 
 public class Fib {
-    static def fib(n:Int):Int = n < 2u ? n : fib(n-1)+fib(n-2);
+    static def fib(n:Int):Int = n < 2 ? n : fib(n-1)+fib(n-2);
     static final class Fib2 extends TaskFrame[Int, Int] {
         public def runTask(t:Int, s:Stack[Int]):void offers Int {
-            if (t < 20u) 
+            if (t < 20) 
                 offer fib(t);
             else {
                 s.push(t-1);

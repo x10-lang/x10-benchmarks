@@ -25,7 +25,7 @@ public class Counts extends TaskFrame[Int, Int] {
 	   c += t;
     }
     public def runRootTask(t:Int, s:Stack[Int]):void offers Int {
-	   for (var i:Int=0u; i < t; i++) 
+	   for (var i:Int=0; i < t; i++) 
 	   s.push(2);
     }
     public static def main (args: Array[String](1)) {
