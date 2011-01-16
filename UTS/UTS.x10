@@ -7,32 +7,32 @@ import x10.util.Stack;
 
 public class UTS {
 
-	static type PLH= PlaceLocalHandle[ParUTS];
-	private static val NORMALIZER = 2147483648.0; // does not depend on input parameters
+    static type PLH= PlaceLocalHandle[ParUTS];
+    private static val NORMALIZER = 2147483648.0; // does not depend on input parameters
 
-  public static struct Constants {
-    public static val BINOMIAL = 0;
-    public static val GEOMETRIC = 1;
-    public static val HYBRID = 2;
+    public static struct Constants {
+        public static val BINOMIAL = 0;
+        public static val GEOMETRIC = 1;
+        public static val HYBRID = 2;
 
-    public static val LINEAR = 0;
-    public static val EXPDEC = 1;
-    public static val CYCLIC = 2;
-    public static val FIXED = 3;
-  }
+        public static val LINEAR = 0;
+        public static val EXPDEC = 1;
+        public static val CYCLIC = 2;
+        public static val FIXED = 3;
+    }
 
 
-	@NativeRep ("c++", "UTS__SHA1Rand", "UTS__SHA1Rand", null)
+    @NativeRep ("c++", "UTS__SHA1Rand", "UTS__SHA1Rand", null)
 	@NativeCPPCompilationUnit ("sha1.c")
 	@NativeCPPCompilationUnit ("UTS__SHA1Rand.cc")
 	public static struct SHA1Rand {
-		public def this (seed:Int) { }
-	global safe public def toString():String = "<" + hashCode()+">";
-    public def this (parent:SHA1Rand) { }
-		public def this (parent:SHA1Rand, spawnNumber:Int) { }
-		@Native ("c++", "UTS__SHA1Rand_methods::apply(#0)")
-		public def apply () : Int = 0;
-	}
+        public def this (seed:Int) { }
+	public def toString():String = "<" + hashCode()+">";
+        public def this (parent:SHA1Rand) { }
+        public def this (parent:SHA1Rand, spawnNumber:Int) { }
+        @Native ("c++", "UTS__SHA1Rand_methods::apply(#0)")
+            public operator this() : Int = 0;
+    }
 
   // A structure that captures a node in the tree as depth + SHA1Rand
   public static struct TreeNode {
@@ -59,7 +59,7 @@ public class UTS {
       this.rng = SHA1Rand (parent.getSHA1Rand(), spawnNumber);
     }
 
-    public def apply (): Int = this.rng();
+    public operator this (): Int = this.rng();
 
     public def getDepth () : Int = this.depth;
 
@@ -72,7 +72,7 @@ public class UTS {
 	val q:Long, m:Int;
 	val a:Int, d:Int;
 	val treeType:Int;
-	val stack:Deque[TreeNode]! = new Deque[TreeNode]();
+	val stack:Deque[TreeNode] = new Deque[TreeNode]();
 	var nodesCounter:UInt = 0;
 	val stopCount:UInt = 25;
 
@@ -114,14 +114,14 @@ public class UTS {
 	}
     }
 	
-	public static def main (args : Rail[String]!) {
-		try {
-			val opts = new OptionsParser(args, null,
-					[Option("t", "", "Tree type 0: BIN, 1: GEO, 2: HYBRID"),
-					 Option("b", "", "Root branching factor"),
-					 Option("r", "", "Root seed (0 <= r <= 2^31"),
-					 Option("a", "", "Tree shape function"),
-					 Option("d", "", "Tree depth"),
+    public static def main (args : Array[String](1)) {
+        try {
+            val opts = new OptionsParser(args, null,
+                                         [Option("t", "", "Tree type 0: BIN, 1: GEO, 2: HYBRID"),
+                                          Option("b", "", "Root branching factor"),
+                                          Option("r", "", "Root seed (0 <= r <= 2^31"),
+                                          Option("a", "", "Tree shape function"),
+                                          Option("d", "", "Tree depth"),
 					 Option("s", "", "Sequential"),
 					 Option("e", "", "Event logs, default 0 (no)."),
 					 Option("q", "", "BIN: probability of a non-leaf node"),
@@ -134,103 +134,101 @@ public class UTS {
            Option("z", "", "Dimension of the sparse hypercube")
 					 ]);
 
-			val t:Int = opts ("-t", 0);
-			val b0 = opts ("-b", 4);
-			val seq = opts("-s", 0);
-			val r:Int = opts ("-r", 0);
-			val verbose = opts("-v",0)==1;
-			val nu:Int = opts("-n",200);
-			val w:Int = opts("-w", 0);
-			val e = opts("-e", 0)==1;
+            val t:Int = opts ("-t", 0);
+            val b0 = opts ("-b", 4);
+            val seq = opts("-s", 0);
+            val r:Int = opts ("-r", 0);
+            val verbose = opts("-v",0)==1;
+            val nu:Int = opts("-n",200);
+            val w:Int = opts("-w", 0);
+            val e = opts("-e", 0)==1;
+            
+            // geometric options
+            val a:Int = opts ("-a", 0);
+            val d:Int = opts ("-d", 6);
 
-			// geometric options
-			val a:Int = opts ("-a", 0);
-			val d:Int = opts ("-d", 6);
+            // binomial options
+            val q:Double = opts ("-q", 15.0/64.0);
+            val mf:Int = opts ("-m", 4);
+            val k:Int = opts ("-k", 0);
 
-			// binomial options
-			val q:Double = opts ("-q", 15.0/64.0);
-			val mf:Int = opts ("-m", 4);
-			val k:Int = opts ("-k", 0);
+            // hybrid options
+            val geo_to_bin_shift_depth_ratio:Double = opts ("-f", 0.5);
+            
+            // Figure out what kind of connectivity is needed.
+            val l:Int = opts ("-l", 3);
+            val z:Int = opts ("-z", 1);
 
-			// hybrid options
-			val geo_to_bin_shift_depth_ratio:Double = opts ("-f", 0.5);
+            Console.OUT.println("--------");
+            Console.OUT.println("Places="+Place.MAX_PLACES);
+            if (Constants.BINOMIAL==t) {
+                Console.OUT.println("b0=" + b0 +
+                                    "   r=" + r +
+                                    "   m=" + mf +
+                                    "   s=" + seq +
+                                    "   w=" + w +
+                                    "   n=" + nu +
+                                    "   q=" + q +
+                                    "   l=" + l + 
+                                    "   z=" + z +
+                                    (l==3 ?" base=" + (z==0? 0: NetworkGenerator.findW(Place.MAX_PLACES, z)) : "")
+                                    );
+            } else if (Constants.GEOMETRIC==t) {
+                Console.OUT.println("b0=" + b0 +
+                                    "   r=" + r +
+                                    "   a=" + a +
+                                    "   d=" + d +
+                                    "   s=" + seq +
+                                    "   w=" + w +
+                                    "   n=" + nu +
+                                    "   l=" + l + 
+                                    "   z=" + z +
+                                    (l==3 ?" base=" + NetworkGenerator.findW(Place.MAX_PLACES, z) : "")
+                                    );
+            } else {
+                
+            }
 
-      // Figure out what kind of connectivity is needed.
-      val l:Int = opts ("-l", 3);
-      val z:Int = opts ("-z", 1);
+            val qq = (q*NORMALIZER) as Long;
 
-			Console.OUT.println("--------");
-			Console.OUT.println("Places="+Place.MAX_PLACES);
-      if (Constants.BINOMIAL==t) {
-				Console.OUT.println("b0=" + b0 +
-						"   r=" + r +
-						"   m=" + mf +
-						"   s=" + seq +
-						"   w=" + w +
-						"   n=" + nu +
-						"   q=" + q +
-            "   l=" + l + 
-            "   z=" + z +
-            (l==3 ?" base=" + (z==0? 0: NetworkGenerator.findW(Place.MAX_PLACES, z)) : "")
-             );
-      } else if (Constants.GEOMETRIC==t) {
-				Console.OUT.println("b0=" + b0 +
-						"   r=" + r +
-						"   a=" + a +
-						"   d=" + d +
-						"   s=" + seq +
-						"   w=" + w +
-						"   n=" + nu +
-            "   l=" + l + 
-            "   z=" + z +
-            (l==3 ?" base=" + NetworkGenerator.findW(Place.MAX_PLACES, z) : "")
-             );
-      } else {
-
-      }
-
-			val qq = (q*NORMALIZER) as Long;
-
-			if (seq != 0) {
-				var time:Long = System.nanoTime();
-			  val nodes = (Constants.BINOMIAL==t) ? 
-                             new SeqUTS (b0, qq, mf).main(TreeNode(r)):
-                             new SeqUTS (b0, a, d).main(TreeNode(r, 0));
-			time = System.nanoTime() - time;
-			Console.OUT.println("Performance = "+nodes+"/"+(time/1E9)+"="+ (nodes/(time/1E3)) + "M nodes/s");
-			} else {
-        // Generate the lifelineNetwork
-        val lifelineNetwork:ValRail[ValRail[Int]] = 
-          (0==l) ? NetworkGenerator.generateRing(Place.MAX_PLACES) :
-          (1==l) ? NetworkGenerator.generateHyperCube(Place.MAX_PLACES):
-          (2==l) ? NetworkGenerator.generateChunkedGraph (Place.MAX_PLACES, z):
+            if (seq != 0) {
+                var time:Long = System.nanoTime();
+                val nodes = (Constants.BINOMIAL==t) ? 
+                    new SeqUTS (b0, qq, mf).main(TreeNode(r)):
+                    new SeqUTS (b0, a, d).main(TreeNode(r, 0));
+                time = System.nanoTime() - time;
+                Console.OUT.println("Performance = "+nodes+"/"+(time/1E9)+"="+ (nodes/(time/1E3)) + "M nodes/s");
+            } else {
+                // Generate the lifelineNetwork
+                val lifelineNetwork:ValRail[ValRail[Int]] = 
+                    (0==l) ? NetworkGenerator.generateRing(Place.MAX_PLACES) :
+                (1==l) ? NetworkGenerator.generateHyperCube(Place.MAX_PLACES):
+                (2==l) ? NetworkGenerator.generateChunkedGraph (Place.MAX_PLACES, z):
                 NetworkGenerator.generateSparseEmbedding (Place.MAX_PLACES, z);
-                        
-
-				val st = (Constants.BINOMIAL==t) ? 
-     PlaceLocalHandle.make[ParUTS](Dist.makeUnique(), 
-	   ()=>new ParUTS(b0, qq, mf,k,nu, w, e, l, lifelineNetwork(here.id))):
-     PlaceLocalHandle.make[ParUTS](Dist.makeUnique(), 
-	   ()=>new ParUTS(b0, a, d, k, nu, w, e, l, lifelineNetwork(here.id)));
-
-				Console.OUT.println("Starting...");
-				var time:Long = System.nanoTime();
-				try {
-				 if (Constants.BINOMIAL==t) st().main(st, TreeNode(r));
-         else st().main(st, TreeNode(r, 0));
-				} catch (v:Throwable) {
-					v.printStackTrace();
-				}
-				time = System.nanoTime() - time;
-				Console.OUT.println("Finished.");
-				st().counter.stats(st, time, verbose);
-			}
-			Console.OUT.println("--------");
-
-		} catch (e:Throwable) {
-			e.printStackTrace(Console.ERR);
-		}
-	}
+                
+                val st = (Constants.BINOMIAL==t) ? 
+                    PlaceLocalHandle.make[ParUTS](Dist.makeUnique(), 
+                                                  ()=>new ParUTS(b0, qq, mf,k,nu, w, e, l, lifelineNetwork(here.id))):
+                    PlaceLocalHandle.make[ParUTS](Dist.makeUnique(), 
+                                                  ()=>new ParUTS(b0, a, d, k, nu, w, e, l, lifelineNetwork(here.id)));
+                
+                Console.OUT.println("Starting...");
+                var time:Long = System.nanoTime();
+                try {
+                    if (Constants.BINOMIAL==t) st().main(st, TreeNode(r));
+                    else st().main(st, TreeNode(r, 0));
+                } catch (v:Throwable) {
+                    v.printStackTrace();
+                }
+                time = System.nanoTime() - time;
+                Console.OUT.println("Finished.");
+                st().counter.stats(st, time, verbose);
+            }
+            Console.OUT.println("--------");
+        } catch (e:Throwable) {
+            e.printStackTrace(Console.ERR);
+        }
+    }
 }
 
 // vim: ts=2:sw=2:et

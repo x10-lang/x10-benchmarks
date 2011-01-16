@@ -1,6 +1,6 @@
 public class Deque[T] {
     public static class EmptyDequeError extends Error {}
-    var r:Rail[T]!;
+    var r:Rail[T];
     var rSize:UInt=0U; // the rail representing the underlying memory
     var head:UInt=0U; // points to the element to be popped from the stack.
     var tail:UInt=0U; // points to the next element to be written into
@@ -26,11 +26,11 @@ public class Deque[T] {
     		 r.copyTo(0, r1,rSize-head, head);
     	 }
     	 Runtime.deallocObject(r);
-		 r=r1;
-		 head=0;
-		 tail=rSize;
-		 rSize *=2;
-		 return;
+         r=r1;
+         head=0;
+         tail=rSize;
+         rSize *=2;
+         return;
     }
     def size()=size;
     def pop():T {
@@ -41,11 +41,11 @@ public class Deque[T] {
         return r(tail);
     }
     def steal(k:UInt) {
-		val result = ValRail.make[T](k, (i:Int)=> r(head+i < rSize ? head+i : head+i-rSize));
-		head += k;
-		if (head >= rSize)
-			head -= rSize;
-		size -= k;
-		return result;
+        val result = Rail.make[T](k, (i:Int)=> r(head+i < rSize ? head+i : head+i-rSize));
+        head += k;
+        if (head >= rSize)
+            head -= rSize;
+        size -= k;
+        return result;
     }
 }

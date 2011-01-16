@@ -14,7 +14,7 @@ import x10.util.Random;
 final class NetworkGenerator {
   public static val INVALID_EDGE:Int = -1;
 
-  private static def countValidEdges (edgeList:ValRail[Int]) {
+  private static def countValidEdges (edgeList:Rail[Int]) {
     var numValidEdges:Int = 0;
     for (var i:Int=0; i<edgeList.length(); ++i) 
       if (INVALID_EDGE != edgeList(i)) ++numValidEdges;
@@ -28,8 +28,8 @@ final class NetworkGenerator {
     // First, create a hypercube along with an overlay of a ring structure.
     // The ring structure is needed to ensure that there is always a linear
     // lifeline available to the system -- in case all else fails.
-    val mutableNetwork:ValRail[Rail[Int]] = 
-      ValRail.make[Rail[Int]] (nplaces, 
+    val mutableNetwork:Rail[Rail[Int]] = 
+      Rail.make[Rail[Int]] (nplaces, 
         (i:Int) => Rail.make[Int](x10.lang.Math.log2(nplaces)+1,
                               (j:Int) => 
           (0==j)?(i+1)%nplaces : 
@@ -38,7 +38,7 @@ final class NetworkGenerator {
                                                    -1:((1<<(j-1))^i)));
 
     // Now, make this hypercube directed by pruning away the 2-cycles 
-    // randomly. Bsaically, we flip a coin and keep one of the 2 edges.
+    // randomly. Basically, we flip a coin and keep one of the 2 edges.
     val rng = new Random();
     if (2 < nplaces) {
       for (var i:Int=0; i<mutableNetwork.length(); ++i) {
@@ -64,8 +64,8 @@ final class NetworkGenerator {
     }
 
     // Finally, create a new thingy based on what we just created.
-    val network:ValRail[ValRail[Int]] = ValRail.make[ValRail[Int]] 
-        (nplaces, (i:Int) => ValRail.make[Int] 
+    val network:Rail[Rail[Int]] = Rail.make[Rail[Int]] 
+        (nplaces, (i:Int) => Rail.make[Int] 
           (mutableNetwork(i).length, (j:Int) => mutableNetwork(i)(j)));
 
     // Return what we just created.
@@ -76,8 +76,8 @@ final class NetworkGenerator {
    * Method to generate a directed hypercube structure.
    */
   public static def generateRing (nplaces:Int) {
-    val network:ValRail[ValRail[Int]] = ValRail.make[ValRail[Int]] 
-      (nplaces, (i:Int) => ValRail.make[Int] (1, (j:Int) => (i+1)%nplaces));
+    val network:Rail[Rail[Int]] = Rail.make[ValRail[Int]] 
+      (nplaces, (i:Int) => Rail.make[Int] (1, (j:Int) => (i+1)%nplaces));
 
     return network;
   }
@@ -87,7 +87,7 @@ final class NetworkGenerator {
    * which is the neighbor in this dimension. Since there is a chance that 
    * not all buckets are of the same size, the neighbor *might* be -1!
    */
-  private static def getMapping (buckets:ValRail[Int],
+  private static def getMapping (buckets:Rail[Int],
                                   place:Int,
                                   dimension:Int) {
 
@@ -138,7 +138,7 @@ final class NetworkGenerator {
     // Figure out how many elements are in each bucket
     val quotient:Int = nplaces/nDimensions;
     var remainder:Int = nplaces%nDimensions;
-    var firstCutBuckets:Rail[Int]! = Rail.make[Int] 
+    var firstCutBuckets:Rail[Int] = Rail.make[Int] 
                                (nDimensions+1, (i:Int) => i*quotient);
 
     // Adjust for the remainder
@@ -150,13 +150,13 @@ final class NetworkGenerator {
       ++extraElementRecepient;
       --remainder; 
     }
-    val buckets:ValRail[Int] = firstCutBuckets;
+    val buckets:Rail[Int] = firstCutBuckets;
 
     // Now generate network. Basically, for each i, we determine which 
     // bucket it belongs to. Then, it is pretty simple to calculate 
     // which element it is mapped to.
-    val network:ValRail[ValRail[Int]] = ValRail.make[ValRail[Int]]
-      (nplaces, (i:Int) => ValRail.make[Int] 
+    val network:Rail[Rail[Int]] = Rail.make[Rail[Int]]
+      (nplaces, (i:Int) => Rail.make[Int] 
         (nDimensions, (j:Int) => getMapping (buckets, i, j)));
 
     return network;
@@ -177,37 +177,37 @@ final class NetworkGenerator {
           nodeList(i) = nodeList(j);
           nodeList(j) = tmp;
         }
-    return ValRail.make[Int](nodeList.length(), (i:Int) => nodeList(i));
+    return Rail.make[Int](nodeList.length(), (i:Int) => nodeList(i));
   }
 
   public static def generateSparseEmbedding (P:Int, k:Int) {
-	  if (k == 0) 
-		  return ValRail.make[ValRail[Int]]
-		      (P, (i:Int) => ValRail.make[Int](k, (i:Int)=>i));
-    // Find a base "w" such that pow (w,k) >= P 
-  val w = findW(P, k);
+      if (k == 0) 
+          return Rail.make[Rail[Int]]
+              (P, (i:Int) => Rail.make[Int](k, (i:Int)=>i));
+      // Find a base "w" such that pow (w,k) >= P 
+      val w = findW(P, k);
 
-    // Now, create an embedding using the following rule:
-    // Express a place p as a base w number. Let us assume that there 
-    // the base w digits for p are u_1...u_k. Then the neighbors are:
-    // ((u_1+1)mod w)...((u_k+1) mod w)). For now, we will use Int 
-    // for each digit assuming that w will never be greater than 
-    // pow (2, 32).
-    val network:ValRail[ValRail[Int]] = ValRail.make[ValRail[Int]]
-     (P, (i:Int) => bubbleSort (Rail.make[Int] 
-       (k, (j:Int) => {
-    	   val ip = new PAdicNumber(w,k,i);
-    	   val o = ip.boundedDelta(1, j, P);
-    	   return o.equals(ip) ? -1 : o.toDecimal();
-       })));
-
-    return network;
+      // Now, create an embedding using the following rule:
+      // Express a place p as a base w number. Let us assume that there 
+      // the base w digits for p are u_1...u_k. Then the neighbors are:
+      // ((u_1+1)mod w)...((u_k+1) mod w)). For now, we will use Int 
+      // for each digit assuming that w will never be greater than 
+      // pow (2, 32).
+      val network:Rail[Rail[Int]] = Rail.make[Rail[Int]]
+          (P, (i:Int) => bubbleSort (Rail.make[Int] 
+                                     (k, (j:Int) => {
+                                         val ip = new PAdicNumber(w,k,i);
+                                         val o = ip.boundedDelta(1, j, P);
+                                         return o.equals(ip) ? -1 : o.toDecimal();
+                                     })));
+      
+      return network;
   }
 
   /** 
    * Print out the network.
    */
-  public static def printNetwork (network:ValRail[ValRail[Int]]) {
+  public static def printNetwork (network:Rail[Rail[Int]]) {
     for (var i:Int=0; i<network.length(); ++i) {
       Console.OUT.print(i + " =>");
       for (var j:Int=0; j<network(i).length(); ++j) 
@@ -220,7 +220,7 @@ final class NetworkGenerator {
    * Verify that there are no cycles of length 2
    */
   public static def has2cycles (nplaces:Int, 
-                                network:ValRail[ValRail[Int]]) {
+                                network:Rail[Rail[Int]]) {
     if (2 < nplaces) {
       for (var i:Int=0; i<network.length(); ++i) {
         for (var j:Int=1; j<network(i).length(); ++j) {

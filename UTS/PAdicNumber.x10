@@ -3,7 +3,7 @@
  * Useful in hypercube based routing.
  */
 public class PAdicNumber(P:Int, K:Int) {
-	global val digits: ValRail[Int]/*(K)*/;
+	val digits: Rail[Int]/*(K)*/;
 	public static def pow(w:Int, var n:Int) {
 		var result:Int=1;
 	while (n-- > 0) result *= w;
@@ -12,19 +12,19 @@ public class PAdicNumber(P:Int, K:Int) {
 	def pow(n:Int) = pow(P, n);
 	public def this(p:Int, k:Int, x:Int):PAdicNumber{self.P==p, self.K==k} {
 		property(p,k);
-		digits = ValRail.make
+		digits = Rail.make
 	     (k, (i:Int) => { val wi = pow(p,i); (x % (p*wi))/wi});
 	}
-	def this (p:Int, k:Int, ds:ValRail[Int]/*(k)*/) {
+	def this (p:Int, k:Int, ds:Rail[Int]/*(k)*/) {
 		property(p, k);
 		digits = ds;
 	}
-	public safe global operator this < (that:PAdicNumber(P,K)):Boolean {
+	public safe  operator this < (that:PAdicNumber(P,K)):Boolean {
 		var i:Int =0;
 		for (; i < K && digits(i) < that.digits(i); ++i) ;
 		return i==K-1;
 	}
-	public global safe def equals(o:Any):Boolean {
+	public def equals(o:Any):Boolean {
 		if (! (o instanceof PAdicNumber)) 
 			return false;
 		val other = o as PAdicNumber;
@@ -35,19 +35,19 @@ public class PAdicNumber(P:Int, K:Int) {
 				return false;
 		return true;
 	}
-	public global safe def hashCode():Int {
+	public def hashCode():Int {
 		return P+K+digits.hashCode();
 	}
 	
 	/**
 	 * Return the number distance d away along dimension dim (using modulo arithmetic). 
 	 */
-	global public def delta(d:Int, dim:Int)= 
-		new PAdicNumber(P, K, ValRail.make(K, 
+	public def delta(d:Int, dim:Int)= 
+		new PAdicNumber(P, K, Rail.make(K, 
 				(i:Int) => (i==dim ?  (digits(i)+d)% P : digits(i))));
 	
-	global public def boundedDelta(d:Int, dim:Int, bound:Int): PAdicNumber(P,K) {
-		val o = new PAdicNumber(P, K, ValRail.make(K, 
+	public def boundedDelta(d:Int, dim:Int, bound:Int): PAdicNumber(P,K) {
+		val o = new PAdicNumber(P, K, Rail.make(K, 
 				(i:Int) => (i==dim ?  (digits(i)+d)% P : digits(i))));
 
 		val od = o.toDecimal();
@@ -66,14 +66,14 @@ public class PAdicNumber(P:Int, K:Int) {
 		
 	
 	
-	global public def toDecimal():Int {
+	public def toDecimal():Int {
 		 var result:Int=digits(K-1);
 	     for (var i:Int=K-1; i > 0; i--) {
 		    result = result*P + digits(i-1);
 	     }
 	     return result;
 	}
-	global safe public def toString() {
+	public def toString() {
 		var result:String="";
 		for (var i:Int=K-1; i >= 0; i--) {
 			result += digits(i);
@@ -109,8 +109,8 @@ public class PAdicNumber(P:Int, K:Int) {
 	  Console.OUT.println("done.");
   } 
   
-  public static def main(args: Rail[String]!) {
-	  val n = args.length;
+    public static def main(args: Array[String](1)) {
+	  val n = args.size;
 	  if (n < 2) {
 		  Console.OUT.println("Usage: PAdicNumbers P:Int k:Int");
 		  return;
