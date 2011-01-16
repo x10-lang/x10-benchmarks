@@ -9,7 +9,7 @@ final class ParUTS {
     static type Constants = UTS.Constants;
     
     final static class FixedSizeStack[T] {
-	val data:Rail[T]!;
+	val data:Rail[T];
 	var last:Int;
 	val size:Int;
 	def this(n:Int, t:T) {
@@ -25,11 +25,11 @@ final class ParUTS {
 	def size():Int=last+1;
         
     }
-    val thieves:FixedSizeStack[Int]!;
+    val thieves:FixedSizeStack[Int];
     
     val width:Int;
     val stack = new Deque[TreeNode]();
-    val myLifelines:ValRail[Int];
+    val myLifelines:Rail[Int];
     
     // Which of the lifelines have I actually activated?
     val lifelinesActivated: Rail[Boolean];
@@ -43,7 +43,7 @@ final class ParUTS {
     val z:Int;
     val logEvents:Boolean;
     val myRandom = new Random();
-    public val counter:Counter!;
+    public val counter:Counter;
     var active:Boolean=false;
     var noLoot:Boolean=true;
     
@@ -58,7 +58,7 @@ final class ParUTS {
 		     w:Int, 
 		     e:Boolean, 
 		     l:Int,
-		     lifelineNetwork:ValRail[Int]) {
+		     lifelineNetwork:Rail[Int]) {
 	this.treeType = Constants.BINOMIAL;
 	this.b0 = b0;
 	this.q = q; 
@@ -90,7 +90,7 @@ final class ParUTS {
 		     w:Int, 
 		     e:Boolean, 
 		     l:Int,
-		     lifelineNetwork:ValRail[Int]) {
+		     lifelineNetwork:Rail[Int]) {
 	this.treeType = Constants.GEOMETRIC;
 	this.b0 = b0;
 	this.a = a; 
@@ -144,7 +144,7 @@ final class ParUTS {
 	    TreeExpander.geometric (a, b0, d, node, stack);
     }
     
-    final def processLoot(loot: ValRail[TreeNode], lifeline:Boolean) {
+    final def processLoot(loot: Rail[TreeNode], lifeline:Boolean) {
 	counter.incRx(lifeline, loot.length);
 	val time = System.nanoTime();
 	for (r in loot) processSubtree(r);
@@ -238,7 +238,7 @@ final class ParUTS {
 	work from randomly chosen neighbors (for a certain number of 
 	tries). If we are not successful, we invoke our lifeline system.
     */
-    def attemptSteal(st:PLH):ValRail[TreeNode] {
+    def attemptSteal(st:PLH):Rail[TreeNode] {
 	val time = System.nanoTime();
 	val P = Place.MAX_PLACES;
 	if (P == 1) return null;
@@ -266,7 +266,7 @@ final class ParUTS {
 	event("No loot; establishing lifeline(s).");
 	
 	// resigned to make a lifeline steal from one of our lifelines.
-	var loot:ValRail[TreeNode] = null;
+	var loot:Rail[TreeNode] = null;
 	for (var i:Int=0; 
 	     (i<myLifelines.length()) && (noLoot) && (0<=myLifelines(i)); 
 	     ++i) {
@@ -290,8 +290,8 @@ final class ParUTS {
 	or by the owning place itself when it wants to give work to 
 	a fallen buddy.
     */
-    def trySteal(p:Int):ValRail[TreeNode]=trySteal(p, false);
-    def trySteal(p:Int, isLifeLine:Boolean) : ValRail[TreeNode] {
+    def trySteal(p:Int):Rail[TreeNode]=trySteal(p, false);
+    def trySteal(p:Int, isLifeLine:Boolean) : Rail[TreeNode] {
 	counter.stealsReceived++;
 	val length = stack.size();
 	val numSteals = k==0u ? (length >=2u ? length/2u : 0u)
@@ -312,7 +312,7 @@ final class ParUTS {
     
     def launch(st:PLH, 
 	       init:Boolean, 
-	       loot:ValRail[TreeNode], 
+	       loot:Rail[TreeNode], 
 	       depth:Int, 
 	       source:Int) {
 	assert loot != null;
