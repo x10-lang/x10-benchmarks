@@ -42,7 +42,7 @@ public class KMeansSPMD {
 
             val opts = new OptionsParser(args, [
                 Option("q","quiet","just print time taken"),
-                Option("v","verbose","print out each iteration")
+                Option("v","verbose","print out clusters")
             ], [
                 Option("p","points","location of data file"),
                 Option("i","iterations","quit after this many iterations"),
@@ -143,9 +143,9 @@ public class KMeansSPMD {
                                 for (var d:Int=0 ; d<dim ; ++d) host_clusters(k*dim+d) /= host_cluster_counts(k);
                             }
 
-                            if (offset==0 && verbose) {
+                            if (offset==0) {
                                 Console.OUT.println("Iteration: "+iter);
-                                printClusters(host_clusters,dim);
+                                if (verbose) printClusters(host_clusters,dim);
                             }
 
                             // TEST FOR CONVERGENCE
@@ -169,7 +169,7 @@ public class KMeansSPMD {
                                 Console.OUT.println(role.toString()+": Communication time: "+comm_time/1E9);
                             }
                             team.barrier(role);
-                            if (role==0) {
+                            if (role==0 && verbose) {
                                 Console.OUT.println("\nFinal results:");
                                 printClusters(host_clusters,dim);
                             }
