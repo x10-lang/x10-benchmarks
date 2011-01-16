@@ -76,7 +76,7 @@ final class NetworkGenerator {
    * Method to generate a directed hypercube structure.
    */
   public static def generateRing (nplaces:Int) {
-    val network:Rail[Rail[Int]] = Rail.make[ValRail[Int]] 
+    val network:Rail[Rail[Int]] = Rail.make[Rail[Int]] 
       (nplaces, (i:Int) => Rail.make[Int] (1, (j:Int) => (i+1)%nplaces));
 
     return network;

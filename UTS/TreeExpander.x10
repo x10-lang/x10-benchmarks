@@ -1,7 +1,7 @@
 import x10.compiler.*;
 import x10.util.OptionsParser;
 import x10.util.Option;
-
+import x10.util.Stack;
 
 public class TreeExpander {
   static type TreeNode = UTS.TreeNode;
@@ -13,7 +13,7 @@ public class TreeExpander {
                                rootBranchingFactor:int, /* self-expln */
                                maxTreeDepth:int, /* cut off after this depth */
                                node:TreeNode, /* random number generator */
-                               deque:Deque[TreeNode]) { /* The place to store */
+                               deque:Stack[TreeNode]) { /* The place to store */
     /* compute branching factor at this node */
     var curNodeBranchingFactor:double;
 
@@ -60,7 +60,7 @@ public class TreeExpander {
                                   (Math.log 
                                 (1-probForCurNodeBranchingFactor))) as int;
 
-    /* Push all the children onto the Deque */
+    /* Push all the children onto the Deque (stack) */
     for (var i:Int=0; i<numChildren; ++i) 
       deque.push(TreeNode (node, i, node.getDepth()+1));
   }
@@ -68,7 +68,7 @@ public class TreeExpander {
   public static def binomial (q:Long, 
                               m:int, 
                               node:TreeNode,
-                              deque:Deque[TreeNode]) {
+                              deque:Stack[TreeNode]) {
     val randomNumber:Long = node();
     val numChildren:Int = (randomNumber < q) ? m : 0;
 
@@ -78,7 +78,7 @@ public class TreeExpander {
 
   public static def processBinomialRoot (b0:Int, 
                                          node:TreeNode, 
-                                         deque:Deque[TreeNode]) {
+                                         deque:Stack[TreeNode]) {
     for (var i:Int=0; i<b0; ++i) deque.push(TreeNode (node, i));
   }
 }

@@ -1,6 +1,9 @@
 
 import x10.util.Random;
 import x10.lang.Math;
+import x10.util.Stack;
+import x10.util.List;
+import x10.util.ArrayList;
 
 final class ParUTS {
     static type PLH= PlaceLocalHandle[ParUTS];
@@ -28,7 +31,7 @@ final class ParUTS {
     val thieves:FixedSizeStack[Int];
     
     val width:Int;
-    val stack = new Deque[TreeNode]();
+    val stack = new Stack[TreeNode]();
     val myLifelines:Rail[Int];
     
     // Which of the lifelines have I actually activated?
@@ -36,7 +39,7 @@ final class ParUTS {
     
     val treeType:Int; // 0=BINOMIAL, 1=GEOMETRIC
     val b0:Int; // root branching factor
-    val q:Long, m:Int, k:UInt, nu:Int; // For the binomial tree
+    val q:Long, m:Int, k:Int, nu:Int; // For the binomial tree
     val a:Int, d:Int; // For the geometric tree
     
     val l:Int; 
@@ -63,7 +66,7 @@ final class ParUTS {
 	this.b0 = b0;
 	this.q = q; 
 	this.m = m; 
-	this.k=k as UInt; 
+	this.k=k; 
 	this.nu=nu; 
 	this.l = l;
 	this.myLifelines = lifelineNetwork;
@@ -218,13 +221,11 @@ final class ParUTS {
 	    val numToSteal = lootSize/(numThieves+1);
 	    for (var i:Int=0; i < numThieves; ++i) {
 		val thief = thieves.pop();
-		val time2 = System.nanoTime(); 
-		val loot = stack.steal(numToSteal);
-		counter.incTimePreppingSteal (System.nanoTime() - time2);
+		val loot = stack.pop(numToSteal);
 		counter.incTxNodes(numToSteal);
 		// event("Distributing " + loot.length() + " to " + thief);
 		val victim = here.id;
-		async (Place(thief)) 
+		async at(Place(thief)) 
 		    st().launch(st, false, loot, depth, victim);
 	    }
 	}
@@ -302,11 +303,9 @@ final class ParUTS {
 	    event("Returning null");
 	    return null;
 	}
-	counter.nodesGiven += (numSteals);
+	val loot = stack.pop(numSteals);
+	counter.nodesGiven += numSteals;
 	counter.stealsSuffered++;
-	val time = System.nanoTime();
-	val loot = stack.steal(numSteals);
-	counter.incTimePreppingSteal (System.nanoTime()-time);
 	return loot;
     }
     
@@ -368,9 +367,10 @@ final class ParUTS {
 	    val lootSize = stack.size()/P;
 	    for (var pi:Int=1 ; pi<P ; ++pi) {
 		val time = System.nanoTime();
-		val loot = stack.steal(lootSize);
+		val loot = stack.pop(lootSize);
 		counter.incTimePreppingSteal (System.nanoTime() - time);
-		async (Place(pi))
+		val pi_ = pi;
+		async at(Place(pi_))
 		    st().launch(st, true, loot, 0, 0);
 		counter.incTxNodes(lootSize);
 	    }

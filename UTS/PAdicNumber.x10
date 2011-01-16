@@ -5,9 +5,9 @@
 public class PAdicNumber(P:Int, K:Int) {
 	val digits: Rail[Int]/*(K)*/;
 	public static def pow(w:Int, var n:Int) {
-		var result:Int=1;
-	while (n-- > 0) result *= w;
-	return result;
+	    var result:Int=1;
+	    while (n-- > 0) result *= w;
+	    return result;
 	}
 	def pow(n:Int) = pow(P, n);
 	public def this(p:Int, k:Int, x:Int):PAdicNumber{self.P==p, self.K==k} {
@@ -19,8 +19,8 @@ public class PAdicNumber(P:Int, K:Int) {
 		property(p, k);
 		digits = ds;
 	}
-	public safe  operator this < (that:PAdicNumber(P,K)):Boolean {
-		var i:Int =0;
+	public  operator this < (that:PAdicNumber(P,K)):Boolean {
+		var i:Int = 0;
 		for (; i < K && digits(i) < that.digits(i); ++i) ;
 		return i==K-1;
 	}
@@ -83,8 +83,8 @@ public class PAdicNumber(P:Int, K:Int) {
 		return result;
 	}
 	
-  public static def main2(args: Rail[String]!) {
-	  val n = args.length;
+    public static def main2(args: Array[String](1)) {
+	val n = args.size();
 	  if (n < 2) {
 		  Console.OUT.println("Usage: PAdicNumbers w:Int k:Int n1:Int ... nk:Int");
 		  return;
@@ -121,9 +121,9 @@ public class PAdicNumber(P:Int, K:Int) {
 	  Console.OUT.println("P=" + P + " w="  + w + " k=" + k);
 	  
 	  val m = NetworkGenerator.generateSparseEmbedding(P,k);
-	  for ((r) in 0..P-1) {
+	  for ([r] in 0..(P-1)) {
 		  Console.OUT.print("Place " + r + ":" + new PAdicNumber(w,k, r) + "=> " );
-		  for ((i) in 0..k-1) {
+		  for ([i] in 0..(k-1)) {
 			  Console.OUT.print(" " + m(r)(i) + ":" 
 					  + (m(r)(i) == -1 ? "-1" : new PAdicNumber(w, k, m(r)(i)).toString()));
 		  }

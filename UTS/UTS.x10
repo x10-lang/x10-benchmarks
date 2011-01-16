@@ -64,7 +64,7 @@ public class UTS {
     public def getDepth () : Int = this.depth;
 
     public def getSHA1Rand (): SHA1Rand = this.rng;
-	public global safe  def toString():String = "<" + depth + " " + rng + ">";
+	public   def toString():String = "<" + depth + " " + rng + ">";
   }
 
     static class SeqUTS {
@@ -72,7 +72,7 @@ public class UTS {
 	val q:Long, m:Int;
 	val a:Int, d:Int;
 	val treeType:Int;
-	val stack:Deque[TreeNode] = new Deque[TreeNode]();
+	val stack:Stack[TreeNode] = new Stack[TreeNode]();
 	var nodesCounter:UInt = 0;
 	val stopCount:UInt = 25;
 
@@ -200,7 +200,7 @@ public class UTS {
                 Console.OUT.println("Performance = "+nodes+"/"+(time/1E9)+"="+ (nodes/(time/1E3)) + "M nodes/s");
             } else {
                 // Generate the lifelineNetwork
-                val lifelineNetwork:ValRail[ValRail[Int]] = 
+                val lifelineNetwork:Rail[Rail[Int]] = 
                     (0==l) ? NetworkGenerator.generateRing(Place.MAX_PLACES) :
                 (1==l) ? NetworkGenerator.generateHyperCube(Place.MAX_PLACES):
                 (2==l) ? NetworkGenerator.generateChunkedGraph (Place.MAX_PLACES, z):
