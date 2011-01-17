@@ -222,7 +222,7 @@ public class UTS {
                 }
                 time = System.nanoTime() - time;
                 Console.OUT.println("Finished.");
-                st().counter.stats(st, time, verbose);
+                st().counter.stats(st, time, verbose, ParUTS.gatherTimes);
             }
             Console.OUT.println("--------");
         } catch (e:Throwable) {

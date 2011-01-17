@@ -292,9 +292,10 @@ public class Counter {
      * Counters.. 
      * @param time
      * @param verbose -- if details for each place should be printed.
+     * @param haveDetailedTimes -- did we gather the various phase times?
      */
     
-    public def stats(st:PlaceLocalHandle[ParUTS], time:Long, verbose:Boolean) {
+    public def stats(st:PlaceLocalHandle[ParUTS], time:Long, verbose:Boolean, haveDetailedTimes:Boolean) {
 	assert here.id == 0;
 	val P = Place.MAX_PLACES;
 	val allCounters = Rail.make[Counter](P,(i:Int) => at(Place(i)) st().counter);
@@ -337,13 +338,15 @@ public class Counter {
 	Console.OUT.println("\t" + ll + " lifeline steals.");
 	Console.OUT.println("\t" + safeSubstring("" + (1.0F*llN)/ll, 0,8) + " nodes stolen/lifeline steal.");
 	Console.OUT.println("Nodes processed:" + computeTime(NODES, P, allCounters));
-	Console.OUT.println("Time computing: " + computeTime(COMPUTING, P, allCounters, 1000, "us"));
-	Console.OUT.println("Time stealing:  " + computeTime(STEALING, P, allCounters, 1000, "us"));
-	Console.OUT.println("Time prepping for steal:  " + computeTime(PREPPINGFORSTEAL, P, allCounters, 1000, "us"));
-	Console.OUT.println("Time probing:   " + computeTime(PROBING, P, allCounters, 1000, "us"));
-	Console.OUT.println("Time alive:     " + computeTime(ALIVE, P, allCounters, 1000, "us"));
-	Console.OUT.println("Time dead:      " + computeTime(DEAD, P, allCounters, 1000, "us"));
-	Console.OUT.println("Time alive+dead:" + computeTime(LIFE, P, allCounters, 1000, "us"));
+	if (haveDetailedTimes) {
+            Console.OUT.println("Time computing: " + computeTime(COMPUTING, P, allCounters, 1000, "us"));
+	    Console.OUT.println("Time stealing:  " + computeTime(STEALING, P, allCounters, 1000, "us"));
+	    Console.OUT.println("Time prepping for steal:  " + computeTime(PREPPINGFORSTEAL, P, allCounters, 1000, "us"));
+	    Console.OUT.println("Time probing:   " + computeTime(PROBING, P, allCounters, 1000, "us"));
+	    Console.OUT.println("Time alive:     " + computeTime(ALIVE, P, allCounters, 1000, "us"));
+	    Console.OUT.println("Time dead:      " + computeTime(DEAD, P, allCounters, 1000, "us"));
+	    Console.OUT.println("Time alive+dead:" + computeTime(LIFE, P, allCounters, 1000, "us"));
+        }
 	Console.OUT.println("Performance = "+nodeSum+"/"+safeSubstring("" + (time/1E9), 0,6)
 			    +"="+ safeSubstring("" + (nodeSum/(time/1E3)), 0, 6) + "M nodes/s");
 	
