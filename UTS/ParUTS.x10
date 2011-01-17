@@ -10,6 +10,8 @@ final class ParUTS {
     static type SHA1Rand = UTS.SHA1Rand;
     static type TreeNode = UTS.TreeNode;
     static type Constants = UTS.Constants;
+
+    static val gatherTimes = false;
     
     final static class FixedSizeStack[T] {
 	val data:Rail[T];
@@ -149,18 +151,18 @@ final class ParUTS {
     
     final def processLoot(loot: Rail[TreeNode], lifeline:Boolean) {
 	counter.incRx(lifeline, loot.length);
-	val time = System.nanoTime();
+	val time = gatherTimes ? System.nanoTime() : 0;
 	for (r in loot) processSubtree(r);
-	counter.incTimeComputing (System.nanoTime() - time);    
+	if (gatherTimes) counter.incTimeComputing (System.nanoTime() - time);    
     }
     
     final def processAtMostN(n:Int) {
-	val time = System.nanoTime();
+	val time = gatherTimes ? System.nanoTime() : 0;
 	for (var count:Int=0; count < n; count++) {
 	    val e = stack.pop();
 	    processSubtree(e);
 	}
-	counter.incTimeComputing (System.nanoTime() - time);  
+	if (gatherTimes) counter.incTimeComputing (System.nanoTime() - time);  
     }
     
     /** A trivial function to calculate minimum of 2 integers */
@@ -180,9 +182,9 @@ final class ParUTS {
 	    while (n > 0) {
 		processAtMostN(n);
                 
-		val time:Long =  System.nanoTime();
+		val time:Long =  gatherTimes ? System.nanoTime() : 0;
 		Runtime.probe();
-		counter.incTimeProbing (System.nanoTime() - time);
+		if (gatherTimes) counter.incTimeProbing (System.nanoTime() - time);
 		val numThieves = thieves.size();
 		if (numThieves > 0) distribute(st, 1, numThieves);
 		n = min(stack.size(), nu);
@@ -214,7 +216,7 @@ final class ParUTS {
     }
     
     def distribute(st:PLH, depth:Int, var numThieves:Int) {
-	val time = System.nanoTime();
+	val time = gatherTimes ? System.nanoTime() : 0;
 	val lootSize= stack.size();
 	if (lootSize > 2u) {
 	    numThieves = min(numThieves, lootSize-2);
@@ -229,7 +231,7 @@ final class ParUTS {
 		    st().launch(st, false, loot, depth, victim);
 	    }
 	}
-	counter.incTimeDistributing (System.nanoTime()-time);
+	if (gatherTimes) counter.incTimeDistributing (System.nanoTime()-time);
     }
     
     /** This is the code invoked locally by each node when there are no 
@@ -240,7 +242,7 @@ final class ParUTS {
 	tries). If we are not successful, we invoke our lifeline system.
     */
     def attemptSteal(st:PLH):Rail[TreeNode] {
-	val time = System.nanoTime();
+	val time = gatherTimes ? System.nanoTime() : 0;
 	val P = Place.MAX_PLACES;
 	if (P == 1) return null;
 	val p = here.id;
@@ -256,12 +258,12 @@ final class ParUTS {
 	    if (loot != null) {
 		//event("Steal succeeded with " + 
 		//(loot == null ? 0 : loot.length()) + " items");
-		counter.incTimeStealing(System.nanoTime() - time);
+		if (gatherTimes) counter.incTimeStealing(System.nanoTime() - time);
 		return loot;
 	    }
 	}
 	if (! noLoot) {
-	    counter.incTimeStealing(System.nanoTime() - time);
+	    if (gatherTimes) counter.incTimeStealing(System.nanoTime() - time);
 	    return null;
 	}
 	event("No loot; establishing lifeline(s).");
@@ -282,7 +284,7 @@ final class ParUTS {
 		}
 	    }
 	}
-	counter.incTimeStealing(System.nanoTime() - time);
+	if (gatherTimes) counter.incTimeStealing(System.nanoTime() - time);
 	return loot;
     }
     
@@ -366,9 +368,9 @@ final class ParUTS {
 	    
 	    val lootSize = stack.size()/P;
 	    for (var pi:Int=1 ; pi<P ; ++pi) {
-		val time = System.nanoTime();
+		val time = gatherTimes ? System.nanoTime() : 0;
 		val loot = stack.pop(lootSize);
-		counter.incTimePreppingSteal (System.nanoTime() - time);
+		if (gatherTimes) counter.incTimePreppingSteal (System.nanoTime() - time);
 		val pi_ = pi;
 		async at(Place(pi_))
 		    st().launch(st, true, loot, 0, 0);
