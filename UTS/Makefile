@@ -2,11 +2,7 @@
 
 # <BEGIN> user settings #
 
-ifeq ($(shell uname -s),Darwin)
-  export X10CXX?=/Users/vsaraswa/ws/head1/x10.dist/bin/x10c++
-else
-  export X10CXX?=/gsa/yktgsa-h1/08/pkambadu/Software/src/x10/x10-trunk/x10.dist/bin/x10c++
-endif
+export X10CXX?=x10c++
 
 
 #leave blank by default, X10 automatically chooses a transport for you. To
