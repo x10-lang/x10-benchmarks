@@ -12,6 +12,10 @@ class FRASimpleDistNoAbstraction {
     @Native("c++", "__pgasrt_tsp_barrier()")
     static def barrier() {}
 
+    @Native("c++", "__pgasrt_tsp_dupdate_hfi(0, place_id, (__pgasrt_local_addr_t)&(imc->raw()[index]), 0, (__pgasrt_local_addr_t)&update, PGASRT_OP_XOR, NULL, NULL);")
+    static def remote_update(imc: IndexedMemoryChunk[Long], place_id:Int, index:Int, update:Long)
+    { imc.getCongruentSibling(Place(place_id)).remoteXor(index, update); }
+
     static POLY = 0x0000000000000007L;
     static PERIOD = 1317624576693539401L;
 
@@ -62,10 +66,7 @@ class FRASimpleDistNoAbstraction {
                 if (place_id==here_id) {
                     imc(index) ^= update;
                 } else {
-                    //@Native("c++", "x10rt_remote_op(place_id, (x10rt_remote_ptr)&(imc->raw()[index]), X10RT_OP_XOR, update);")
-                    //@Native("c++","extern \"C\" void * __pgasrt_tsp_dupdate_hfi (unsigned localThread, unsigned destNode, __pgasrt_local_addr_t dst, size_t offset, __pgasrt_local_addr_t src, __pgasrt_ops_t op, __pgasrt_LCompHandler_t comp_h, void * info);") { }
-                    @Native("c++", "__pgasrt_tsp_dupdate_hfi(0, place_id, (__pgasrt_local_addr_t)&(imc->raw()[index]), 0, (__pgasrt_local_addr_t)&update, PGASRT_OP_XOR, NULL, NULL);")
-                    { imc.getCongruentSibling(Place(place_id)).remoteXor(index, update); }
+                    remote_update(imc, place_id, index, update);
                 }
                 ran = (ran << 1) ^ (ran<0L ? poly : 0L);
             }
