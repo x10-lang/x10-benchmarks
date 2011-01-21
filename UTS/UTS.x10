@@ -34,45 +34,12 @@ public class UTS {
             public operator this() : Int = 0;
     }
 
-  // A structure that captures a node in the tree as depth + SHA1Rand
-  public static struct TreeNode {
-    val depth:Int;
-    val rng:SHA1Rand;
-
-    public def this (seed:Int) { 
-      this.depth = -1;
-      this.rng = SHA1Rand(seed);
-    }
-
-    public def this (seed:Int, depth:Int) {
-      this.depth = depth;
-      this.rng = SHA1Rand (seed);
-    }
-
-    public def this (parent:TreeNode, spawnNumber:Int) {
-      this.depth = -1;
-      this.rng = SHA1Rand (parent.getSHA1Rand(), spawnNumber);
-    }
-
-    public def this (parent:TreeNode, spawnNumber:Int, depth:Int) {
-      this.depth = depth;
-      this.rng = SHA1Rand (parent.getSHA1Rand(), spawnNumber);
-    }
-
-    public operator this (): Int = this.rng();
-
-    public def getDepth () : Int = this.depth;
-
-    public def getSHA1Rand (): SHA1Rand = this.rng;
-	public   def toString():String = "<" + depth + " " + rng + ">";
-  }
-
     static class SeqUTS {
 	val b0:Int;
 	val q:Long, m:Int;
 	val a:Int, d:Int;
 	val treeType:Int;
-	val stack:Stack[TreeNode] = new Stack[TreeNode]();
+	val stack:Stack[SHA1Rand] = new Stack[SHA1Rand]();
 	var nodesCounter:UInt = 0;
 	val stopCount:UInt = 25;
 
@@ -90,20 +57,14 @@ public class UTS {
     public final def processStack () {
 
 	while (stack.size() > 0u) {
-	    if (Constants.BINOMIAL==treeType) 
 		TreeExpander.binomial (q, m, stack.pop(), stack);
-	    else TreeExpander.geometric (a, b0, d, stack.pop(), stack);
 	    ++nodesCounter;
 	}
 
     }
   
-	public final def main (rootNode:TreeNode) {
-	    if (Constants.BINOMIAL==treeType) {
+	public final def main (rootNode:SHA1Rand) {
 		TreeExpander.processBinomialRoot (b0, rootNode, stack);
-	    } else { 
-		TreeExpander.geometric (a, b0, d, rootNode, stack);
-	    }
 	    ++nodesCounter; // root node is counted -- so count it here.
 
 	    this.processStack();
@@ -194,8 +155,8 @@ public class UTS {
             if (seq != 0) {
                 var time:Long = System.nanoTime();
                 val nodes = (Constants.BINOMIAL==t) ? 
-                    new SeqUTS (b0, qq, mf).main(TreeNode(r)):
-                    new SeqUTS (b0, a, d).main(TreeNode(r, 0));
+                    new SeqUTS (b0, qq, mf).main(SHA1Rand(r)):
+                    new SeqUTS (b0, a, d).main(SHA1Rand(r));
                 time = System.nanoTime() - time;
                 Console.OUT.println("Performance = "+nodes+"/"+(time/1E9)+"="+ (nodes/(time/1E3)) + "M nodes/s");
             } else {
@@ -215,8 +176,8 @@ public class UTS {
                 Console.OUT.println("Starting...");
                 var time:Long = System.nanoTime();
                 try {
-                    if (Constants.BINOMIAL==t) st().main(st, TreeNode(r));
-                    else st().main(st, TreeNode(r, 0));
+                    if (Constants.BINOMIAL==t) st().main(st, SHA1Rand(r));
+                    else st().main(st, SHA1Rand(r));
                 } catch (v:Throwable) {
                     v.printStackTrace();
                 }

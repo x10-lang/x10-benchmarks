@@ -7,10 +7,14 @@ import x10.util.Box;
 
 @NativeCPPInclude("pgas_collectives.h")
 
-class FRASimpleDist {
+class FRASimpleDistNoAbstraction {
 
     @Native("c++", "__pgasrt_tsp_barrier()")
     static def barrier() {}
+
+    @Native("c++", "__pgasrt_tsp_dupdate_hfi(0, place_id, (__pgasrt_local_addr_t)&(imc->raw()[index]), 0, (__pgasrt_local_addr_t)&update, PGASRT_OP_XOR, NULL, NULL);")
+    static def remote_update(imc: IndexedMemoryChunk[Long], place_id:Int, index:Int, update:Long)
+    { imc.getCongruentSibling(Place(place_id)).remoteXor(index, update); }
 
     static POLY = 0x0000000000000007L;
     static PERIOD = 1317624576693539401L;
@@ -62,7 +66,7 @@ class FRASimpleDist {
                 if (place_id==here_id) {
                     imc(index) ^= update;
                 } else {
-                    imc.getCongruentSibling(Place(place_id)).remoteXor(index, update);
+                    remote_update(imc, place_id, index, update);
                 }
                 ran = (ran << 1) ^ (ran<0L ? poly : 0L);
             }
@@ -73,7 +77,7 @@ class FRASimpleDist {
     private static def help (err:Boolean) {
         if (here.id!=0) return;
         val out = err ? Console.ERR : Console.OUT;
-        out.println("Usage: FRASimpleDist [-m <mem>] [-u <updates>]");
+        out.println("Usage: FRASimpleDistNoAbstraction [-m <mem>] [-u <updates>]");
         out.println("where");
         out.println("   <mem> is the log2 size of the local table (default 12)");
         out.println("   <updates> is the number of updates per element (default 4)");

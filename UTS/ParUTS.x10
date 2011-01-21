@@ -8,7 +8,6 @@ import x10.util.ArrayList;
 final class ParUTS {
     static type PLH= PlaceLocalHandle[ParUTS];
     static type SHA1Rand = UTS.SHA1Rand;
-    static type TreeNode = UTS.TreeNode;
     static type Constants = UTS.Constants;
 
     static val gatherTimes = false;
@@ -33,7 +32,7 @@ final class ParUTS {
     val thieves:FixedSizeStack[Int];
     
     val width:Int;
-    val stack = new Stack[TreeNode]();
+    val stack = new Stack[SHA1Rand]();
     val myLifelines:Rail[Int];
     
     // Which of the lifelines have I actually activated?
@@ -141,15 +140,12 @@ final class ParUTS {
     /** Check if the current node (governed by the SHA1Rand state) has any
 	children. If so, push it onto the local stack.
     */
-    final def processSubtree (node:TreeNode) {
+    final def processSubtree (node:SHA1Rand) {
 	++counter.nodesCounter;
-	if (Constants.BINOMIAL==treeType) 
 	    TreeExpander.binomial (q, m, node, stack);
-	else 
-	    TreeExpander.geometric (a, b0, d, node, stack);
     }
     
-    final def processLoot(loot: Rail[TreeNode], lifeline:Boolean) {
+    final def processLoot(loot: Rail[SHA1Rand], lifeline:Boolean) {
 	counter.incRx(lifeline, loot.length);
 	val time = gatherTimes ? System.nanoTime() : 0;
 	for (r in loot) processSubtree(r);
@@ -241,7 +237,7 @@ final class ParUTS {
 	work from randomly chosen neighbors (for a certain number of 
 	tries). If we are not successful, we invoke our lifeline system.
     */
-    def attemptSteal(st:PLH):Rail[TreeNode] {
+    def attemptSteal(st:PLH):Rail[SHA1Rand] {
 	val time = gatherTimes ? System.nanoTime() : 0;
 	val P = Place.MAX_PLACES;
 	if (P == 1) return null;
@@ -269,7 +265,7 @@ final class ParUTS {
 	event("No loot; establishing lifeline(s).");
 	
 	// resigned to make a lifeline steal from one of our lifelines.
-	var loot:Rail[TreeNode] = null;
+	var loot:Rail[SHA1Rand] = null;
 	for (var i:Int=0; 
 	     (i<myLifelines.length()) && (noLoot) && (0<=myLifelines(i)); 
 	     ++i) {
@@ -293,8 +289,8 @@ final class ParUTS {
 	or by the owning place itself when it wants to give work to 
 	a fallen buddy.
     */
-    def trySteal(p:Int):Rail[TreeNode]=trySteal(p, false);
-    def trySteal(p:Int, isLifeLine:Boolean) : Rail[TreeNode] {
+    def trySteal(p:Int):Rail[SHA1Rand]=trySteal(p, false);
+    def trySteal(p:Int, isLifeLine:Boolean) : Rail[SHA1Rand] {
 	counter.stealsReceived++;
 	val length = stack.size();
 	val numSteals = k==0u ? (length >=2u ? length/2u : 0u)
@@ -313,7 +309,7 @@ final class ParUTS {
     
     def launch(st:PLH, 
 	       init:Boolean, 
-	       loot:Rail[TreeNode], 
+	       loot:Rail[SHA1Rand], 
 	       depth:Int, 
 	       source:Int) {
 	assert loot != null;
@@ -353,17 +349,13 @@ final class ParUTS {
 	for distributed UTS.
     */
     def main (st:PLH, 
-	      rootNode:TreeNode) {
+	      rootNode:SHA1Rand) {
 	val P=Place.MAX_PLACES;
 	event("Start main finish");
 	counter.startLive();
 	finish {
 	    event("Launch main");
-	    if (Constants.BINOMIAL==treeType) { 
 		TreeExpander.processBinomialRoot (b0, rootNode, stack);
-            } else {
-		TreeExpander.geometric (a, b0, d, rootNode, stack);
-            }
             ++counter.nodesCounter; // root node is never pushed on the stack.
 	    
 	    val lootSize = stack.size()/P;
