@@ -38,6 +38,7 @@ X10RUN?=runx10
 X10CXXFLAGS=-report \
             postcompile=5 \
             -STATIC_CALLS \
+            -EXPERIMENTAL \
             $(X10RT_TRANSPORT) \
             -MAIN_CLASS=UTS \
             -v \
