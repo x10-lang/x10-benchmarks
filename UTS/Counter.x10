@@ -296,7 +296,7 @@ public class Counter {
      * @param haveDetailedTimes -- did we gather the various phase times?
      */
     
-    public def stats[T](allCounters:Rail[Array[Counter](1){rail}], time:Long, verbose:Boolean, haveDetailedTimes:Boolean){
+    public def stats(allCounters:Rail[Array[Counter](1){rail}], time:Long, verbose:Boolean, haveDetailedTimes:Boolean){
         assert here.id == 0;
         val P = Place.MAX_PLACES;
        // val allCounters = Rail.make[Array[Counter](1){rail}](P,(i:Int) => at(Place(i)) st().counters);
