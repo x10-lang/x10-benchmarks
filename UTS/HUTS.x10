@@ -45,7 +45,7 @@ final class HUTS implements Counted {
     val thieves:FixedSizeStack[Int];
     
     val width:Int;
-    val stack = new Stack[TreeNode]();
+  
     val myLifelines:Rail[Int];
     
     // Which of the lifelines have I actually activated?
@@ -60,6 +60,7 @@ final class HUTS implements Counted {
     val z:Int;
     val logEvents:Boolean;
     val myRandom = new Random();
+    val stacks = new Array[Stack[TreeNode]](Runtime.INIT_THREADS, (Int)=> new Stack[TreeNode]());
     public val counters:Array[Counter](1){rail};
     var active:Boolean=false;
     var noLoot:Boolean=true;
@@ -120,6 +121,7 @@ final class HUTS implements Counted {
         this.width=w;
         this.logEvents=e;
         this.counters = new Array[Counter](Runtime.INIT_THREADS, (Int)=> new Counter(e));
+        this.
         thieves = new FixedSizeStack[Int](Place.MAX_PLACES, 0);
         lifelinesActivated = Rail.make[Boolean](Place.MAX_PLACES, (Int)=>false);
         printLifelineNetwork();
@@ -150,35 +152,71 @@ final class HUTS implements Counted {
      * }
      */
     
-    /** Check if the current node (governed by the SHA1Rand state) has any
-     * children. If so, push it onto the local stack.
+    /** Proess at most n nodes from instack in parallel (permitting stealing),
+     * and then call probe. instack is guaranteed to have at least n elements.
+     * 
+     * Additionally, if the worker executing this is not the worker who
+     * owns instack, then keep processing the worker's stack until it is empty.
+     * 
+     * This should be invoked by the worker who owns instack (=controlling worker),
+     * under a finish.
+     * 
+     * On return the controlling worker will know that at least n of 
+     * its tasks have been completed, (and possibly some others).
+     * Also, all other workers will have empty stacks. The controlling
+     * worker may have stolen some tasks from other workers during
+     * this execution so may end up with more tasks than n less than
+     * what it started with.
      */
-    final def processSubtree (node:TreeNode) {
-        val Me = Runtime.workerId();
-        ++counters(Me).nodesCounter;
-        if (Constants.BINOMIAL==treeType) 
-            TreeExpander.binomial (q, m, node, stack);
-        else 
-            TreeExpander.geometric (a, b0, d, node, stack);
+    final def processSubtree (n:Int, var instack:Stack[TreeNode]) {
+        while (true){
+            for (var count:Int=0; count < n; count++) {
+                val node = instack.pop();
+                // Let other workers steal the contiuation.
+                async  {
+                    val Me = Runtime.workerId();
+                    val stack = stacks(Me);
+                    val counter = counters(Me);
+                    ++counter.nodesCounter;
+                    if (Constants.BINOMIAL==treeType) 
+                        TreeExpander.binomial (q, m, node, stack);
+                    else 
+                        TreeExpander.geometric (a, b0, d, node, stack);
+                }
+            }
+            // This continuation may be executed by a thief. This
+            // thief could be the controlling worker.
+            val Me = Runtime.workerId();
+            // service incoming thefts and disbursement of loot from
+            // this worker's stack.
+            val time:Long =  gatherTimes ? System.nanoTime() : 0;
+            Runtime.probe();
+            if (gatherTimes) counters(Me).incTimeProbing (System.nanoTime() - time);
+            
+            val stack = stacks(Me);
+            if (stack == instack)
+                // This is the controlling worker, exit after processing 
+                // at most n.
+                break;
+            // Non-controlling worker: continue processing worker stack
+            // to completion.
+            val nn = min(stack.size(), nu);
+            instack=stack;
+            if (nn <= 0)
+                break;
+        } 
     }
     
     final def processLoot(loot: Rail[TreeNode], lifeline:Boolean) {
-        val counter = counters(Runtime.workerId());
+        val Me = Runtime.workerId();
+        val counter = counters(Me);
+        val stack = stacks(Me);
         counter.incRx(lifeline, loot.length);
         val time = gatherTimes ? System.nanoTime() : 0;
-        for (r in loot) processSubtree(r);
-        if (gatherTimes) counter.incTimeComputing (System.nanoTime() - time);    
-    }
-    
-    final def processAtMostN(n:Int) {
-        val Me = Runtime.workerId();
-        val time = gatherTimes ? System.nanoTime() : 0;
-        finish  // Share work with other local workers.
-        for (var count:Int=0; count < n; count++) {
-            val e = stack.pop();
-            // Let other workers steal this.
-            async  
-               processSubtree(e);
+        finish {
+            for (r in loot) stack.push(r);
+            processSubtree(loot.length(), stack);
+          
         }
         if (gatherTimes) counters(Me).incTimeComputing (System.nanoTime() - time);  
     }
@@ -188,8 +226,12 @@ final class HUTS implements Counted {
     
     /** Go through each element in the stack, process it (generate its
      * children, and add them to the stack) until there is nothing left
-     * on the stack. At this point, attempt to steal. If nothing can be 
-     * stolen, terminate for now. Also, after processing a particular 
+     * on the stack. 
+     * 
+     * <p> At this point, attempt to steal. 
+     * 
+     * <p> If nothing can be stolen, terminate for now. 
+     * <p> Also, after processing a particular 
      * number of nodes, check if there are any outstanding messages to
      * handle and also, distribute a chunk of the local stack (work) to 
      * our lifeline buddy.
@@ -197,18 +239,22 @@ final class HUTS implements Counted {
     final def processStack(st:PLH) {
         val Me = Runtime.workerId();
         val counter = counters(Me);
+        val stack = stacks(Me);
         while (true) {
             var n:Int = min(stack.size(), nu);
             while (n > 0) {
-                processAtMostN(n);
-                
-                val time:Long =  gatherTimes ? System.nanoTime() : 0;
-                Runtime.probe();
-                if (gatherTimes) counter.incTimeProbing (System.nanoTime() - time);
+                // Process at most N nodes from the stack in parallel.
+                finish {
+                    val time = gatherTimes ? System.nanoTime() : 0;
+                    processSubtree(n, stack);
+                    if (gatherTimes) counters(Me).incTimeComputing (System.nanoTime() - time);  
+                }
+                // Only this async is responsible for distributing to thieves
                 val numThieves = thieves.size();
                 if (numThieves > 0) distribute(st, 1, numThieves);
                 n = min(stack.size(), nu);
             }
+            // only this async is responsible for remote steals.
             val loot = attemptSteal(st);
             if (null==loot) { 
                 if (! noLoot) {
@@ -238,6 +284,7 @@ final class HUTS implements Counted {
     def distribute(st:PLH, depth:Int, var numThieves:Int) {
         val Me = Runtime.workerId();
         val counter = counters(Me);
+        val stack = stacks(Me);
         val time = gatherTimes ? System.nanoTime() : 0;
         val lootSize= stack.size();
         if (lootSize > 2u) {
@@ -249,6 +296,8 @@ final class HUTS implements Counted {
                 counter.incTxNodes(numToSteal);
                 // event("Distributing " + loot.length() + " to " + thief);
                 val victim = here.id;
+                // This is a remote distribution async governed by the
+                // main finish
                 async at(Place(thief)) 
                 st().launch(st, false, loot, depth, victim);
             }
@@ -319,7 +368,9 @@ final class HUTS implements Counted {
     def trySteal(p:Int):Rail[TreeNode]=trySteal(p, false);
     def trySteal(p:Int, isLifeLine:Boolean) : Rail[TreeNode] {
         val Me = Runtime.workerId();
-        counters(Me).stealsReceived++;
+        val counter = counters(Me);
+        val stack = stacks(Me);
+        counter.stealsReceived++;
         val length = stack.size();
         val numSteals = k==0u ? (length >=2u ? length/2u : 0u)
                 : (k < length ? k : (k/2u < length ? k/2u : 0u));
@@ -330,8 +381,8 @@ final class HUTS implements Counted {
             return null;
         }
         val loot = stack.pop(numSteals);
-        counters(Me).nodesGiven += numSteals;
-        counters(Me).stealsSuffered++;
+        counter.nodesGiven += numSteals;
+        counter.stealsSuffered++;
         return loot;
     }
     
@@ -342,6 +393,7 @@ final class HUTS implements Counted {
             source:Int) {
         assert loot != null;
         val Me = Runtime.workerId();
+        val counter =  counters(Me);
         try {
             lifelinesActivated(source) = false;
             if (active) {
@@ -355,13 +407,13 @@ final class HUTS implements Counted {
                 return;
             }
             active=true;
-            counters(Me).startLive();
-            counters(Me).updateDepth(depth);
+            counter.startLive();
+            counter.updateDepth(depth);
             processLoot(loot, true);
             if (depth > 0) 
                 distribute(st, depth+1);
             processStack(st);
-            counters(Me).stopLive();
+            counter.stopLive();
             active=false;
         } catch (v:Throwable) {
             Console.OUT.println("Exception at " + here);
@@ -382,7 +434,10 @@ final class HUTS implements Counted {
         val P=Place.MAX_PLACES;
         val T = Runtime.INIT_THREADS;
         event("Start main finish");
-        counters(0).startLive();
+        val counter = counters(0);
+        val stack=stacks(0);
+        counter.startLive();
+        // The main finish!
         finish {
             event("Launch main");
             if (Constants.BINOMIAL==treeType) { 
@@ -390,7 +445,7 @@ final class HUTS implements Counted {
             } else {
                 TreeExpander.geometric (a, b0, d, rootNode, stack);
             }
-            ++counters(0).nodesCounter; // root node is never pushed on the stack.
+            ++counter.nodesCounter; // root node is never pushed on the stack.
             
             val lootSize = stack.size()/P;
             for (var pi:Int=1 ; pi<P ; ++pi) {
@@ -398,16 +453,17 @@ final class HUTS implements Counted {
                 val loot = stack.pop(lootSize);
                 if (gatherTimes) counters(0).incTimePreppingSteal (System.nanoTime() - time);
                 val pi_ = pi;
-                // Launch the async executing tasks at the remote place.
+                // Launch the initial async executing tasks at the remote place.
+                // Governed by the main finish.
                 async at(Place(pi_))
                     st().launch(st, true, loot, 0, 0);
-                counters(0).incTxNodes(lootSize);
+                counter.incTxNodes(lootSize);
             }
             active=true;
             processStack(st);
             active=false;
             event("Finish main");
-            counters(0).stopLive();
+            counter.stopLive();
         } 
         event("End main finish");
     }
