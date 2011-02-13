@@ -7,16 +7,16 @@ import x10.util.Team;
 @NativeCPPCompilationUnit("essl_natives.cc")
 class LU {
 
-    @Native("c++", "blockTriSolve((#1)->raw()->raw(), (#2)->raw()->raw(), #3)")
+    @NativeCPPExtern
         native static def blockTriSolve(me:Array[Double], diag:Array[Double], B:Int):void;
 
-    @Native("c++", "blockBackSolve((#1)->raw()->raw(), (#2)->raw()->raw(), #3)")
+    @NativeCPPExtern
         native static def blockBackSolve(me:Array[Double], diag:Array[Double], B:Int):void;
 
-    @Native("c++", "blockMulSub((#1)->raw()->raw(), (#2)->raw()->raw(), (#3)->raw()->raw(), #4)")
+    @NativeCPPExtern
         native static def blockMulSub(me:Array[Double], left:Array[Double], upper:Array[Double], B:Int):void;
 
-    @Native("c++", "blockMulSubRow((#1)->raw()->raw(), (#2)->raw()->raw(), #3, #4, #5)")
+    @NativeCPPExtern
         native static def blockMulSubRow(me:Array[Double], diag:Array[Double], B:Int, j:Int, cond:boolean):void;
     
     /*
