@@ -43,13 +43,13 @@ class LU {
     val row:Team;
     var ready:Boolean;
     val pivot:Array[Int](1);
-    val rowForBroadcast:Array[Double](1){rail};
-    val rowBuffer:Array[Double];
-    val colBuffer:Array[Double];
-    val colBuffers:Array[Array[Double]](1){rail};
-    val rowBuffers:Array[Array[Double]](1){rail};
-    val buffer:Array[Double](1){rail};
-    val buffers:PlaceLocalHandle[Array[Double](1){rail}];
+    val rowForBroadcast:Array[Double](1){rail,self!=null};
+    val rowBuffer:Array[Double]{self!=null};
+    val colBuffer:Array[Double]{self!=null};
+    val colBuffers:Array[Array[Double]{self!=null}](1){rail,self!=null};
+    val rowBuffers:Array[Array[Double]{self!=null}](1){rail,self!=null};
+    val buffer:Array[Double](1){rail,self!=null};
+    val buffers:PlaceLocalHandle[Array[Double](1){rail,self!=null}];
 
     def computeRowSum() {
         val sum = new Array[Double](B);
@@ -334,13 +334,13 @@ class LU {
         val px = Int.parse(args(2));
         val py = Int.parse(args(3));
         val A = BlockedArray.make(M, N, B, B, px, py);
-        val buffers = PlaceLocalHandle.makeFlat[Array[Double](1){rail}](Dist.makeUnique(), ()=>new Array[Double](N));        
+        val buffers = PlaceLocalHandle.makeFlat[Array[Double](1){rail,self!=null}](Dist.makeUnique(), ()=>new Array[Double](N));        
         val lus = PlaceLocalHandle.makeFlat[LU](Dist.makeUnique(), ()=>new LU(M, N, B, px, py, A, buffers));
         Console.OUT.println ("LU Starting: M " + M + " B " + B + " px " + px + " py " + py);
         start(lus);
     }
 
-    def this(M:Int, N:Int, B:Int, px:Int, py:Int, A:PlaceLocalHandle[BlockedArray], buffers:PlaceLocalHandle[Array[Double](1){rail}]) { 
+    def this(M:Int, N:Int, B:Int, px:Int, py:Int, A:PlaceLocalHandle[BlockedArray], buffers:PlaceLocalHandle[Array[Double](1){rail,self!=null}]) { 
         this.M = M; this.N = N; this.B = B; this.px = px; this.py = py;
         this.A = A; A_here = A();
         this.buffers = buffers; buffer = buffers();
@@ -352,8 +352,8 @@ class LU {
         row = Team.WORLD.split(here.id, colRole, rowRole);
         pivot = new Array[Int](B);
         rowForBroadcast = new Array[Double](B);
-        val rowBuffers = new Array[Array[Double]](M / B / px + 1, (Int)=>new Array[Double](B * B));
-        val colBuffers = new Array[Array[Double]](N / B / py + 1, (Int)=>new Array[Double](B * B));
+        val rowBuffers = new Array[Array[Double]{self!=null}](M / B / px + 1, (Int)=>new Array[Double](B * B));
+        val colBuffers = new Array[Array[Double]{self!=null}](N / B / py + 1, (Int)=>new Array[Double](B * B));
         this.rowBuffers = rowBuffers;
         this.colBuffers = colBuffers;
         rowBuffer = rowBuffers(0);
