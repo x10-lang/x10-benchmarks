@@ -7,6 +7,7 @@
 \usepackage{listings}
 \usepackage{color}
 \usepackage{url}
+\usepackage[ruled,vlined]{algorithm2e}
 
 % To ensure that C++ symbol comes out right.
 \newcommand{\Cpp}{C\kern-0.05em\texttt{+\kern-0.03em+}}
@@ -36,7 +37,8 @@ literate={->}{{$\rightarrow\;$}}1 {<-}{{$\leftarrow\;$}}1 {=>}{{$\Rightarrow\;$}
 %
 % paper title
 % can use linebreaks \\ within to get better formatting as desired
-\title{Towards Massive-scale Betweenness Centrality}
+\title{Computing Betweenness Centrality Of Massive-Scale Unweighted, Directed
+Graphs}
 
 \author{\IEEEauthorblockN{Prabhanjan Kambadur}
         \IEEEauthorblockA{I.B.M. T.J. Watson Research Center \\
@@ -51,12 +53,13 @@ literate={->}{{$\rightarrow\;$}}1 {<-}{{$\leftarrow\;$}}1 {=>}{{$\Rightarrow\;$}
 
 \input{introduction}
 
+\input{background}
+
 \input{related}
 
-\bibliographystyle{abbrv}
+\bibliographystyle{plain}
 
 \bibliography{references}
-
 
 % that's all folks
 \end{document}

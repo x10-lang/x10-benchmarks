@@ -15,6 +15,7 @@ TEX=bc.tex \
     abstract.tex \
     introduction.tex \
     related.tex \
+    background.tex \
     references.bib 
 
 all: pdf 
