@@ -1,1 +1,114 @@
 \section{Background}
+\label{sec:background}
+% Define BC
+Betweenness Centrality (BC) is a graph theoretic metric of a node's importance
+in a graph.~\footnote{In this paper, we focus exclusively on the unweighted,
+directed graphs.}
+%
+Informally, a node's BC gives an indication of the ratio of the total number 
+of shortest paths between all other nodes taken pair-wise.
+%
+That is, a node with a high centrality score can reach other nodes with 
+relatively fewer hops than another node with a lower centrality score.
+%
+More formally, let $G(V,E)$ be a graph with the vertex set $V$ and edge set
+$E$; let the number of vertices ($\lvert{}V\rvert{})$ be $n$ and the number of 
+edges ($\lvert{}E\rvert{}$) be $m$.
+%
+The BC of a node (vertex) $v\in{V})$ is given by the equation:
+%
+\begin{equation}
+BC_{v} = \sum_{s\ne{}v\ne{}t\in{}V}{\frac{\sigma{}_{st}(v)}{\sigma{}_{st}}}
+\end{equation}
+%
+Where $\sigma{}_{st}$ is the number of shortest paths from node $s$ to node $t$ 
+and $\sigma{}_{st}(v)$ is the number of those shortest paths that go through 
+node $v$.
+% Get into the simple means of computing BC
+There are multiple ways of computing the BC scores of nodes in a graph; in the
+following subsections, we highlight a few of these techniques.
+%
+Please note that regardless of the approach that is used in computing BC, the 
+central kernel is enumerating all the shortest paths.
+
+\subsection{Algebraic Approach}
+\label{subsec:algebraic}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{figure}
+\begin{minipage}{0.20\textwidth}
+\begin{center}
+\begin{displaymath}
+\xymatrix{
+A \ar[r] & D \ar[d] \\
+B \ar[u] \ar[ur] \ar[r] & C \ar[ul]
+}
+\end{displaymath}
+\end{center}
+\end{minipage}
+\hspace{10pt}
+\begin{minipage}{0.18\textwidth}
+\begin{center}
+\begin{displaymath}
+A = \left[ \begin{array}{cccc}
+  0 & 0 & 0 & 1 \\
+  1 & 0 & 1 & 1 \\
+  1 & 0 & 0 & 0 \\
+  0 & 0 & 1 & 0 \\
+\end{array} \right]
+\end{displaymath}
+\end{center}
+\end{minipage}
+\caption{A sample directed, unweighted graph and its resulting adjacency
+matrix. A $1$ in position $a_{ij}$ indicates an edge from node $i$ to node
+$j$.}
+\label{fig:sample}
+\end{figure}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Every graph $G(V,E)$ can be represented as an adjacency matrix $A$, where an 
+entry $a_{ij}$ is marked as $1$ \textit{iff} $(i,j)\in{}E$.
+%
+Figure~\ref{fig:sample} shows a sample four node graph and its related 
+adjacency matrix; we will be using this graph as a running example throughout
+this section.
+%
+By inspection, we can tell that the diameter of the graph is $3$; therefore, 
+all the possible paths in the matrix (including the number of paths) can be 
+enumerated by simply taking the powers of the adjacency matrix $A$; in other 
+words, we find the transitive closure of the graph $G$.
+%
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{figure}
+\begin{minipage}{0.2\textwidth}
+\begin{center}
+\begin{displaymath}
+A^2 = \left[ \begin{array}{cccc}
+   0 & 0 & 1 & 0 \\
+   1 & 0 & 1 & 1 \\
+   0 & 0 & 0 & 1 \\
+   1 & 0 & 0 & 0 \\
+\end{array} \right]
+\end{displaymath}
+\end{center}
+\end{minipage}
+\hspace{10pt}
+\begin{minipage}{0.2\textwidth}
+\begin{center}
+\begin{displaymath}
+A^3 = \left[ \begin{array}{cccc}
+   1 & 0 & 0 & 0 \\
+   1 & 0 & 1 & 1 \\
+   0 & 0 & 1 & 0 \\
+   0 & 0 & 0 & 1 \\
+\end{array} \right]
+\end{displaymath}
+\end{center}
+\end{minipage}
+\caption{A sample directed, unweighted graph and its resulting adjacency
+matrix. A $1$ in position $a_{ij}$ indicates an edge from node $i$ to node
+$j$.}
+\label{fig:sample_powers}
+\end{figure}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
