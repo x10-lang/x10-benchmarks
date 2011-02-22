@@ -78,6 +78,9 @@ all the possible paths in the matrix (including the number of paths) can be
 enumerated by simply taking the powers of the adjacency matrix $A$; in other 
 words, we find the transitive closure of the graph $G$.
 %
+However, computing the transitive closure is an over-kill; what we want in 
+order to compute BC are just the shortest paths between all pair of vertices,
+not all paths of length diameter or less.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \begin{figure}
@@ -106,9 +109,50 @@ A^3 = \left[ \begin{array}{cccc}
 \end{displaymath}
 \end{center}
 \end{minipage}
-\caption{A sample directed, unweighted graph and its resulting adjacency
-matrix. A $1$ in position $a_{ij}$ indicates an edge from node $i$ to node
-$j$.}
+\caption{The $2^{nd}$ and $3^{rd}$ powers of the adjacency matrix, $A$, shown
+in Figure~\ref{fig:sample}. $A^2$ shows the paths of path length $2$, and $A^3$
+shows the paths in the sample graph of path length $3$.}
 \label{fig:sample_powers}
 \end{figure}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Floyd-Warshall's Algorithm
+\begin{algorithm}
+\SetKwFunction{edgeCost}{edgeCost}
+\SetKwFunction{minimum}{minimum}
+
+\caption{FloydWarshall}
+\label{alg:floyd_warshall}
+\KwIn{$A$: Adjacency matrix of graph $G(V,E)$}
+
+\For{$i=1:n$}{
+  \For{$j=1:n$}{
+    $path_{ij}$ = \edgeCost{$i$,$j$};\
+  }
+}
+
+\For{$k=1:n$}{
+  \For{$i=1:n$}{
+    \For{$j=1:n$}{
+      $path_{ij}$ = \minimum{$path_{ij}$, $path_{ik}+path_{kj}$};\
+    }
+  }
+}
+\end{algorithm}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Another possible solution was proposed by Batagelj~\cite{Batagelj-1994} and 
+involved modifying Floyd/Warshall's algorithm~\cite{floyd62,warshall62} for 
+all pairs shortest paths.
+%
+Briefly, Floyd/Warshall's algorithm computes all pairs shortest paths given an
+adjacency matrix representation of a weighted graph in $O(n^3)$ time; the
+algorithm is outlined in
+Algorithm~\ref{alg:floyd_warshall}.~\footnote{Floyd/Warshall's does not handle
+negative cycles, although it can be used to detect such cycles in a graph.}
+%
+In his solution, Batagelj avoided unnecessary work by using \textit{geodetic
+semiring}, an instance of the closed semiring generalization for shortest
+paths~\cite{Aho-1974}.
+%
