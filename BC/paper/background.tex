@@ -19,6 +19,7 @@ The BC of a node (vertex) $v\in{V})$ is given by the equation:
 %
 \begin{equation}
 BC_{v} = \sum_{s\ne{}v\ne{}t\in{}V}{\frac{\sigma{}_{st}(v)}{\sigma{}_{st}}}
+\label{eq:bc}
 \end{equation}
 %
 Where $\sigma{}_{st}$ is the number of shortest paths from node $s$ to node $t$ 
@@ -155,4 +156,126 @@ negative cycles, although it can be used to detect such cycles in a graph.}
 In his solution, Batagelj avoided unnecessary work by using \textit{geodetic
 semiring}, an instance of the closed semiring generalization for shortest
 paths~\cite{Aho-1974}.
+%
+We briefly sketch the solution here for the sample graph shown in
+Figure~\ref{fig:sample}.
+%
+First, from the adjacency matrix $A$, we create a new relation matrix
+$R=[(d_{u,v}, n_{u,v})]$, where $d$ is the geodesic between $(u,v)\in{}E$ and
+$n_{u,v}$ is the number of geodesics between $u$ and $v$; initially
+%
+\begin{equation}
+(d,n)_{u,v} = \left\{ \begin{array}{rcl} 
+  (1,1) & \mbox{for} & (u,v)\in{} A \\
+  (\infty{},0) & \mbox{for} & (u,v)\notin{} A \\
+\end{array}\right.
+\label{eq:dnuv}
+\end{equation}
+
+Using this transformation on the adjacency matrix shown in
+Figure~\ref{fig:sample}, we get the following matrix:
+%
+\begin{displaymath}
+R = \left[ \begin{array}{cccc}
+  (\infty{},0) & (\infty{},0) & (\infty{},0) & (1,1) \\
+  (1,1) & (\infty{},0) & (1,1) & (1,1) \\
+  (1,1) & (\infty{},0) & (\infty{},0) & (\infty{},0) \\
+  (\infty{},0) & (\infty{},0) & (1,1) & (\infty{},0) \\
+\end{array} \right]
+\end{displaymath}
+%
+From this matrix $R$, we compute the geodesic closure $R^+$ using the semiring
+$(R, \oplus{}, \odot{}, (\infty,0), (0,1))$, where:
+
+\begin{equation}
+(a,i)\oplus{}(b,j) = (min (a,b), \left\{ \begin{array}{rr} 
+  i & a<b \\
+  i+j & a=b \\
+  j & a>b \\
+\end{array}\right.)
+\label{eq:oplus}
+\end{equation}
+
+\begin{equation}
+(a,i)\odot{}(b,j) = (a+b, i\times{}j)
+\label{eq:odot}
+\end{equation}
+%
+The key intuition here is that knowing the distance ($d_{u,v}$), and the number
+of shortest paths ($n_{u,v}$, it is easy to compute the number of shortest
+paths between $(u,v)$ using the following equation:
+%
+\begin{equation}
+n_{u,v}(t) = \left\{ \begin{array}{rr} 
+  n_{u,t}\times{}n_{t,v} & d_{u,t}+d_{t,v} \\
+  0 & otherwise \\
+\end{array}\right.
+\label{eq:bcoft}
+\end{equation}
+%
+For a complete proof of $(R, \oplus{}, \odot{}, (\infty,0), (0,1))$ being a 
+geodesic semiring, please refer to Batagelj~\cite{Batagelj-1994}.~\footnote{
+$(R, \oplus{}, \odot{}, (\infty,0), (0,1))$ is a semiring \textit{iff} all 
+distances ($d_{i,j}$) are positive.}
+%
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Modified Batagelj's Algorithm
+\begin{algorithm}
+\SetKwFunction{minimum}{minimum}
+
+\caption{computeGeodeticSemiRing}
+\label{alg:batagelj}
+\KwIn{$R$: Relational matrix of graph $G(V,E)$}
+
+\For{$k=1:n$}{
+  \For{$i=1:n$}{
+    \For{$j=1:n$}{
+      $distance$ = \minimum{$\infty{},d_{i,k}+d_{k,j}$}\;
+      \If{$d_{i,j}\ge{}distance$}{
+        $count = n_{i,k}\times{}n_{k,j}$\;
+        \If{$d_{i,j}==distance$}{
+          $n_{i,j} = n_{i,j} + count$\;
+        }\Else{
+          $n_{i,j} = count$\;
+          $d_{i,j} = distance$\;
+        }
+      }
+    }
+  }
+}
+\end{algorithm}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%
+The modified Floyd-Warshall's algorithm that computes $R^+$ is given in
+Algorithm~\ref{alg:batagelj}; after application of this algorithm to the 
+matrix $R$, we get:
+%
+\begin{displaymath}
+R^+ = \left[ \begin{array}{cccc}
+  (3,1) & (\infty{},0) & (2,1) & (1,1) \\
+  (1,1) & (\infty{},0) & (1,1) & (1,1) \\
+  (1,1) & (\infty{},0) & (3,1) & (1,2) \\
+  (2,1) & (\infty{},0) & (1,1) & (3,1) \\
+\end{array} \right]
+\end{displaymath}
+%
+From $R^+$, it is simple to compute the BC of any node using
+equations~\ref{eq:bcoft} and~\ref{eq:bc}.
+%
+For example, BC($D$) in $G$ (from Figure~\ref{fig:sample}) is $1$ as it lies 
+on the only shortest path between $C$ and $A$.
+%
+In this method, computing $R^+$ takes $O(n^3)$ operations, and then computing
+BC of any node requires considering all pair-wise entries, which takes a
+further $O(n^2)$ computations.
+%
+Therefore, the overall computational complexity of the algorithm is $O(n^3)$;
+space complexity is $O(n^2)$.
+%
+This is too steep a price to pay in real-world graphs, which are sparse and 
+large.
+
+%
+% Brandes' approach
 %
