@@ -281,6 +281,59 @@ large.
 %
 \subsection{Graph Traversal Approach}
 \label{subsec:graph_traversal}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Brandes' Algorithm
+\begin{algorithm}
+\SetKwFunction{enqueue}{enqueue}
+\SetKwFunction{dequeue}{dequeue}
+\SetKwFunction{push}{push}
+\SetKwFunction{pop}{pop}
+\SetKwFunction{new}{new}
+\SetKwFunction{append}{append}
+\SetKwFunction{neighbor}{neighbor}
+
+\caption{brandesBC}
+\label{alg:brandes}
+\KwIn{$G(V,E)$: A graph}
+$BC_v = 0$, $v\in{}V$\;
+
+\For{$s\in{}V$}{
+  $S \leftarrow{}$ \new{$stack$}\;
+  $P_w \leftarrow{} \emptyset{}, w\in{}V$\;
+  $\sigma{}_w \leftarrow{} 0, w\in{}V; \sigma{}_s \leftarrow{} 1$\;
+  $D_w \leftarrow{} -1, w\in{}V; D_s \leftarrow{} 0$\;
+  $Q \leftarrow{}$ \new{$queue$}\;
+  \enqueue{$Q$,$s$}\;
+
+  \While{$Q\ne\emptyset{}$}{
+    $v \leftarrow{}$ \dequeue{$Q$}\;
+    \push{$S$,$v$}\;
+    \ForEach{$w\leftarrow{}$\neighbor{$v$}}{
+      \If{$D_w<0$}{
+        \enqueue{$Q$,$w$}\;
+        $D_w = D_v + 1$\;
+      }
+      \If{$D_w=D_v+1$}{
+        \append{$P_w$,$v$}\;
+        $\sigma{}_w = \sigma{}_w + \sigma{}_v$\;
+      }
+    }
+  }
+  $\delta{}_v \leftarrow{} 0, v\in{}V$\;
+  \While{$S\ne\emptyset{}$}{
+    $w \leftarrow{}$ \pop{$S$}\;
+    \ForEach{$v\in{}P_w$}{
+      $\delta{}_v\leftarrow{}\delta{}_v+\frac{\sigma{}_v}{\sigma{}_w}\times{}(1+\delta{}_w)$\;
+    }
+    \If{$w\ne{}s$}{
+      $BC_w \leftarrow{} BC_w + \delta{}_w$\;
+    }
+  }
+}
+\end{algorithm}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%
 The key to computing efficiently is to exploit the sparsity of the graph 
 structure (as opposed to its adjacency matrix).
 %
@@ -341,54 +394,56 @@ $s,v,t$ and finally, the BC scores are computed.
 %
 This final algorithm is given in Algorithm~\ref{alg:brandes}.
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% Brandes' Algorithm
-\begin{algorithm}
-\SetKwFunction{enqueue}{enqueue}
-\SetKwFunction{dequeue}{dequeue}
-\SetKwFunction{push}{push}
-\SetKwFunction{pop}{pop}
-\SetKwFunction{new}{new}
-\SetKwFunction{append}{append}
-\SetKwFunction{neighbor}{neighbor}
+%
+Let us consider the execution of Brandes's algorithm~\ref{alg:brandes} on our
+sample graph $G$~\ref{fig:sample}; let the start vertex be $A$.
 
-\caption{brandesBC}
-\label{alg:brandes}
-\KwIn{$G(V,E)$: A graph}
-$BC_v = 0$, $v\in{}V$\;
+\begin{align*}
+Initialize\ BCs\ (line\ 1)\\
+BC_A\leftarrow{}BC_B\leftarrow{}BC_D\leftarrow{}BC_C\leftarrow{}0\\
+Initialize\ for\ BFS\ from\ A\ (lines\ 3\ to\ 8) \\ 
+Q \leftarrow{} A, S \leftarrow{} \emptyset{} \\
+P_A\leftarrow{}P_B\leftarrow{}P_C\leftarrow{}P_D\leftarrow{}\emptyset{}\\
+\sigma{}_B\leftarrow{}\sigma{}_C\leftarrow{}\sigma{}_D\leftarrow{}0, \sigma{}_A\leftarrow{}1\\
+D_B\leftarrow{}D_C\leftarrow{}D_D\leftarrow{}-1, D_A\leftarrow{}0\\
+BFS\ from\ A\ (lines\ 9\ to\ 18)\\
+Q \leftarrow{} \emptyset{}, S \leftarrow{} (D,C,A) \\
+P_A\leftarrow{}P_B\leftarrow{}\emptyset{}, P_C\leftarrow{}A,P_D\leftarrow{}C\\
+\sigma{}_B\leftarrow{}0,\sigma{}_C\leftarrow{}\sigma{}_D\leftarrow{}\sigma{}_A\leftarrow{}1\\
+D_B\leftarrow{}-1,D_C\leftarrow{}1,D_D\leftarrow{}2,D_A\leftarrow{}0\\
+Compute\ BC\ contributions\ (lines\ 19\ to\ 25)\\
+S\leftarrow{}\emptyset{}\\
+\delta{}_A\leftarrow{}\delta{}_C\leftarrow{}1,\delta{}_D\leftarrow{}\delta{}_B\leftarrow{}0\\
+BC_A\leftarrow{}BC_B\leftarrow{}BC_D\leftarrow{}0,BC_C\leftarrow{}1\\
+\end{align*}
+%
+This change in the $BC_C$ denotes that $C$ is on \textit{all} shortest paths
+from $A$ to $C$.
+%
+Similarly, when shortest paths from $C$ are computed, the BC's are changed 
+to:
+%
+\begin{align*}
+BC_A\leftarrow{}BC_B\leftarrow{}0,BC_C\leftarrow{}BC_D\leftarrow{}1\\
+\end{align*}
+%
+This change in the $BC_D$ denotes that $D$ is on \textit{all} shortest paths
+from $C$ to $A$.
+%
+Similarly, when shortest paths from $C$ are computed, the BC's are changed 
+to:
+%
+\begin{align*}
+BC_B\leftarrow{}0,BC_A\leftarrow{}BC_C\leftarrow{}BC_C\leftarrow{}1\\
+\end{align*}
+%
+This change in the $BC_A$ denotes that $A$ is on \textit{all} shortest paths
+from $D$ to $C$.
+%
+Finally, when shortest paths from $B$ are computed, the BC's do not change as 
+$B$ is directly connected to $A,C,$ and $D$.
 
-\For{$s\in{}V$}{
-  $S \leftarrow{}$ \new{$stack$}\;
-  $P_w \leftarrow{} \emptyset{}, w\in{}V$\;
-  $\sigma{}_w \leftarrow{} 0, w\in{}V; \sigma{}_s \leftarrow{} 1$\;
-  $D_w \leftarrow{} -1, w\in{}V; D_s \leftarrow{} 0$\;
-  $Q \leftarrow{}$ \new{$queue$}\;
-  \enqueue{$Q$,$s$}\;
-
-  \While{$Q\ne\emptyset{}$}{
-    $v \leftarrow{}$ \dequeue{$Q$}\;
-    \push{$S$,$v$}\;
-    \ForEach{$w\leftarrow{}$\neighbor{$v$}}{
-      \If{$D_w<0$}{
-        \enqueue{$Q$,$w$}\;
-        $D_w = D_v + 1$\;
-      }
-      \If{$D_w=D_v+1$}{
-        \append{$P_w$,$v$}\;
-        $\sigma{}_w = \sigma{}_w + \sigma{}_v$\;
-      }
-    }
-  }
-  $\delta{}_v \leftarrow{} 0, v\in{}V$\;
-  \While{$S\ne\emptyset{}$}{
-    $w \leftarrow{}$ \pop{$S$}\;
-    \ForEach{$v\in{}P_w$}{
-      $\delta{}_v\leftarrow{}\delta{}_v+\frac{\sigma{}_v}{\sigma{}_w}\times{}(1+\delta{}_w)$\;
-    }
-    \If{$w\ne{}s$}{
-      $BC_w \leftarrow{} BC_w + \delta{}_w$\;
-    }
-  }
-}
-\end{algorithm}
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%
+% Vector formulation of the problem
+%
+\subsection{Hybrid Formulation}
