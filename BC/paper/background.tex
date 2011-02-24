@@ -279,3 +279,116 @@ large.
 %
 % Brandes' approach
 %
+\subsection{Graph Traversal Approach}
+\label{subsec:graph_traversal}
+The key to computing efficiently is to exploit the sparsity of the graph 
+structure (as opposed to its adjacency matrix).
+%
+This was the central theme on which Brandes~\cite{brandes01:_mathsoc} algorithm
+is based.
+%
+Brandes recognized the recursive nature of BC computations that were exploited
+in equation~\ref{eq:bcoft}.
+%
+For unweighted graphs, the basic idea is to perform breadth-first searches
+(BFS) from all nodes.
+%
+At each step, the closest set of vertices are added, and during this step, 
+cumulative betweenness scores for all vertices are computed by using the 
+predecessor relationship.
+%
+Formally, let us define the \textit{predecessors} of a vertex $v$ on shortest
+paths from $s$ to be
+%
+\begin{equation}
+P_v(s)=\{u\in{}V:{u,v}\in{}E,d_G(s,v)=d_G(s,u)+(u,v)\}
+\end{equation}
+%
+Where $d_G(s,v)$ is the shortest path from $s$ to $v$.
+%
+Now, the number of shortest paths from $s$ to $v$ ($\sigma{}_{sv}$) is exactly
+$1$ more than the sum of the number of shortest paths from $s$ to each vertex
+$u\in{}P_v(s)$. 
+%
+\begin{equation}
+\sigma{}_{sv} = 1 + \sum_{u\in{}P_v(s)}\sigma{}_{su}
+\end{equation}
+%
+Therefore, in $O(m)$ time, we can compute all the shortest paths and number of
+shortest paths from a vertex $s$ to every other vertex; that is, in $O(mn)$,
+we can compute all pairs and number of shortest paths.
+%
+Furthermore, this solution only requires $O(m+n)$ space.
+%
+The only thing left to do is to determine the contributions to the BC of each
+vertex from every other vertex.
+%
+This information is already embedded in $P_v(s)$; there are
+$\lvert{}P_v(s)\rvert{}$ distinct predecessors in the shortest paths from $s$
+to $v$, and the number of shortest paths that each predecessor $P_{u,s}(i)$
+is on is $\sigma{}_{su}(i)$. 
+%
+Now, using this information, we can compute the contribution of $(s,v)$ to 
+the BC scores of each of the predecessors in $P_v(s)$.
+%
+\begin{equation}
+BC(u) = BC(u) + \frac{\sigma{}_{su}}{\sigma{}_{sv}}, u\in{}P_v(s)
+\end{equation}
+%
+In actual computation, the total number of shortest paths that go from $s$ to 
+any vertex $v\in{}V$ through vertex $t\ne{}s,v$ is accumulated for every vertex
+$s,v,t$ and finally, the BC scores are computed.
+%
+This final algorithm is given in Algorithm~\ref{alg:brandes}.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Brandes' Algorithm
+\begin{algorithm}
+\SetKwFunction{enqueue}{enqueue}
+\SetKwFunction{dequeue}{dequeue}
+\SetKwFunction{push}{push}
+\SetKwFunction{pop}{pop}
+\SetKwFunction{new}{new}
+\SetKwFunction{append}{append}
+\SetKwFunction{neighbor}{neighbor}
+
+\caption{brandesBC}
+\label{alg:brandes}
+\KwIn{$G(V,E)$: A graph}
+$BC_v = 0$, $v\in{}V$\;
+
+\For{$s\in{}V$}{
+  $S \leftarrow{}$ \new{$stack$}\;
+  $P_w \leftarrow{} \emptyset{}, w\in{}V$\;
+  $\sigma{}_w \leftarrow{} 0, w\in{}V; \sigma{}_s \leftarrow{} 1$\;
+  $D_w \leftarrow{} -1, w\in{}V; D_s \leftarrow{} 0$\;
+  $Q \leftarrow{}$ \new{$queue$}\;
+  \enqueue{$Q$,$s$}\;
+
+  \While{$Q\ne\emptyset{}$}{
+    $v \leftarrow{}$ \dequeue{$Q$}\;
+    \push{$S$,$v$}\;
+    \ForEach{$w\leftarrow{}$\neighbor{$v$}}{
+      \If{$D_w<0$}{
+        \enqueue{$Q$,$w$}\;
+        $D_w = D_v + 1$\;
+      }
+      \If{$D_w=D_v+1$}{
+        \append{$P_w$,$v$}\;
+        $\sigma{}_w = \sigma{}_w + \sigma{}_v$\;
+      }
+    }
+  }
+  $\delta{}_v \leftarrow{} 0, v\in{}V$\;
+  \While{$S\ne\emptyset{}$}{
+    $w \leftarrow{}$ \pop{$S$}\;
+    \ForEach{$v\in{}P_w$}{
+      $\delta{}_v\leftarrow{}\delta{}_v+\frac{\sigma{}_v}{\sigma{}_w}\times{}(1+\delta{}_w)$\;
+    }
+    \If{$w\ne{}s$}{
+      $BC_w \leftarrow{} BC_w + \delta{}_w$\;
+    }
+  }
+}
+\end{algorithm}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
