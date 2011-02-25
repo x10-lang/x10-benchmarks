@@ -405,20 +405,22 @@ Initialize\ for\ BFS\ from\ a\ (lines\ 3\ to\ 8) \\
 Q \leftarrow{} a, S \leftarrow{} \emptyset{} \\
 P_a\leftarrow{}P_b\leftarrow{}P_c\leftarrow{}P_d\leftarrow{}\emptyset{}\\
 \sigma{}_b\leftarrow{}\sigma{}_c\leftarrow{}\sigma{}_d\leftarrow{}0, \sigma{}_a\leftarrow{}1\\
-D_b\leftarrow{}D_c\leftarrow{}D_d\leftarrow{}-1, D_a\leftarrow{}0\\
+D_b\leftarrow{}D_c\leftarrow{}D_d\leftarrow{}-1, D_a\leftarrow{}0
 \end{align*}
+
 \begin{align*}
 BFS\ from\ a\ (lines\ 9\ to\ 18)\\
 Q \leftarrow{} \emptyset{}, S \leftarrow{} (c,d,a) \\
 P_a\leftarrow{}P_b\leftarrow{}\emptyset{}, P_c\leftarrow{}d,P_d\leftarrow{}a\\
 \sigma{}_b\leftarrow{}0,\sigma{}_c\leftarrow{}\sigma{}_d\leftarrow{}\sigma{}_a\leftarrow{}1\\
-D_b\leftarrow{}-1,D_c\leftarrow{}2,D_d\leftarrow{}1,D_a\leftarrow{}0\\
+D_b\leftarrow{}-1,D_c\leftarrow{}2,D_d\leftarrow{}1,D_a\leftarrow{}0
 \end{align*}
+
 \begin{align*}
 Compute\ BC\ contributions\ (lines\ 19\ to\ 25)\\
 S\leftarrow{}\emptyset{}\\
 \delta{}_a\leftarrow{}2,\delta{}_d\leftarrow{}1,\delta{}_b\leftarrow{}\delta{}_c\leftarrow{}0\\
-BC_a\leftarrow{}BC_b\leftarrow{}BC_c\leftarrow{}0,BC_d\leftarrow{}1\\
+BC_a\leftarrow{}BC_b\leftarrow{}BC_c\leftarrow{}0,BC_d\leftarrow{}1
 \end{align*}
 %
 This change in the $BC_d$ denotes that $d$ is on \textit{all} shortest paths
@@ -428,7 +430,7 @@ Similarly, when shortest paths from $c$ are computed, the BC's are changed
 to:
 %
 \begin{align*}
-BC_b\leftarrow{}BC_c\leftarrow{}0,BC_a\leftarrow{}BC_d\leftarrow{}1\\
+BC_b\leftarrow{}BC_c\leftarrow{}0,BC_a\leftarrow{}BC_d\leftarrow{}1
 \end{align*}
 %
 This change in the $BC_a$ denotes that $a$ is on \textit{all} shortest paths
@@ -438,7 +440,7 @@ Similarly, when shortest paths from $d$ are computed, the BC's are changed
 to:
 %
 \begin{align*}
-BC_b\leftarrow{}0,BC_a\leftarrow{}BC_c\leftarrow{}BC_d\leftarrow{}1\\
+BC_b\leftarrow{}0,BC_a\leftarrow{}BC_c\leftarrow{}BC_d\leftarrow{}1
 \end{align*}
 %
 This change in the $BC_c$ denotes that $c$ is on \textit{all} shortest paths
@@ -500,10 +502,10 @@ $BC\leftarrow{}$\matrixy{$1$,$n$,$0$}\;
   \tcp{Compute BC updates for all but source vertices}
   \For{$d\in{}(depth,depth-1,...,2)$}{
     \tcp{Compute child weights}
-    $weights\leftarrow{}$\eltWiseMult{$BFS(d)$,$nsp^{inv}$}\;
-    $weights\leftarrow{}$\eltWiseMult{$weights$,$BC_{updt}$}\;
+    $weights_1\leftarrow{}$\eltWiseMult{$BFS(d)$,$nsp^{inv}$}\;
+    $weights\leftarrow{}$\eltWiseMult{$weights_1$,$BC_{updt}$}\;
     \tcp{Apply child weights}
-    $temp_1\leftarrow{}$\matmult{$A$,$weights^T$}\;
+    $temp_1\leftarrow{}$\matmult{$A$,$weights^T$}$^T$\;
     \tcp{Sum them up over parents}
     $temp_2\leftarrow{}$\eltWiseMult{$BFS(d-1)$,$nsp$}\;
     \tcp{Apply weights based on parents values}
@@ -566,8 +568,8 @@ However, note that the space requirements increase linearly with the block
 size.
 %
 After performing all these optimizations, we end up with
-algorithm~\ref{alg:hybrid}, which is given as a one of the sample
-implementation of the SSCA benchmarks~\cite{ssca_matlab}.
+algorithm~\ref{alg:hybrid}, which is given as the sample MATLAB implementation
+for the SSCA benchmarks~\cite{ssca_matlab}.
 %
 For example, in our sample graph $G$ from Figure~\ref{fig:sample}, the first 
 frontier expansion starting out from vertices $a$ and $a$ can be expressed as
@@ -628,3 +630,103 @@ simply consider the first frontier to be the starting vertex's adjacency row.
 %
 Please note that in an actual, high performance implementation, all matrices
 are sparsely represented to save space.
+%
+Let us now work through Algorithm~\ref{alg:hybrid} for the sample graph $G$ 
+from Figure~\ref{fig:sample}; for simplicity, we process only one vertex at a
+time.
+%
+As before, let us start processing from vertex $a$.
+%
+\begin{align*}
+(Initialization:\ lines\ 1\ to\ 10) \\
+nPasses\leftarrow{}4,
+BC\leftarrow{}\left[\begin{array}{cccc}0 & 0 & 0 & 0 \\\end{array} \right]\\
+BFS\leftarrow{}\emptyset{}, batch\leftarrow{}1:1, depth\leftarrow{}0\\
+nsp\leftarrow{}\left[\begin{array}{cccc}1 & 0 & 0 & 0 \\\end{array} \right],
+frontier\leftarrow{}\left[\begin{array}{cccc}0 & 0 & 0 & 1 \\\end{array} \right]
+\end{align*}
+%
+Here, we have initialized $nsp(a)$ to be $1$ and set the frontier to be $a$'s
+adjacency ($d$).
+%
+\begin{align*}
+(BFS\ search\ from\ a:\ lines\ 11\ to\ 19,\ first\ pass) \\
+depth\leftarrow{}1,
+BFS(1)\leftarrow{}\left[\begin{array}{cccc}0 & 0 & 0 & 1 \\\end{array} \right]\\
+nsp\leftarrow{}\left[\begin{array}{cccc}1 & 0 & 0 & 1 \\\end{array} \right],
+frontier\leftarrow{}\left[\begin{array}{cccc}0 & 0 & 1 & 0 \\\end{array} \right]
+\end{align*}
+%
+At the end of the first pass, we discover vertex $c$; $nsp$ now indicates that
+we have found one shortest path $(a,d)$.
+%
+\begin{align*}
+(BFS\ search\ from\ a:\ lines\ 11\ to\ 19,\ second\ pass) \\
+depth\leftarrow{}2,
+BFS(2)\leftarrow{}\left[\begin{array}{cccc}0 & 0 & 1 & 0 \\\end{array} \right]\\
+nsp\leftarrow{}\left[\begin{array}{cccc}1 & 0 & 1 & 1 \\\end{array} \right],
+frontier\leftarrow{}\left[\begin{array}{cccc}0 & 0 & 0 & 0 \\\end{array} \right]
+\end{align*}
+%
+At the end of the second pass, we rediscover $a$, hence there is no new
+$frontier$, and the BFS ceases; $nsp$ indicates that we discovered two shortest
+paths, $(a,d)$ and $(c,d)$.
+%
+Now, we move on to updating the BC scores for all vertices based on our
+exploration from vertex $a$.
+%
+\begin{align*}
+(Initialization:\ lines\ 20\ and \ 21) \\
+BC_{updt}\leftarrow{}\left[\begin{array}{cccc}1 & 1 & 1 & 1 \\\end{array} \right],
+nsp^{inv}\leftarrow{}\left[\begin{array}{cccc}1 & 0 & 1 & 1 \\\end{array} \right]
+\end{align*}
+%
+As in Brandes~\ref{alg:brandes}), we move back from the final frontier to the 
+first; in our example, this is $depth=2$.
+%
+\begin{align*}
+(Compute\ and\ update\ child\ weights:\ lines\ 23\ to\ 28)\\
+weights_1\leftarrow{}\left[\begin{array}{cccc}0 & 0 & 1 & 0 \\\end{array} \right],
+weights\leftarrow{}\left[\begin{array}{cccc}0 & 0 & 1 & 0 \\\end{array} \right]\\
+temp_1\leftarrow{}\left[\begin{array}{cccc}0 & 1 & 0 & 1 \\\end{array} \right],
+temp_2\leftarrow{}\left[\begin{array}{cccc}0 & 0 & 0 & 1 \\\end{array} \right]\\
+temp_3\leftarrow{}\left[\begin{array}{cccc}0 & 0 & 0 & 1 \\\end{array} \right],
+BC_{updt}\leftarrow{}\left[\begin{array}{cccc}1 & 1 & 1 & 2 \\\end{array} \right]
+\end{align*}
+%
+Next, we update the BC scores for each vertex with $BC_{updt}$.
+%
+\begin{align*}
+(Update\ the\ BC\ scores:\ lines\ 29\ and\ 30)\\
+BC\leftarrow{}\left[\begin{array}{cccc}1 & 1 & 1 & 2 \\\end{array} \right]
+\end{align*}
+%
+Notice that in Algorithm~\ref{alg:hybrid}, we pre-compute $BC_{updt}$ to be $1$
+for all vertices; hence, even though at the end of the BFS exploration for 
+vertex $a$, BC scores of all vertices show a value $>0$, the only true change
+is that of vertex $d$, which lies on the path from $a$ to $c$.
+%
+For brevity, we will now simply list the values of BC after the end of BFS 
+exploration for each of the remaining vertices:
+%
+\begin{align*}
+After\ BFS\ from\ b,\ 
+BC\leftarrow{}\left[\begin{array}{cccc}2 & 2 & 2 & 3 \\\end{array} \right]\\
+After\ BFS\ from\ c,\ 
+BC\leftarrow{}\left[\begin{array}{cccc}4 & 3 & 3 & 4 \\\end{array} \right]\\
+After\ BFS\ from\ d,\ 
+BC\leftarrow{}\left[\begin{array}{cccc}5 & 4 & 5 & 5 \\\end{array} \right]
+\end{align*}
+%
+The final trick to get the accurate BC scores is to subtract the number of
+passes as each pass adds $1$ to each vertex's BC score
+(Algorithm~\ref{alg:hybrid}, line $31$).
+%
+Note that without initializing $BC_{updt}$ with ones, line $24$ in
+Algorithm~\ref{alg:hybrid} would not have computed $weights$ accurately;
+therefore, it is critical to initialize $BC_{updt}$ with ones.
+%
+\begin{align*}
+Subtract\ 4\ from\ BC\ (line\ 31):\ 
+BC\leftarrow{}\left[\begin{array}{cccc}1 & 0 & 1 & 1 \\\end{array} \right]
+\end{align*}
