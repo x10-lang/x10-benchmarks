@@ -451,6 +451,75 @@ $b$ is directly connected to $a,c,$ and $d$.
 % Vector formulation of the problem
 %
 \subsection{Hybrid Formulation}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Hybrid Algorithm
+\begin{algorithm}
+\SetKwFunction{minimum}{min}
+\SetKwFunction{matrixy}{matrix}
+\SetKwFunction{nnzExists}{nnzExists}
+\SetKwFunction{matmult}{matmult}
+\SetKwFunction{eltWiseMult}{eltWiseMult}
+\SetKwFunction{eltWiseInvert}{eltWiseInvert}
+\SetKwFunction{matadd}{matadd}
+
+\caption{hybridBC}
+\label{alg:hybrid}
+\KwIn{$A$: Adjacency matrix of an unweighted graph $G$}
+\KwIn{$n$: Dimension of $A$ ($n\times{}n$)}
+\KwIn{$nVerts$: Number of BFS' to perform at once}
+\tcp{We assume that nVerts is divisible by $n$}
+$nPasses = \frac{nVerts}{n}$\;
+$BC\leftarrow{}$\matrixy{$1$,$n$,$0$}\;
+
+\ForEach{$p\in{}(1:nPasses)$}{
+  $BFS \leftarrow{} \emptyset{}$\;
+  $batch = ((p-1)\times{}nVerts+1):$\minimum{$p\times{}nVerts,N$}\;
+  $nsp\leftarrow{}$\matrixy{$nVerts$,$n$, $0$}\;
+  \ForEach{$row\in{}(1:nVerts)$}{$nsp(row,batch(row))\leftarrow{}1$\;}
+  $depth\leftarrow{}0$\;
+  $frontier\leftarrow{}A(batch,:)$\;
+
+  \tcp{BFS search for all vertices in current batch}
+  \While{\nnzExists{$frontier$}}{
+    $depth\leftarrow{}depth+1$\;
+    $nsp\leftarrow{}$\matadd{$nsp$,$frontier$}\;
+    $BFS(depth)\leftarrow{}frontier$\;
+    $frontier\leftarrow{}$\matmult{$frontier$,$A$}\;
+    \tcp{Reset entries for already visited vertices}
+    \ForEach{$row\in{}(1:nVerts)$}{
+      \ForEach{$col\in{}(1:n)$}{
+        \If{$nsp(row,col)==1$}{$frontier(row,col)\leftarrow{}0$\;}
+      }
+    }
+  }
+
+  \tcp{Pre-compute BC updates for all but source vertices}
+  $BC_{updt}\leftarrow{}$\matrixy{$1$,$n$,$1$}\;
+  $nsp^{inv}\leftarrow{}$\eltWiseInvert{$nsp$}\;
+
+  \tcp{Compute BC updates for all but source vertices}
+  \For{$d\in{}(depth,depth-1,...,2)$}{
+    \tcp{Compute child weights}
+    $weights\leftarrow{}$\eltWiseMult{$BFS(d)$,$nsp^{inv}$}\;
+    $weights\leftarrow{}$\eltWiseMult{$weights$,$BC_{updt}$}\;
+    \tcp{Apply child weights}
+    $temp_1\leftarrow{}$\matmult{$A$,$weights^T$}\;
+    \tcp{Sum them up over parents}
+    $temp_2\leftarrow{}$\eltWiseMult{$BFS(d-1)$,$nsp$}\;
+    \tcp{Apply weights based on parents values}
+    $temp_3\leftarrow{}$\eltWiseMult{$temp_1$,$temp_2$}\;
+    $BC_{updt}\leftarrow{}BC_{updt}+temp_3$\;
+  }
+
+  \tcp{Update BC scores from each source vertex's BFS}
+  \For{$row\in{}(1:nVerts)$}{
+    $BC\leftarrow{}$\matadd{$BC$+$BC_{updt}(row,:)$}\;
+  }
+}
+\tcp{Subtract additional values added by precomputation}
+$BC\leftarrow{}$\matadd{$BC$,\matrixy{$1$,$n$,$-nPasses$}}\;
+\end{algorithm}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
 Both from a computational and spatial standpoint, there are several
 inefficiencies in Algorithm~\ref{alg:brandes}.
@@ -553,6 +622,9 @@ vectors, which requires transposing the original adjacency matrix.
 %
 As can be seen, by starting out with BFS expansion from $a$ and $c$, we end 
 up with the new frontier $d$ for $a$, and $a$ for $c$, respectively.
+%
+In fact, since this is always the case, we can forgo this computation and
+simply consider the first frontier to be the starting vertex's adjacency row.
 %
 Please note that in an actual, high performance implementation, all matrices
 are sparsely represented to save space.
