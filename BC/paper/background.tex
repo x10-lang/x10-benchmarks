@@ -121,7 +121,7 @@ shows the paths in the sample graph of path length $3$.}
 % Floyd-Warshall's Algorithm
 \begin{algorithm}
 \SetKwFunction{edgeCost}{edgeCost}
-\SetKwFunction{minimum}{minimum}
+\SetKwFunction{minimum}{min}
 
 \caption{FloydWarshall}
 \label{alg:floyd_warshall}
@@ -222,7 +222,7 @@ distances ($d_{i,j}$) are positive.}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Modified Batagelj's Algorithm
 \begin{algorithm}
-\SetKwFunction{minimum}{minimum}
+\SetKwFunction{minimum}{min}
 
 \caption{computeGeodeticSemiRing}
 \label{alg:batagelj}
@@ -730,3 +730,5 @@ therefore, it is critical to initialize $BC_{updt}$ with ones.
 Subtract\ 4\ from\ BC\ (line\ 31):\ 
 BC\leftarrow{}\left[\begin{array}{cccc}1 & 0 & 1 & 1 \\\end{array} \right]
 \end{align*}
+%
+This gives the final and accurate BC scores for all the vertices.
