@@ -52,21 +52,51 @@ Their algorithm computes BC for both weighted and unweighted graphs, which are
 partitioned \textit{a priori} with a space complexity of
 $O(\lvert{}V\rvert{}+\lvert{}E\rvert{})$ building on the $\Delta{}$-stepping
 single source shortest path solution by Meyer~\cite{Meyer03:DeltaStepping}.
+%
+Although Edmonds' algorithm does not preclude multi-level parallelism, it does 
+not demonstrate multi-level parallelism.
+%
+Also, they achieved limited scaling for RMAT graphs --- scaling was
+non-existant for over 16 processors.
+%
+Furthermore, all the efforts described above try to parallelize based on the
+graph-traversal approach that was described in
+Section~\ref{subsec:graph_traversal}.
+%
+It is important to note that there have been several noteworthy efforts to 
+parallelize BFS traversal of a graph itself.
+%
+Notably, Agrawal et al.~\cite{virat_sc_2010} were able to achieve impressive 
+numbers by exploiting the inherent non-uniform nature of modern multi-core 
+processors.
+
+%
+% Now throw in stuff about C-BLAS
+%
+To our knowledge, there has been only one effort (Buluc~\cite{buluc-2010}) that
+is based on the hybrid approach of using linear algebraic primitives for BFS
+exploration (see Section~\ref{subsec:hybrid}).
+%
+Buluc successfully used BC as a case study for the need to have combinatorial
+BLAS operations for graph algorithms by scaling up to 1225 processors on 
+graphs with $32$ million vertices and $\approx{}256$ million edges.
+%
+Note that exact BC was not computed, but merely approximations were performed
+by randomly picking certain vertices as source vertices.
+%
+This effort, however promising, still does not take advantage of the multiple
+levels of fine-grained parallelism available on modern multi-core processors.
 
 
-
-
-Here are the relavant citations. They have been bunched together as of now, but
-will soon be explained in greater detail. ~\cite{brandes01:_mathsoc},
-~\cite{dijkstra59}, ~\cite{bellman58}, ~\cite{Meyer03:DeltaStepping},
-~\cite{meyer-diss}, , ~\cite{Frieze85},
-~\cite{Hassin85}, ~\cite{floyd62} , ~\cite{warshall62}, ~\cite{Blondel07},
-~\cite{Miller85}, ~\cite{clr90}, 
-~\cite{LogGP95}, ~\cite{Val90}, ~\cite{ParallelBGL}, ~\cite{boost},
-~\cite{Bader07:ApproxBC}, ~\cite{Sabidussi66}, ~\cite{Anthonisse71,Freeman77},
-~\cite{floyd62,JohnsonSSSP77,warshall62}, ~\cite{jaja92:intro_parallel_alg},
-~\cite{CrauserMehlhornMeyerSSSP98}, ~\cite{edmonds06:dimacs}
-~\cite{Madduri07:ALEXNEX}, ~\cite, 
-, ~\cite{Bollobas01:random_graphs},
-~\cite{CrauserMehlhornMeyerSSSP98}, ~\cite{Jenq87}, ~\cite{Kumar91},
-~\cite{Santos:2006}, 
+%~\cite{dijkstra59}, ~\cite{bellman58}, ~\cite{Meyer03:DeltaStepping},
+%~\cite{meyer-diss}, , ~\cite{Frieze85},
+%~\cite{Hassin85}, ~\cite{floyd62} , ~\cite{warshall62}, ~\cite{Blondel07},
+%~\cite{Miller85}, ~\cite{clr90}, 
+%~\cite{LogGP95}, ~\cite{Val90}, ~\cite{ParallelBGL}, ~\cite{boost},
+%~\cite{Bader07:ApproxBC}, ~\cite{Sabidussi66}, ~\cite{Anthonisse71,Freeman77},
+%~\cite{floyd62,JohnsonSSSP77,warshall62}, ~\cite{jaja92:intro_parallel_alg},
+%~\cite{CrauserMehlhornMeyerSSSP98}, ~\cite{edmonds06:dimacs}
+%~\cite{Madduri07:ALEXNEX}, ~\cite, 
+%, ~\cite{Bollobas01:random_graphs},
+%~\cite{CrauserMehlhornMeyerSSSP98}, ~\cite{Jenq87}, ~\cite{Kumar91},
+%~\cite{Santos:2006}, 

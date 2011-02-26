@@ -11,9 +11,9 @@ Furthermore, given that the sizes of graphs that need analysis is
 ever-increasing, parallelization of the BC computation is a must.
 %
 To compute BC for massive-scale graphs on modern super computers, which by
-nature are heterogeneous in nature (i.e., support shared- and distributed-memory
-parallelism simultaneously), it is important to develop a parallel algorithm
-that is also heterogeneous for optimal performance.
+nature offer hierarchical parallelism (i.e., support shared- and
+distributed-memory parallelism simultaneously), it is important to develop a
+parallel algorithm that is also hierarchical for optimal performance.
 %
 There have been several attempts at parallelizing BC
 computations~\cite{Madduri:2009,Santos:2006,edmonds-hipc-2010}; however, these
@@ -26,6 +26,6 @@ approximations have also been implemented~\cite{Bader07:ApproxBC,buluc-2010}.
 In this paper, we summarize the state-of-the-art algorithms for computing BC 
 (both serial and parallel).
 %
-Furthermore, we develop a new heterogeneous algorithm for computing BC, which 
+Furthermore, we develop a new hierarchical algorithm for computing BC, which 
 improves on existing solutions.
 \end{abstract}
