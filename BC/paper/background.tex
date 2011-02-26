@@ -446,8 +446,15 @@ BC_b\leftarrow{}0,BC_a\leftarrow{}BC_c\leftarrow{}BC_d\leftarrow{}1
 This change in the $BC_c$ denotes that $c$ is on \textit{all} shortest paths
 from $d$ to $a$.
 %
-Finally, when shortest paths from $b$ are computed, the BC's do not change as 
+Finally, when shortest paths from $b$ are computed, BC's do not change as 
 $b$ is directly connected to $a,c,$ and $d$.
+
+%
+% Discuss some parallelization issues
+%
+\subsubsection{Parallelization}
+%
+\todoanju{Add information about parallelization.}
 
 %
 % Vector formulation of the problem
@@ -459,10 +466,10 @@ $b$ is directly connected to $a,c,$ and $d$.
 \SetKwFunction{minimum}{min}
 \SetKwFunction{matrixy}{matrix}
 \SetKwFunction{nnzExists}{nnzExists}
-\SetKwFunction{matmult}{matmult}
+\SetKwFunction{matMult}{matMult}
 \SetKwFunction{eltWiseMult}{eltWiseMult}
 \SetKwFunction{eltWiseInvert}{eltWiseInvert}
-\SetKwFunction{matadd}{matadd}
+\SetKwFunction{matAdd}{matAdd}
 \SetKwFunction{eltWiseNot}{not}
 
 \caption{hybridBC}
@@ -485,9 +492,9 @@ $BC\leftarrow{}$\matrixy{$1$,$n$,$0$}\;
   \tcp{BFS search for all vertices in current batch}
   \While{\nnzExists{$fringe$}}{
     $depth\leftarrow{}depth+1$\;
-    $nsp\leftarrow{}$\matadd{$nsp$,$fringe$}\;
+    $nsp\leftarrow{}$\matAdd{$nsp$,$fringe$}\;
     $BFS(depth)\leftarrow{}fringe$\;
-    $fringe\leftarrow{}$\matmult{$fringe$,$A$}\;
+    $fringe\leftarrow{}$\matMult{$fringe$,$A$}\;
     \tcp{Reset entries for already visited vertices}
     $fringe\leftarrow{}$\eltWiseMult{$fringe$,\eltWiseNot{$nsp$}}\;
   }
@@ -502,7 +509,7 @@ $BC\leftarrow{}$\matrixy{$1$,$n$,$0$}\;
     $weights_1\leftarrow{}$\eltWiseMult{$BFS(d)$,$nsp^{inv}$}\;
     $weights\leftarrow{}$\eltWiseMult{$weights_1$,$BC_{updt}$}\;
     \tcp{Apply child weights}
-    $temp_1\leftarrow{}$\matmult{$A$,$weights^T$}$^T$\;
+    $temp_1\leftarrow{}$\matMult{$A$,$weights^T$}$^T$\;
     \tcp{Sum them up over parents}
     $temp_2\leftarrow{}$\eltWiseMult{$BFS(d-1)$,$nsp$}\;
     \tcp{Apply weights based on parents values}
@@ -512,11 +519,11 @@ $BC\leftarrow{}$\matrixy{$1$,$n$,$0$}\;
 
   \tcp{Update BC scores from each source vertex's BFS}
   \For{$row\in{}(1:nVerts)$}{
-    $BC\leftarrow{}$\matadd{$BC$+$BC_{updt}(row,:)$}\;
+    $BC\leftarrow{}$\matAdd{$BC$+$BC_{updt}(row,:)$}\;
   }
 }
 \tcp{Subtract additional values added by precomputation}
-$BC\leftarrow{}$\matadd{$BC$,\matrixy{$1$,$n$,$-nPasses$}}\;
+$BC\leftarrow{}$\matAdd{$BC$,\matrixy{$1$,$n$,$-nPasses$}}\;
 \end{algorithm}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
@@ -729,4 +736,18 @@ BC\leftarrow{}\left[\begin{array}{cccc}1 & 0 & 1 & 1 \\\end{array} \right]
 \end{align*}
 %
 This gives the final and accurate BC scores for all the vertices.
+%
+
+%
+% Discuss some parallelization issues
+%
+\subsubsection{Parallelization}
+%
+\todoanju{Add information about parallelization.}
+
+%
+% Discuss Approximate solutions 
+%
+\subsection{Approximating BC}
+\label{subsec:approximate_bc}
 %
