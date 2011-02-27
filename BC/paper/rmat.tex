@@ -1,6 +1,47 @@
 \section{RMAT Graphs}
 \label{sec:rmat}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{algorithm}
+\SetKwFunction{rand}{rand}
+\SetKwFunction{matrixy}{matrix}
+\SetKwFunction{eltWiseMult}{eltWiseMult}
+\SetKwFunction{eltWiseAdd}{eltWiseAdd}
+\SetKwFunction{eltWiseNot}{eltWiseNot}
+\SetKwFunction{sparse}{sparse}
+
+\caption{RMAT}
+\label{alg:rmat}
+\KwIn{$n$: Number of nodes in graph $2^n$}
+\KwIn{$k$: The number of edges to generate $(k\times{}2^{n})$}
+\KwIn{$a$: Prob that an edge lies in first quadrant}
+\KwIn{$b$: Prob that an edge lies in second quadrant}
+\KwIn{$c$: Prob that an edge lies in third quadrant}
+\KwIn{$d$: Prob that an edge lies in fourth quadrant}
+
+$N\leftarrow{}2^{n},M\leftarrow{}k\times{}N$\;
+$rowIndices\leftarrow{}colIndices\leftarrow{}$\matrixy{$1$,$M$,$1$}\;
+$ab\leftarrow{}(a+b),cNorm\leftarrow{}\frac{c}{(c+d)},aNorm\leftarrow{}\frac{a}{(a+b)}$\;
+
+\For{$i\in{}0..(n-1)$}{
+  $lowerHalf\leftarrow{}$\rand{$M$,$1$}$>ab$\;
+  $upperHalf\leftarrow{}$\eltWiseNot{$lowerHalf$}\;
+  $cQuadrant\leftarrow{}$\eltWiseMult{$cNorm$,$lowerHalf$}\;
+  $aQuadrant\leftarrow{}$\eltWiseMult{$aNorm$,$upperHalf$}\;
+  $acQuadrant\leftarrow{}$\eltWiseAdd{$aQuadrant$,$cQuadrant$}\;
+  $rowBits\leftarrow{}upperHalf$\;
+  $colBits\leftarrow{}$\rand{$M$,$1$}$>acQuadrant$\;
+  $currentRows\leftarrow{}$\eltWiseMult{$2^i$,$rowBits$}\;
+  $currentCols\leftarrow{}$\eltWiseMult{$2^i$,$colBits$}\;
+  $rowIndices\leftarrow{}rowIndices+currentRows$\;
+  $colIndices\leftarrow{}colIndices+currentCols$\;
+}
+
+$rmat\leftarrow{}$\sparse{$rowIndices$,$colIndices$,\matrixy{$1$,$M$,$1$}}\;
+\Return{$rmat$}\;
+
+\end{algorithm}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \begin{table}
 \begin{center}
 \begin{tabular}{|c|l|}  \hline
