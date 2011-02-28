@@ -27,17 +27,17 @@ pkambadu@us.ibm.com}
 Betweenness centrality (BC) is an important metric that can be used to
 determine the power of a vertex in a graph~\cite{Freeman77,Anthonisse71}.
 %
-Informally, it is a measure of a node's ability to reach other vertices in 
-the graph quickly; formally, for a graph $G(V,E)$, where $V$ is the vertex set
-and $E$ is the edge set, the BC of a vertex $v\in{}V$ is $BC_{v} =
-\sum_{s\ne{}v\ne{}t\in{}V}{\frac{\sigma{}_{st}(v)}{\sigma{}_{st}}}$.
+Informally, it is a measure of a node's ability to reach other vertices in the
+graph quickly; formally, for a graph $G(V,E)$, where $V$ is the vertex set and
+$E$ is the edge set, the BC of a vertex $v$ is defined as
+$\sum_{s\ne{}v\ne{}t\in{}V}{\frac{\sigma{}_{st}(v)}{\sigma{}_{st}}}$.
 %
 Here, $\sigma{}_{st}$ denotes the number of shortest paths from a vertex $s$ to
-a vertex $t$ in $G$, and $\sigma{}_st(v)$ denotes the number of shortest paths
-from $s$ to $t$ that go through $v$.
+a vertex $t$ in $G$, and $\sigma{}_{st}(v)$ denotes the number of shortest
+paths from $s$ to $t$ that go through $v$.
 %
-BC's uses range from analyzing social networks to power grids; in fact,
-computing BC is one of the core kernels of DARPA's HPCS
+BC's is used widely to analyze graphs in social networks, power grids, etc.; in
+fact, computing BC is one of the core kernels of DARPA's HPCS
 SSCA\#2~\cite{ssca_matlab}, a benchmark designed to evaluate the capability of
 emerging platforms to support graph analytics efficiently.
 %
@@ -47,12 +47,12 @@ Brandes~\cite{brandes01:_mathsoc}, requires $O(nm)$ time and $O(n+m)$ space if
 the edges are unweighted, and $O(nm+n^2log(n))$ time and $O(n+m)$ space if the
 edges are weighted.
 %
-The workhorse of Brandes' algorithm is the all-pairs-shortest-paths (APSP)
-formulation, which is solved using Dijkstra's algorithm~\cite{dijkstra59} for
-weighted graphs and breadth-first search (BFS)~\cite{clr90} for unweighted
-graphs.
+The key computation in Brandes' algorithm is solving the
+all-pairs-shortest-paths (APSP) problem; APSP is solved using Dijkstra's
+algorithm~\cite{dijkstra59} for weighted graphs and breadth-first search
+(BFS)~\cite{clr90} for unweighted graphs.
 %
-Incidentally, massive-scale parallel BFS is itself one of the Graph 500
+Incidentally, parallel BFS is also one of the Graph 500
 benchmarks~\cite{graph500}, whose aim (like SSCA) is to guide the design of
 next-generation hardware and software that can handle analytics workloads.
 %
