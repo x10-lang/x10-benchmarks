@@ -468,9 +468,10 @@ $b$ is directly connected to $a,c,$ and $d$.
 \SetKwFunction{matrixy}{matrix}
 \SetKwFunction{nnzExists}{nnzExists}
 \SetKwFunction{matMult}{matMult}
+\SetKwFunction{eltWiseAdd}{eltWiseAdd}
 \SetKwFunction{eltWiseMult}{eltWiseMult}
+\SetKwFunction{eltWiseAssign}{eltWiseAssign}
 \SetKwFunction{eltWiseInvert}{eltWiseInvert}
-\SetKwFunction{matAdd}{matAdd}
 \SetKwFunction{eltWiseNot}{not}
 
 \caption{hybridBC}
@@ -488,12 +489,12 @@ $BC\leftarrow{}$\matrixy{$1$,$n$,$0$}\;
   $nsp\leftarrow{}$\matrixy{$nVerts$,$n$, $0$}\;
   \ForEach{$row\in{}(1:nVerts)$}{$nsp(row,batch(row))\leftarrow{}1$\;}
   $depth\leftarrow{}0$\;
-  $fringe\leftarrow{}A(batch,:)$\;
+  \eltWiseAssign{$fringe$,$A(batch,:)$}\;
 
   \tcp{BFS search for all vertices in current batch}
   \While{\nnzExists{$fringe$}}{
     $depth\leftarrow{}depth+1$\;
-    $nsp\leftarrow{}$\matAdd{$nsp$,$fringe$}\;
+    $nsp\leftarrow{}$\eltWiseAdd{$nsp$,$fringe$}\;
     $BFS(depth)\leftarrow{}fringe$\;
     $fringe\leftarrow{}$\matMult{$fringe$,$A$}\;
     \tcp{Reset entries for already visited vertices}
@@ -515,16 +516,16 @@ $BC\leftarrow{}$\matrixy{$1$,$n$,$0$}\;
     $temp_2\leftarrow{}$\eltWiseMult{$BFS(d-1)$,$nsp$}\;
     \tcp{Apply weights based on parents values}
     $temp_3\leftarrow{}$\eltWiseMult{$temp_1$,$temp_2$}\;
-    $BC_{updt}\leftarrow{}BC_{updt}+temp_3$\;
+    $BC_{updt}\leftarrow{}$\eltWiseAdd{$BC_{updt}$,$temp_3$}\;
   }
 
   \tcp{Update BC scores from each source vertex's BFS}
   \For{$row\in{}(1:nVerts)$}{
-    $BC\leftarrow{}$\matAdd{$BC$+$BC_{updt}(row,:)$}\;
+    $BC\leftarrow{}$\eltWiseAdd{$BC$,$BC_{updt}(row,:)$}\;
   }
 }
 \tcp{Subtract additional values added by precomputation}
-$BC\leftarrow{}$\matAdd{$BC$,\matrixy{$1$,$n$,$-nPasses$}}\;
+$BC\leftarrow{}$\eltWiseAdd{$BC$,\matrixy{$1$,$n$,$-nPasses$}}\;
 \end{algorithm}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
@@ -577,7 +578,7 @@ algorithm~\ref{alg:hybrid}, which is given as the sample MATLAB implementation
 for the SSCA benchmarks~\cite{ssca_matlab}.
 %
 For example, in our sample graph $G$ from Figure~\ref{fig:sample}, the first 
-fringe expansion starting out from vertices $a$ and $a$ can be expressed as
+fringe expansion starting out from vertices $a$ and $c$ can be expressed as
 follows:
 
 %
