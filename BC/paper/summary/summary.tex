@@ -27,31 +27,49 @@ pkambadu@us.ibm.com}
 Betweenness centrality (BC) is an important metric that can be used to
 determine the power of a vertex in a graph~\cite{Freeman77,Anthonisse71}.
 %
-Its uses range from analyzing social networks to power grids; in fact,
+Informally, it is a measure of a node's ability to reach other vertices in 
+the graph quickly; formally, for a graph $G(V,E)$, where $V$ is the vertex set
+and $E$ is the edge set, the BC of a vertex $v\in{}V$ is $BC_{v} =
+\sum_{s\ne{}v\ne{}t\in{}V}{\frac{\sigma{}_{st}(v)}{\sigma{}_{st}}}$.
+%
+Here, $\sigma{}_{st}$ denotes the number of shortest paths from a vertex $s$ to
+a vertex $t$ in $G$, and $\sigma{}_st(v)$ denotes the number of shortest paths
+from $s$ to $t$ that go through $v$.
+%
+BC's uses range from analyzing social networks to power grids; in fact,
 computing BC is one of the core kernels of DARPA's HPCS
 SSCA\#2~\cite{ssca_matlab}, a benchmark designed to evaluate the capability of
-emerging platforms to perform graph analytics.
+emerging platforms to support graph analytics efficiently.
 %
-Computing BC for a directed graph $G(V,E)$, with $n$ vertices and $m$ edges, is
-both temporally and spatially demanding; the best known serial algorithm
-requires $O(nm)$ time and $O(n+m)$ space if the edges are unweighted, and
-$O(nm+n^2log(n))$ time and $O(n+m)$ space if the edges are
-weighted~\cite{brandes01:_mathsoc}.
+Calculating BC for a graph with $n$ vertices and $m$ edges, is both
+computationally and spatially demanding; the best known serial algorithm, by
+Brandes~\cite{brandes01:_mathsoc}, requires $O(nm)$ time and $O(n+m)$ space if
+the edges are unweighted, and $O(nm+n^2log(n))$ time and $O(n+m)$ space if the
+edges are weighted.
+%
+The workhorse of Brandes' algorithm is the all-pairs-shortest-paths (APSP)
+formulation, which is solved using Dijkstra's algorithm~\cite{dijkstra59} for
+weighted graphs and breadth-first search (BFS)~\cite{clr90} for unweighted
+graphs.
+%
+Incidentally, massive-scale parallel BFS is itself one of the Graph 500
+benchmarks~\cite{graph500}, whose aim (like SSCA) is to guide the design of
+next-generation hardware and software that can handle analytics workloads.
 %
 Given the burgeoning sizes of graphs that need to be analysed, many efforts
 have attempted to parallelize BC computations with varying degrees of
 success~\cite{Madduri:2009,Santos:2006,edmonds-hipc-2010,Yang05,buluc-2010};
-the best known result~\cite{buluc-2010} has demonstrated scalability up to 
-1225 cores on an unweighted graph with $32$ million modes and $\approx{}256$
-million edges.
+the best known result~\cite{buluc-2010} has demonstrated (using MPI)
+scalability up to 1225 cores on an unweighted graph with $32$ million modes and
+$\approx{}256$ million edges.
 %
-As such, an efficient and parallel algorithm for computing BC for massive-scale
-weighted/unweighted graphs is a must on Hadoop~\cite{Hadoop}, which is IBM's
-planned analytics platform.
+Given the emergence of SSCA and Graph 500 as important benchmarks targeted at
+the analytics community, it is essential to develop efficient, parallel, and 
+highly scalable algorithms for computing BC on Hadoop~\cite{Hadoop}.
 %
-To aid researchers in both developing and demonstrating scalability of such an
-algorithm will require access to a large Hadoop cluster ($\ge{}2048{}$ cores,
-$\ge{}4GB$ of memory/core) with either HDFS or GPFS support.
+To aid researchers in developing and demonstrating scalability of these
+algorithms, it is necessary to have access to a large Hadoop cluster
+($\ge{}2048{}$ cores, $\ge{}4GB$ of memory/core) with HDFS/GPFS support.
 
 \bibliographystyle{plain}
 
