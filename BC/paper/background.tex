@@ -752,3 +752,35 @@ This gives the final and accurate BC scores for all the vertices.
 \subsection{Approximating BC}
 \label{subsec:approximate_bc}
 %
+Real-world graph sizes are ever increasing and BC computations are expensive;
+consequently, approximate measures for BC have been explored.
+%
+There are three prominent works in this regard.
+%
+First, Eppstein and Wang~\cite{Eppstein-2004} describe a randomized
+approximation algorithm for estimation of \textit{closeness centrality} in
+weighted graphs.
+%
+Their method (RAND) randomly chooses $k$ vertices one by one and use these 
+vertices as start vertices for the single source shortest paths; that is, 
+instead of solving all sources shortest paths problem, $k$ sources shortest
+paths problem is solved.
+%
+They further proved that for $k=\Theta{(\frac{log(n)}{\epsilon{}^2})}$, their
+algorithm approximates closeness centrality with an additive error of
+$\epsilon{}\Delta{}_{G}$, where $\Delta{}_G$ is the diameter of the graph, and
+$\epsilon{}$ is a small constant.
+%
+Brandes and Pich~\cite{brandes-2007}, after experimenting with various 
+deterministic strategies for selecting source vertices for approximating BC,
+concluded that a random sampling strategy was superior.
+%
+Bader et al.~\cite{Bader07:ApproxBC} presented an adaptive sampling technique
+that approximates the BC of \textit{a given vertex}.
+%
+They conclude that for $0<\epsilon{}<\frac{1}{2}$, if the centrality of a vertex
+$v$ is $\frac{n^2}{t}$ for some constant factor $t\ge{}1$, then with a 
+probability $\ge{}(1-2\epsilon{})$, its centrality can be estimated within a 
+factor of $\frac{1}{\epsilon{}}$ by using only $\epsilon{}t$ samples of 
+source vertices.
+%
