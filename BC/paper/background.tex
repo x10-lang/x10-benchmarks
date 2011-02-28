@@ -759,7 +759,11 @@ There are three prominent works in this regard.
 %
 First, Eppstein and Wang~\cite{Eppstein-2004} describe a randomized
 approximation algorithm for estimation of \textit{closeness centrality} in
-weighted graphs.
+weighted graphs.~\footnote{Closeness centrality (CC) of a vertex is a global
+metric that measures the the distance of a vertex to all other vertices in the
+graph.
+%
+Formally $CC_v=\frac{1}{\sum_{u\in{}V}{d(v,u)}}$.}
 %
 Their method (RAND) randomly chooses $k$ vertices one by one and use these 
 vertices as start vertices for the single source shortest paths; that is, 
