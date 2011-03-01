@@ -114,3 +114,46 @@ they are in the lower $(c+d)$ or the upper half $(a+b)$; these form the rows.
 The columns are determined by another sample of $M$ random numbers; only this 
 time, we chose to place them in either the $(a+c)$ half or $(b+d)$ half of the 
 adjacency matrix.
+%
+
+%
+% How can you parallelize this.
+%
+\subsubsection{Parallelization}
+%
+To parallelize algorithm~\ref{alg:rmat}, let us first understand how the edges 
+are generated.
+%
+The \code{for} loop (lines $4$ to $15$) is repeated $n$ times, where $2^n$ is 
+the number of vertices.
+%
+In each loop iteration, $M$ \code{boolean} values are generated for row numbers
+($i$ in $a_{ij}$) and $M$ \code{boolean} values are generated for column
+numbers ($j$ in $a_{ij}$), where $M=k\times{}2^n$ is the number of edges.
+%
+At iteration $l$, these \code{boolean} values are used to set the $l^{th}$ bit
+of the $M$ row and column numbers that correspond to the $M$ edges.
+%
+At the end of $n$ iterations, each of the $n$ bits required to represent $2^n$
+vertices are set to either $1$ or $0$ for each of the $M$ rows and columns.
+%
+There are two strategies for parallelization that can be pursued.
+%
+First, we can parallelize the execution of the $n$ iterations, taking care to
+see that each parallel execution stream knows its global iteration numbers ---
+this is necessary to ensure that edges generated connect vertices globally
+rather than locally.
+%
+However, considering that we have only $n$ iterations (e.g., a graph with
+$2^{64}$ nodes is an order of magnitude greater than \textit{exascale}), this
+approach only gives us $n$-way parallelism.
+%
+A better approach is to parallelize across generation of the $M$ edges, which
+gives us more parallelism; that is, each processor generates a portion of the 
+graph.
+%
+However, since there might still be multiple edges, a global reduction
+operation is required at the very end.
+%
+Note that if there is sufficient computation power, one can always parallelize
+both the $n$ iterations and the generation of the $M$ edges.
