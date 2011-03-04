@@ -745,7 +745,59 @@ This gives the final and accurate BC scores for all the vertices.
 %
 \subsubsection{Parallelization}
 %
-\todoanju{Add information about parallelization.}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{table}
+\centering
+\begin{tabular}{|c|c|}
+\hline
+Variable & Space Requirement \\ \hline
+$BC$ & $O(n)$ \\ \hline
+$A$ & $O(m)$ \\ \hline
+$fringe$ & $O(nVerts\times{}m)$ \\ \hline
+$BFS$ & $O(depth\times{}nVerts\times{}m)$ \\ \hline
+$nsp$ & $O(nVerts\times{}n)$ \\ \hline
+$nsp^{inv}$ & Computed on the fly \\ \hline
+$BC_{updt}$ & $O(n)$ \\ \hline
+$weights_1$ & Computed on the fly \\ \hline
+$weights$ & $O(n)$ \\ \hline
+$temp_1,temp_2,temp_3$ & Computed ont the fly \\ \hline
+\end{tabular}
+\caption{Table depicting the space requirements of each variable in 
+Algorithm~\ref{alg:hybrid}.}
+\label{tbl:hybrid}
+\end{table}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Algorithm~\ref{alg:hybrid} is expressed mostly in terms of computations on 
+sparse matrices with sparse or dense vectors, which makes it especially 
+suitable for parallelization.
+%
+In this segment, we discuss some of the obvious factors that affect parallel 
+performance of Algorithm~\ref{alg:hybrid}.
+%
+First, let us recap that we are interested mostly in social network analysis
+and the real-world graphs in this particular domain are similar to RMAT
+graphs (see Section~\ref{sec:rmat}).
+%
+Briefly, these graphs follow the power-law, have low average connectivity and
+low diameter.
+%
+First, let us recap that Algorithm~\ref{alg:hybrid} implements BFS as a
+matrix-matrix multiplication (line $15$).
+%
+The \func{matMult} takes two matrices, $A$ and $fringe$; of these, $A$, the
+adjacency matrix, is both constant and sparse.
+%
+On the other hand, $fringe$, might start out sparse depending on the start
+vertices chosen for exploration, but becomes dense rapidly owing to the low
+diameter of the graphs in question.
+%
+Similarly, $BFS$, the array that stores the fringe at each depth-level also 
+becomes dense rapidly.
+%
+In fact, both $fringe$ and $BFS$ require $O(m)$ storage; for a large graph,
+$fringe$ and $BFS$ even for a single start vertex (i.e., $nVerts==1$) might not
+fit in memory without incurring excessive cache misses.
 
 %
 % Discuss Approximate solutions 
@@ -789,3 +841,5 @@ probability $\ge{}(1-2\epsilon{})$, its centrality can be estimated within a
 factor of $\frac{1}{\epsilon{}}$ by using only $\epsilon{}t$ samples of 
 source vertices.
 %
+Table~\ref{tbl:hybrid} lists the space requirements of each of the variables 
+used in Algorithm~\ref{alg:hybrid}.
