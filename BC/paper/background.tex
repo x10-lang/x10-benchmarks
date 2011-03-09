@@ -832,6 +832,11 @@ Algorithm~\ref{alg:hybrid}; As can be seen, other than \func{extractRows},
 %
 That is, these operations do not require and communication in the case of a 
 distributed-memory implementation.
+%
+One way to parallelize on both shared- and distributed-memory machines is to 
+parallelize the operations that are depicted in Table~\ref{tbl:complexity}; 
+Buluc~\cite{buluc-2010} parallelized these operations for distributed memory,
+but not for shared memory.
 
 %
 % Discuss Approximate solutions 
