@@ -473,7 +473,7 @@ $b$ is directly connected to $a,c,$ and $d$.
 \SetKwFunction{eltWiseAssign}{eltWiseAssign}
 \SetKwFunction{eltWiseInvert}{eltWiseInvert}
 \SetKwFunction{eltWiseNot}{not}
-\SetKwFunction{extractSubMatrix}{extractSubMatrix}
+\SetKwFunction{extractRows}{extractRows}
 
 \caption{hybridBC}
 \label{alg:hybrid}
@@ -490,7 +490,7 @@ $BC\leftarrow{}$\matrixy{$1$,$n$,$0$}\;
   $nsp\leftarrow{}$\matrixy{$nVerts$,$n$, $0$}\;
   \ForEach{$row\in{}(1:nVerts)$}{$nsp(row,batch(row))\leftarrow{}1$\;}
   $depth\leftarrow{}0$\;
-  \eltWiseAssign{$fringe$,\extractSubMatrix{$A$,$batch$,$:$}}\;
+  \eltWiseAssign{$fringe$,\extractRows{$A$,$batch$}}\;
 
   \tcp{BFS search for all vertices in current batch}
   \While{\nnzExists{$fringe$}}{
@@ -747,26 +747,29 @@ This gives the final and accurate BC scores for all the vertices.
 \subsubsection{Parallelization}
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\begin{table}
+\begin{table*}
 \centering
-\begin{tabular}{|c|c|c|}
+\begin{tabular}{|c|c|c|c|c|}
 \hline
-Variable & Space Requirement & Type \\ \hline
-$BC$ & $O(n)$ & \code{double} \\ \hline
-$A$ & $O(m)$ & \code{<int,int,int>} \\ \hline
-$fringe$ & $O(nVerts\times{}m)$ & \code{<int,int,int>} \\ \hline
-$BFS$ & $O(depth\times{}nVerts\times{}m)$ & \code{<int,int,int>}[] \\ \hline
-$nsp$ & $O(nVerts\times{}n)$ & \code{<int,int,int>} \\ \hline
-$nsp^{inv}$ & Computed on the fly & --- \\ \hline
-$BC_{updt}$ & $O(n)$ & \code{double} \\ \hline
-$weights_1$ & Computed on the fly & --- \\ \hline
-$weights$ & $O(n)$ & \code{double} \\ \hline
-$temp_1,temp_2,temp_3$ & Computed on the fly & --- \\ \hline
+Variable & Shape & Space Requirement & Representation & Sparsity (RMAT-specific) \\ \hline
+$BC$ & Row-vector & $O(n)$ & \code{double}[] & Dense \\ \hline
+$A$ & Square-matrix & $O(m)$ & CSR/CSC(\code{<int,int,int>}) & Hyper-sparse \\ \hline
+$fringe$ & Rectangular-matrix & $O(nVerts\times{}m)$ & CSR/CSC(\code{<int,int,int>}) & Sparse \\ \hline
+$BFS$ & Rectangular-matrix & $O(depth\times{}nVerts\times{}m)$ & CSR/CSC\code{<int,int,int>}[] & Sparse \\ \hline
+$nsp$ & Rectangular-matrix & $O(nVerts\times{}n)$ & CSR/CSC(\code{<int,int,int>}) & Dense \\ \hline
+$nsp^{inv}$ & Rectangular-matrix & Computed on the fly & CSR/CSC(\code{<int,int,int>}) & Dense \\ \hline
+$BC_{updt}$ & Row-vector & $O(n)$ & \code{double} & Dense \\ \hline
+$weights_1$ & Rectangular-matrix & Computed on the fly & --- & --- \\ \hline
+$weights$ & Rectangular-matrix & $O(n)$ & \code{double} & Sparse to Hyper-sparse \\ \hline
+$temp_1,temp_2,temp_3$ & Rectangular-matrix & Computed on the fly & --- & Sparse \\ \hline
 \end{tabular}
-\caption{Table depicting the space requirements of each variable in 
-Algorithm~\ref{alg:hybrid}. Triplets indicate storage in either CSR or CSC.}
+\caption{Table depicting the space requirements of each variable in
+Algorithm~\ref{alg:hybrid}. Sparsity is specific to RMAT graphs (see
+Section~\ref{sec:rmat}. Hyper-sparse means that there are less non-zeros than 
+the number of columns/rows. CSR refers to the compressed sparse row format and 
+CSC to the compressed sparse column format.}
 \label{tbl:hybrid}
-\end{table}
+\end{table*}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 Algorithm~\ref{alg:hybrid} is expressed mostly in terms of computations on 
@@ -809,7 +812,7 @@ $nVerts==1$) might not fit in memory.
 \begin{tabular}{|c|c|c|} \hline
 Kernel & Description & Type \\ \hline
 \functhree{matrix}{m}{n}{init} & Create an $(m\times{}n)$ matrix initialized to \textit{init} & local \\ \hline
-\functhree{extractSubMatrix}{A}{m1:m2}{n1:n2} & Extract a submatrix referred by the rows ($m1:m2$) and cols ($n1:n2$) & global \\ \hline
+\functwo{extractRows}{A}{row-list} & Extract a submatrix formed by the rows in $row-list$ & global \\ \hline
 \functwo{eltWiseAssign}{A}{B} & Assign the matrix $A$ to the matrix $B$ & local \\ \hline
 \functwo{eltWiseAdd}{A}{B} & Element-wise addition of two (sparse) matrices & local \\ \hline
 \functwo{eltWiseMult}{A}{B} & Element-wise multiplication of two (sparse) matrices & local \\ \hline
@@ -823,7 +826,7 @@ and their features.}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
 Table~\ref{tbl:complexity} depicts the different kernels used in
-Algorithm~\ref{alg:hybrid}; As can be seen, other than \func{extractSubMatrix},
+Algorithm~\ref{alg:hybrid}; As can be seen, other than \func{extractRows},
 \func{nnzExists}, and \func{matMult}, all the other operations are completely
 \textit{local}.
 %
