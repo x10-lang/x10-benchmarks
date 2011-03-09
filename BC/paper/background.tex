@@ -503,7 +503,7 @@ $BC\leftarrow{}$\matrixy{$1$,$n$,$0$}\;
   }
 
   \tcp{Pre-compute BC updates for all but source vertices}
-  $BC_{updt}\leftarrow{}$\matrixy{$1$,$n$,$1$}\;
+  $BC_{updt}\leftarrow{}$\matrixy{$nVerts$,$n$,$1$}\;
   $nsp^{inv}\leftarrow{}$\eltWiseInvert{$nsp$}\;
 
   \tcp{Compute BC updates for all but source vertices}
@@ -752,15 +752,15 @@ This gives the final and accurate BC scores for all the vertices.
 \begin{tabular}{|c|c|c|c|c|}
 \hline
 Variable & Shape & Space Requirement & Representation & Sparsity (RMAT-specific) \\ \hline
-$BC$ & Row-vector & $O(n)$ & \code{double}[] & Dense \\ \hline
+$BC$ & Row-vector & $n$ & \code{double}[] & Dense \\ \hline
 $A$ & Square-matrix & $O(m)$ & CSR/CSC(\code{<int,int>}) & Hyper-sparse \\ \hline
 $fringe$ & Rectangular-matrix & $O(nVerts\times{}m)$ & CSR/CSC(\code{<int,int>}) & Sparse \\ \hline
-$BFS$ & Rectangular-matrix & $O(depth\times{}nVerts\times{}m)$ & CSR/CSC\code{<int,int>}[] & Sparse \\ \hline
-$nsp$ & Rectangular-matrix & $O(nVerts\times{}n)$ & \code{int}[] & Dense \\ \hline
+$BFS$ & Rectangular-matrix & $O(m)$ & CSR/CSC\code{<int,int>}[] & Sparse \\ \hline
+$nsp$ & Rectangular-matrix & $nVerts\times{}n$ & \code{int}[] & Dense \\ \hline
 $nsp^{inv}$ & Rectangular-matrix & Computed on the fly & \code{int}[] & Dense \\ \hline
-$BC_{updt}$ & Row-vector & $O(n)$ & \code{double}[] & Dense \\ \hline
+$BC_{updt}$ & Rectangular-matrix & $nVerts\times{}n$ & \code{double}[] & Dense \\ \hline
 $weights_1$ & Rectangular-matrix & Computed on the fly & --- & --- \\ \hline
-$weights$ & Rectangular-matrix & $O(n)$ & \code{double}[] & Sparse to Hyper-sparse \\ \hline
+$weights$ & Rectangular-matrix & $O(nVerts\times{}n)$ & \code{double}[] & Sparse to Hyper-sparse \\ \hline
 $temp_1,temp_2,temp_3$ & Rectangular-matrix & Computed on the fly & --- & Sparse \\ \hline
 \end{tabular}
 \caption{Table depicting the space requirements of each variable in
@@ -778,7 +778,7 @@ CSC to the compressed sparse column format.}
 \begin{tabular}{|c|c|c|} \hline
 Kernel & Description & Type \\ \hline
 \functhree{matrix}{m}{n}{init} & Create an $(m\times{}n)$ matrix initialized to \textit{init} & local \\ \hline
-\functwo{extractRows}{A}{row-list} & Extract a submatrix formed by the rows in $row-list$ & global \\ \hline
+\functwo{extractRows}{A}{rowList} & Extract a submatrix formed by the rows in $rowList$ & global \\ \hline
 \functwo{eltWiseAssign}{A}{B} & Assign the matrix $A$ to the matrix $B$ & local \\ \hline
 \functwo{eltWiseAdd}{A}{B} & Element-wise addition of two (sparse) matrices & local \\ \hline
 \functwo{eltWiseMult}{A}{B} & Element-wise multiplication of two (sparse) matrices & local \\ \hline
