@@ -753,14 +753,14 @@ This gives the final and accurate BC scores for all the vertices.
 \hline
 Variable & Shape & Space Requirement & Representation & Sparsity (RMAT-specific) \\ \hline
 $BC$ & Row-vector & $O(n)$ & \code{double}[] & Dense \\ \hline
-$A$ & Square-matrix & $O(m)$ & CSR/CSC(\code{<int,int,int>}) & Hyper-sparse \\ \hline
-$fringe$ & Rectangular-matrix & $O(nVerts\times{}m)$ & CSR/CSC(\code{<int,int,int>}) & Sparse \\ \hline
-$BFS$ & Rectangular-matrix & $O(depth\times{}nVerts\times{}m)$ & CSR/CSC\code{<int,int,int>}[] & Sparse \\ \hline
-$nsp$ & Rectangular-matrix & $O(nVerts\times{}n)$ & CSR/CSC(\code{<int,int,int>}) & Dense \\ \hline
-$nsp^{inv}$ & Rectangular-matrix & Computed on the fly & CSR/CSC(\code{<int,int,int>}) & Dense \\ \hline
-$BC_{updt}$ & Row-vector & $O(n)$ & \code{double} & Dense \\ \hline
+$A$ & Square-matrix & $O(m)$ & CSR/CSC(\code{<int,int>}) & Hyper-sparse \\ \hline
+$fringe$ & Rectangular-matrix & $O(nVerts\times{}m)$ & CSR/CSC(\code{<int,int>}) & Sparse \\ \hline
+$BFS$ & Rectangular-matrix & $O(depth\times{}nVerts\times{}m)$ & CSR/CSC\code{<int,int>}[] & Sparse \\ \hline
+$nsp$ & Rectangular-matrix & $O(nVerts\times{}n)$ & \code{int}[] & Dense \\ \hline
+$nsp^{inv}$ & Rectangular-matrix & Computed on the fly & \code{int}[] & Dense \\ \hline
+$BC_{updt}$ & Row-vector & $O(n)$ & \code{double}[] & Dense \\ \hline
 $weights_1$ & Rectangular-matrix & Computed on the fly & --- & --- \\ \hline
-$weights$ & Rectangular-matrix & $O(n)$ & \code{double} & Sparse to Hyper-sparse \\ \hline
+$weights$ & Rectangular-matrix & $O(n)$ & \code{double}[] & Sparse to Hyper-sparse \\ \hline
 $temp_1,temp_2,temp_3$ & Rectangular-matrix & Computed on the fly & --- & Sparse \\ \hline
 \end{tabular}
 \caption{Table depicting the space requirements of each variable in
@@ -771,40 +771,6 @@ CSC to the compressed sparse column format.}
 \label{tbl:hybrid}
 \end{table*}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-Algorithm~\ref{alg:hybrid} is expressed mostly in terms of computations on 
-sparse matrices with sparse or dense vectors, which makes it especially 
-suitable for parallelization.
-%
-In this segment, we discuss some of the obvious factors that affect parallel 
-performance of Algorithm~\ref{alg:hybrid}.
-%
-First, let us recap that we are interested mostly in social network analysis
-and the real-world graphs in this particular domain are similar to RMAT
-graphs (see Section~\ref{sec:rmat}).
-%
-Briefly, these graphs follow the power-law, have low average connectivity and
-low diameter.
-%
-First, let us recap that Algorithm~\ref{alg:hybrid} implements BFS as a
-matrix-matrix multiplication (line $15$).
-%
-The \func{matMult} takes two matrices, $A$ and $fringe$; of these, $A$, the
-adjacency matrix, is both constant and sparse.
-%
-On the other hand, $fringe$, might start out sparse depending on the start
-vertices chosen for exploration, but becomes dense rapidly owing to the low
-diameter of the graphs in question.
-%
-Table~\ref{tbl:hybrid} lists the space requirements of each of the variables 
-used in Algorithm~\ref{alg:hybrid}.
-%
-Similarly, $BFS$, the array that stores the fringe at each depth-level also 
-becomes dense rapidly.
-%
-For a large graph, $fringe$ and $BFS$ even for a single start vertex (i.e.,
-$nVerts==1$) might not fit in memory.
-
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \begin{table*}
@@ -825,6 +791,71 @@ and their features.}
 \end{table*}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
+Algorithm~\ref{alg:hybrid} is expressed mostly in terms of computations on 
+sparse matrices with sparse or dense vectors, which makes it especially 
+suitable for parallelization.
+%
+In this segment, we discuss some of the factors that influence parallelization
+of Algorithm~\ref{alg:hybrid}.
+%
+First, let us recap that we are interested mostly in social network analysis
+and the real-world graphs in this particular domain are similar to RMAT
+graphs (see Section~\ref{sec:rmat}).
+%
+Briefly, these graphs follow the power-law, have low average connectivity and
+low diameter.
+%
+First, let us recap that Algorithm~\ref{alg:hybrid} implements BFS as a
+matrix-matrix multiplication (line $15$).
+%
+
+%
+% Space analysis
+%
+\paragraph{Space Analysis}
+Table~\ref{tbl:hybrid} lists the space requirements of each of the variables
+used in Algorithm~\ref{alg:hybrid}; we will now analyze each variable
+separately.
+% BC and BC_updt
+BC is computed for each vertex $v\in{}V$, and hence, the row-vector $BC$ is
+represented as a dense array of \code{double}'s; for simplicity, we assume that
+this is the case for $BC_{updt}$ as well; 
+%
+% Dropping the value from A, fringe and BFS since these are unweighted.
+%
+The adjacency matrix of the graph $A$ for RMAT graphs is sparse; therefore, 
+it can be represented in either CSR, CSC, DCSR, or DCSC~\cite{buluc-2010} 
+formats.
+%
+However, as we are exclusively dealing with \textit{unweighted} graphs in this 
+paper, we can drop the edge weights completely; this saves us $m$ entries in 
+$A$ alone.
+%
+For similar reasons, we can drop the edge weights from $fringe$ and $BFS$.
+%
+Notice that $\sum{}_{i=1}^{diameter(G)}BFS(i)=m$; that is, the total number of 
+non-zero entries in $BFS$ is exactly the same as the number of edges in $G$.
+%
+Therefore, by not storing edge weights, we save an additional $m$ entries for a
+total saving of $2m$ (potentially integers).
+%
+% nsp has to be stored dense since in a power-law graph, most people are 
+% connected and hence, there is no that much saving happening if you think
+% about it.
+%
+A stark contrast is detected when it comes to the variable $nsp$, an array that
+stores the number of shortest paths from each source vertex to all other
+vertices.
+%
+In an RMAT graph, there exists a connection between any two vertices with a 
+high probability; that is, $nsp$ will be dense. 
+%
+Therefore, storing $nsp$ in regular dense format, which requires
+$nVerts\times{}n$ \code{integer}s is beneficial over storing them in compressed
+formats that require explicit representation of the row and the column numbers,
+thereby saving us This saves us $\approx{}2n$ space.
+
+\paragraph{Kernel Operations}
 Table~\ref{tbl:complexity} depicts the different kernels used in
 Algorithm~\ref{alg:hybrid}; As can be seen, other than \func{extractRows},
 \func{nnzExists}, and \func{matMult}, all the other operations are completely
