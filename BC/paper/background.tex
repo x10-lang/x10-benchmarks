@@ -473,6 +473,7 @@ $b$ is directly connected to $a,c,$ and $d$.
 \SetKwFunction{eltWiseAssign}{eltWiseAssign}
 \SetKwFunction{eltWiseInvert}{eltWiseInvert}
 \SetKwFunction{eltWiseNot}{not}
+\SetKwFunction{extractSubMatrix}{extractSubMatrix}
 
 \caption{hybridBC}
 \label{alg:hybrid}
@@ -489,7 +490,7 @@ $BC\leftarrow{}$\matrixy{$1$,$n$,$0$}\;
   $nsp\leftarrow{}$\matrixy{$nVerts$,$n$, $0$}\;
   \ForEach{$row\in{}(1:nVerts)$}{$nsp(row,batch(row))\leftarrow{}1$\;}
   $depth\leftarrow{}0$\;
-  \eltWiseAssign{$fringe$,$A(batch,:)$}\;
+  \eltWiseAssign{$fringe$,\extractSubMatrix{$A$,$batch$,$:$}}\;
 
   \tcp{BFS search for all vertices in current batch}
   \While{\nnzExists{$fringe$}}{
@@ -748,22 +749,22 @@ This gives the final and accurate BC scores for all the vertices.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \begin{table}
 \centering
-\begin{tabular}{|c|c|}
+\begin{tabular}{|c|c|c|}
 \hline
-Variable & Space Requirement \\ \hline
-$BC$ & $O(n)$ \\ \hline
-$A$ & $O(m)$ \\ \hline
-$fringe$ & $O(nVerts\times{}m)$ \\ \hline
-$BFS$ & $O(depth\times{}nVerts\times{}m)$ \\ \hline
-$nsp$ & $O(nVerts\times{}n)$ \\ \hline
-$nsp^{inv}$ & Computed on the fly \\ \hline
-$BC_{updt}$ & $O(n)$ \\ \hline
-$weights_1$ & Computed on the fly \\ \hline
-$weights$ & $O(n)$ \\ \hline
-$temp_1,temp_2,temp_3$ & Computed ont the fly \\ \hline
+Variable & Space Requirement & Type \\ \hline
+$BC$ & $O(n)$ & \code{double} \\ \hline
+$A$ & $O(m)$ & \code{<int,int,int>} \\ \hline
+$fringe$ & $O(nVerts\times{}m)$ & \code{<int,int,int>} \\ \hline
+$BFS$ & $O(depth\times{}nVerts\times{}m)$ & \code{<int,int,int>}[] \\ \hline
+$nsp$ & $O(nVerts\times{}n)$ & \code{<int,int,int>} \\ \hline
+$nsp^{inv}$ & Computed on the fly & --- \\ \hline
+$BC_{updt}$ & $O(n)$ & \code{double} \\ \hline
+$weights_1$ & Computed on the fly & --- \\ \hline
+$weights$ & $O(n)$ & \code{double} \\ \hline
+$temp_1,temp_2,temp_3$ & Computed on the fly & --- \\ \hline
 \end{tabular}
 \caption{Table depicting the space requirements of each variable in 
-Algorithm~\ref{alg:hybrid}.}
+Algorithm~\ref{alg:hybrid}. Triplets indicate storage in either CSR or CSC.}
 \label{tbl:hybrid}
 \end{table}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -800,6 +801,34 @@ becomes dense rapidly.
 %
 For a large graph, $fringe$ and $BFS$ even for a single start vertex (i.e.,
 $nVerts==1$) might not fit in memory.
+
+%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{table*}
+\centering
+\begin{tabular}{|c|c|c|} \hline
+Kernel & Description & Type \\ \hline
+\functhree{matrix}{m}{n}{init} & Create an $(m\times{}n)$ matrix initialized to \textit{init} & local \\ \hline
+\functhree{extractSubMatrix}{A}{m1:m2}{n1:n2} & Extract a submatrix referred by the rows ($m1:m2$) and cols ($n1:n2$) & global \\ \hline
+\functwo{eltWiseAssign}{A}{B} & Assign the matrix $A$ to the matrix $B$ & local \\ \hline
+\functwo{eltWiseAdd}{A}{B} & Element-wise addition of two (sparse) matrices & local \\ \hline
+\functwo{eltWiseMult}{A}{B} & Element-wise multiplication of two (sparse) matrices & local \\ \hline
+\funcone{nnzExists}{A} & Check for the presence of a non-zero in the matrix $A$ & global \\ \hline
+\functwo{matMult}{A}{B} & Multiply two (sparse) matrices & global \\ \hline
+\end{tabular}
+\caption{A Table depicting the different matrix kernels in Algorithm~\ref{alg:hybrid}
+and their features.}
+\label{tbl:complexity}
+\end{table*}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%
+Table~\ref{tbl:complexity} depicts the different kernels used in
+Algorithm~\ref{alg:hybrid}; As can be seen, other than \func{extractSubMatrix},
+\func{nnzExists}, and \func{matMult}, all the other operations are completely
+\textit{local}.
+%
+That is, these operations do not require and communication in the case of a 
+distributed-memory implementation.
 
 %
 % Discuss Approximate solutions 
