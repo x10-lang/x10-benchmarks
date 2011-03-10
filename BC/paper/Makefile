@@ -17,6 +17,7 @@ TEX=bc.tex \
     related.tex \
     background.tex \
     rmat.tex \
+    ops.tex \
     references.bib 
 
 all: pdf 
