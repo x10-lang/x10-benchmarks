@@ -36,7 +36,7 @@ class FRASimpleDist {
             ran = temp;
             i -= 1;
             if (((n >> i) & 1) != 0)
-                ran = (ran << 1) ^ (ran < 0 ? POLY : 0);
+                ran = (ran << 1) ^ (ran < 0 ? POLY : 0L);
         }
         return ran;
     }
@@ -90,10 +90,10 @@ class FRASimpleDist {
         var updates_ : Int = 4;
 
         // parse arguments
-        for (var i:Int=0 ; i<args.size() ; ) {
+        for (var i:Int=0 ; i<args.size ; ) {
             if (args(i).equals("-m")) {
                 i++;
-                if (i >= args.size()) {
+                if (i >= args.size) {
                     if (here.id==0)
                         Console.ERR.println("Too few cmdline params.");
                     help(true);
@@ -102,7 +102,7 @@ class FRASimpleDist {
                 logLocalTableSize_ = Int.parseInt(args(i++));
             } else if (args(i).equals("-u")) {
                 i++;
-                if (i >= args.size()) {
+                if (i >= args.size) {
                     if (here.id==0)
                         Console.ERR.println("Too few cmdline params.");
                     help(true);
