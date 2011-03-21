@@ -869,6 +869,28 @@ parallelize the operations that are depicted in Table~\ref{tbl:complexity};
 Buluc~\cite{buluc-2010} parallelized these operations for distributed memory,
 but not for shared memory.
 
+\subsubsection{Shortcomings}
+%
+Algorithm~\ref{alg:hybrid} works \textit{only} for unweighted graphs.
+%
+When the edges are weighted, the ``shortest path'' from one node to another 
+is determined not only by the number of hops that need to be taken, but also
+the cost/weight of each hop.
+%
+Consequently, many changes are needed to algorithm~\ref{alg:hybrid} in order 
+to make it work for weighted graphs.
+%
+For example, line $16$, which ensures that each vertex is visited only once
+is incorrect for weighted graphs as a path with greater number of hops, but 
+lower cost can still be found.
+%
+In essence, we degenerate to Floyd-Warshall's $O(n^3)$ algorithm; therefore, 
+Algorithm~\ref{alg:hybrid} is unsuitable for weighted graphs.
+%
+However, for benchmarking purposes, Algorithm~\ref{alg:hybrid} is sufficient;
+for example, kernel 4 of HPC Graph Analysis Benchmarks~\cite{ssca_matlab} only
+require computation of unweighted betweenness centrality.
+
 %
 % Discuss Approximate solutions 
 %
