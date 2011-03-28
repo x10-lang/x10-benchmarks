@@ -30,16 +30,16 @@ public final class Binomial(b0:Int, q:Double, m:Int) extends TaskFrame[UTS.SHA1R
 				"   q=" + q +
                 "   l=" + l + 
                 "   z=" + z +
-                (l==3U ?" base=" + NetworkGenerator.findW(Place.MAX_PLACES, z) : ""));
+                (l==3 ?" base=" + NetworkGenerator.findW(Place.MAX_PLACES, z) : ""));
 	}
 	public def runTask(s:SHA1Rand, stack:Stack[SHA1Rand]) offers Int {
-		pushN(s, s() < q ? m : 0U, stack);
+		pushN(s, s() < q ? m : 0, stack);
 	}
 	public def runRootTask(s:SHA1Rand, stack:Stack[SHA1Rand]) offers Int {
 		pushN(s, b0, stack);
 	}
 	private def pushN(s:SHA1Rand, N:Int, stack:Stack[SHA1Rand]) offers Int {
-		if (N == 0U ) return;
+		if (N == 0 ) return;
 		for (var i:Int=0; i<N; ++i) 
 			stack.push(SHA1Rand(s, i as Int));
 				offer N;

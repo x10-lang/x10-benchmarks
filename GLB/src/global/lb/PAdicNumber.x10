@@ -42,7 +42,7 @@ public class PAdicNumber(P:Int, K:Int) {
 	 * Numerical less than relationship, implemented by lexicographic
 	 * ordering on representation.
 	 */
-	public operator this < (that:PAdicNumber(P,K)):Boolean {
+	public operator this < (that:PAdicNumber):Boolean {
 		var i:Int =0;
 		for (; i < K && digits(i) < that.digits(i); ++i) ;
 		return i==K-1;
@@ -78,14 +78,14 @@ public class PAdicNumber(P:Int, K:Int) {
 	 * If d >= bound, keep adding d to the dim'th component (using modulo arithmetic)
 	 * until you reach a number < bound. Assume: this < bound.
 	 */
-	public def boundedDelta(d:Int, dim:Int, bound:Int): PAdicNumber(P,K) {
+	public def boundedDelta(d:Int, dim:Int, bound:Int): PAdicNumber {
 		val o = new PAdicNumber(P, K, Rail.make(K, 
 				(i:Int) => (i==dim ?  (digits(i)+d)% P : digits(i))));
 
 		val od = o.toDecimal();
 		if (od < bound)
 			return o; 
-		var q:PAdicNumber(P,K)  = o.delta(d,dim);
+		var q:PAdicNumber  = o.delta(d,dim);
 		var qd:Int = q.toDecimal();
 		while (qd >= bound) {
 			q = q.delta(d,dim);

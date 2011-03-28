@@ -13,7 +13,6 @@ package global.lb;
 /**
  * A Counter object tracks statistics associated with a LocalRunner.
  * @author vj
-
  */
 public class Counter  {
 

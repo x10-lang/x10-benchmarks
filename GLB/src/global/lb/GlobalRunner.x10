@@ -143,7 +143,7 @@ public final class GlobalRunner[T, Z]  implements Runner[T,Z] {
 		val myRandom = new Random();
 		
 		// Holds statistics for the engine execution.
-		public val counter = new Counter[T]();
+		public val counter = new Counter();
 		
 		// Is an async active at this place?
 		var active:Boolean=false;
@@ -276,7 +276,7 @@ public final class GlobalRunner[T, Z]  implements Runner[T,Z] {
 					val thief = thieves.pop();
 					val loot = stack.pop(numToSteal);
 					counter.incTxNodes(numToSteal);
-					Event.event("Distributing " + loot.length() + " to " + thief);
+					Event.event("Distributing " + loot.length + " to " + thief);
 					val victim = here.id;
 					async at(Place(thief)) 
 					   st().launch(st, false, loot, depth+1, victim);
@@ -330,7 +330,7 @@ public final class GlobalRunner[T, Z]  implements Runner[T,Z] {
 				
 				Event.event("No loot; establishing lifeline(s).");
 				var loot:Rail[T] = null;
-				val n = myLifelines.length();
+				val n = myLifelines.length;
 				for (var i:Int=0; (i<n) && (noLoot) && (0<=myLifelines(i)); ++i) {
 					val lifeline:Int = myLifelines(i);
 					if (!lifelinesActivated(lifeline) ) {
