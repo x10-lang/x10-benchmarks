@@ -30,7 +30,7 @@ public class UTS {
         public def toString():String = "<" + hashCode()+">";
         public def this (parent:SHA1Rand) { }
         public def this (parent:SHA1Rand, spawnNumber:Int) { }
-        @Native ("c++", "UTS__SHA1Rand_methods::__apply(#0)")
+        @Native ("c++", "(#0)->__apply()")
         public operator this() : Int = 0;
     }
     

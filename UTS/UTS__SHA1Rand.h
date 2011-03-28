@@ -3,70 +3,87 @@
 
 #include <x10rt.h>
 
-
-#define X10_LANG_STRUCT_H_NODEPS
-#include <x10/lang/Struct.h>
-#undef X10_LANG_STRUCT_H_NODEPS
 #define X10_LANG_ANY_H_NODEPS
 #include <x10/lang/Any.h>
 #undef X10_LANG_ANY_H_NODEPS
-namespace x10 { namespace lang { 
-        class Int;
-    } } 
-#include <x10/lang/Int.struct_h>
-#include <UTS__SHA1Rand.struct_h>
 
-        class UTS__SHA1Rand_methods  {
-        public:
-            static void _instance_init(UTS__SHA1Rand& this_);
+namespace x10 {
+    namespace lang {
+        class String;
+    }
+}
+
+#include "sha1_rand.hpp"
+#include <x10aux/config.h>
+#include <x10aux/ref.h>
+#include <x10aux/RTT.h>
+#include <x10aux/serialization.h>
+
+class UTS__SHA1Rand {
+public:
+    RTT_H_DECLS_STRUCT
+        
+    sha1_rand FMGL(cxx_sha1_rng);
+
+    UTS__SHA1Rand* operator->() { return this; }
     
-            static void _constructor(UTS__SHA1Rand& this_, x10_int seed) {
-                x10::lang::Struct_methods::_constructor(this_);
-                this_.FMGL(cxx_sha1_rng).init((int)seed);
-            }
-            inline static UTS__SHA1Rand _make(x10_int seed) {
-                UTS__SHA1Rand this_; 
-                _constructor(this_, seed);
-                return this_;
-            }
+    static x10aux::itable_entry _itables[2];
+    x10aux::itable_entry* _getITables() { return _itables; }
+    static x10::lang::Any::itable<UTS__SHA1Rand > _itable_0;
+
+    static x10aux::itable_entry _iboxitables[2];
+    x10aux::itable_entry* _getIBoxITables() { return _iboxitables; }
+
+    static UTS__SHA1Rand _alloc() {
+        UTS__SHA1Rand t;
+        memset(&t, 0, sizeof(UTS__SHA1Rand));
+        return t;
+    }
+
+    inline static UTS__SHA1Rand _make(x10_int seed) {
+        UTS__SHA1Rand this_; 
+        this_->_constructor(seed);
+        return this_;
+    }
+    void _constructor(x10_int seed) {
+        FMGL(cxx_sha1_rng).init((int)seed);
+    }
     
-            static void _constructor(UTS__SHA1Rand& this_, UTS__SHA1Rand parent, x10_int spawn_number)
-            {
-                x10::lang::Struct_methods::_constructor(this_);
-                this_.FMGL(cxx_sha1_rng).init(parent->FMGL(cxx_sha1_rng), (int)spawn_number);
-            }
-            inline static UTS__SHA1Rand _make(
-                UTS__SHA1Rand parent,
-                x10_int spawn_number)
-            {
-                UTS__SHA1Rand this_; 
-                _constructor(this_, parent,
-                             spawn_number);
-                return this_;
-            }
+    inline static UTS__SHA1Rand _make(UTS__SHA1Rand parent, x10_int spawn_number) {
+        UTS__SHA1Rand this_; 
+        this_->_constructor(parent, spawn_number);
+        return this_;
+    }
+    void _constructor(UTS__SHA1Rand parent, x10_int spawn_number) {
+        FMGL(cxx_sha1_rng).init(parent->FMGL(cxx_sha1_rng), (int)spawn_number);
+    }
+
+    x10_int __apply() {
+        return FMGL(cxx_sha1_rng)();
+    }
+        
+    static void _serialize(UTS__SHA1Rand this_, x10aux::serialization_buffer& buf);
     
-            static x10_int __apply(UTS__SHA1Rand this_) {
-                return this_.FMGL(cxx_sha1_rng)();
-            }
+    static UTS__SHA1Rand _deserialize(x10aux::deserialization_buffer& buf) {
+        UTS__SHA1Rand this_;
+        this_->_deserialize_body(buf);
+        return this_;
+    }
+    
+    void _deserialize_body(x10aux::deserialization_buffer& buf);
 
-            static x10aux::ref<x10::lang::String> typeName(UTS__SHA1Rand this_) { return this_->typeName(); }
-            static x10_boolean equals(UTS__SHA1Rand this_, x10aux::ref<x10::lang::Any> that) { return this_->equals(that); }
-            static x10_boolean equals(UTS__SHA1Rand this_, UTS__SHA1Rand that) { return this_->equals(that); }
-            static x10aux::ref<x10::lang::String> toString(UTS__SHA1Rand this_) { return this_->toString(); }
-            static x10_int hashCode(UTS__SHA1Rand this_) { return this_->hashCode(); }
-        };
+    x10_boolean _struct_equals(UTS__SHA1Rand that);
+    
+    x10_boolean equals(x10aux::ref<x10::lang::Any> that);
+    
+    x10_boolean equals(UTS__SHA1Rand that);
+    
+    x10aux::ref<x10::lang::String> toString();
+    
+    x10_int hashCode();
+    
+    x10aux::ref<x10::lang::String> typeName();
+};
 
+#endif 
 
-#endif // UTS__SHA1RAND_H
-
-class UTS__SHA1Rand;
-
-#ifndef UTS__SHA1RAND_H_NODEPS
-#define UTS__SHA1RAND_H_NODEPS
-#include <x10/lang/Struct.h>
-#include <x10/lang/Any.h>
-#include <x10/lang/Int.h>
-#ifndef UTS__SHA1RAND_H_GENERICS
-#define UTS__SHA1RAND_H_GENERICS
-#endif // UTS__SHA1RAND_H_GENERICS
-#endif // __UTS__SHA1RAND_H_NODEPS
