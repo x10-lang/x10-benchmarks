@@ -43,7 +43,7 @@ public class UTS {
 	public def this (seed:Int) { }
 	public def this (parent:SHA1Rand) { }
 	public def this (parent:SHA1Rand, spawnNumber:Int) { }
-	@Native ("c++", "examples::UTS::UTS__SHA1Rand_methods::__apply(#0)")
+	@Native ("c++", "(#0)->__apply()")
 	    public operator this() : Int = 0;
     }
 	
