@@ -16,7 +16,7 @@ final class NetworkGenerator {
 
   private static def countValidEdges (edgeList:Rail[Int]) {
     var numValidEdges:Int = 0;
-    for (var i:Int=0; i<edgeList.length(); ++i) 
+    for (var i:Int=0; i<edgeList.length; ++i) 
       if (INVALID_EDGE != edgeList(i)) ++numValidEdges;
     return numValidEdges;
   }
@@ -41,15 +41,15 @@ final class NetworkGenerator {
     // randomly. Basically, we flip a coin and keep one of the 2 edges.
     val rng = new Random();
     if (2 < nplaces) {
-      for (var i:Int=0; i<mutableNetwork.length(); ++i) {
-        for (var j:Int=1; j<mutableNetwork(i).length(); ++j) {
+      for (var i:Int=0; i<mutableNetwork.length; ++i) {
+        for (var j:Int=1; j<mutableNetwork(i).length; ++j) {
           // check if the cycle has already been broken
           if (mutableNetwork(i)(j) > i) {
             // break the cycle by flipping a coin 
             if (rng.nextBoolean()) {
               // go to the other entry and make it -1 
               val index:Int = mutableNetwork(i)(j);
-              for (var k:Int=1; k<mutableNetwork(index).length(); ++k) {
+              for (var k:Int=1; k<mutableNetwork(index).length; ++k) {
                 if (mutableNetwork(index)(k) == j) {
                   mutableNetwork(index)(k) = -1;
                   break;
@@ -93,7 +93,7 @@ final class NetworkGenerator {
 
     // Figure out which bucket this place belongs to
     var bucketNumber:Int=-1;
-    val nDimensions:Int = buckets.length();
+    val nDimensions:Int = buckets.length;
     for (var i:Int=0; i<nDimensions; ++i) {
       if (place >= buckets(i) && place < buckets(i+1)) {
         bucketNumber = i;
@@ -144,7 +144,7 @@ final class NetworkGenerator {
     // Adjust for the remainder
     var extraElementRecepient:Int = 1;
     while (0 != remainder) { 
-      for (var i:Int=extraElementRecepient; i<firstCutBuckets.length(); ++i) {
+      for (var i:Int=extraElementRecepient; i<firstCutBuckets.length; ++i) {
        ++firstCutBuckets(i);
       }
       ++extraElementRecepient;
@@ -170,14 +170,14 @@ final class NetworkGenerator {
   }
 
   private static def bubbleSort (nodeList:Rail[Int]) {
-    for (var i:Int=0; i<nodeList.length(); ++i) 
-      for (var j:Int=i; j<nodeList.length(); ++j) 
+    for (var i:Int=0; i<nodeList.length; ++i) 
+      for (var j:Int=i; j<nodeList.length; ++j) 
         if (nodeList(i) < nodeList(j)) {
           val tmp:Int = nodeList(i);
           nodeList(i) = nodeList(j);
           nodeList(j) = tmp;
         }
-    return Rail.make[Int](nodeList.length(), (i:Int) => nodeList(i));
+    return Rail.make[Int](nodeList.length, (i:Int) => nodeList(i));
   }
 
   public static def generateSparseEmbedding (P:Int, k:Int) {
@@ -208,9 +208,9 @@ final class NetworkGenerator {
    * Print out the network.
    */
   public static def printNetwork (network:Rail[Rail[Int]]) {
-    for (var i:Int=0; i<network.length(); ++i) {
+    for (var i:Int=0; i<network.length; ++i) {
       Console.OUT.print(i + " =>");
-      for (var j:Int=0; j<network(i).length(); ++j) 
+      for (var j:Int=0; j<network(i).length; ++j) 
         if (-1 != network(i)(j)) Console.OUT.print(" " + network(i)(j));
       Console.OUT.println();
     }
@@ -222,8 +222,8 @@ final class NetworkGenerator {
   public static def has2cycles (nplaces:Int, 
                                 network:Rail[Rail[Int]]) {
     if (2 < nplaces) {
-      for (var i:Int=0; i<network.length(); ++i) {
-        for (var j:Int=1; j<network(i).length(); ++j) {
+      for (var i:Int=0; i<network.length; ++i) {
+        for (var j:Int=1; j<network(i).length; ++j) {
           val lifeLine = network(i)(j);
           if (-1 != lifeLine) {
             for (var k:Int=0; k<network(lifeLine).length; ++k) {

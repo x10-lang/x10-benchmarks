@@ -51,7 +51,7 @@ final class ParUTS implements Counted {
     public val counter:Counter;
     var active:Boolean=false;
     var noLoot:Boolean=true;
-    public def counters()=[counter];
+    public def counters()=[counter as Counter];
     
     /** Initialize the state. Executed at all places when executing the 
      * PlaceLocalHandle.make command in main (of UTS). BINOMIAL
@@ -119,7 +119,7 @@ final class ParUTS implements Counted {
     
     def printLifelineNetwork () {
         Console.OUT.print (here.id + " =>");
-        for (var i:Int=0; i<myLifelines.length(); ++i) 
+        for (var i:Int=0; i<myLifelines.length; ++i) 
             if (-1 != myLifelines(i)) 
                 Console.OUT.print  (" " + myLifelines(i) +  " " +
                         new PAdicNumber(NetworkGenerator.findW(Place.MAX_PLACES, z), z, myLifelines(i)));
@@ -152,13 +152,13 @@ final class ParUTS implements Counted {
     
     final def processLoot(loot: Rail[TreeNode], lifeline:Boolean) {
         counter.incRx(lifeline, loot.length);
-        val time = gatherTimes ? System.nanoTime() : 0;
+        val time = gatherTimes ? System.nanoTime() : 0L;
         for (r in loot) processSubtree(r);
         if (gatherTimes) counter.incTimeComputing (System.nanoTime() - time);    
     }
     
     final def processAtMostN(n:Int) {
-        val time = gatherTimes ? System.nanoTime() : 0;
+        val time = gatherTimes ? System.nanoTime() : 0L;
         for (var count:Int=0; count < n; count++) {
             val e = stack.pop();
             processSubtree(e);
@@ -183,7 +183,7 @@ final class ParUTS implements Counted {
             while (n > 0) {
                 processAtMostN(n);
                 
-                val time:Long =  gatherTimes ? System.nanoTime() : 0;
+                val time:Long =  gatherTimes ? System.nanoTime() : 0L;
                 Runtime.probe();
                 if (gatherTimes) counter.incTimeProbing (System.nanoTime() - time);
                 val numThieves = thieves.size();
@@ -217,7 +217,7 @@ final class ParUTS implements Counted {
     }
     
     def distribute(st:PLH, depth:Int, var numThieves:Int) {
-        val time = gatherTimes ? System.nanoTime() : 0;
+        val time = gatherTimes ? System.nanoTime() : 0L;
         val lootSize= stack.size();
         if (lootSize > 2u) {
             numThieves = min(numThieves, lootSize-2);
@@ -226,7 +226,7 @@ final class ParUTS implements Counted {
                 val thief = thieves.pop();
                 val loot = stack.pop(numToSteal);
                 counter.incTxNodes(numToSteal);
-                // event("Distributing " + loot.length() + " to " + thief);
+                // event("Distributing " + loot.length + " to " + thief);
                 val victim = here.id;
                 async at(Place(thief)) 
                 st().launch(st, false, loot, depth, victim);
@@ -243,7 +243,7 @@ final class ParUTS implements Counted {
      * tries). If we are not successful, we invoke our lifeline system.
      */
     def attemptSteal(st:PLH):Rail[TreeNode] {
-        val time = gatherTimes ? System.nanoTime() : 0;
+        val time = gatherTimes ? System.nanoTime() : 0L;
         val P = Place.MAX_PLACES;
         if (P == 1) return null;
         val p = here.id;
@@ -258,7 +258,7 @@ final class ParUTS implements Counted {
             val loot = at (Place(q)) st().trySteal(p);
             if (loot != null) {
                 //event("Steal succeeded with " + 
-                //(loot == null ? 0 : loot.length()) + " items");
+                //(loot == null ? 0 : loot.length) + " items");
                 if (gatherTimes) counter.incTimeStealing(System.nanoTime() - time);
                 return loot;
             }
@@ -272,13 +272,13 @@ final class ParUTS implements Counted {
         // resigned to make a lifeline steal from one of our lifelines.
         var loot:Rail[TreeNode] = null;
         for (var i:Int=0; 
-        (i<myLifelines.length()) && (noLoot) && (0<=myLifelines(i)); 
+        (i<myLifelines.length) && (noLoot) && (0<=myLifelines(i)); 
         ++i) {
             val lifeline:Int = myLifelines(i);
             if (!lifelinesActivated(lifeline) ) {
                 lifelinesActivated(lifeline) = true;
                 loot = at(Place(lifeline)) st().trySteal(p, true);
-                // event("Lifeline steal result " + (loot==null ? 0 : loot.length()));
+                // event("Lifeline steal result " + (loot==null ? 0 : loot.length));
                 if (null!=loot) {
                     lifelinesActivated(lifeline) = false;
                     break;
@@ -298,9 +298,9 @@ final class ParUTS implements Counted {
     def trySteal(p:Int, isLifeLine:Boolean) : Rail[TreeNode] {
         counter.stealsReceived++;
         val length = stack.size();
-        val numSteals = k==0u ? (length >=2u ? length/2u : 0u)
-                : (k < length ? k : (k/2u < length ? k/2u : 0u));
-        if (numSteals==0u) {
+        val numSteals = k==0 ? (length >=2 ? length/2 : 0)
+                : (k < length ? k : (k/2 < length ? k/2 : 0));
+        if (numSteals==0) {
             if (isLifeLine)
                 thieves.push(p);
             event("Returning null");
@@ -369,7 +369,7 @@ final class ParUTS implements Counted {
             
             val lootSize = stack.size()/P;
             for (var pi:Int=1 ; pi<P ; ++pi) {
-                val time = gatherTimes ? System.nanoTime() : 0;
+                val time = gatherTimes ? System.nanoTime() : 0L;
                 val loot = stack.pop(lootSize);
                 if (gatherTimes) counter.incTimePreppingSteal (System.nanoTime() - time);
                 val pi_ = pi;

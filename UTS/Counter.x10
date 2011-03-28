@@ -325,7 +325,7 @@ public class Counter {
         
         if (verbose) {
             for (var i:Int=0; i < P; i++) {
-                val n = allCounters(i).size();
+                val n = allCounters(i).size;
                 for (var j:Int=0; j < n; j++)
                 allCounters(i)(j).verboseStats(i*n+j, sumCounters);
             }
@@ -379,7 +379,7 @@ public class Counter {
     // states.
     private def printLifeStory (allCounters:Rail[Array[Counter](1){rail}]) {
         
-        val numPlaces:Int = allCounters.length();
+        val numPlaces:Int = allCounters.length;
         
         val lifeStories = Rail.make[ConstSeqAccessContainer] 
                                     (numPlaces, 

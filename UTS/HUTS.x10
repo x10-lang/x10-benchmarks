@@ -60,8 +60,8 @@ final class HUTS implements Counted {
     val z:Int;
     val logEvents:Boolean;
     val myRandom = new Random();
-    val stacks = new Array[Stack[TreeNode]](Runtime.INIT_THREADS, (Int)=> new Stack[TreeNode]());
-    public val counters:Array[Counter](1){rail};
+    val stacks = new Array[Stack[TreeNode]](Runtime.NTHREADS, (Int)=> new Stack[TreeNode]());
+    public val counters:Array[Counter](1){rail,rect,zeroBased};
     var active:Boolean=false;
     var noLoot:Boolean=true;
     public def counters()=counters;
@@ -88,7 +88,7 @@ final class HUTS implements Counted {
         this.z = lifelineNetwork.length; // assume symmetric.
         this.width=w;
         this.logEvents=e;
-        this.counters = new Array[Counter](Runtime.INIT_THREADS, (Int)=> new Counter(e));
+        this.counters = new Array[Counter](Runtime.NTHREADS, (Int)=> new Counter(e));
         thieves = new FixedSizeStack[Int](z, 0);
         lifelinesActivated = Rail.make[Boolean](Place.MAX_PLACES, (Int)=>false);
         //	printLifelineNetwork();
@@ -120,7 +120,7 @@ final class HUTS implements Counted {
         this.z = lifelineNetwork.length; // assume symmetric.
         this.width=w;
         this.logEvents=e;
-        this.counters = new Array[Counter](Runtime.INIT_THREADS, (Int)=> new Counter(e));
+        this.counters = new Array[Counter](Runtime.NTHREADS, (Int)=> new Counter(e));
         this.
         thieves = new FixedSizeStack[Int](Place.MAX_PLACES, 0);
         lifelinesActivated = Rail.make[Boolean](Place.MAX_PLACES, (Int)=>false);
@@ -132,7 +132,7 @@ final class HUTS implements Counted {
     
     def printLifelineNetwork () {
         Console.OUT.print (here.id + " =>");
-        for (var i:Int=0; i<myLifelines.length(); ++i) 
+        for (var i:Int=0; i<myLifelines.length; ++i) 
             if (-1 != myLifelines(i)) 
                 Console.OUT.print  (" " + myLifelines(i) +  " " +
                         new PAdicNumber(NetworkGenerator.findW(Place.MAX_PLACES, z), z, myLifelines(i)));
@@ -189,7 +189,7 @@ final class HUTS implements Counted {
             val Me = Runtime.workerId();
             // service incoming thefts and disbursement of loot from
             // this worker's stack.
-            val time:Long =  gatherTimes ? System.nanoTime() : 0;
+            val time:Long =  gatherTimes ? System.nanoTime() : 0L;
             Runtime.probe();
             if (gatherTimes) counters(Me).incTimeProbing (System.nanoTime() - time);
             
@@ -212,10 +212,10 @@ final class HUTS implements Counted {
         val counter = counters(Me);
         val stack = stacks(Me);
         counter.incRx(lifeline, loot.length);
-        val time = gatherTimes ? System.nanoTime() : 0;
+        val time = gatherTimes ? System.nanoTime() : 0L;
         finish {
             for (r in loot) stack.push(r);
-            processSubtree(loot.length(), stack);
+            processSubtree(loot.length, stack);
           
         }
         if (gatherTimes) counters(Me).incTimeComputing (System.nanoTime() - time);  
@@ -245,7 +245,7 @@ final class HUTS implements Counted {
             while (n > 0) {
                 // Process at most N nodes from the stack in parallel.
                 finish {
-                    val time = gatherTimes ? System.nanoTime() : 0;
+                    val time = gatherTimes ? System.nanoTime() : 0L;
                     processSubtree(n, stack);
                     if (gatherTimes) counters(Me).incTimeComputing (System.nanoTime() - time);  
                 }
@@ -285,7 +285,7 @@ final class HUTS implements Counted {
         val Me = Runtime.workerId();
         val counter = counters(Me);
         val stack = stacks(Me);
-        val time = gatherTimes ? System.nanoTime() : 0;
+        val time = gatherTimes ? System.nanoTime() : 0L;
         val lootSize= stack.size();
         if (lootSize > 2u) {
             numThieves = min(numThieves, lootSize-2);
@@ -294,7 +294,7 @@ final class HUTS implements Counted {
                 val thief = thieves.pop();
                 val loot = stack.pop(numToSteal);
                 counter.incTxNodes(numToSteal);
-                // event("Distributing " + loot.length() + " to " + thief);
+                // event("Distributing " + loot.length + " to " + thief);
                 val victim = here.id;
                 // This is a remote distribution async governed by the
                 // main finish
@@ -314,7 +314,7 @@ final class HUTS implements Counted {
      */
     def attemptSteal(st:PLH):Rail[TreeNode] {
         val Me = Runtime.workerId();
-        val time = gatherTimes ? System.nanoTime() : 0;
+        val time = gatherTimes ? System.nanoTime() : 0L;
         val P = Place.MAX_PLACES;
         if (P == 1) return null;
         val p = here.id;
@@ -329,7 +329,7 @@ final class HUTS implements Counted {
             val loot = at (Place(q)) st().trySteal(p);
             if (loot != null) {
                 //event("Steal succeeded with " + 
-                //(loot == null ? 0 : loot.length()) + " items");
+                //(loot == null ? 0 : loot.length) + " items");
                 if (gatherTimes) counters(Me).incTimeStealing(System.nanoTime() - time);
                 return loot;
             }
@@ -343,13 +343,13 @@ final class HUTS implements Counted {
         // resigned to make a lifeline steal from one of our lifelines.
         var loot:Rail[TreeNode] = null;
         for (var i:Int=0; 
-        (i<myLifelines.length()) && (noLoot) && (0<=myLifelines(i)); 
+        (i<myLifelines.length) && (noLoot) && (0<=myLifelines(i)); 
         ++i) {
             val lifeline:Int = myLifelines(i);
             if (!lifelinesActivated(lifeline) ) {
                 lifelinesActivated(lifeline) = true;
                 loot = at(Place(lifeline)) st().trySteal(p, true);
-                // event("Lifeline steal result " + (loot==null ? 0 : loot.length()));
+                // event("Lifeline steal result " + (loot==null ? 0 : loot.length));
                 if (null!=loot) {
                     lifelinesActivated(lifeline) = false;
                     break;
@@ -372,9 +372,9 @@ final class HUTS implements Counted {
         val stack = stacks(Me);
         counter.stealsReceived++;
         val length = stack.size();
-        val numSteals = k==0u ? (length >=2u ? length/2u : 0u)
-                : (k < length ? k : (k/2u < length ? k/2u : 0u));
-        if (numSteals==0u) {
+        val numSteals = k==0 ? (length >=2 ? length/2 : 0)
+                : (k < length ? k : (k/2 < length ? k/2 : 0));
+        if (numSteals==0) {
             if (isLifeLine)
                 thieves.push(p);
             event("Returning null");
@@ -432,7 +432,7 @@ final class HUTS implements Counted {
     def main (st:PLH, 
             rootNode:TreeNode) {
         val P=Place.MAX_PLACES;
-        val T = Runtime.INIT_THREADS;
+        val T = Runtime.NTHREADS;
         event("Start main finish");
         val counter = counters(0);
         val stack=stacks(0);
@@ -449,7 +449,7 @@ final class HUTS implements Counted {
             
             val lootSize = stack.size()/P;
             for (var pi:Int=1 ; pi<P ; ++pi) {
-                val time = gatherTimes ? System.nanoTime() : 0;
+                val time = gatherTimes ? System.nanoTime() : 0L;
                 val loot = stack.pop(lootSize);
                 if (gatherTimes) counters(0).incTimePreppingSteal (System.nanoTime() - time);
                 val pi_ = pi;
