@@ -3,9 +3,9 @@ import x10.io.EOFException;
 import x10.io.File;
 import x10.io.FileReader;
 import x10.io.IOException;
-import x10.util.RailBuilder;
+import x10.util.ArrayBuilder;
 import x10.util.StringBuilder;
-import x10.util.RailBuilder;
+import x10.util.ArrayBuilder;
 
 /**
  * An instance reads an ASCII character file in order to extract key value pairs.
@@ -65,8 +65,8 @@ public struct ParameterReader {
      */
    public def this(path: String, commentStartChar_: Char) {
       var status: String;
-      val keys_ = new RailBuilder[String]();
-      val values_ = new RailBuilder[String]();
+      val keys_ = new ArrayBuilder[String]();
+      val values_ = new ArrayBuilder[String]();
       val commentStart_ = commentStartChar_.ord();
       try {
          val relative = new File(path);
@@ -96,9 +96,9 @@ public struct ParameterReader {
     */
    public def getIntArrayProperty(key: String) {
       val raw = getRawValue(key);
-      val builder = new RailBuilder[Int]();
+      val builder = new ArrayBuilder[Int]();
       var start: Int = -1;
-      for([i] in 0..(raw.length()-1)) { // implements raw.split(/[^0-9-]/) the hard way.
+      for(i in 0..(raw.length()-1)) { // implements raw.split(/[^0-9-]/) the hard way.
          var c: Char = raw.charAt(i);
          var b: Int= c.ord();
          if ((b>=0x30 && b<=0x39) || b==0x2D) {
@@ -142,7 +142,7 @@ public struct ParameterReader {
     * @throws IllegalArgumentException if the key is not found.
     */
    private def getRawValue(key: String) {
-      for([n] in 0..(keys.length-1)) {
+      for (n in 0..(keys.size-1)) {
          if(keys(n).equals(key)) return values(n);
       }
       throw new IllegalArgumentException("Key, "+key+", not found.");
@@ -205,7 +205,7 @@ public struct ParameterReader {
     * @return the empty string normally, an error message otherwise
     * @throws IOException if a read attempt fails for any reason other than EOF
     */
-   private static def readString(reader: FileReader, values_:RailBuilder[String], initialSegment: String, commentStart: Int) {
+   private static def readString(reader: FileReader, values_:ArrayBuilder[String], initialSegment: String, commentStart: Int) {
       var endString: Int = initialSegment.indexOf("'");
       if (endString >= 0) {
          values_.add(initialSegment.substring(0, endString));
@@ -237,7 +237,7 @@ public struct ParameterReader {
      * @return the empty string normally, an error message otherwise
      * @throws IOException if a read attempt fails for any reason other than EOF
      */
-   private static def readDecimal(reader: FileReader, values_:RailBuilder[String], initialSegment: String, commentStart: Int) {
+   private static def readDecimal(reader: FileReader, values_:ArrayBuilder[String], initialSegment: String, commentStart: Int) {
       var line: String = initialSegment;
       try { 
          if(line.length() == 0) line = readNonEmptyLine(reader, commentStart);
@@ -264,7 +264,7 @@ public struct ParameterReader {
     * @return the empty string normally, an error message otherwise
     * @throws IOException if a read attempt fails for any reason other than EOF
     */
-   private static def readArray(reader: FileReader, values_:RailBuilder[String], initialSegment: String, commentStart: Int) {
+   private static def readArray(reader: FileReader, values_:ArrayBuilder[String], initialSegment: String, commentStart: Int) {
       val buffer = new StringBuilder();
       var line: String = initialSegment;
       try {
@@ -297,7 +297,7 @@ public struct ParameterReader {
     * @return a completion code: empty string means "everything ok", 'EOF' means "end of
     *   file".
     */
-   private static def readAParameter(reader: FileReader, keys_: RailBuilder[String], values_: RailBuilder[String], commentStart: Int) {
+   private static def readAParameter(reader: FileReader, keys_: ArrayBuilder[String], values_: ArrayBuilder[String], commentStart: Int) {
       try {
          var line: String = readNonEmptyLine(reader, commentStart);
          val firstEqual = line.indexOf("=");

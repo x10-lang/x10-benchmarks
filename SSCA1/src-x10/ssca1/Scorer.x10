@@ -1,7 +1,7 @@
 package ssca1;
-import x10.util.RailBuilder;
+import x10.util.ArrayBuilder;
 import x10.util.StringBuilder;
-import x10.util.RailBuilder;
+import x10.util.ArrayBuilder;
 
 /**
  * Instances compute the traceback matrix and location of the ends of the winning
@@ -89,14 +89,14 @@ public class Scorer {
       longOffset = segInfo.firstInLonger(here.id);  // where to start if shortfall == 0
       longRail = longer;
       shortRail = shorter;
-      val shortSize = shorter.length();
-      longSize  = longer.length();
+      val shortSize = shorter.size;
+      longSize  = longer.size;
       val longSize_ = longSize;
-      tracebackMoves = Rail.make[Byte]((shortSize+1)*(longSize_ + 1));
+      tracebackMoves = new Rail[Byte]((shortSize+1)*(longSize_ + 1));
       val tracebackMoves_ = tracebackMoves;	
-      for ([i] in 1..(shortSize-1)) tracebackMoves_(i*(longSize_ + 1)) = STOP;
-      for ([j] in 0..(longSize_-1))  tracebackMoves_(j) = STOP;
-      val bestScoreUpTo_I_J = Rail.make[Int](longSize_ + 1);
+      for (i in 1..(shortSize-1)) tracebackMoves_(i*(longSize_ + 1)) = STOP;
+      for (j in 0..(longSize_-1))  tracebackMoves_(j) = STOP;
+      val bestScoreUpTo_I_J = new Rail[Int](longSize_ + 1);
       var winningScore : Long = 0;
       var shorterLast: Int = -1;
       var longerLast: Int = -1;
@@ -108,10 +108,10 @@ public class Scorer {
       val extendGapPenalty = parms.extendGapPenalty;
       val openGapPenalty = parms.openGapPenalty;
 
-      for([i] in 1..shortSize) {
+      for(i in 1..shortSize) {
          var previousBestScore: Int = 0;
          val short_i_minus_1: Byte = shorter(i-1);
-         for([j] in 1..longSize_) { // try {
+         for(j in 1..longSize_) { // try {
             //if (j-1 >= longSize_) throw new IllegalArgumentException("long rail access fails: "+j+" versus "+longSize_);
             val long_j:Byte = longer(j-1);
 
@@ -167,11 +167,11 @@ public class Scorer {
       var nextMove: Int = BAD;
       val shorterLast = score.shortEnds;
       val longerLast  = score.longEnds;
-      if(DEBUG) Console.ERR.println("long winner ends at "+longerLast+",  array ends at "+longRail.length);
+      if(DEBUG) Console.ERR.println("long winner ends at "+longerLast+",  array ends at "+longRail.size);
       var i: Int = shorterLast; // i now marks the end of the winning subsequence of the shorter sequence 
       var j: Int = longerLast;  // j marks the end of the winning subsequence of the longer sequence
-      val shortBuilder = new RailBuilder[Byte]();
-      val longBuilder  = new RailBuilder[Byte]();
+      val shortBuilder = new ArrayBuilder[Byte]();
+      val longBuilder  = new ArrayBuilder[Byte]();
       var done: Boolean = false;
       while(!done) { try { //  until we are at the tracebackMove matrix boundary marked by the STOP sentinels
     	  nextMove = getTracebackMove(i, j);
@@ -197,7 +197,7 @@ public class Scorer {
             done = true;
             break;
           }
-      } catch(e: Exception) {throw new ArrayIndexOutOfBoundsException("i="+i+", j="+j+" vs "+longRail.length);}}
+      } catch(e: Exception) {throw new ArrayIndexOutOfBoundsException("i="+i+", j="+j+" vs "+longRail.size);}}
       try {return new Output(score.score,  
     		  ((i+1)..shorterLast) as Region{self.rank == 1}, 
     		  ((j+1+longOffset)..(longOffset+longerLast)) as Region{self.rank == 1}, 

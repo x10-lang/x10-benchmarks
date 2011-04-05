@@ -4,10 +4,9 @@ import x10.io.IOException;
 import x10.io.FileReader;
 import x10.io.File;
 import x10.util.HashMap;
-import x10.util.RailBuilder;
+import x10.util.ArrayBuilder;
 import x10.util.StringBuilder;
 import x10.util.Timer;
-import x10.util.RailBuilder;
 
 /**
  * This is the X10 implementation of the Smith-Waterman algorithm for string matching.
@@ -96,7 +95,7 @@ public class SW {
     * @param builder used to accumulate the sequence of characters we really care about.
     * @param commentStart starts text to be ignored through the next LF or CR.
     */
-   private static def readInASequence(path:String, alphabetIndex: Rail[Byte], builder: RailBuilder[Byte], commentStart: Char) {
+   private static def readInASequence(path:String, alphabetIndex: Rail[Byte], builder: ArrayBuilder[Byte], commentStart: Char) {
       try { 
          val reader = (new File(path)).openRead();
          try {
@@ -123,7 +122,7 @@ public class SW {
     *    is valid.
     * @param builder used to accumulate the sequence of characters we really care about.
     */
-   private static def readInASequence(path:String, alphabetIndex: Rail[Byte], builder: RailBuilder[Byte]) {
+   private static def readInASequence(path:String, alphabetIndex: Rail[Byte], builder: ArrayBuilder[Byte]) {
       readInASequence(path, alphabetIndex, builder, DEFAULT_COMMENT_START);
    }
    
@@ -165,8 +164,8 @@ public class SW {
             at(Place.FIRST_PLACE) System.setExitCode(33);
             return;
          }
-         val shorterBuilder = new RailBuilder[Byte]();
-         val longerBuilder = new RailBuilder[Byte]();
+         val shorterBuilder = new ArrayBuilder[Byte]();
+         val longerBuilder = new ArrayBuilder[Byte]();
          finish {
             async readInASequence(parsedArgs.get("s").value, parms.alphabetIndex, shorterBuilder);
             async readInASequence(parsedArgs.get("l").value, parms.alphabetIndex, longerBuilder);
@@ -180,9 +179,9 @@ public class SW {
          timings.add(INPUT_PHASE, rep, dataIsRead - startInput);
 
          // Step 2: find the best scores and initialize the traceback matrices
-         val segInfo   = SegmentationInfo(parms, shorter, longer.length());
+         val segInfo   = SegmentationInfo(parms, shorter, longer.size);
          if (rep == 0) Console.OUT.println("Places available: "+Place.MAX_PLACES+"\r\nPlaces used: "+segInfo.segmentCount);
-         val segmentedInput = Rail.make[Rail[Byte]](segInfo.segmentCount, (i:int) => segInfo.slice(i, longer));
+         val segmentedInput = new Rail[Rail[Byte]](segInfo.segmentCount, (i:int) => segInfo.slice(i, longer));
 	 finish for ([p] in 0..(segInfo.segmentCount-1)) {
              val mySegment = segmentedInput(p);  // extract the subsegment here to minimize captured state in async body.
 	     val capturedP = p;

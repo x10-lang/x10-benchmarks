@@ -64,8 +64,8 @@ public struct SegmentationInfo {
    
    public def this(parms: Parameters, shorter: Rail[Byte], longLength: Int) {
       var maxScoreOnMatch: Int = 0;
-      val shortLength = shorter.length();
-      for([i] in 0..(shortLength-1)) {
+      val shortLength = shorter.size;
+      for(i in 0..(shortLength-1)) {
          val entry = shorter(i);
          maxScoreOnMatch += parms.getScore(entry, entry);
       }
@@ -97,8 +97,8 @@ public struct SegmentationInfo {
       //                When switching to Rail[Byte], this problem was no longer masked.
       //                I think there is probabbly a more principled adjustment in the calculations that feed into
       //                last, but am leaving that for Jonathan to investigate.  
-      val last2 = last < whole.length() ? last : whole.length();
+      val last2 = last < whole.size ? last : whole.size;
 
-      return Rail.make[Byte](last2-first, (i:int)=>{ whole(first+i) });
+      return new Rail[Byte](last2-first, (i:int)=>{ whole(first+i) });
    }
 }

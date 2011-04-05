@@ -52,31 +52,31 @@ import x10.util.StringBuilder;
       source = path;
       val reader = ParameterReader(path);
       if (DEBUG) Console.ERR.println("Reader done");
-      val alphabetIndex_ = Rail.make[Byte](256, (n: Int) => -1 as Byte);
+      val alphabetIndex_ = new Rail[Byte](256, -1 as Byte);
       if (reader.errors.length() != 0) {
          error = reader.errors;
          openGapPenalty = extendGapPenalty = alphabetSize = 0;
          alphabet = "";
          alphabetIndex = alphabetIndex_;
-         scoringMatrix = Rail.make[Int](1, 0); // bug: should allow []
+         scoringMatrix = new Rail[Int](1, 0); 
          return;
       }
       openGapPenalty = reader.getNumericProperty("openGap");
       extendGapPenalty = reader.getNumericProperty("extendGap");
       val rawAlphabet = reader.getStringProperty("alphabet");
       val builder = new StringBuilder();
-      for([n] in (0..(rawAlphabet.length()-1))) {
+      for(n in (0..(rawAlphabet.length()-1))) {
          val c = rawAlphabet.charAt(n);
          if (!c.isSpaceChar()) builder.add(c);
       }
       val compressed = alphabet = builder.result();
       val size = alphabetSize = compressed.length();
-      for([j] in 0..(size-1)) alphabetIndex_(compressed.charAt(j).ord()) = j as Byte;
+      for(j in 0..(size-1)) alphabetIndex_(compressed.charAt(j).ord()) = j as Byte;
       alphabetIndex = alphabetIndex_ as Rail[Byte];
       val scoringMatrix_ = reader.getIntArrayProperty("scores");
       val expected = size*size;
-      error = (scoringMatrix_.length == expected)  ? "" :
-              "Scoring matrix size is "+scoringMatrix_.length+", but expected "+expected+"\r\n";
+      error = (scoringMatrix_.size == expected)  ? "" :
+              "Scoring matrix size is "+scoringMatrix_.size+", but expected "+expected+"\r\n";
  
       scoringMatrix = scoringMatrix_ as Rail[Int];
       if (DEBUG) Console.OUT.println(asString(SHOW_SCORES));
@@ -104,7 +104,7 @@ import x10.util.StringBuilder;
    private def showIndex() {
       val builder = new StringBuilder();
       var ellipsis: Boolean = false;
-      for([n] in (0..255)) {
+      for(n in (0..255)) {
     	 if (alphabetIndex(n) == -1) {
     	    if(!ellipsis) { builder.add("..."); ellipsis = true; }
     	 }
@@ -117,9 +117,9 @@ import x10.util.StringBuilder;
       val builder = new StringBuilder();
       val size = alphabet.length();
       val last = size - 1;
-      for([n] in (0..last)) {
+      for(n in (0..last)) {
          builder.add("'"+alphabet(n)+"'\t");
-         for([m] in (0..last)) {
+         for(m in (0..last)) {
             builder.add(scoringMatrix(n*size + m).toString()+"\t");
          }
          builder.add("\r\n");
