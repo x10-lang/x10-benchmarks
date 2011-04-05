@@ -3,7 +3,7 @@
  * Useful in hypercube based routing.
  */
 public class PAdicNumber(P:Int, K:Int) {
-	val digits: Rail[Int]/*(K)*/;
+	val digits: Rail[Int];
 	public static def pow(w:Int, var n:Int) {
 	    var result:Int=1;
 	    while (n-- > 0) result *= w;
@@ -12,10 +12,9 @@ public class PAdicNumber(P:Int, K:Int) {
 	def pow(n:Int) = pow(P, n);
 	public def this(p:Int, k:Int, x:Int):PAdicNumber{self.P==p, self.K==k} {
 		property(p,k);
-		digits = Rail.make
-	     (k, (i:Int) => { val wi = pow(p,i); (x % (p*wi))/wi});
+		digits = new Rail[Int](k, (i:Int) => { val wi = pow(p,i); (x % (p*wi))/wi});
 	}
-	def this (p:Int, k:Int, ds:Rail[Int]/*(k)*/) {
+	def this (p:Int, k:Int, ds:Rail[Int]) {
 		property(p, k);
 		digits = ds;
 	}
@@ -43,12 +42,10 @@ public class PAdicNumber(P:Int, K:Int) {
 	 * Return the number distance d away along dimension dim (using modulo arithmetic). 
 	 */
 	public def delta(d:Int, dim:Int)= 
-		new PAdicNumber(P, K, Rail.make(K, 
-				(i:Int) => (i==dim ?  (digits(i)+d)% P : digits(i))));
+		new PAdicNumber(P, K, new Rail[Int](K, (i:Int) => (i==dim ?  (digits(i)+d)% P : digits(i))));
 	
 	public def boundedDelta(d:Int, dim:Int, bound:Int): PAdicNumber {
-		val o = new PAdicNumber(P, K, Rail.make(K, 
-				(i:Int) => (i==dim ?  (digits(i)+d)% P : digits(i))));
+		val o = new PAdicNumber(P, K, new Rail[Int](K, (i:Int) => (i==dim ?  (digits(i)+d)% P : digits(i))));
 
 		val od = o.toDecimal();
 		if (od < bound)

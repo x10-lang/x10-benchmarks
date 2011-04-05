@@ -299,9 +299,9 @@ public class Counter {
     public def stats(allCounters:Rail[Array[Counter](1){rail}], time:Long, verbose:Boolean, haveDetailedTimes:Boolean){
         assert here.id == 0;
         val P = Place.MAX_PLACES;
-       // val allCounters = Rail.make[Array[Counter](1){rail}](P,(i:Int) => at(Place(i)) st().counters);
+       // val allCounters = new Rail[Array[Counter](1){rail}](P,(i:Int) => at(Place(i)) st().counters);
         val sumCounters = new Counter();
-        for (bc in allCounters) {
+        for (bc in allCounters.values()) {
             for (b in bc.values()) 
             sumCounters.addIn(b);
         }
@@ -313,7 +313,7 @@ public class Counter {
         var minAliveRatio:Float =101.0F;
         var relativeAliveRatio:Float = 101.0F;
         val idealRatio = 1.0F/P;
-        for (bc in  allCounters) for (b in bc.values()) {
+        for (bc in  allCounters.values()) for (b in bc.values()) {
             val nodes = b.nodesCounter;
             val ratio = (1.0F*nodes)/nodeSum;
             val iBalance = ((100.0F*(ratio-idealRatio))/idealRatio);
@@ -361,13 +361,13 @@ public class Counter {
     }
     
     private def isAStoryToBeTold (lifeStories:Rail[ConstSeqAccessContainer]) {
-        for (story in lifeStories) if (!(story.empty())) return true;
+        for (story in lifeStories.values()) if (!(story.empty())) return true;
         return false;
     }
     
     private def getMinTimeStamp (lifeStories:Rail[ConstSeqAccessContainer]) {
         var minTimeStamp:Long = Long.MAX_VALUE;
-        for (story in lifeStories)  {
+        for (story in lifeStories.values())  {
             if (!(story.empty()) && (story.peek().timeStamp < minTimeStamp))
                 minTimeStamp = story.peek().timeStamp;
         }
@@ -379,14 +379,14 @@ public class Counter {
     // states.
     private def printLifeStory (allCounters:Rail[Array[Counter](1){rail}]) {
         
-        val numPlaces:Int = allCounters.length;
+        val numPlaces:Int = allCounters.size;
         
-        val lifeStories = Rail.make[ConstSeqAccessContainer] 
+        val lifeStories = new Rail[ConstSeqAccessContainer] 
                                     (numPlaces, 
                                             (i:Int) => new ConstSeqAccessContainer(allCounters(i)(0).lifeStory));
         
         val currentStates:Rail[Int] = 
-            Rail.make[Int] (numPlaces, (i:Int) => Event.DEAD);
+            new Rail[Int] (numPlaces, (i:Int) => Event.DEAD);
         
         var firstIteration:Boolean = true;
         var lastUndoctoredTimeStamp:Long = -1L;
@@ -458,7 +458,7 @@ public class Counter {
         var min:Long= Long.MAX_VALUE;
         var max:Long=-1;
         var mean:Long=0;
-        for (bc in allCounters)
+        for (bc in allCounters.values())
              for (b in bc.values())
         {
             val c = i==COMPUTING ? b.timeComputing :

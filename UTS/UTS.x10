@@ -283,7 +283,7 @@ public class UTS {
                 time = System.nanoTime() - time;
                 Console.OUT.println("Finished.");
                 val P = Place.MAX_PLACES;
-                val allCounters = Rail.make[Array[Counter](1){rail}](P,(i:Int) => at(Place(i)) st().counters());
+                val allCounters = new Rail[Array[Counter](1){rail}](P,(i:Int) => at(Place(i)) st().counters());
                 allCounters(0)(0).stats(allCounters, time, verbose, ParUTS.gatherTimes);
             }
             else {
@@ -312,7 +312,7 @@ public class UTS {
                 time = System.nanoTime() - time;
                 Console.OUT.println("Finished.");
                 val P = Place.MAX_PLACES;
-                val allCounters = Rail.make[Array[Counter](1){rail}](P,(i:Int) => at(Place(i)) st().counters());
+                val allCounters = new Rail[Array[Counter](1){rail}](P,(i:Int) => at(Place(i)) st().counters());
                 st().counter.stats(allCounters, time, verbose, ParUTS.gatherTimes);
             }
             Console.OUT.println("--------");

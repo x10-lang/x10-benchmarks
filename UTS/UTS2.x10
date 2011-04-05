@@ -57,7 +57,7 @@ public class UTS2 {
 	  }
       }
 
-      final def pop(k:Int) = ValRail.make[SHA1Rand](k, (int)=> stack.pop());
+      final def pop(k:Int) = Valnew Rail[SHA1Rand](k, (int)=> stack.pop());
       
     public final def trySteal () : ValRail[SHA1Rand] {
       stealsReceived++;

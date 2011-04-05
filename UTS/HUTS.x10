@@ -30,7 +30,7 @@ final class HUTS implements Counted {
         var last:Int;
         val size:Int;
         def this(n:Int, t:T) {
-            data = Rail.make[T](n, (i:Int) => t);
+            data = new Rail[T](n, (i:Int) => t);
             last = -1;
             size= n;
         }
@@ -85,12 +85,12 @@ final class HUTS implements Counted {
         this.nu=nu; 
         this.l = l;
         this.myLifelines = lifelineNetwork;
-        this.z = lifelineNetwork.length; // assume symmetric.
+        this.z = lifelineNetwork.size; // assume symmetric.
         this.width=w;
         this.logEvents=e;
         this.counters = new Array[Counter](Runtime.NTHREADS, (Int)=> new Counter(e));
         thieves = new FixedSizeStack[Int](z, 0);
-        lifelinesActivated = Rail.make[Boolean](Place.MAX_PLACES, (Int)=>false);
+        lifelinesActivated = new Rail[Boolean](Place.MAX_PLACES, (Int)=>false);
         //	printLifelineNetwork();
         
         this.a = -1; 
@@ -117,13 +117,13 @@ final class HUTS implements Counted {
         this.nu=nu; 
         this.l = l;
         this.myLifelines = lifelineNetwork;
-        this.z = lifelineNetwork.length; // assume symmetric.
+        this.z = lifelineNetwork.size; // assume symmetric.
         this.width=w;
         this.logEvents=e;
         this.counters = new Array[Counter](Runtime.NTHREADS, (Int)=> new Counter(e));
         this.
         thieves = new FixedSizeStack[Int](Place.MAX_PLACES, 0);
-        lifelinesActivated = Rail.make[Boolean](Place.MAX_PLACES, (Int)=>false);
+        lifelinesActivated = new Rail[Boolean](Place.MAX_PLACES, (Int)=>false);
         printLifelineNetwork();
         
         this.q = -1; 
@@ -132,7 +132,7 @@ final class HUTS implements Counted {
     
     def printLifelineNetwork () {
         Console.OUT.print (here.id + " =>");
-        for (var i:Int=0; i<myLifelines.length; ++i) 
+        for (var i:Int=0; i<myLifelines.size; ++i) 
             if (-1 != myLifelines(i)) 
                 Console.OUT.print  (" " + myLifelines(i) +  " " +
                         new PAdicNumber(NetworkGenerator.findW(Place.MAX_PLACES, z), z, myLifelines(i)));
@@ -211,11 +211,11 @@ final class HUTS implements Counted {
         val Me = Runtime.workerId();
         val counter = counters(Me);
         val stack = stacks(Me);
-        counter.incRx(lifeline, loot.length);
+        counter.incRx(lifeline, loot.size);
         val time = gatherTimes ? System.nanoTime() : 0L;
         finish {
-            for (r in loot) stack.push(r);
-            processSubtree(loot.length, stack);
+            for (r in loot.values()) stack.push(r);
+            processSubtree(loot.size, stack);
           
         }
         if (gatherTimes) counters(Me).incTimeComputing (System.nanoTime() - time);  
@@ -294,7 +294,7 @@ final class HUTS implements Counted {
                 val thief = thieves.pop();
                 val loot = stack.pop(numToSteal);
                 counter.incTxNodes(numToSteal);
-                // event("Distributing " + loot.length + " to " + thief);
+                // event("Distributing " + loot.size + " to " + thief);
                 val victim = here.id;
                 // This is a remote distribution async governed by the
                 // main finish
@@ -329,7 +329,7 @@ final class HUTS implements Counted {
             val loot = at (Place(q)) st().trySteal(p);
             if (loot != null) {
                 //event("Steal succeeded with " + 
-                //(loot == null ? 0 : loot.length) + " items");
+                //(loot == null ? 0 : loot.size) + " items");
                 if (gatherTimes) counters(Me).incTimeStealing(System.nanoTime() - time);
                 return loot;
             }
@@ -343,13 +343,13 @@ final class HUTS implements Counted {
         // resigned to make a lifeline steal from one of our lifelines.
         var loot:Rail[TreeNode] = null;
         for (var i:Int=0; 
-        (i<myLifelines.length) && (noLoot) && (0<=myLifelines(i)); 
+        (i<myLifelines.size) && (noLoot) && (0<=myLifelines(i)); 
         ++i) {
             val lifeline:Int = myLifelines(i);
             if (!lifelinesActivated(lifeline) ) {
                 lifelinesActivated(lifeline) = true;
                 loot = at(Place(lifeline)) st().trySteal(p, true);
-                // event("Lifeline steal result " + (loot==null ? 0 : loot.length));
+                // event("Lifeline steal result " + (loot==null ? 0 : loot.size));
                 if (null!=loot) {
                     lifelinesActivated(lifeline) = false;
                     break;
@@ -450,7 +450,7 @@ final class HUTS implements Counted {
             val lootSize = stack.size()/P;
             for (var pi:Int=1 ; pi<P ; ++pi) {
                 val time = gatherTimes ? System.nanoTime() : 0L;
-                val loot = stack.pop(lootSize);
+                val loot = stack.pop(lootSize); 
                 if (gatherTimes) counters(0).incTimePreppingSteal (System.nanoTime() - time);
                 val pi_ = pi;
                 // Launch the initial async executing tasks at the remote place.
