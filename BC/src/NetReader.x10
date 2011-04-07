@@ -34,10 +34,10 @@ public  struct NetReader {
                           new WeightedGraph(N): new UnweightedGraph(N);
 
     /* Now, read the graph in */
-    for ([i] in 0..(N-1)) {
+    for (i in 0..(N-1)) {
       val numNeighbors = inputFileReader.readInt();
 
-      for ([j] in 0..(numNeighbors-1)) {
+      for (j in 0..(numNeighbors-1)) {
         if (adjacencyGraph instanceof AbstractWeightedCSRGraph) {
           (adjacencyGraph as AbstractWeightedCSRGraph).addEdge 
                                   (i, inputFileReader.readInt(), 1 as Long);
@@ -75,14 +75,14 @@ public  struct NetReader {
     val tokens = line.split(splitter);
     
     /* First count the number of non-empty tokens */
-    for ([i] in 0..(tokens.size()-1)) {
+    for (i in 0..(tokens.size-1)) {
       if (0<(tokens(i).length())) ++numNonEmptyTokens;
     }
 
     /* Now create the Rail */
-    val nonEmptyTokens:Rail[String] = Rail.make[String] (numNonEmptyTokens);
+    val nonEmptyTokens:Rail[String] = new Rail[String] (numNonEmptyTokens);
     var nonEmptyTokenIndex:Int = 0;
-    for ([i] in 0..(tokens.size()-1)) {
+    for (i in 0..(tokens.size-1)) {
       if (0<(tokens(i).length())) {
         nonEmptyTokens(nonEmptyTokenIndex++) = tokens(i);
       }
@@ -137,12 +137,12 @@ public  struct NetReader {
       if (foundDirectedEdges) {
         val tokens:Rail[String] = tokenize(thisLine," ");
 
-        if (2 > tokens.length()) 
+        if (2 > tokens.size) 
           throw new Exception ("Format not \"src dest weight\"");
 
         val source= Int.parse (tokens(0)) - startIndex;
         val destination = Int.parse (tokens(1)) - startIndex;
-        val weight:Long = (2==tokens.length()) ? 1 as Long: 
+        val weight:Long = (2==tokens.size) ? 1 as Long: 
                                                   Long.parse (tokens(2));
 
         if (adjacencyGraph instanceof AbstractWeightedCSRGraph) {
@@ -156,12 +156,12 @@ public  struct NetReader {
       } else if (foundUnDirectedEdges) {
         val tokens:Rail[String] = tokenize(thisLine," ");
 
-        if (2 > tokens.length()) 
+        if (2 > tokens.size) 
           throw new Exception ("Format not \"src dest weight\"");
 
         val source= Int.parse (tokens(0)) - startIndex;
         val destination = Int.parse (tokens(1)) - startIndex;
-        val weight:Long = (2==tokens.length()) ? 1 as Long: 
+        val weight:Long = (2==tokens.size) ? 1 as Long: 
                                                   Long.parse (tokens(2));
 
         if (adjacencyGraph instanceof AbstractWeightedCSRGraph) {
@@ -224,12 +224,12 @@ public  struct NetReader {
       if (foundEdges) {
         val tokens:Rail[String] = tokenize(thisLine," ");
 
-        if (2 > tokens.length())
+        if (2 > tokens.size)
           throw new Exception ("Format not \"src dest weight\"");
 
         val source= Int.parse (tokens(0)) - startIndex;
         val destination = Int.parse (tokens(1)) - startIndex;
-        val weight:Long = (2==tokens.length()) ? 1 as Long: 
+        val weight:Long = (2==tokens.size) ? 1 as Long: 
                                                   Long.parse (tokens(2));
 
         if (adjacencyGraph instanceof AbstractWeightedCSRGraph) {

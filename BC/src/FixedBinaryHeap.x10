@@ -4,7 +4,7 @@
  * you need to specify up front how the capacity of the heap. No changing 
  * once initialized.
  *
- * Note that in this implementation, we are leaving Rail position 0 untouched.
+ * Note that in this implementation, we are leaving IMC position 0 untouched.
  * This is because its easier to then access the left and right child of a 
  * node using the 2*i and 2*i+1 operation.
  *
@@ -13,19 +13,20 @@
 import x10.util.HashMap;
 import x10.util.OptionsParser;
 import x10.util.Option;
+import x10.util.IndexedMemoryChunk;
 
 public final class FixedBinaryHeap {
-  /* the internal storage is a Rail */
-  private val internalHeap:Rail[Int];
-  private val indexMap:Rail[Int];
+  /* the internal storage is an IMC */
+  private val internalHeap:IndexedMemoryChunk[Int];
+  private val indexMap:IndexedMemoryChunk[Int];
   private val comparator:(x:Int,y:Int)=>Int;
   private var size:Int;
 
   // Constructor
   public def this (comparator:(x:Int,y:Int)=>Int, N:Int) {
     this.comparator = comparator;
-    this.internalHeap = Rail.make[Int] (N+1);
-    this.indexMap = Rail.make[Int] (N);
+    this.internalHeap = IndexedMemoryChunk.allocateZeroed[Int] (N+1);
+    this.indexMap = IndexedMemoryChunk.allocateZeroed[Int] (N);
     this.size = 0;
   } 
     
@@ -51,10 +52,10 @@ public final class FixedBinaryHeap {
       
   // Add an element, putting it in its right order
   public def push (newElement:Int) : void {
-    // check if this is still within our Rail bounds
+    // check if this is still within our IMC bounds
     // length() returns an index beyond the last point we can write.
     // we are writing to (this.size+1), so when we increment it, it should
-    // still be less than the length of the Rail.
+    // still be less than the length of the IMC.
     assert ((this.size+1) < this.internalHeap.length());
 
     // increment the size of the array
@@ -149,16 +150,16 @@ public final class FixedBinaryHeap {
 
     val makeIncreasingComparator = (distanceMap:HashMap[Int, Int]) => {
       return (x:Int, y:Int) => {
-        val dx = distanceMap.get(x).value();
-        val dy = distanceMap.get(y).value();
+        val dx = distanceMap.get(x)();
+        val dy = distanceMap.get(y)();
         return (dx==dy) ? 0 : (dx<dy) ? -1 : +1;
       };
     };
 
     val makeNonIncreasingComparator = (distanceMap:HashMap[Int, Int]) => {
       return (x:Int, y:Int) => {
-        val dx = distanceMap.get(x).value();
-        val dy = distanceMap.get(y).value();
+        val dx = distanceMap.get(x)();
+        val dy = distanceMap.get(y)();
         return (dx==dy) ? 0 : (dx<dy) ? +1 : -1;
       };
     };
@@ -166,7 +167,7 @@ public final class FixedBinaryHeap {
     val comparator = (1==isIncreasing) ? makeIncreasingComparator(distanceMap):
                                       makeNonIncreasingComparator(distanceMap);
 
-    val myQueue = new FixedBinaryHeap[Int] (comparator, 10);
+    val myQueue = new FixedBinaryHeap (comparator, 10);
     
     distanceMap.put (0, 0);
     myQueue.push (0);

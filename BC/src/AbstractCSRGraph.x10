@@ -39,15 +39,15 @@ public abstract class AbstractCSRGraph {
     this.M = inputFileReader.readInt ();
 
     // Second, create the datastructures that we need.
-    this.inDegreeMap = Rail.make[Int] 
+    this.inDegreeMap = new Rail[Int] 
                         (this.N, (i:Int) => inputFileReader.readInt());
 
     // Third, create the offset map --- which has (N+1) entries. BEWARE!
-    this.offsetMap = Rail.make[Int] 
+    this.offsetMap = new Rail[Int] 
                         (this.N+1, (i:Int) => inputFileReader.readInt());
 
     // Finally, read the adjacencyMap, which has M entries.
-    this.adjacencyMap = Rail.make[Int] 
+    this.adjacencyMap = new Rail[Int] 
                         (this.M, (i:Int) => inputFileReader.readInt());
 
     // Set compressed to true
@@ -58,8 +58,8 @@ public abstract class AbstractCSRGraph {
   public def this(N:Int) {
     this.N = N;
     this.M = 0;
-    this.inDegreeMap = Rail.make[Int] (this.N, (Int) => 0);
-    this.offsetMap = Rail.make[Int] ((this.N)+1);
+    this.inDegreeMap = new Rail[Int] (this.N, (Int) => 0);
+    this.offsetMap = new Rail[Int] ((this.N)+1);
     this.compressed = false;
   }
 

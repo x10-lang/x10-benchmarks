@@ -12,14 +12,14 @@ public final class UnweightedGraph extends AbstractUnweightedCSRGraph {
   public def this (N:Int) { 
     super(N);
     this.adjacencyList = 
-     Rail.make[ArrayList[Int]] (N, (Int)=> new ArrayList[Int]());
+     new Rail[ArrayList[Int]] (N, (Int)=> new ArrayList[Int]());
   }
 
 
   /** Constructor: construct from the CSR format file */
   public def this(csrFileName:String) {
     super(csrFileName);
-    this.adjacencyList = Rail.make[ArrayList[Int]] (0);
+    this.adjacencyList = new Rail[ArrayList[Int]] (0);
   }
 
   /**
@@ -34,11 +34,11 @@ public final class UnweightedGraph extends AbstractUnweightedCSRGraph {
     if (this.compressed) return;
 
     // Create as many elements as edges.
-    this.adjacencyMap = Rail.make[Int](this.M);
+    this.adjacencyMap = new Rail[Int](this.M);
 
     // Start copying over from the first vertex onwards.
     var currentOffset:Int = 0;
-    for ([v] in 0..(this.N-1)) {
+    for (v in 0..(this.N-1)) {
       // Put in the starting offset for this vertex.
       this.offsetMap(v) = currentOffset;
       
@@ -59,7 +59,7 @@ public final class UnweightedGraph extends AbstractUnweightedCSRGraph {
     this.compressed = true;
 
     // de-allocate anything that we don't need
-    for ([i] in 0..(this.adjacencyList.length-1)) {
+    for (i in 0..(this.adjacencyList.size-1)) {
       Runtime.deallocObject(this.adjacencyList(i));
     }
     Runtime.deallocObject (this.adjacencyList);
@@ -91,7 +91,7 @@ public final class UnweightedGraph extends AbstractUnweightedCSRGraph {
   public def toString (): String {
     var outString:String = "";
 
-    for ([v] in 0..(N-1)) {
+    for (v in 0..(N-1)) {
       val neighbors = this.adjacencyList (v);
 
       for (w in neighbors) {

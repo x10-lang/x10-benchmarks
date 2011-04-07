@@ -1,3 +1,5 @@
+import x10.util.IndexedMemoryChunk;
+
 /**
  * An implementation of the stack that allows us to set the initial size 
  * of the stack and that holds all the time. This also uses a Rail instead
@@ -5,7 +7,7 @@
  * with sizes that are a power of two.
  */
 public class FixedRailQueue[T] {
-  private val internalStorage:Rail[T];
+  private val internalStorage:IndexedMemoryChunk[T];
   private var N:Int;
   private var head:Int;
   private var tail:Int;
@@ -21,7 +23,7 @@ public class FixedRailQueue[T] {
   /** Construct a fixed size stack */
   public def this(N:Int) { 
     this.N = this.getNearestPowerOf2 (N);
-    this.internalStorage = Rail.make[T] (this.N);
+    this.internalStorage = IndexedMemoryChunk.allocateZeroed[T] (this.N);
     this.head=0;
     this.tail=0;
     this.size=0;

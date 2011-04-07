@@ -1,15 +1,17 @@
+import x10.util.IndexedMemoryChunk;
+
 /**
  * An implementation of the stack that allows us to set the initial size 
- * of the stack and that holds all the time. This also uses a Rail instead
+ * of the stack and that holds all the time. This also uses a IMC instead
  * of an ArrayList --- so it should be considerably faster.
  */
 public class FixedRailStack[T] {
-  private val internalStorage:Rail[T];
+  private val internalStorage:IndexedMemoryChunk[T];
   private var size:Int;
 
   /** Construct a fixed size stack */
   public def this(N:Int) { 
-    this.internalStorage = Rail.make[T] (N);
+    this.internalStorage = IndexedMemoryChunk.allocateZeroed[T](N);
     this.size=0;
   }
 

@@ -44,14 +44,14 @@ public final struct Rmat {
 	 * A function that mimics the MATLAB function "zeros".
 	 */
 	private final def zeros (numElements:Int):Rail[Int] =
-		Rail.make[Int] (numElements, (Int)=>0);
+		new Rail[Int] (numElements, (Int)=>0);
 	
 	/**
 	 *  A function that mimics the MATLAB function rand (M,1). It generates a 
 	 *  vector of M random numbers. Here, numElements is M!
 	 */
 	private final def rand (rng:Random, numElements:Int) =
-		Rail.make[Double] (numElements, (Int)=>rng.nextDouble());
+		new Rail[Double] (numElements, (Int)=>rng.nextDouble());
 	
 	/**
 	 * A function that mimics the use of > operator in MATLAB when the LHS is 
@@ -60,7 +60,7 @@ public final struct Rmat {
 	 * integer-valued vector where there is a 1 if "V[i] > a" and 0 otherwise.
 	 */
 	private final def greaterThan (lhs:Rail[Double], rhs:Double) =
-		Rail.make[Int] (lhs.length(), (i:Int)=>(lhs(i) > rhs) ? 1 : 0);
+		new Rail[Int] (lhs.size, (i:Int)=>(lhs(i) > rhs) ? 1 : 0);
 	
 	/**
 	 * The same function as above, only with a element-wise comparison in the RHS
@@ -68,7 +68,7 @@ public final struct Rmat {
 	 * resultant vector if "LHS[i] > RHS[i]", and 0 otherwise.
 	 */
 	private final def greaterThan (lhs:Rail[Double], rhs:Rail[Double]) =
-		Rail.make[Int] (lhs.length(), 
+		new Rail[Int] (lhs.size, 
 				(i:Int)=>(lhs(i) > rhs(i)) ? 1 : 0);
 	
 	/**
@@ -80,8 +80,8 @@ public final struct Rmat {
 	private final def multiply (lhs:Rail[Int], 
 			multiplier:Double, 
 			flip:Boolean) =
-				Rail.make[Double] 
-				          (lhs.length(), (i:Int)=> { 
+				new Rail[Double] 
+				          (lhs.size, (i:Int)=> { 
 				        	  val lhsMultiplier = flip ? ((lhs(i) > 0) ? 0 : 1) : lhs(i);
 				        	  multiplier*(lhsMultiplier as Double)});
 	
@@ -90,19 +90,19 @@ public final struct Rmat {
 	 */
 	private final def multiply (lhs:Rail[Int], 
 			multiplier:Int) =
-				Rail.make[Int] (lhs.length(), (i:Int)=>lhs(i)*multiplier);
+				new Rail[Int] (lhs.size, (i:Int)=>lhs(i)*multiplier);
 	
 	/**
 	 * A straightforward addition of two vectors.
 	 */
 	private final def add (lhs:Rail[Double], rhs:Rail[Double]) = 
-		Rail.make[Double] (lhs.length(), (i:Int)=>lhs(i)+rhs(i));
+		new Rail[Double] (lhs.size, (i:Int)=>lhs(i)+rhs(i));
 	
 	/**
 	 * Same as above, but with a different type
 	 */
 	private final def add (lhs:Rail[Int], rhs:Rail[Int]) =
-				Rail.make[Int] (lhs.length(), (i:Int)=>lhs(i)+rhs(i));
+				new Rail[Int] (lhs.size, (i:Int)=>lhs(i)+rhs(i));
 	
 	
 	/**
@@ -119,7 +119,7 @@ public final struct Rmat {
     /* Declare the adjacency graph */
     val adjacencyGraph:AbstractCSRGraph = weighted? 
                       new WeightedGraph(this.N): new UnweightedGraph(this.N);
-		val numElements = row.length(); 
+		val numElements = row.size; 
 		
 		for (var i:Int=0; i<numElements; ++i) {
 			val v = row(i);

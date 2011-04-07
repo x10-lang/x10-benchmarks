@@ -17,9 +17,9 @@ public final class Brandes(N:Int) {
 
   val graph:AbstractCSRGraph;
   val debug:Int;
-  val verticesToWorkOn=Rail.make[Int] (N, (i:Int)=>i);
-  val betweennessMap=Rail.make[Double] (N, (Int)=> 0.0D);
-  val betweennessMapLocks = Rail.make[Lock](N, (Int)=> new Lock());
+  val verticesToWorkOn=new Rail[Int] (N, (i:Int)=>i);
+  val betweennessMap=new Rail[Double] (N, (Int)=> 0.0D);
+  val betweennessMapLocks = new Rail[Lock](N, (Int)=> new Lock());
   
   // Constructor
   public def this(g:AbstractCSRGraph, debug:Int) {
@@ -51,16 +51,16 @@ public final class Brandes(N:Int) {
                                debug:Int) { 
     var allocTime:Long= System.nanoTime();
     // Per-thread structure --- initialize once.
-    val myBetweennessMap = Rail.make[Double] (N, 0.0 as Double);
+    val myBetweennessMap = new Rail[Double] (N, 0.0 as Double);
 
     // These are the per-vertex data structures.
     val vertexStack = new FixedRailStack[Int] (N);
-    val predecessorMap= Rail.make[FixedRailStack[Int]](N, (i:Int)=> 
+    val predecessorMap= new Rail[FixedRailStack[Int]](N, (i:Int)=> 
           new FixedRailStack[Int](graph.getInDegree(i)));
-    val distanceMap = Rail.make[Long](N, Long.MAX_VALUE);
-    val sigmaMap = Rail.make(N, 0 as Long);
+    val distanceMap = new Rail[Long](N, Long.MAX_VALUE);
+    val sigmaMap = new Rail[Long](N, 0L);
     val regularQueue = new FixedRailQueue[Int] (N);
-    val deltaMap = Rail.make[Double](N, 0.0 as Double);
+    val deltaMap = new Rail[Double](N, 0.0 as Double);
     val processedVerticesStack = new FixedRailStack[Int](N);
 
     allocTime = (System.nanoTime() - allocTime);
@@ -183,17 +183,17 @@ public final class Brandes(N:Int) {
                                     debug:Int) { 
     var allocTime:Long= System.nanoTime();
     // Per-thread structure --- initialize once.
-    val myBetweennessMap = Rail.make[Double] (N, 0.0 as Double);
+    val myBetweennessMap = new Rail[Double] (N, 0.0 as Double);
 
     // These are the per-vertex data structures.
     val vertexStack = new FixedRailStack[Int] (N);
-    val predecessorMap= Rail.make[FixedRailStack[Int]](N, (i:Int)=> 
+    val predecessorMap= new Rail[FixedRailStack[Int]](N, (i:Int)=> 
           new FixedRailStack[Int](graph.getInDegree(i)));
-    val distanceMap = Rail.make[Long](N, Long.MAX_VALUE);
-    val sigmaMap = Rail.make(N, 0 as Long);
+    val distanceMap = new Rail[Long](N, Long.MAX_VALUE);
+    val sigmaMap = new Rail[Long](N, 0L);
     val binaryHeapComparator = makeNonIncreasingComparator(distanceMap);
     val priorityQueue = new FixedBinaryHeap (binaryHeapComparator, N);
-    val deltaMap = Rail.make[Double](N, 0.0 as Double);
+    val deltaMap = new Rail[Double](N, 0.0 as Double);
     val processedVerticesStack = new FixedRailStack[Int](N);
 
     allocTime = (System.nanoTime() - allocTime);
@@ -322,7 +322,7 @@ public final class Brandes(N:Int) {
   private def permuteVertices () {
     val prng = new Random();
     val maxIndex = N-1;
-    val unshuffledVertices:Rail[Int] = Rail.make[Int] (N, (i:Int)=>i);
+    val unshuffledVertices:Rail[Int] = new Rail[Int] (N, (i:Int)=>i);
     for ([i] in 0..maxIndex) {
       val indexToPick = prng.nextInt (maxIndex-i);
       this.verticesToWorkOn(i) = unshuffledVertices(i+indexToPick);
@@ -346,7 +346,7 @@ public final class Brandes(N:Int) {
     // Evaluate after splitting up the tasks based on the scheduling policy
     // A "-1" indicates that the user wants to split evenly across all threads.
     val myTotalWorkLoad = (vertexEndIndex-vertexBeginIndex+1);
-    val numChunks = (-1==chunk) ? Runtime.INIT_THREADS: chunk;
+    val numChunks = (-1==chunk) ? Runtime.NTHREADS: chunk;
     assert numChunks > 0;
     val chunkSize = myTotalWorkLoad/numChunks;
     
@@ -550,8 +550,8 @@ public final class Brandes(N:Int) {
       printer.println ("" + Place.MAX_PLACES + " place" 
     		  + (Place.MAX_PLACES > 1 ? "s" : "")
     		  + " and " + 
-          Runtime.INIT_THREADS + " worker" 
-          + (Runtime.INIT_THREADS > 1 ? "s" : "") + "/place");
+          Runtime.NTHREADS + " worker" 
+          + (Runtime.NTHREADS > 1 ? "s" : "") + "/place");
       
       crunchNumbers (gm, printer, permute, weighted, chunk, debug);
       

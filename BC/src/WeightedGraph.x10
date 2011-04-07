@@ -14,7 +14,7 @@ public final class WeightedGraph extends AbstractWeightedCSRGraph {
   public def this (N:Int) { 
     super(N);
     this.adjacencyList = 
-     Rail.make[HashMap[Int, Long]] (N, (Int)=> new HashMap[Int, Long]());
+     new Rail[HashMap[Int, Long]] (N, (Int)=> new HashMap[Int, Long]());
   }
 
   /**
@@ -29,8 +29,8 @@ public final class WeightedGraph extends AbstractWeightedCSRGraph {
     if (this.compressed) return;
 
     // Create as many elements as edges.
-    this.adjacencyMap = Rail.make[Int](this.M);
-    this.edgeWeightMap = Rail.make[Long](this.M);
+    this.adjacencyMap = new Rail[Int](this.M);
+    this.edgeWeightMap = new Rail[Long](this.M);
 
     // Start copying over from the first vertex onwards.
     var currentOffset:Int = 0;
@@ -56,7 +56,7 @@ public final class WeightedGraph extends AbstractWeightedCSRGraph {
     this.compressed = true;
 
     // de-allocate anything that we don't need
-    for ([i] in 0..(this.adjacencyList.length-1)) {
+    for (i in 0..(this.adjacencyList.size-1)) {
       Runtime.deallocObject(this.adjacencyList(i));
     }
     Runtime.deallocObject (this.adjacencyList);
