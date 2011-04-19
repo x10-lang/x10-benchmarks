@@ -3,10 +3,10 @@ package FT;
 import x10.compiler.Native;
 
 class Random {
-	@Native("c++", "srandom(#1)")
+	@Native("c++", "::srandom(#1)")
 	static native def srandom(seed:Int):void;
 
-	@Native("c++", "random()")
+	@Native("c++", "::random()")
 	native def random():Long;
 	
 	def this(I:Int) {
