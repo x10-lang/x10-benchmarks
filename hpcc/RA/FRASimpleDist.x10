@@ -5,12 +5,12 @@ import x10.compiler.NativeCPPInclude;
 import x10.util.IndexedMemoryChunk;
 import x10.util.Box;
 
-@NativeCPPInclude("pgas_collectives.h")
+//@NativeCPPInclude("pgas_collectives.h")
 
 class FRASimpleDist {
 
-    @Native("c++", "__pgasrt_tsp_barrier()")
-    static def barrier() {}
+//  @Native("c++", "__pgasrt_tsp_barrier()")
+//  static def barrier() {}
 
     static POLY = 0x0000000000000007L;
     static PERIOD = 1317624576693539401L;
@@ -54,7 +54,7 @@ class FRASimpleDist {
             val poly = POLY;
             val here_id = here.id;
             val lu = local_updates;
-            barrier();
+//          barrier();
             for (var i:Long=0 ; i<lu ; i+=1L) {
                 val place_id = ((ran>>size) as Int) & mask2;
                 val index = (ran as Int) & mask1;
@@ -66,7 +66,7 @@ class FRASimpleDist {
                 }
                 ran = (ran << 1) ^ (ran<0L ? poly : 0L);
             }
-            barrier();
+//          barrier();
         }
     }
 
