@@ -131,7 +131,11 @@ class FRASimpleDist {
 
         // print some info
         Console.OUT.println("Main table size:   2^"+logLocalTableSize+"*"+Place.MAX_PLACES
-                                       +" == "+tableSize+" words");
+                                       +" == "+tableSize+" words"
+                                       +" ("+tableSize*8.0/1024/1024+" MB)");
+        Console.OUT.println("Per-process table size:   2^"+logLocalTableSize
+                                       +" == "+localTableSize+" words"
+                                       +" ("+localTableSize*8.0/1024/1024+" MB)");
         Console.OUT.println("Number of places:  " + Place.MAX_PLACES);
         Console.OUT.println("Number of updates: " + numUpdates);
 
