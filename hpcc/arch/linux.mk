@@ -15,6 +15,8 @@ ifeq ($(USE_ACML), 1)
 export BLAS_LIB		?= /opt/acml4.3.0/gfortran64/lib/libacml.a /usr/lib/gcc/x86_64-redhat-linux/4.1.1/libgfortran.a
 else
 export BLAS_LIB		?= -lblas
+# Linux + essl + gcc below
+#export BLAS_LIB		?= -lessl -lm -lxlf90_r -lxl -lxlomp_ser -lxlfmath -L/opt/ibmcmp/xlsmp/2.1/lib64 -L/opt/ibmcmp/xlf/13.1/lib64 -R/opt/ibmcmp/lib64
 endif
 
 export POSTCOMPILE_AR		?= ar
