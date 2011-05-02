@@ -21,21 +21,21 @@ class FRASimpleDist {
         val m2 = new Array[Long](64);
         while (n < 0) n += PERIOD;
         while (n > PERIOD) n -= PERIOD;
-        if (n == 0) return 0x1L;
+        if (n == 0L) return 0x1L;
         var temp:Long = 0x1;
         for (i=0; i<64; i++) {
             m2(i) = temp;
             temp = (temp << 1) ^ (temp < 0 ? POLY : 0L);
             temp = (temp << 1) ^ (temp < 0 ? POLY : 0L);
         }
-        for (i=62; i>=0; i--) if (((n >> i) & 1) != 0) break;
+        for (i=62; i>=0; i--) if (((n >> i) & 1) != 0L) break;
         var ran:Long = 0x2;
         while (i > 0) {
             temp = 0;
-            for (j=0; j<64; j++) if (((ran >> j) & 1) != 0) temp ^= m2(j);
+            for (j=0; j<64; j++) if (((ran >> j) & 1) != 0L) temp ^= m2(j);
             ran = temp;
             i -= 1;
-            if (((n >> i) & 1) != 0)
+            if (((n >> i) & 1) != 0L)
                 ran = (ran << 1) ^ (ran < 0 ? POLY : 0L);
         }
         return ran;
@@ -154,7 +154,7 @@ class FRASimpleDist {
         finish for (p in Place.places()) async at (p) {
             var err:Int = 0;
             for ([i] in 0..(localTableSize-1)) 
-                if (plhimc()()(i) != i) err++;
+                if (plhimc()()(i) != (i as Long)) err++;
             Console.OUT.println(here+": Found " + err + " errors.");
         }
     }
