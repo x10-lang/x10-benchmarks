@@ -9,7 +9,7 @@ import x10.io.Printer;
 import x10.lang.Cell;
 import x10.util.concurrent.AtomicLong;
 import x10.util.Team;
-import x10.lang.Lock;
+import x10.util.concurrent.Lock;
 
 public final class Brandes(N:Int) {
   static type AtomicType=LockedDouble;

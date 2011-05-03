@@ -2,22 +2,19 @@
 
 # <BEGIN> user settings #
 
-ifeq ($(shell uname -s),Darwin)
-  export X10CXX?=/Users/pkambadu/Software/src/x10/x10-trunk/x10.dist/bin/x10c++
-else
-  export X10CXX?=/gsa/yktgsa-h1/08/pkambadu/Software/src/x10/x10-trunk/x10.dist/bin/x10c++
-endif
+export X10CXX?=x10c++
 
 #leave blank by default, X10 automatically chooses a transport for you. To
 #force a particular implementation, please uncheck one of the other options.
-export X10RTTRANSPORT	?= 
+#export X10RTTRANSPORT	?= 
+export X10RTTRANSPORT	?= -x10rt pami
 #export X10RTTRANSPORT	?= -x10rt mpi
 #export X10RTTRANSPORT ?= -x10rt standalone
 #export X10RTTRANSPORT ?= -x10rt pgas_lapi
 #export X10RTTRANSPORT ?= -x10rt pgas_bgp
 #export X10RTTRANSPORT ?= -x10rt pgas_sockets
 
-export X10CXXFLAGS 	?= -report postcompile=5 -VERBOSE_CALLS
+export X10CXXFLAGS 	?= -report postcompile=5
 
 # <END> user settings #
 
@@ -40,7 +37,6 @@ endif
 X10RUN?=runx10
 X10CXXFLAGS=-report \
             postcompile=5 \
-            -STATIC_CALLS \
             $(X10RT_TRANSPORT) \
             -v \
             -NO_CHECKS \

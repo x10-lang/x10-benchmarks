@@ -4,7 +4,7 @@
 	 * Since there are currently no atomic increments on arbitray 
 	 * Doubles such as Doubles and Floats, we will fake it with locks
 	 */
-import x10.lang.Lock;
+import x10.util.concurrent.Lock;
 
 public final  class LockedDouble {
 	private var value:Double;
