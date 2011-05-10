@@ -5,7 +5,7 @@ import x10.compiler.NativeCPPInclude;
 import x10.util.IndexedMemoryChunk;
 import x10.util.Box;
 
-//@NativeCPPInclude("pgas_collectives.h")
+@NativeCPPInclude("pgas_collectives.h")
 
 class FRASimpleDistNoAbstraction {
 
@@ -77,7 +77,7 @@ class FRASimpleDistNoAbstraction {
     private static def help (err:Boolean) {
         if (here.id!=0) return;
         val out = err ? Console.ERR : Console.OUT;
-        out.println("Usage: FRASimpleDistNoAbstraction [-m <mem>] [-u <updates>]");
+        out.println("Usage: FRASimpleDist [-m <mem>] [-u <updates>]");
         out.println("where");
         out.println("   <mem> is the log2 size of the local table (default 12)");
         out.println("   <updates> is the number of updates per element (default 4)");
