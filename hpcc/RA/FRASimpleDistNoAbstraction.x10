@@ -5,12 +5,12 @@ import x10.compiler.NativeCPPInclude;
 import x10.util.IndexedMemoryChunk;
 import x10.util.Box;
 
-@NativeCPPInclude("pgas_collectives.h")
+//@NativeCPPInclude("pgas_collectives.h")
 
 class FRASimpleDistNoAbstraction {
 
-    @Native("c++", "__pgasrt_tsp_barrier()")
-    static def barrier() {}
+//  @Native("c++", "__pgasrt_tsp_barrier()")
+//  static def barrier() {}
 
     @Native("c++", "__pgasrt_tsp_dupdate_hfi(0, place_id, (__pgasrt_local_addr_t)&(imc->raw()[index]), 0, (__pgasrt_local_addr_t)&update, PGASRT_OP_XOR, NULL, NULL);")
     static def remote_update(imc: IndexedMemoryChunk[Long], place_id:Int, index:Int, update:Long)
@@ -25,22 +25,22 @@ class FRASimpleDistNoAbstraction {
         val m2 = new Array[Long](64);
         while (n < 0) n += PERIOD;
         while (n > PERIOD) n -= PERIOD;
-        if (n == 0) return 0x1L;
+        if (n == 0L) return 0x1L;
         var temp:Long = 0x1;
         for (i=0; i<64; i++) {
             m2(i) = temp;
             temp = (temp << 1) ^ (temp < 0 ? POLY : 0L);
             temp = (temp << 1) ^ (temp < 0 ? POLY : 0L);
         }
-        for (i=62; i>=0; i--) if (((n >> i) & 1) != 0) break;
+        for (i=62; i>=0; i--) if (((n >> i) & 1) != 0L) break;
         var ran:Long = 0x2;
         while (i > 0) {
             temp = 0;
-            for (j=0; j<64; j++) if (((ran >> j) & 1) != 0) temp ^= m2(j);
+            for (j=0; j<64; j++) if (((ran >> j) & 1) != 0L) temp ^= m2(j);
             ran = temp;
             i -= 1;
-            if (((n >> i) & 1) != 0)
-                ran = (ran << 1) ^ (ran < 0 ? POLY : 0);
+            if (((n >> i) & 1) != 0L)
+                ran = (ran << 1) ^ (ran < 0 ? POLY : 0L);
         }
         return ran;
     }
@@ -58,7 +58,7 @@ class FRASimpleDistNoAbstraction {
             val poly = POLY;
             val here_id = here.id;
             val lu = local_updates;
-            barrier();
+//          barrier();
             for (var i:Long=0 ; i<lu ; i+=1L) {
                 val place_id = ((ran>>size) as Int) & mask2;
                 val index = (ran as Int) & mask1;
@@ -70,7 +70,7 @@ class FRASimpleDistNoAbstraction {
                 }
                 ran = (ran << 1) ^ (ran<0L ? poly : 0L);
             }
-            barrier();
+//          barrier();
         }
     }
 
@@ -94,10 +94,10 @@ class FRASimpleDistNoAbstraction {
         var updates_ : Int = 4;
 
         // parse arguments
-        for (var i:Int=0 ; i<args.size() ; ) {
+        for (var i:Int=0 ; i<args.size ; ) {
             if (args(i).equals("-m")) {
                 i++;
-                if (i >= args.size()) {
+                if (i >= args.size) {
                     if (here.id==0)
                         Console.ERR.println("Too few cmdline params.");
                     help(true);
@@ -106,7 +106,7 @@ class FRASimpleDistNoAbstraction {
                 logLocalTableSize_ = Int.parseInt(args(i++));
             } else if (args(i).equals("-u")) {
                 i++;
-                if (i >= args.size()) {
+                if (i >= args.size) {
                     if (here.id==0)
                         Console.ERR.println("Too few cmdline params.");
                     help(true);
@@ -128,16 +128,20 @@ class FRASimpleDistNoAbstraction {
         val numUpdates = updates_*tableSize;
 
         // create congruent array (same address at each place)
-        val plhimc = PlaceLocalHandle.make(Dist.makeUnique(), () => new Box(IndexedMemoryChunk.allocate[Long](localTableSize, 8, true, true)) as Box[IndexedMemoryChunk[Long]]{self!=null});
+        val plhimc = PlaceLocalHandle.make(Dist.makeUnique(), () => new Box(IndexedMemoryChunk.allocateZeroed[Long](localTableSize, 8, true)) as Box[IndexedMemoryChunk[Long]]{self!=null});
         finish for (p in Place.places()) async at (p) {
             for ([i] in 0..(localTableSize-1)) plhimc()()(i) = i as Long;
         }
 
         // print some info
-        Console.OUT.println("Main table size:   2^"+logLocalTableSize+"*"+Place.MAX_PLACES
-                                       +" == "+tableSize+" words");
-        Console.OUT.println("Number of places:  " + Place.MAX_PLACES);
-        Console.OUT.println("Number of updates: " + numUpdates);
+        Console.OUT.println("Main table size:         2^"+logLocalTableSize+"*"+Place.MAX_PLACES
+                                       +" == "+tableSize+" words"
+                                       +" ("+tableSize*8.0/1024/1024+" MB)");
+        Console.OUT.println("Per-process table size:  2^"+logLocalTableSize
+                                       +" == "+localTableSize+" words"
+                                       +" ("+localTableSize*8.0/1024/1024+" MB)");
+        Console.OUT.println("Number of places:        " + Place.MAX_PLACES);
+        Console.OUT.println("Number of updates:       " + numUpdates);
 
         // time it
         var cpuTime:Double = -Timer.nanoTime() * 1e-9D;
@@ -154,7 +158,7 @@ class FRASimpleDistNoAbstraction {
         finish for (p in Place.places()) async at (p) {
             var err:Int = 0;
             for ([i] in 0..(localTableSize-1)) 
-                if (plhimc()()(i) != i) err++;
+                if (plhimc()()(i) != (i as Long)) err++;
             Console.OUT.println(here+": Found " + err + " errors.");
         }
     }
