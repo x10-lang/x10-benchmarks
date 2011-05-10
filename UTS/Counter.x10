@@ -74,7 +74,7 @@ public class Counter {
         
         public def size () : Long = (collectionLength-index);
         
-        public def empty () : Boolean = (size()==0);
+        public def empty () : Boolean = (size()==0L);
     }
     
     var lifelines:Long=0L;

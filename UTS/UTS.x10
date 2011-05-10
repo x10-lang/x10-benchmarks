@@ -89,7 +89,7 @@ public class UTS {
         
         public final def processStack () {
             
-            while (stack.size() > 0u) {
+            while (stack.size() > 0) {
                 if (Constants.BINOMIAL==treeType) 
                     TreeExpander.binomial (q, m, stack.pop(), stack);
                 else TreeExpander.geometric (a, b0, d, stack.pop(), stack);
@@ -136,7 +136,7 @@ public class UTS {
         
         public final def processStack () {
             
-            while (stack.size() > 0u) {
+            while (stack.size() > 0) {
                 if (Constants.BINOMIAL==treeType) 
                     async TreeExpander.binomial (q, m, stack.pop(), stack);
                 else async TreeExpander.geometric (a, b0, d, stack.pop(), stack);

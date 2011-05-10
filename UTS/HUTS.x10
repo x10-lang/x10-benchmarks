@@ -287,7 +287,7 @@ final class HUTS implements Counted {
         val stack = stacks(Me);
         val time = gatherTimes ? System.nanoTime() : 0L;
         val lootSize= stack.size();
-        if (lootSize > 2u) {
+        if (lootSize > 2) {
             numThieves = min(numThieves, lootSize-2);
             val numToSteal = lootSize/(numThieves+1);
             for (var i:Int=0; i < numThieves; ++i) {
