@@ -48,7 +48,7 @@ public struct ParameterReader {
    
    val keys:   Rail[String];
    val values: Rail[String];
-   val commentStart: Int;
+   val commentStart: Byte;
    val errors: String;
          
    /**
@@ -67,7 +67,7 @@ public struct ParameterReader {
       var status: String;
       val keys_ = new ArrayBuilder[String]();
       val values_ = new ArrayBuilder[String]();
-      val commentStart_ = commentStartChar_.ord();
+      val commentStart_ = commentStartChar_.ord() as Byte;
       try {
          val relative = new File(path);
          val absolute = relative.getAbsoluteFile();
@@ -170,20 +170,22 @@ public struct ParameterReader {
     * @throws EOFException when attempting to read beyond the end of the file.
     * @throws IOException more generally if the reader fails.
     */
-   private static def readNonEmptyLine(reader: FileReader, commentStart: Int): String {
+   private static def readNonEmptyLine(reader: FileReader, commentStart: Byte): String {
       val builder = new StringBuilder();
       // skip leading white space
       //Console.ERR.println("available? "+reader.available()); // !BUG
       var b: Byte = reader.readByte();
+      val hash = '#'.ord() as Byte;
+      val semi = ';'.ord() as Byte;
       while(true) {
-         while(b <= 0x20) { b = reader.readByte(); }  //!BUG--isSpaceChar wrong
-         while(b != 0xA && b != 0xD && b != commentStart) { // read until end of line or EOF
+         while(b <= 0x20y) { b = reader.readByte(); }  //!BUG--isSpaceChar wrong
+         while(b != 0xAy && b != 0xDy && b != commentStart) { // read until end of line or EOF
             builder.add(b as Char);
             b = reader.readByte();
          }
          val answer = builder.result();
-         if (b == '#'.ord() || b == ';'.ord()) {
-            try { while(b != 0xA && b != 0xC) b = reader.read(); }
+         if (b == hash || b == semi) {
+            try { while(b != 0xAy && b != 0xCy) b = reader.read(); }
             catch(e: Exception) {  }
          }
          if (DEBUG) Console.ERR.println("answer: '"+answer+"', length="+answer.length());
@@ -205,7 +207,7 @@ public struct ParameterReader {
     * @return the empty string normally, an error message otherwise
     * @throws IOException if a read attempt fails for any reason other than EOF
     */
-   private static def readString(reader: FileReader, values_:ArrayBuilder[String], initialSegment: String, commentStart: Int) {
+   private static def readString(reader: FileReader, values_:ArrayBuilder[String], initialSegment: String, commentStart: Byte) {
       var endString: Int = initialSegment.indexOf("'");
       if (endString >= 0) {
          values_.add(initialSegment.substring(0, endString));
@@ -237,7 +239,7 @@ public struct ParameterReader {
      * @return the empty string normally, an error message otherwise
      * @throws IOException if a read attempt fails for any reason other than EOF
      */
-   private static def readDecimal(reader: FileReader, values_:ArrayBuilder[String], initialSegment: String, commentStart: Int) {
+   private static def readDecimal(reader: FileReader, values_:ArrayBuilder[String], initialSegment: String, commentStart: Byte) {
       var line: String = initialSegment;
       try { 
          if(line.length() == 0) line = readNonEmptyLine(reader, commentStart);
@@ -264,7 +266,7 @@ public struct ParameterReader {
     * @return the empty string normally, an error message otherwise
     * @throws IOException if a read attempt fails for any reason other than EOF
     */
-   private static def readArray(reader: FileReader, values_:ArrayBuilder[String], initialSegment: String, commentStart: Int) {
+   private static def readArray(reader: FileReader, values_:ArrayBuilder[String], initialSegment: String, commentStart: Byte) {
       val buffer = new StringBuilder();
       var line: String = initialSegment;
       try {
@@ -297,7 +299,7 @@ public struct ParameterReader {
     * @return a completion code: empty string means "everything ok", 'EOF' means "end of
     *   file".
     */
-   private static def readAParameter(reader: FileReader, keys_: ArrayBuilder[String], values_: ArrayBuilder[String], commentStart: Int) {
+   private static def readAParameter(reader: FileReader, keys_: ArrayBuilder[String], values_: ArrayBuilder[String], commentStart: Byte) {
       try {
          var line: String = readNonEmptyLine(reader, commentStart);
          val firstEqual = line.indexOf("=");

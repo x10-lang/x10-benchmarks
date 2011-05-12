@@ -105,7 +105,7 @@ import x10.util.StringBuilder;
       val builder = new StringBuilder();
       var ellipsis: Boolean = false;
       for(n in (0..255)) {
-    	 if (alphabetIndex(n) == -1) {
+    	 if (alphabetIndex(n) == -1y) {
     	    if(!ellipsis) { builder.add("..."); ellipsis = true; }
     	 }
     	 else { builder.add((n as Char).toString()+"("+alphabetIndex(n)+"), "); }

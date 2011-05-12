@@ -9,7 +9,7 @@ import x10.util.ArrayBuilder;
  */
 public class Scorer {
     /** constants used to populate the traceback matrix */
-    static BAD = 0, STOP = 1, LEFT = 2, DIAGONAL = 3, UP = 4;
+    static BAD = 0y, STOP = 1y, LEFT = 2y, DIAGONAL = 3y, UP = 4y;
     /** for debugging output only: string values for the traceback entries */
     static DIRECTION_NAMES = ["BAD", "STOP", "LEFT", "DIAGONAL", "UP"];
     static GAP = '-'.ord() as Byte;
@@ -164,7 +164,7 @@ public class Scorer {
     *    and where in the original sequences it came from.
     */ 
    public def result() {
-      var nextMove: Int = BAD;
+      var nextMove: Byte = BAD;
       val shorterLast = score.shortEnds;
       val longerLast  = score.longEnds;
       if(DEBUG) Console.ERR.println("long winner ends at "+longerLast+",  array ends at "+longRail.size);
