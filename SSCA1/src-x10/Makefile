@@ -1,9 +1,9 @@
 all: sw run
 
 sw:
-	x10c++ -STATIC_CALLS -NO_CHECKS -O -report postcompile=5 -o sw ssca1/SW.x10
+	x10c++ -STATIC_CHECKS -NO_CHECKS -O -report postcompile=5 -o sw ssca1/SW.x10
 swd:
-	x10c++ -STATIC_CALLS -report postcompile=5 -o sw ssca1/SW.x10
+	x10c++ -STATIC_CHECKS -report postcompile=5 -o sw ssca1/SW.x10
 
 run:
 	mpirunx10 -n 1 sw -s ../data/short9.txt -l ../data/long9.txt -p ../data/baseDNA.txt -r 4
