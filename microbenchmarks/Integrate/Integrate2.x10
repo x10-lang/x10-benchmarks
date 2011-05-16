@@ -11,16 +11,16 @@ import x10.io.Console;
  */
 public final class Integrate2 {
 
-    const errorTolerance:double = 1.0e-12;
+    static errorTolerance:double = 1.0e-12;
 
-    const SERIAL:int = -1;
-    const DYNAMIC:int = 0;
-    const FUTURE:int = 1;
-    const ASYNC:int = 2;
+    static SERIAL:int = -1;
+    static DYNAMIC:int = 0;
+    static FUTURE:int = 1;
+    static ASYNC:int = 2;
 
-    const reps:int = 10;
+    static reps:int = 10;
 
-    public static def main(args:Rail[String]!):void {
+    public static def main(args:Rail[String]):void {
         val start:double = 0.0;
         val end:double = 1536.0; // 2048.0; // 8192.0;
 	var forkPolicy:int = DYNAMIC;
@@ -147,9 +147,15 @@ public final class Integrate2 {
             if (diff <= errorTolerance)
                 return alr;
 	    else {
-		val expr1 = future (here) recEval(c, r, fc, fr, ar);
-		val expr2 = recEval(l, c, fl, fc, al);
-		return expr1() + expr2;
+                val expr1:double;
+                val expr2:double;
+                finish {
+                    async { 
+                        expr1 = recEval(c, r, fc, fr, ar);
+                    }
+		    expr2 = recEval(l, c, fl, fc, al);
+                }
+		return expr1 + expr2;
 	   }
         }
     }
@@ -245,9 +251,15 @@ public final class Integrate2 {
                 return alr;
 	    } else {
 	        if (x10.lang.Runtime.surplusActivityCount() <= 3) {
-		    val expr1 = future (here) recEval(c, r, fc, fr, ar);
-		    val expr2 = recEval(l, c, fl, fc, al);
-		    return expr1() + expr2;
+                    val expr1:double;
+                    val expr2:double;
+                    finish {
+                        async { 
+		            expr1 = recEval(c, r, fc, fr, ar);
+                        }
+		        expr2 = recEval(l, c, fl, fc, al);
+                    }
+		    return expr1 + expr2;
 	        } else {
 	            return recEval(c, r, fc, fr, ar) + recEval(l, c, fl, fc, al);
                 }
