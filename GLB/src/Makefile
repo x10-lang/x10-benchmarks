@@ -35,7 +35,7 @@ endif
 X10RUN?=runx10
 X10CXXFLAGS=-report \
             postcompile=5 \
-            -VERBOSE_CALLS \
+            -VERBOSE_CHECKS \
             -O \
             -NO_CHECKS=true \
             $(X10RT_TRANSPORT) \

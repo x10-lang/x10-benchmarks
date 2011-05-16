@@ -28,7 +28,7 @@ public final class NetworkGenerator {
 
   private static def countValidEdges (edgeList:Rail[Int]) {
     var numValidEdges:Int = 0;
-    for (var i:Int=0; i<edgeList.length; ++i) 
+    for (var i:Int=0; i<edgeList.size; ++i) 
       if (INVALID_EDGE != edgeList(i)) ++numValidEdges;
     return numValidEdges;
   }
@@ -41,8 +41,8 @@ public final class NetworkGenerator {
     // The ring structure is needed to ensure that there is always a linear
     // lifeline available to the system -- in case all else fails.
     val mutableNetwork:Rail[Rail[Int]] = 
-      Rail.make[Rail[Int]] (nplaces, 
-        (i:Int) => Rail.make[Int](x10.lang.Math.log2(nplaces)+1,
+      new Rail[Rail[Int]] (nplaces, 
+        (i:Int) => new Rail[Int](x10.lang.Math.log2(nplaces)+1,
                               (j:Int) => 
           (0==j)?(i+1)%nplaces : 
                  (((i+1)%nplaces)==((1<<(j-1))^i) || 
@@ -53,15 +53,15 @@ public final class NetworkGenerator {
     // randomly. Bsaically, we flip a coin and keep one of the 2 edges.
     val rng = new Random();
     if (2 < nplaces) {
-      for (var i:Int=0; i<mutableNetwork.length; ++i) {
-        for (var j:Int=1; j<mutableNetwork(i).length; ++j) {
+      for (var i:Int=0; i<mutableNetwork.size; ++i) {
+        for (var j:Int=1; j<mutableNetwork(i).size; ++j) {
           // check if the cycle has already been broken
           if (mutableNetwork(i)(j) > i) {
             // break the cycle by flipping a coin 
             if (rng.nextBoolean()) {
               // go to the other entry and make it -1 
               val index:Int = mutableNetwork(i)(j);
-              for (var k:Int=1; k<mutableNetwork(index).length; ++k) {
+              for (var k:Int=1; k<mutableNetwork(index).size; ++k) {
                 if (mutableNetwork(index)(k) == j) {
                   mutableNetwork(index)(k) = -1;
                   break;
@@ -76,9 +76,9 @@ public final class NetworkGenerator {
     }
 
     // Finally, create a new thingy based on what we just created.
-    val network:Rail[Rail[Int]] = Rail.make[Rail[Int]] 
-        (nplaces, (i:Int) => Rail.make[Int] 
-          (mutableNetwork(i).length, (j:Int) => mutableNetwork(i)(j)));
+    val network:Rail[Rail[Int]] = new Rail[Rail[Int]] 
+        (nplaces, (i:Int) => new Rail[Int] 
+          (mutableNetwork(i).size, (j:Int) => mutableNetwork(i)(j)));
 
     // Return what we just created.
     return network;
@@ -88,8 +88,8 @@ public final class NetworkGenerator {
    * Method to generate a directed hypercube structure.
    */
   public static def generateRing (nplaces:Int) {
-    val network:Rail[Rail[Int]] = Rail.make[Rail[Int]] 
-      (nplaces, (i:Int) => Rail.make[Int] (1, (j:Int) => (i+1)%nplaces));
+    val network:Rail[Rail[Int]] = new Rail[Rail[Int]] 
+      (nplaces, (i:Int) => new Rail[Int] (1, (j:Int) => (i+1)%nplaces));
 
     return network;
   }
@@ -105,7 +105,7 @@ public final class NetworkGenerator {
 
     // Figure out which bucket this place belongs to
     var bucketNumber:Int=-1;
-    val nDimensions:Int = buckets.length;
+    val nDimensions:Int = buckets.size;
     for (var i:Int=0; i<nDimensions; ++i) {
       if (place >= buckets(i) && place < buckets(i+1)) {
         bucketNumber = i;
@@ -150,13 +150,13 @@ public final class NetworkGenerator {
     // Figure out how many elements are in each bucket
     val quotient:Int = nplaces/nDimensions;
     var remainder:Int = nplaces%nDimensions;
-    var firstCutBuckets:Rail[Int] = Rail.make[Int] 
+    var firstCutBuckets:Rail[Int] = new Rail[Int] 
                                (nDimensions+1, (i:Int) => i*quotient);
 
     // Adjust for the remainder
     var extraElementRecepient:Int = 1;
     while (0 != remainder) { 
-      for (var i:Int=extraElementRecepient; i<firstCutBuckets.length; ++i) {
+      for (var i:Int=extraElementRecepient; i<firstCutBuckets.size; ++i) {
        ++firstCutBuckets(i);
       }
       ++extraElementRecepient;
@@ -167,8 +167,8 @@ public final class NetworkGenerator {
     // Now generate network. Basically, for each i, we determine which 
     // bucket it belongs to. Then, it is pretty simple to calculate 
     // which element it is mapped to.
-    val network = Rail.make[Rail[Int]]
-      (nplaces, (i:Int) => Rail.make[Int] 
+    val network = new Rail[Rail[Int]]
+      (nplaces, (i:Int) => new Rail[Int] 
         (nDimensions, (j:Int) => getMapping (buckets, i, j)));
 
     return network;
@@ -182,8 +182,8 @@ public final class NetworkGenerator {
   }
 
   private static def bubbleSort (nodeList:Rail[Int]) {
-    for (var i:Int=0; i<nodeList.length; ++i) 
-      for (var j:Int=i; j<nodeList.length; ++j) 
+    for (var i:Int=0; i<nodeList.size; ++i) 
+      for (var j:Int=i; j<nodeList.size; ++j) 
         if (nodeList(i) < nodeList(j)) {
           val tmp:Int = nodeList(i);
           nodeList(i) = nodeList(j);
@@ -202,8 +202,8 @@ public final class NetworkGenerator {
     // ((u_1+1)mod w)...((u_k+1) mod w)). For now, we will use Int 
     // for each digit assuming that w will never be greater than 
     // pow (2, 32).
-    val network:Rail[Rail[Int]] = Rail.make[Rail[Int]]
-     (P, (i:Int) => bubbleSort (Rail.make[Int] 
+    val network:Rail[Rail[Int]] = new Rail[Rail[Int]]
+     (P, (i:Int) => bubbleSort (new Rail[Int] 
        (k, (j:Int) => {
     	   val ip = new PAdicNumber(w,k,i);
     	   val o = ip.boundedDelta(1, j, P);
@@ -215,7 +215,7 @@ public final class NetworkGenerator {
 
   public static def printMyEdges (myLifelines: Rail[Int]) {
 		Console.OUT.print (""+ here.id + " =>");
-		val z = myLifelines.length;
+		val z = myLifelines.size;
 		for (var i:Int=0; i<z; ++i) 
 			if (-1 != myLifelines(i)) 
 				Console.OUT.print  (" " + myLifelines(i) +  " " +
@@ -227,9 +227,9 @@ public final class NetworkGenerator {
    * Print out the network.
    */
   public static def printNetwork (network:Rail[Rail[Int]]) {
-    for (var i:Int=0; i<network.length; ++i) {
+    for (var i:Int=0; i<network.size; ++i) {
       Console.OUT.print(""+i + " =>");
-      for (var j:Int=0; j<network(i).length; ++j) 
+      for (var j:Int=0; j<network(i).size; ++j) 
         if (-1 != network(i)(j)) Console.OUT.print(" " + network(i)(j));
       Console.OUT.println();
     }
@@ -241,11 +241,11 @@ public final class NetworkGenerator {
   public static def has2cycles (nplaces:Int, 
                                 network:Rail[Rail[Int]]) {
     if (2 < nplaces) {
-      for (var i:Int=0; i<network.length; ++i) {
-        for (var j:Int=1; j<network(i).length; ++j) {
+      for (var i:Int=0; i<network.size; ++i) {
+        for (var j:Int=1; j<network(i).size; ++j) {
           val lifeLine = network(i)(j);
           if (-1 != lifeLine) {
-            for (var k:Int=0; k<network(lifeLine).length; ++k) {
+            for (var k:Int=0; k<network(lifeLine).size; ++k) {
               if (i == network(lifeLine)(k)) {
                 return false;
               }

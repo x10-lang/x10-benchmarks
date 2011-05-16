@@ -19,7 +19,7 @@ import x10.compiler.NonEscaping;
  */
 public class PAdicNumber(P:Int, K:Int) {
 	// digits(0) is the most significant digit.
-	val digits: Rail[Int](K);
+	val digits: Rail[Int];
     public static def pow(w:Int, var n:Int) {
 	   var result:Int=1;
        while (n-- > 0) result *= w;
@@ -28,13 +28,13 @@ public class PAdicNumber(P:Int, K:Int) {
 	
 	public def this(p:Int, k:Int, x:Int):PAdicNumber{self.P==p, self.K==k} {
 		property(p,k);
-		digits = Rail.make[Int](k);
-                for (var i:int =0; i<digits.length; i++) {
+		digits = new Rail[Int](k);
+                for (var i:int =0; i<digits.size; i++) {
                     val wi = pow(p, i); 
                     digits(i) = (x % (p*wi))/wi;
                 }
 	}
-	def this (p:Int, k:Int, ds:Rail[Int](k)) {
+	def this (p:Int, k:Int, ds:Rail[Int]) {
 		property(p, k);
 		digits = ds;
 	}
@@ -70,8 +70,7 @@ public class PAdicNumber(P:Int, K:Int) {
 	 * Return the number distance d away along dimension dim (using modulo arithmetic). 
 	 */
 	public def delta(d:Int, dim:Int)= 
-		new PAdicNumber(P, K, Rail.make(K, 
-				(i:Int) => (i==dim ?  (digits(i)+d)% P : digits(i))));
+		new PAdicNumber(P, K, new Rail[int](K, (i:Int) => (i==dim ?  (digits(i)+d)% P : digits(i))));
 	
 	/**
 	 * Return the number distance d away along dimension dim (using modulo arithmetic). 
@@ -79,8 +78,7 @@ public class PAdicNumber(P:Int, K:Int) {
 	 * until you reach a number < bound. Assume: this < bound.
 	 */
 	public def boundedDelta(d:Int, dim:Int, bound:Int): PAdicNumber {
-		val o = new PAdicNumber(P, K, Rail.make(K, 
-				(i:Int) => (i==dim ?  (digits(i)+d)% P : digits(i))));
+		val o = new PAdicNumber(P, K, new Rail[int](K, (i:Int) => (i==dim ?  (digits(i)+d)% P : digits(i))));
 
 		val od = o.toDecimal();
 		if (od < bound)
@@ -120,7 +118,7 @@ public class PAdicNumber(P:Int, K:Int) {
 	}
 	
   public static def main2(args: Rail[String]) {
-	  val n = args.length;
+	  val n = args.size;
 	  if (n < 2) {
 		  Console.OUT.println("Usage: PAdicNumbers w:Int k:Int n1:Int ... nk:Int");
 		  return;

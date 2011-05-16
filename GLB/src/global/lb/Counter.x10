@@ -154,7 +154,7 @@ def verboseStats(h:Int, sumCounters:Counter) {
 		val P = Place.MAX_PLACES;
 
 		val sumCounters = new Counter();
-		for (b in allCounters) {
+		for (b in allCounters.values()) {
 			sumCounters.addIn(b);
 		}
 		sumCounters.assertTxTally();
@@ -165,7 +165,7 @@ def verboseStats(h:Int, sumCounters:Counter) {
 		var minAliveRatio:Float =101.0F;
 		var relativeAliveRatio:Float = 101.0F;
 		val idealRatio = 1.0F/P;
-		for (b in  allCounters) {
+		for (b in  allCounters.values()) {
 			val nodes = b.nodesCounter;
 			val ratio = (1.0F*nodes)/nodeSum;
 			val iBalance = ((100.0F*(ratio-idealRatio))/idealRatio);
@@ -219,7 +219,7 @@ def verboseStats(h:Int, sumCounters:Counter) {
 		var min:Long= Long.MAX_VALUE;
 		var max:Long=-1;
 		var mean:Long=0;
-		for (b in allCounters) {
+		for (b in allCounters.values()) {
 			val c = i==COMPUTING ? b.timeComputing :
 				i == STEALING ? b.timeStealing :
 					i == PROBING ? b.timeProbing :

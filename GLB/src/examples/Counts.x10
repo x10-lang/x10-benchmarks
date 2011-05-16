@@ -41,7 +41,7 @@ public class Counts extends TaskFrame[Int, Int] {
                 public def zero()=0;
                 public operator this(a:Int, b:Int)=a+b;
             };
-	        val counts = Rail.make(Place.MAX_PLACES, 
+	        val counts = new Rail(Place.MAX_PLACES, 
 			      (i:Int)=> at(Place(i)) GlobalRef[TaskFrame[Int,Int]](new Counts()));
 	        val runner = seq ? new SeqRunner[Int,Int](new Counts()) as Runner[Int,Int]
 		                     : new GlobalRunner[Int, Int](args, ()=> counts(here.id));

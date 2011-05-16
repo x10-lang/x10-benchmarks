@@ -90,7 +90,7 @@ public final class GlobalRunner[T, Z]  implements Runner[T,Z] {
 	public def stats(time:Long, verbose:Boolean) {
 		val st = this.st;
 		val allCounters 
-		= Rail.make[Counter](Place.MAX_PLACES,
+		= new Rail[Counter](Place.MAX_PLACES,
 				(i:Int) => at(Place(i)) st().counter);
 		st().counter.stats(allCounters, time, verbose);
 	}
@@ -103,7 +103,7 @@ public final class GlobalRunner[T, Z]  implements Runner[T,Z] {
 		var last:Int=-1;
 		val size:Int;
 		def this(n:Int, t:S) {
-			data = Rail.make[S](n, (i:Int) => t);
+			data = new Rail[S](n, (i:Int) => t);
 			size= n;
 		}
 		def empty():Boolean= last < 0;
@@ -174,11 +174,11 @@ public final class GlobalRunner[T, Z]  implements Runner[T,Z] {
 				f:TaskFrame[T,Z]) {
 			this.nu=nu; 
 			this.myLifelines = lifelineNetwork;
-			this.z = lifelineNetwork.length; // assume symmetric.
+			this.z = lifelineNetwork.size; // assume symmetric.
 			this.width=w;
 			this.logEvents=e;
 			this.thieves = new FixedSizeStack[Int](z, 0);
-			this.lifelinesActivated = Rail.make[Boolean](Place.MAX_PLACES, false);
+			this.lifelinesActivated = new Rail[Boolean](Place.MAX_PLACES, false);
 			this.frame = f;
 		}
 		
@@ -194,10 +194,10 @@ public final class GlobalRunner[T, Z]  implements Runner[T,Z] {
 		 * 
 		 */
 		final def processLoot(loot: Rail[T], lifeline:Boolean):void offers Z {
-			Event.event("Processing loot of size " + loot.length + " with stack "+ stack.size());
-			counter.incRx(lifeline, loot.length);
+			Event.event("Processing loot of size " + loot.size + " with stack "+ stack.size());
+			counter.incRx(lifeline, loot.size);
 			val time = System.nanoTime();
-			for (r in loot) 
+			for (r in loot.values()) 
 				processSubtree(r);
 			counter.timeComputing += (System.nanoTime() - time);    
 			Event.event("Processing finishes with loot, stack "+ stack.size());
@@ -276,7 +276,7 @@ public final class GlobalRunner[T, Z]  implements Runner[T,Z] {
 					val thief = thieves.pop();
 					val loot = stack.pop(numToSteal);
 					counter.incTxNodes(numToSteal);
-					Event.event("Distributing " + loot.length + " to " + thief);
+					Event.event("Distributing " + loot.size + " to " + thief);
 					val victim = here.id;
 					async at(Place(thief)) 
 					   st().launch(st, false, loot, depth+1, victim);
@@ -318,7 +318,7 @@ public final class GlobalRunner[T, Z]  implements Runner[T,Z] {
 					// May suffer incoming thefts or distributions.
 					val loot = at (Place(q)) st().trySteal(p);
 					if (loot != null) {
-						Event.event("Received loot (" + loot.length +
+						Event.event("Received loot (" + loot.size +
 								") from victim(" + q + ").");
 						return loot;
 					}
@@ -330,7 +330,7 @@ public final class GlobalRunner[T, Z]  implements Runner[T,Z] {
 				
 				Event.event("No loot; establishing lifeline(s).");
 				var loot:Rail[T] = null;
-				val n = myLifelines.length;
+				val n = myLifelines.size;
 				for (var i:Int=0; (i<n) && (noLoot) && (0<=myLifelines(i)); ++i) {
 					val lifeline:Int = myLifelines(i);
 					if (!lifelinesActivated(lifeline) ) {
@@ -338,7 +338,7 @@ public final class GlobalRunner[T, Z]  implements Runner[T,Z] {
 						loot = at(Place(lifeline)) st().trySteal(p, true);
 						if (null!=loot) {
 							lifelinesActivated(lifeline) = false;
-							Event.event("Received loot (" + loot.length +
+							Event.event("Received loot (" + loot.size +
 									") from lifeline(" + lifeline + ")");
 							break;
 						}
@@ -383,7 +383,7 @@ public final class GlobalRunner[T, Z]  implements Runner[T,Z] {
 			try {
 				Event.event("Place (" + source + ") launches " 
 						+ (init ? "init " : "dealt ") + "async with " + 
-						(loot == null ? "0" : "" + loot.length) + " tasks.");
+						(loot == null ? "0" : "" + loot.size) + " tasks.");
 				lifelinesActivated(source) = false;
 				if (active) {
 					noLoot = false;
@@ -431,7 +431,7 @@ public final class GlobalRunner[T, Z]  implements Runner[T,Z] {
 				val lootSize = stack.size()/P;
 				// Break out loot ahead of time because
 				// a thief might come in the middle and steal some from you.
-				val loots = Rail.make(P-1,(i:Int)=> stack.pop(lootSize));
+				val loots = new Rail[Rail[T]](P-1,(i:Int)=> stack.pop(lootSize));
 				for (var pi:Int=1 ; pi<P ; ++pi) {
 					val loot = loots(pi-1);
 					Event.event("Launching at place " + pi+".");
