@@ -163,8 +163,9 @@ public class Counter {
     }
     
     def computeStateCounts(state:State) {
-        var lastEvent:Event = lifeStory(0);
         val size = lifeStory.size();
+        if (size <= 1) return;
+        var lastEvent:Event = lifeStory(0);
         for (var i:Int=1; i < size; ++i) {
             val currEvent = lifeStory(i);
             val delta = (currEvent.timeStamp - lastEvent.timeStamp)/1000 as Int; // micro-seconds
