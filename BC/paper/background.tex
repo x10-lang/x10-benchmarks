@@ -209,7 +209,7 @@ paths between $(u,v)$ using the following equation:
 %
 \begin{equation}
 n_{u,v}(t) = \left\{ \begin{array}{rr} 
-  n_{u,t}\times{}n_{t,v} & d_{u,t}+d_{t,v} \\
+  n_{u,t}\times{}n_{t,v} & d_{u,t}+d_{t,v}=d_{u,v} \\
   0 & otherwise \\
 \end{array}\right.
 \label{eq:bcoft}
@@ -368,6 +368,9 @@ $u\in{}P_v(s)$.
 \begin{equation}
 \sigma{}_{sv} = 1 + \sum_{u\in{}P_v(s)}\sigma{}_{su}
 \end{equation}
+%
+\todoanju{Check this equation again; I might have confused lemmas $3$ and $5$
+from Brandes' algorithm.}
 %
 Therefore, in $O(m)$ time, we can compute all the shortest paths and number of
 shortest paths from a vertex $s$ to every other vertex; that is, in $O(mn)$,
