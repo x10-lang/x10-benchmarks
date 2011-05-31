@@ -41,8 +41,8 @@ central kernel is enumerating all the shortest paths.
 \begin{center}
 \begin{displaymath}
 \xymatrix{
-a \ar[r] & d \ar[d] \\
-b \ar[u] \ar[ur] \ar[r] & c \ar[ul]
+d \ar[r] & a \ar[dl] \\
+b \ar[u] \ar[r] & c \ar[u]
 }
 \end{displaymath}
 \end{center}
@@ -52,10 +52,10 @@ b \ar[u] \ar[ur] \ar[r] & c \ar[ul]
 \begin{center}
 \begin{displaymath}
 A = \left[ \begin{array}{cccc}
-  0 & 0 & 0 & 1 \\
-  1 & 0 & 1 & 1 \\
+  0 & 1 & 0 & 0 \\
+  0 & 0 & 1 & 1 \\
   1 & 0 & 0 & 0 \\
-  0 & 0 & 1 & 0 \\
+  1 & 0 & 0 & 0 \\
 \end{array} \right]
 \end{displaymath}
 \end{center}
@@ -89,10 +89,10 @@ not all paths of length diameter or less.
 \begin{center}
 \begin{displaymath}
 A^2 = \left[ \begin{array}{cccc}
-   0 & 0 & 1 & 0 \\
-   1 & 0 & 1 & 1 \\
-   0 & 0 & 0 & 1 \\
-   1 & 0 & 0 & 0 \\
+   0 & 0 & 1 & 1 \\
+   2 & 0 & 0 & 0 \\
+   0 & 1 & 0 & 0 \\
+   0 & 1 & 0 & 0 \\
 \end{array} \right]
 \end{displaymath}
 \end{center}
@@ -102,17 +102,19 @@ A^2 = \left[ \begin{array}{cccc}
 \begin{center}
 \begin{displaymath}
 A^3 = \left[ \begin{array}{cccc}
-   1 & 0 & 0 & 0 \\
-   1 & 0 & 1 & 1 \\
-   0 & 0 & 1 & 0 \\
-   0 & 0 & 0 & 1 \\
+   2 & 0 & 0 & 0 \\
+   0 & 2 & 0 & 0 \\
+   0 & 0 & 1 & 1 \\
+   0 & 0 & 1 & 1 \\
 \end{array} \right]
 \end{displaymath}
 \end{center}
 \end{minipage}
 \caption{The $2^{nd}$ and $3^{rd}$ powers of the adjacency matrix, $A$, shown
 in Figure~\ref{fig:sample}. $A^2$ shows the paths of path length $2$, and $A^3$
-shows the paths in the sample graph of path length $3$.}
+shows the paths in the sample graph of path length $3$. The entries in $A$,
+$A^2$, and $A^3$ indicate the number of paths. For example, $A^2_{2,1}=2$ as
+there are two paths of length 2 between $b$ and $a$ in Figure~\ref{fig:sample}.}
 \label{fig:sample_powers}
 \end{figure}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -177,10 +179,10 @@ Figure~\ref{fig:sample}, we get the following matrix:
 %
 \begin{displaymath}
 R = \left[ \begin{array}{cccc}
-  (\infty{},0) & (\infty{},0) & (\infty{},0) & (1,1) \\
-  (1,1) & (\infty{},0) & (1,1) & (1,1) \\
+  (\infty{},0) & (1,1) & (\infty{},0) & (\infty{},0) \\
+  (\infty{},0) & (\infty{},0) & (1,1) & (1,1) \\
   (1,1) & (\infty{},0) & (\infty{},0) & (\infty{},0) \\
-  (\infty{},0) & (\infty{},0) & (1,1) & (\infty{},0) \\
+  (1,1) & (\infty{},0) & (\infty{},0) & (\infty{},0) \\
 \end{array} \right]
 \end{displaymath}
 %
@@ -202,7 +204,7 @@ $(R, \oplus{}, \odot{}, (\infty,0), (0,1))$, where:
 \end{equation}
 %
 The key intuition here is that knowing the distance ($d_{u,v}$), and the number
-of shortest paths ($n_{u,v}$, it is easy to compute the number of shortest
+of shortest paths ($n_{u,v}$), it is easy to compute the number of shortest
 paths between $(u,v)$ using the following equation:
 %
 \begin{equation}
@@ -253,18 +255,18 @@ matrix $R$, we get:
 %
 \begin{displaymath}
 R^+ = \left[ \begin{array}{cccc}
-  (3,1) & (\infty{},0) & (2,1) & (1,1) \\
-  (1,1) & (\infty{},0) & (1,1) & (1,1) \\
-  (1,1) & (\infty{},0) & (3,1) & (2,1) \\
-  (2,1) & (\infty{},0) & (1,1) & (3,1) \\
+  (3,2) & (1,1) & (2,1) & (2,1) \\
+  (2,2) & (3,2) & (1,1) & (1,1) \\
+  (1,1) & (2,1) & (3,1) & (3,1) \\
+  (1,1) & (2,1) & (3,1) & (3,1) \\
 \end{array} \right]
 \end{displaymath}
 %
 From $R^+$, it is simple to compute the BC of any node using
 equations~\ref{eq:bcoft} and~\ref{eq:bc}.
 %
-For example, BC($d$) in $G$ (from Figure~\ref{fig:sample}) is $1$ as it lies 
-on the only shortest path between $c$ and $a$.
+For example, BC($d$) (and BC($c$)) in $G$ (from Figure~\ref{fig:sample}) is
+$1/2$ as it lies on the only shortest path between $b$ and $a$.
 %
 In this method, computing $R^+$ takes $O(n^3)$ operations, and then computing
 BC of any node requires considering all pair-wise entries, which takes a
@@ -410,44 +412,50 @@ D_b\leftarrow{}D_c\leftarrow{}D_d\leftarrow{}-1, D_a\leftarrow{}0
 
 \begin{align*}
 BFS\ from\ a\ (lines\ 9\ to\ 18)\\
-Q \leftarrow{} \emptyset{}, S \leftarrow{} (c,d,a) \\
-P_a\leftarrow{}P_b\leftarrow{}\emptyset{}, P_c\leftarrow{}d,P_d\leftarrow{}a\\
-\sigma{}_b\leftarrow{}0,\sigma{}_c\leftarrow{}\sigma{}_d\leftarrow{}\sigma{}_a\leftarrow{}1\\
-D_b\leftarrow{}-1,D_c\leftarrow{}2,D_d\leftarrow{}1,D_a\leftarrow{}0
+Q \leftarrow{} \emptyset{}, S \leftarrow{} (c,d,b,a) \\
+P_a\leftarrow{}\emptyset{},P_b\leftarrow{}a, P_c\leftarrow{}b,P_d\leftarrow{}b\\
+\sigma{}_b\leftarrow{}\sigma{}_c\leftarrow{}\sigma{}_d\leftarrow{}\sigma{}_a\leftarrow{}1\\
+D_a\leftarrow{}0,D_b\leftarrow{}1,D_c\leftarrow{}2,D_d\leftarrow{}2
 \end{align*}
 
 \begin{align*}
 Compute\ BC\ contributions\ (lines\ 19\ to\ 25)\\
 S\leftarrow{}\emptyset{}\\
-\delta{}_a\leftarrow{}2,\delta{}_d\leftarrow{}1,\delta{}_b\leftarrow{}\delta{}_c\leftarrow{}0\\
-BC_a\leftarrow{}BC_b\leftarrow{}BC_c\leftarrow{}0,BC_d\leftarrow{}1
+\delta{}_a\leftarrow{}1,\delta{}_b\leftarrow{}2,\delta{}_c\leftarrow{}\delta{}_d\leftarrow{}0\\
+BC_a\leftarrow{}BC_c\leftarrow{}BC_d\leftarrow{}0,BC_b\leftarrow{}2
 \end{align*}
 %
-This change in the $BC_d$ denotes that $d$ is on \textit{all} shortest paths
-from $a$ to $d$.
+This change in the $BC_b$ denotes that $d$ is on \textit{all} shortest paths
+from $a$ to $c$ and $d$.
+%
+Similarly, when shortest paths from $b$ are computed, the BC's are changed 
+to:
+%
+\begin{align*}
+BC_a\leftarrow{}0,BC_b\leftarrow{}2,BC_c\leftarrow{}BC_d\leftarrow{}1/2
+\end{align*}
+%
+These changes in $BC_c$ and $BC_d$ indicate that there are two shortest paths 
+from $b$ to $a$, one each going through $c$ and $d$ respectively.
 %
 Similarly, when shortest paths from $c$ are computed, the BC's are changed 
 to:
 %
 \begin{align*}
-BC_b\leftarrow{}BC_c\leftarrow{}0,BC_a\leftarrow{}BC_d\leftarrow{}1
+BC_a\leftarrow{}2,BC_b\leftarrow{}3,BC_c\leftarrow{}BC_d\leftarrow{}1/2
 \end{align*}
 %
-This change in the $BC_a$ denotes that $a$ is on \textit{all} shortest paths
-from $c$ to $d$.
+These changes in $BC_a$ and $BC_b$ are because $a$ lies on two shortest paths 
+from $c$ (to $b$ and $d$) and $b$ on the shortest path from $c$ to $d$.
 %
-Similarly, when shortest paths from $d$ are computed, the BC's are changed 
-to:
+Finally, when shortest paths from $d$ are computed, BC's are changed to:
 %
 \begin{align*}
-BC_b\leftarrow{}0,BC_a\leftarrow{}BC_c\leftarrow{}BC_d\leftarrow{}1
+BC_a\leftarrow{}4,BC_b\leftarrow{}4,BC_c\leftarrow{}BC_d\leftarrow{}1/2
 \end{align*}
 %
-This change in the $BC_c$ denotes that $c$ is on \textit{all} shortest paths
-from $d$ to $a$.
-%
-Finally, when shortest paths from $b$ are computed, BC's do not change as 
-$b$ is directly connected to $a,c,$ and $d$.
+These changes in $BC_a$ and $BC_b$ are because $a$ lies on two shortest paths 
+from $d$ (to $b$ and $c$) and $b$ on the shortest path from $d$ to $c$.
 
 %
 % Discuss some parallelization issues
@@ -588,10 +596,10 @@ follows:
 \begin{displaymath}
 \left[ \begin{array}{cccc}
   a^T & b^T & c^T & d^T \\
-  0 & 1 & 1 & 0 \\
-  0 & 0 & 0 & 0 \\
-  0 & 1 & 0 & 1 \\
-  1 & 1 & 0 & 0 \\
+  0 & 0 & 1 & 1 \\
+  1 & 0 & 0 & 0 \\
+  0 & 1 & 0 & 0 \\
+  0 & 1 & 0 & 0 \\
 \end{array} \right]
 \end{displaymath}
 \end{center}
@@ -601,10 +609,10 @@ follows:
 \begin{center}
 \begin{displaymath}
 \left[ \begin{array}{cc}
-   a & c \\
+   a^T & c^T \\
+   0 & 1 \\ 
    1 & 0 \\ 
    0 & 0 \\ 
-   0 & 1 \\ 
    0 & 0 \\
 \end{array} \right]
 \end{displaymath}
@@ -614,10 +622,10 @@ follows:
 \begin{center}
 \begin{displaymath}
  = \left[ \begin{array}{cc}
-  d & a\\
-  0 & 1\\
-  0 & 0\\ 
+  b^T & a^T\\
   0 & 0\\
+  0 & 1\\ 
+  1 & 0\\
   1 & 0\\
 \end{array} \right]
 \end{displaymath}
@@ -630,7 +638,7 @@ For formatting purposes, we have shown right multiplication by the starting
 vectors, which requires transposing the original adjacency matrix.
 %
 As can be seen, by starting out with BFS expansion from $a$ and $c$, we end 
-up with the new fringe $d$ for $a$, and $a$ for $c$, respectively.
+up with the new fringe $b$ for $a$, and $a$ for $c$, respectively.
 %
 In fact, since this is always the case, we can forgo this computation and
 simply consider the first fringe to be the starting vertex's adjacency row.
@@ -650,34 +658,37 @@ nPasses\leftarrow{}4,
 BC\leftarrow{}\left[\begin{array}{cccc}0 & 0 & 0 & 0 \\\end{array} \right]\\
 BFS\leftarrow{}\emptyset{}, batch\leftarrow{}1:1, depth\leftarrow{}0\\
 nsp\leftarrow{}\left[\begin{array}{cccc}1 & 0 & 0 & 0 \\\end{array} \right],
-fringe\leftarrow{}\left[\begin{array}{cccc}0 & 0 & 0 & 1 \\\end{array} \right]
+fringe\leftarrow{}\left[\begin{array}{cccc}0 & 1 & 0 & 0 \\\end{array} \right]
 \end{align*}
 %
 Here, we have initialized $nsp(a)$ to be $1$ and set the fringe to be $a$'s
-adjacency ($d$).
+adjacency ($b$).
 %
 \begin{align*}
 (BFS\ search\ from\ a:\ lines\ 11\ to\ 16,\ first\ pass) \\
 depth\leftarrow{}1,
-BFS(1)\leftarrow{}\left[\begin{array}{cccc}0 & 0 & 0 & 1 \\\end{array} \right]\\
-nsp\leftarrow{}\left[\begin{array}{cccc}1 & 0 & 0 & 1 \\\end{array} \right],
-fringe\leftarrow{}\left[\begin{array}{cccc}0 & 0 & 1 & 0 \\\end{array} \right]
+BFS(1)\leftarrow{}\left[\begin{array}{cccc}0 & 1 & 0 & 0 \\\end{array} \right]\\
+nsp\leftarrow{}\left[\begin{array}{cccc}1 & 1 & 0 & 0 \\\end{array} \right],
+fringe\leftarrow{}\left[\begin{array}{cccc}0 & 0 & 1 & 1 \\\end{array} \right]
 \end{align*}
 %
-At the end of the first pass, we discover vertex $c$; $nsp$ now indicates that
-we have found one shortest path $(a,d)$.
+At the end of the first pass, we discover vertex $b$; $nsp$ now indicates that
+we have found one shortest path $(a,b)$.
 %
 \begin{align*}
 (BFS\ search\ from\ a:\ lines\ 11\ to\ 16,\ second\ pass) \\
 depth\leftarrow{}2,
-BFS(2)\leftarrow{}\left[\begin{array}{cccc}0 & 0 & 1 & 0 \\\end{array} \right]\\
-nsp\leftarrow{}\left[\begin{array}{cccc}1 & 0 & 1 & 1 \\\end{array} \right],
+BFS(2)\leftarrow{}\left[\begin{array}{cccc}0 & 0 & 1 & 1 \\\end{array} \right]\\
+nsp\leftarrow{}\left[\begin{array}{cccc}1 & 1 & 1 & 1 \\\end{array} \right],
 fringe\leftarrow{}\left[\begin{array}{cccc}0 & 0 & 0 & 0 \\\end{array} \right]
 \end{align*}
 %
-At the end of the second pass, we rediscover $a$, hence there is no new
-$fringe$, and the BFS ceases; $nsp$ indicates that we discovered two shortest
-paths, $(a,d)$ and $(c,d)$.
+At the end of the second pass, we have discovered $c$ and $d$; at this point
+there are no more undiscovered vertices and the BFS search from $a$ ceases.
+%
+$nsp$ indicates that we discovered 3 shortest paths, $(a,b)$, $(a,c)$, and
+$(a,d)$; the path $(a,a)$ is not useful in computing BC scores when the start
+vertex is $a$ itself.
 %
 Now, we move on to updating the BC scores for all vertices based on our
 exploration from vertex $a$.
@@ -685,7 +696,7 @@ exploration from vertex $a$.
 \begin{align*}
 (Initialize\ for\ BC\ updates:\ lines\ 17\ and \ 18) \\
 BC_{updt}\leftarrow{}\left[\begin{array}{cccc}1 & 1 & 1 & 1 \\\end{array} \right],
-nsp^{inv}\leftarrow{}\left[\begin{array}{cccc}1 & 0 & 1 & 1 \\\end{array} \right]
+nsp^{inv}\leftarrow{}\left[\begin{array}{cccc}1 & 1 & 1 & 1 \\\end{array} \right]
 \end{align*}
 %
 As in Brandes~\ref{alg:brandes}), we move back from the final fringe to the 
@@ -693,36 +704,36 @@ first; in our example, this is $depth=2$.
 %
 \begin{align*}
 (Compute\ and\ update\ child\ weights:\ lines\ 20\ to\ 25)\\
-weights_1\leftarrow{}\left[\begin{array}{cccc}0 & 0 & 1 & 0 \\\end{array} \right],
-weights\leftarrow{}\left[\begin{array}{cccc}0 & 0 & 1 & 0 \\\end{array} \right]\\
-temp_1\leftarrow{}\left[\begin{array}{cccc}0 & 1 & 0 & 1 \\\end{array} \right],
-temp_2\leftarrow{}\left[\begin{array}{cccc}0 & 0 & 0 & 1 \\\end{array} \right]\\
-temp_3\leftarrow{}\left[\begin{array}{cccc}0 & 0 & 0 & 1 \\\end{array} \right],
-BC_{updt}\leftarrow{}\left[\begin{array}{cccc}1 & 1 & 1 & 2 \\\end{array} \right]
+weights_1\leftarrow{}\left[\begin{array}{cccc}0 & 0 & 1 & 1 \\\end{array} \right],
+weights\leftarrow{}\left[\begin{array}{cccc}0 & 0 & 1 & 1 \\\end{array} \right]\\
+temp_1\leftarrow{}\left[\begin{array}{cccc}0 & 2 & 0 & 0 \\\end{array} \right],
+temp_2\leftarrow{}\left[\begin{array}{cccc}0 & 1 & 0 & 0 \\\end{array} \right]\\
+temp_3\leftarrow{}\left[\begin{array}{cccc}0 & 2 & 0 & 0 \\\end{array} \right],
+BC_{updt}\leftarrow{}\left[\begin{array}{cccc}1 & 3 & 1 & 1 \\\end{array} \right]
 \end{align*}
 %
 Next, we update the BC scores for each vertex with $BC_{updt}$.
 %
 \begin{align*}
 (Update\ the\ BC\ scores:\ lines\ 26\ and\ 27)\\
-BC\leftarrow{}\left[\begin{array}{cccc}1 & 1 & 1 & 2 \\\end{array} \right]
+BC\leftarrow{}\left[\begin{array}{cccc}1 & 3 & 1 & 1 \\\end{array} \right]
 \end{align*}
 %
 Notice that in Algorithm~\ref{alg:hybrid}, we pre-compute $BC_{updt}$ to be $1$
 for all vertices; hence, even though at the end of the BFS exploration for 
 vertex $a$, BC scores of all vertices show a value $>0$, the only true change
-is that of vertex $d$, which lies on the path from $a$ to $c$.
+is that of vertex $b$, which lies on the path from $a$ to both $c$ and $d$.
 %
 For brevity, we will now simply list the values of BC after the end of BFS 
 exploration for each of the remaining vertices:
 %
 \begin{align*}
 After\ BFS\ from\ b,\ 
-BC\leftarrow{}\left[\begin{array}{cccc}2 & 2 & 2 & 3 \\\end{array} \right]\\
+BC\leftarrow{}\left[\begin{array}{cccc}2 & 4 & 2.5 & 2.5 \\\end{array} \right]\\
 After\ BFS\ from\ c,\ 
-BC\leftarrow{}\left[\begin{array}{cccc}4 & 3 & 3 & 4 \\\end{array} \right]\\
+BC\leftarrow{}\left[\begin{array}{cccc}5 & 6 & 3.5 & 3.5 \\\end{array} \right]\\
 After\ BFS\ from\ d,\ 
-BC\leftarrow{}\left[\begin{array}{cccc}5 & 4 & 5 & 5 \\\end{array} \right]
+BC\leftarrow{}\left[\begin{array}{cccc}8 & 8 & 4.5 & 4.5 \\\end{array} \right]
 \end{align*}
 %
 The final trick to get the accurate BC scores is to subtract the number of
@@ -735,7 +746,7 @@ therefore, it is critical to initialize $BC_{updt}$ with ones.
 %
 \begin{align*}
 Subtract\ 4\ from\ BC\ (line\ 28):\ 
-BC\leftarrow{}\left[\begin{array}{cccc}1 & 0 & 1 & 1 \\\end{array} \right]
+BC\leftarrow{}\left[\begin{array}{cccc}4 & 4 & 0.5 & 0.5 \\\end{array} \right]
 \end{align*}
 %
 This gives the final and accurate BC scores for all the vertices.
