@@ -265,8 +265,9 @@ R^+ = \left[ \begin{array}{cccc}
 From $R^+$, it is simple to compute the BC of any node using
 equations~\ref{eq:bcoft} and~\ref{eq:bc}.
 %
-For example, BC($d$) (and BC($c$)) in $G$ (from Figure~\ref{fig:sample}) is
-$1/2$ as it lies on the only shortest path between $b$ and $a$.
+For example, BC($d$) and BC($c$) in $G$ (from Figure~\ref{fig:sample}) are
+both $1/2$ as there are exactly two shortest paths between $b$ and $a$, and 
+$c$ and $d$ are on these paths.
 %
 In this method, computing $R^+$ takes $O(n^3)$ operations, and then computing
 BC of any node requires considering all pair-wise entries, which takes a
@@ -428,8 +429,8 @@ S\leftarrow{}\emptyset{}\\
 BC_a\leftarrow{}BC_c\leftarrow{}BC_d\leftarrow{}0,BC_b\leftarrow{}2
 \end{align*}
 %
-This change in the $BC_b$ denotes that $d$ is on \textit{all} shortest paths
-from $a$ to $c$ and $d$.
+This change in the $BC_b$ denotes that $b$ is on \textit{all} shortest paths
+from $a$ to $c$ and $a$ to $d$.
 %
 Similarly, when shortest paths from $b$ are computed, the BC's are changed 
 to:
@@ -665,7 +666,7 @@ fringe\leftarrow{}\left[\begin{array}{cccc}0 & 1 & 0 & 0 \\\end{array} \right]
 \end{align*}
 %
 Here, we have initialized $nsp(a)$ to be $1$ and set the fringe to be $a$'s
-adjacency ($b$).
+adjacency, which is $b$.
 %
 \begin{align*}
 (BFS\ search\ from\ a:\ lines\ 11\ to\ 16,\ first\ pass) \\
@@ -675,8 +676,9 @@ nsp\leftarrow{}\left[\begin{array}{cccc}1 & 1 & 0 & 0 \\\end{array} \right],
 fringe\leftarrow{}\left[\begin{array}{cccc}0 & 0 & 1 & 1 \\\end{array} \right]
 \end{align*}
 %
-At the end of the first pass, we discover vertex $b$; $nsp$ now indicates that
-we have found one shortest path $(a,b)$.
+At the end of the first pass, we have expanded vertex $b$ and discovered 
+vertices $c$ and $d$; $nsp$ now indicates that we have found one shortest path
+$(a,b)$.
 %
 \begin{align*}
 (BFS\ search\ from\ a:\ lines\ 11\ to\ 16,\ second\ pass) \\
@@ -686,7 +688,7 @@ nsp\leftarrow{}\left[\begin{array}{cccc}1 & 1 & 1 & 1 \\\end{array} \right],
 fringe\leftarrow{}\left[\begin{array}{cccc}0 & 0 & 0 & 0 \\\end{array} \right]
 \end{align*}
 %
-At the end of the second pass, we have discovered $c$ and $d$; at this point
+At the end of the second pass, we have explored $c$ and $d$; at this point
 there are no more undiscovered vertices and the BFS search from $a$ ceases.
 %
 $nsp$ indicates that we discovered 3 shortest paths, $(a,b)$, $(a,c)$, and
