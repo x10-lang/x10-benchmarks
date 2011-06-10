@@ -3,9 +3,23 @@ import x10.util.Random;
 import x10.lang.Math;
 import x10.util.Stack;
 import x10.util.List;
-import x10.util.ArrayList;
+import x10.util.GrowableIndexedMemoryChunk;
+import x10.compiler.Inline;
 
 final class ParUTS implements Counted {
+    @Inline static def pop(stack:GrowableIndexedMemoryChunk[TreeNode]):TreeNode {
+        val e = stack(stack.length() - 1);
+        stack.removeLast();
+        return e;
+    }
+
+    @Inline static def pop(stack:GrowableIndexedMemoryChunk[TreeNode], k:Int):Array[TreeNode](1){rect,rail,zeroBased} {
+        val n = stack.length();
+        if (n < k)
+            return null;
+        return stack.moveSectionToArray(n-k, n-1);
+    }
+
     static type PLH= PlaceLocalHandle[ParUTS];
     static type SHA1Rand = UTS.SHA1Rand;
     static type TreeNode = UTS.TreeNode;
@@ -33,7 +47,7 @@ final class ParUTS implements Counted {
     val thieves:FixedSizeStack[Int];
     
     val width:Int;
-    val stack = new Stack[TreeNode]();
+    val stack = new GrowableIndexedMemoryChunk[TreeNode]();
     val myLifelines:Rail[Int];
     
     // Which of the lifelines have I actually activated?
@@ -164,7 +178,7 @@ final class ParUTS implements Counted {
     final def processAtMostN(n:Int) {
         val time = gatherTimes ? System.nanoTime() : 0L;
         for (var count:Int=0; count < n; count++) {
-            val e = stack.pop();
+            val e = pop(stack);
             processSubtree(e);
         }
         if (gatherTimes) counter.incTimeComputing (System.nanoTime() - time);  
@@ -183,7 +197,7 @@ final class ParUTS implements Counted {
      */
     final def processStack(st:PLH) {
         while (true) {
-            var n:Int = min(stack.size(), nu);
+            var n:Int = min(stack.length(), nu);
             while (n > 0) {
                 processAtMostN(n);
                 
@@ -192,7 +206,7 @@ final class ParUTS implements Counted {
                 if (gatherTimes) counter.incTimeProbing (System.nanoTime() - time);
                 val numThieves = thieves.size();
                 if (numThieves > 0) distribute(st, 1, numThieves);
-                n = min(stack.size(), nu);
+                n = min(stack.length(), nu);
             }
             val loot = attemptSteal(st);
             if (null==loot) { 
@@ -222,13 +236,13 @@ final class ParUTS implements Counted {
     
     def distribute(st:PLH, depth:Int, var numThieves:Int) {
         val time = gatherTimes ? System.nanoTime() : 0L;
-        val lootSize= stack.size();
+        val lootSize= stack.length();
         if (lootSize > 2) {
             numThieves = min(numThieves, lootSize-2);
             val numToSteal = lootSize/(numThieves+1);
             for (var i:Int=0; i < numThieves; ++i) {
                 val thief = thieves.pop();
-                val loot = stack.pop(numToSteal);
+                val loot = pop(stack, numToSteal);
                 counter.incTxNodes(numToSteal);
                 // event("Distributing " + loot.size + " to " + thief);
                 val victim = here.id;
@@ -301,7 +315,7 @@ final class ParUTS implements Counted {
     def trySteal(p:Int):Rail[TreeNode]=trySteal(p, false);
     def trySteal(p:Int, isLifeLine:Boolean) : Rail[TreeNode] {
         counter.stealsReceived++;
-        val length = stack.size();
+        val length = stack.length();
         val numSteals = k==0 ? (length >=2 ? length/2 : 0)
                 : (k < length ? k : (k/2 < length ? k/2 : 0));
         if (numSteals==0) {
@@ -310,7 +324,7 @@ final class ParUTS implements Counted {
             event("Returning null");
             return null;
         }
-        val loot = stack.pop(numSteals);
+        val loot = pop(stack, numSteals);
         counter.nodesGiven += numSteals;
         counter.stealsSuffered++;
         return loot;
@@ -368,10 +382,10 @@ final class ParUTS implements Counted {
             }
             ++counter.nodesCounter; // root node is never pushed on the stack.
             
-            val lootSize = stack.size()/P;
+            val lootSize = stack.length()/P;
             for (var pi:Int=1 ; pi<P ; ++pi) {
                 val time = gatherTimes ? System.nanoTime() : 0L;
-                val loot = stack.pop(lootSize);
+                val loot = pop(stack, lootSize);
                 if (gatherTimes) counter.incTimePreppingSteal (System.nanoTime() - time);
                 val pi_ = pi;
                 async at(Place(pi_))
