@@ -53,8 +53,12 @@ final class HUTS implements Counted {
     
     val treeType:Int; // 0=BINOMIAL, 1=GEOMETRIC
     val b0:Int; // root branching factor
-    val q:Long, m:Int, k:Int, nu:Int; // For the binomial tree
-    val a:Int, d:Int; // For the geometric tree
+    val q:Long;
+    val m:Int;
+    val k:Int;
+    val nu:Int; // For the binomial tree
+    val a:Int;
+    val d:Int; // For the geometric tree
     
     val l:Int; 
     val z:Int;
@@ -416,9 +420,6 @@ final class HUTS implements Counted {
             counter.stopLive();
             active=false;
         } catch (v:Throwable) {
-            Console.OUT.println("Exception at " + here);
-            v.printStackTrace();
-        } catch (v:Error) {
             Console.OUT.println("Exception at " + here);
             v.printStackTrace();
         }

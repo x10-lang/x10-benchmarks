@@ -69,8 +69,10 @@ public class UTS {
     
     static class SeqUTS {
         val b0:Int;
-        val q:Long, m:Int;
-        val a:Int, d:Int;
+        val q:Long;
+        val m:Int;
+        val a:Int;
+        val d:Int;
         val treeType:Int;
         val stack:Stack[TreeNode] = new Stack[TreeNode]();
         var nodesCounter:UInt = 0;
@@ -117,8 +119,10 @@ public class UTS {
     /** A single place UTS using finish and asyncs. Should work with work-stealing.*/
     static class PUTS {
         val b0:Int;
-        val q:Long, m:Int;
-        val a:Int, d:Int;
+        val q:Long;
+        val m:Int;
+        val a:Int;
+        val d:Int;
         val treeType:Int;
         val stack:Stack[TreeNode] = new Stack[TreeNode]();
         var nodesCounter:UInt = 0;
