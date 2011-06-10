@@ -169,7 +169,7 @@ final class ParUTS implements Counted {
     @Inline final def processLoot(loot: Rail[TreeNode], lifeline:Boolean) {
         counter.incRx(lifeline, loot.size);
         val time = gatherTimes ? System.nanoTime() : 0L;
-        for (r in loot.values()) processSubtree(r);
+        for (var i:Int=0; i<loot.size; i++) processSubtree(loot(i));
         if (gatherTimes) counter.incTimeComputing (System.nanoTime() - time);    
     }
     
