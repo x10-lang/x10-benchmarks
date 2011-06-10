@@ -39,22 +39,22 @@ public class UTS {
         val depth:Int;
         val rng:SHA1Rand;
         
-        public def this (seed:Int) { 
+        @Inline public def this (seed:Int) { 
             this.depth = -1;
             this.rng = SHA1Rand(seed);
         }
         
-        public def this (seed:Int, depth:Int) {
+        @Inline public def this (seed:Int, depth:Int) {
             this.depth = depth;
             this.rng = SHA1Rand (seed);
         }
         
-        public def this (parent:TreeNode, spawnNumber:Int) {
+        @Inline public def this (parent:TreeNode, spawnNumber:Int) {
             this.depth = -1;
             this.rng = SHA1Rand (parent.getSHA1Rand(), spawnNumber);
         }
         
-        public def this (parent:TreeNode, spawnNumber:Int, depth:Int) {
+        @Inline public def this (parent:TreeNode, spawnNumber:Int, depth:Int) {
             this.depth = depth;
             this.rng = SHA1Rand (parent.getSHA1Rand(), spawnNumber);
         }

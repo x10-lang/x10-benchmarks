@@ -61,7 +61,7 @@ public class TreeExpander {
                         (1-probForCurNodeBranchingFactor))) as int;
     }
     
-    public static def geometric (shapeFunction:int, /* 0..3*/
+    @Inline public static def geometric (shapeFunction:int, /* 0..3*/
             rootBranchingFactor:int, /* self-expln */
             maxTreeDepth:int, /* cut off after this depth */
             node:TreeNode, /* random number generator */
@@ -73,7 +73,7 @@ public class TreeExpander {
             deque.push(TreeNode (node, i, node.getDepth()+1));
     }
     
-    public static def geometric (shapeFunction:int, /* 0..3*/
+    @Inline public static def geometric (shapeFunction:int, /* 0..3*/
             rootBranchingFactor:int, /* self-expln */
             maxTreeDepth:int, /* cut off after this depth */
             node:TreeNode, /* random number generator */
@@ -85,7 +85,7 @@ public class TreeExpander {
             deque.add(TreeNode (node, i, node.getDepth()+1));
     }
     
-    public static def binomial (q:Long, 
+    @Inline public static def binomial (q:Long, 
             m:int, 
             node:TreeNode,
             deque:Stack[TreeNode]) {
@@ -96,7 +96,7 @@ public class TreeExpander {
         for (var i:Int=0; i<numChildren; ++i) deque.push(TreeNode (node, i));
     }
     
-    public static def binomial (q:Long, 
+    @Inline public static def binomial (q:Long, 
             m:int, 
             node:TreeNode,
             deque:GrowableIndexedMemoryChunk[TreeNode]) {
@@ -107,13 +107,13 @@ public class TreeExpander {
         for (var i:Int=0; i<numChildren; ++i) deque.add(TreeNode (node, i));
     }
     
-    public static def processBinomialRoot (b0:Int, 
+    @Inline public static def processBinomialRoot (b0:Int, 
             node:TreeNode, 
             deque:Stack[TreeNode]) {
         for (var i:Int=0; i<b0; ++i) deque.push(TreeNode (node, i));
     }
 
-    public static def processBinomialRoot (b0:Int, 
+    @Inline public static def processBinomialRoot (b0:Int, 
             node:TreeNode, 
             deque:GrowableIndexedMemoryChunk[TreeNode]) {
         for (var i:Int=0; i<b0; ++i) deque.add(TreeNode (node, i));

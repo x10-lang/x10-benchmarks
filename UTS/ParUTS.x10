@@ -30,11 +30,9 @@ final class ParUTS implements Counted {
     final static class FixedSizeStack[T] {
         val data:Rail[T];
         var last:Int;
-        val size:Int;
         def this(n:Int, t:T) {
             data = new Rail[T](n, (i:Int) => t);
             last = -1;
-            size= n;
         }
         def empty():Boolean= last < 0;
         def pop():T = data(last--);
@@ -160,7 +158,7 @@ final class ParUTS implements Counted {
     /** Check if the current node (governed by the SHA1Rand state) has any
      * children. If so, push it onto the local stack.
      */
-    final def processSubtree (node:TreeNode) {
+    @Inline final def processSubtree (node:TreeNode) {
         ++counter.nodesCounter;
         if (Constants.BINOMIAL==treeType) 
             TreeExpander.binomial (q, m, node, stack);
@@ -168,14 +166,14 @@ final class ParUTS implements Counted {
             TreeExpander.geometric (a, b0, d, node, stack);
     }
     
-    final def processLoot(loot: Rail[TreeNode], lifeline:Boolean) {
+    @Inline final def processLoot(loot: Rail[TreeNode], lifeline:Boolean) {
         counter.incRx(lifeline, loot.size);
         val time = gatherTimes ? System.nanoTime() : 0L;
         for (r in loot.values()) processSubtree(r);
         if (gatherTimes) counter.incTimeComputing (System.nanoTime() - time);    
     }
     
-    final def processAtMostN(n:Int) {
+    @Inline final def processAtMostN(n:Int) {
         val time = gatherTimes ? System.nanoTime() : 0L;
         for (var count:Int=0; count < n; count++) {
             val e = pop(stack);
@@ -195,7 +193,7 @@ final class ParUTS implements Counted {
      * handle and also, distribute a chunk of the local stack (work) to 
      * our lifeline buddy.
      */
-    final def processStack(st:PLH) {
+    @Inline final def processStack(st:PLH) {
         while (true) {
             var n:Int = min(stack.length(), nu);
             while (n > 0) {
