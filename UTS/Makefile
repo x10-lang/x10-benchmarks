@@ -65,12 +65,14 @@ X10_STRUCTS_STRUCTS_H=$(X10_STRUCTS:.x10=.struct_h)
 X10_CLASSES=UTS.x10 \
             UTS__SeqUTS.x10 \
             ParUTS.x10 \
+            ParUTSBin.x10 \
             Counter.x10 \
             Counter__ConstSeqAccessContainer.x10 \
             NetworkGenerator.x10 \
             TreeExpander.x10 \
             PAdicNumber.x10 \
             ParUTS__FixedSizeStack.x10 \
+            ParUTSBin__FixedSizeStack.x10 \
             Deque.x10 \
             Deque__EmptyDequeError.x10
 X10_CLASSES_CC=$(X10_CLASSES:.x10=.cc)

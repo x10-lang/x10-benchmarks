@@ -7,7 +7,6 @@ import x10.util.Stack;
 
 public class UTS {
     
-    static type PLH= PlaceLocalHandle[ParUTS];
     private static val NORMALIZER = 2147483648.0; // does not depend on input parameters
     
     public static struct Constants {
@@ -298,26 +297,39 @@ public class UTS {
                             (2==l) ? NetworkGenerator.generateChunkedGraph (Place.MAX_PLACES, z):
                                 NetworkGenerator.generateSparseEmbedding (Place.MAX_PLACES, z);
                             
-                val st = 
-                    (Constants.BINOMIAL==t) ? 
-                        PlaceLocalHandle.make[ParUTS](Dist.makeUnique(), 
-                                ()=>new ParUTS(b0, qq, mf,k,nu, w, e, l, lifelineNetwork(here.id))):
-                                    PlaceLocalHandle.make[ParUTS](Dist.makeUnique(), 
-                                            ()=>new ParUTS(b0, a, d, k, nu, w, e, l, lifelineNetwork(here.id)));
-                                
-                Console.OUT.println("Starting...");
-                var time:Long = System.nanoTime();
-                try {
-                    if (Constants.BINOMIAL==t) st().main(st, TreeNode(r));
-                    else st().main(st, TreeNode(r, 0));
-                } catch (v:Throwable) {
-                    v.printStackTrace();
+                if (Constants.BINOMIAL==t) {
+	                val st = PlaceLocalHandle.make[ParUTSBin](Dist.makeUnique(), 
+	                                ()=>new ParUTSBin(b0, qq, mf,k,nu, w, e, l, lifelineNetwork(here.id)));
+	                                
+	                Console.OUT.println("Starting...");
+	                var time:Long = System.nanoTime();
+	                try {
+	                    st().main(st, SHA1Rand(r));
+	                } catch (v:Throwable) {
+	                    v.printStackTrace();
+	                }
+	                time = System.nanoTime() - time;
+	                Console.OUT.println("Finished.");
+	                val P = Place.MAX_PLACES;
+	                val allCounters = new Rail[Array[Counter](1){rail}](P,(i:Int) => at(Place(i)) st().counters());
+	                st().counter.stats(allCounters, time, verbose, ParUTS.gatherTimes);
+                } else {
+	                val st = PlaceLocalHandle.make[ParUTS](Dist.makeUnique(), 
+	                                                ()=>new ParUTS(b0, a, d, k, nu, w, e, l, lifelineNetwork(here.id)));
+	                                    
+                    Console.OUT.println("Starting...");
+                    var time:Long = System.nanoTime();
+                    try {
+                        st().main(st, TreeNode(r, 0));
+                    } catch (v:Throwable) {
+                        v.printStackTrace();
+                    }
+                    time = System.nanoTime() - time;
+                    Console.OUT.println("Finished.");
+                    val P = Place.MAX_PLACES;
+                    val allCounters = new Rail[Array[Counter](1){rail}](P,(i:Int) => at(Place(i)) st().counters());
+                    st().counter.stats(allCounters, time, verbose, ParUTS.gatherTimes);
                 }
-                time = System.nanoTime() - time;
-                Console.OUT.println("Finished.");
-                val P = Place.MAX_PLACES;
-                val allCounters = new Rail[Array[Counter](1){rail}](P,(i:Int) => at(Place(i)) st().counters());
-                st().counter.stats(allCounters, time, verbose, ParUTS.gatherTimes);
             }
             Console.OUT.println("--------");
         } catch (e:Throwable) {

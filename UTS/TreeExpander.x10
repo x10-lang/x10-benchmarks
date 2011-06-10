@@ -107,6 +107,17 @@ public class TreeExpander {
         for (var i:Int=0; i<numChildren; ++i) deque.add(TreeNode (node, i));
     }
     
+    @Inline public static def binomial (q:Long, 
+            m:int, 
+            node:SHA1Rand,
+            deque:GrowableIndexedMemoryChunk[SHA1Rand]) {
+        val randomNumber:Long = node();
+        val numChildren:Int = (randomNumber < q) ? m : 0;
+        
+        /* Push all the children onto the stack */
+        for (var i:Int=0; i<numChildren; ++i) deque.add(SHA1Rand (node, i));
+    }
+    
     @Inline public static def processBinomialRoot (b0:Int, 
             node:TreeNode, 
             deque:Stack[TreeNode]) {
@@ -117,5 +128,11 @@ public class TreeExpander {
             node:TreeNode, 
             deque:GrowableIndexedMemoryChunk[TreeNode]) {
         for (var i:Int=0; i<b0; ++i) deque.add(TreeNode (node, i));
+    }
+
+    @Inline public static def processBinomialRoot (b0:Int, 
+            node:SHA1Rand, 
+            deque:GrowableIndexedMemoryChunk[SHA1Rand]) {
+        for (var i:Int=0; i<b0; ++i) deque.add(SHA1Rand (node, i));
     }
 }
