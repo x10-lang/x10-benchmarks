@@ -85,7 +85,7 @@ public class Scorer {
     * on this form of the loop better in writing the MPI code, because it made the communication
     * among processors a lot easier to understand. 
     */
-   public def this(parms: Parameters, shorter: Rail[Byte], longer: Rail[Byte], segInfo: SegmentationInfo) {
+   public def this(parms: Parameters, shorter: Rail[Byte], longer: Rail[Byte], segInfo: SegmentationInfo, probing:Int) {
       longOffset = segInfo.firstInLonger(here.id);  // where to start if shortfall == 0
       longRail = longer;
       shortRail = shorter;
@@ -109,6 +109,7 @@ public class Scorer {
       val openGapPenalty = parms.openGapPenalty;
 
       for(i in 1..shortSize) {
+         if (probing != 0) Runtime.wsProcessEvents();
          var previousBestScore: Int = 0;
          val short_i_minus_1: Byte = shorter(i-1);
          for(j in 1..longSize_) { // try {

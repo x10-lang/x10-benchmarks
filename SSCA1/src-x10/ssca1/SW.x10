@@ -54,7 +54,7 @@ public class SW {
       for(var n: Int = 0; n < args.size-1; n+=2) {
          val value = args(n+1);
          val key = args(n).substring(1,2); // only care about the key's prefix
-         if("lprs".indexOf(key) >= 0) parsedArgs.put(key, value); 
+         if("lprsy".indexOf(key) >= 0) parsedArgs.put(key, value); 
          else {
             Console.ERR.println("Unrecognized command line flag, '" +key + "'\r\n"+USAGE);
             at(Place.FIRST_PLACE) System.setExitCode(25);
@@ -149,6 +149,8 @@ public class SW {
       val parsedArgs = new HashMap[String, String]();
       if (!parseTheArgs(args, parsedArgs)) return;
       val repetitions = Int.parseInt(parsedArgs.get("r").value);
+      val probing = null != parsedArgs.get("y") ? Int.parseInt(parsedArgs.get("y").value) : 0;
+      if (probing == 1) Runtime.println("Using periodic probe");
       val timings = new Timings(repetitions, phaseLeaders);
       val begin = timer.milliTime();
       var finalResult: Output = new Output();
@@ -186,7 +188,7 @@ public class SW {
              val mySegment = segmentedInput(p);  // extract the subsegment here to minimize captured state in async body.
 	     val capturedP = p;
              async at (Place.place(p)) {
-	         val s = new Scorer(parms, shorter, mySegment, segInfo);
+	         val s = new Scorer(parms, shorter, mySegment, segInfo, probing);
                  scorers(capturedP) = s;
                  scores(capturedP) = s.score;
              }
