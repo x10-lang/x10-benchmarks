@@ -111,11 +111,7 @@ public class TreeExpander {
             m:int, 
             node:SHA1Rand,
             deque:GrowableIndexedMemoryChunk[SHA1Rand]) {
-        val randomNumber:Long = node();
-        val numChildren:Int = (randomNumber < q) ? m : 0;
-        
-        /* Push all the children onto the stack */
-        for (var i:Int=0; i<numChildren; ++i) deque.add(SHA1Rand (node, i));
+        if (node() < q) for (var i:Int=0; i<m; ++i) deque.add(SHA1Rand (node, i));
     }
     
     @Inline public static def processBinomialRoot (b0:Int, 
