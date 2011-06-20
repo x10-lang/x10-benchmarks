@@ -1,73 +1,67 @@
-
+import x10.util.Box;
 import x10.util.Random;
 import x10.lang.Math;
 import x10.util.Stack;
 import x10.util.List;
-import x10.util.GrowableIndexedMemoryChunk;
+import x10.util.IndexedMemoryChunk;
 import x10.compiler.Inline;
 
-final class ParUTSBin implements Counted {
-    @Inline static def pop(stack:GrowableIndexedMemoryChunk[TreeNode]):TreeNode {
+final class ParUTSBin {
+	@Inline public static def processBinomialRoot (b0:Int, 
+			node:SHA1Rand, 
+			deque:GrowableIndexedMemoryChunk[SHA1Rand]) {
+		for (var i:Int=0; i<b0; ++i) deque.add(SHA1Rand (node, i));
+	}
+	
+    @Inline static def pop(stack:GrowableIndexedMemoryChunk[SHA1Rand]):SHA1Rand {
         val e = stack(stack.length() - 1);
         stack.removeLast();
         return e;
     }
 
-    @Inline static def pop(stack:GrowableIndexedMemoryChunk[TreeNode], k:Int):Array[TreeNode](1){rect,rail,zeroBased} {
-        val n = stack.length();
-        if (n < k)
-            return null;
-        return stack.moveSectionToArray(n-k, n-1);
+    @Inline static def pop(stack:GrowableIndexedMemoryChunk[SHA1Rand], k:Int):Box[IndexedMemoryChunk[SHA1Rand]] {
+        return new Box(stack.moveSectionToIndexedMemoryChunk(k));
     }
 
-    static type PLH= PlaceLocalHandle[ParUTSBin];
+    static type PLH = PlaceLocalHandle[ParUTSBin];
     static type SHA1Rand = UTS.SHA1Rand;
-    static type TreeNode = UTS.SHA1Rand;
-    static type Constants = UTS.Constants;
-    
-    static val gatherTimes = false;
     
     final static class FixedSizeStack[T] {
-        val data:Rail[T];
-        var last:Int;
-        def this(n:Int, t:T) {
-            data = new Rail[T](n, (i:Int) => t);
-            last = -1;
+        val data:IndexedMemoryChunk[T];
+        var size:Int;
+        def this(n:Int) {
+            data = IndexedMemoryChunk.allocateUninitialized[T](n);
+            size = 0;
         }
-        def empty():Boolean= last < 0;
-        def pop():T = data(last--);
-        def push(t:T) {
-            data(++last)=t;
-        }
-        def size():Int=last+1;
-        
+        @Inline def pop():T = data(--size);
+        @Inline def push(t:T) { data(size++) = t; }
     }
+    
     val thieves:FixedSizeStack[Int];
     
     val width:Int;
-    val stack = new GrowableIndexedMemoryChunk[TreeNode]();
-    val myLifelines:Rail[Int];
+    val stack = new GrowableIndexedMemoryChunk[SHA1Rand](65536);
+    val lifelines:Rail[Int];
     
     // Which of the lifelines have I actually activated?
-    val lifelinesActivated: Rail[Boolean];
+    val lifelinesActivated: IndexedMemoryChunk[Boolean];
     
-    val treeType:Int; // 0=BINOMIAL, 1=GEOMETRIC
     val b0:Int; // root branching factor
     val q:Long;
     val m:Int;
     val k:Int;
     val nu:Int; // For the binomial tree
-    val a:Int;
-    val d:Int; // For the geometric tree
     
     val l:Int; 
     val z:Int;
-    val logEvents:Boolean;
     val myRandom = new Random();
     public val counter:Counter;
     var active:Boolean=false;
-    var noLoot:Boolean=true;
+    @x10.compiler.Volatile transient var empty:Boolean;
+    @x10.compiler.Volatile transient var ack:Int=0;
     public def counters()=[counter as Counter];
+    
+    var st:PLH;
     
     /** Initialize the state. Executed at all places when executing the 
      * PlaceLocalHandle.make command in main (of UTS). BINOMIAL
@@ -81,106 +75,43 @@ final class ParUTSBin implements Counted {
             e:Boolean, 
             l:Int,
             lifelineNetwork:Rail[Int]) {
-        this.treeType = Constants.BINOMIAL;
         this.b0 = b0;
         this.q = q; 
         this.m = m; 
-        this.k=k; 
-        this.nu=nu; 
+        this.k = k; 
+        this.nu = nu; 
         this.l = l;
-        this.myLifelines = lifelineNetwork;
-        this.z = lifelineNetwork.size; // assume symmetric.
-        this.width=w;
-        this.logEvents=e;
-        this.counter = new Counter(logEvents);
-        thieves = new FixedSizeStack[Int](z, 0);
-        lifelinesActivated = new Rail[Boolean](Place.MAX_PLACES, (Int)=>false);
-        //	printLifelineNetwork();
-        
-        this.a = -1; 
-        this.d = -1;
+        this.lifelines = lifelineNetwork;
+        this.z = lifelineNetwork.size;
+        this.width = w;
+        this.counter = new Counter(false);
+        thieves = new FixedSizeStack[Int](z);
+        lifelinesActivated = IndexedMemoryChunk.allocateZeroed[Boolean](Place.MAX_PLACES);
     }
     
-    /** Initialize the state. Executed at all places when executing the 
-     * PlaceLocalHandle.make command in main (of UTS). GEOMETRIC
-     */
-    public def this (b0:Int, 
-            a:Int, 
-            d:Int, 
-            k:Int, 
-            nu:Int, 
-            w:Int, 
-            e:Boolean, 
-            l:Int,
-            lifelineNetwork:Rail[Int]) {
-        this.treeType = Constants.GEOMETRIC;
-        this.b0 = b0;
-        this.a = a; 
-        this.d = d; 
-        this.k=k; 
-        this.nu=nu; 
-        this.l = l;
-        this.myLifelines = lifelineNetwork;
-        this.z = lifelineNetwork.size; // assume symmetric.
-        this.width=w;
-        this.logEvents=e;
-        this.counter = new Counter(logEvents);
-        thieves = new FixedSizeStack[Int](Place.MAX_PLACES, 0);
-        lifelinesActivated = new Rail[Boolean](Place.MAX_PLACES, (Int)=>false);
-        printLifelineNetwork();
-        
-        this.q = -1; 
-        this.m = -1;
-    }
-    
-    def printLifelineNetwork () {
-        Console.OUT.print (here.id + " =>");
-        for (var i:Int=0; i<myLifelines.size; ++i) 
-            if (-1 != myLifelines(i)) 
-                Console.OUT.print  (" " + myLifelines(i) +  " " +
-                        new PAdicNumber(NetworkGenerator.findW(Place.MAX_PLACES, z), z, myLifelines(i)));
-            else Console.OUT.print (" X");
-        Console.OUT.println ();
-    }
-    
-    def event(s:String) { 
-        /*      event(false, s); */
-    }
-    
-    /*
-     * def event(verbose:Boolean, s:String) {
-     * if (verbose)
-     * Console.OUT.println("[Place(" + here.id+"), at " 
-     * + System.nanoTime() + "] " + s);
-     * }
-     */
-    
-    /** Check if the current node (governed by the SHA1Rand state) has any
-     * children. If so, push it onto the local stack.
-     */
-    @Inline final def processSubtree (node:TreeNode) {
-        ++counter.nodesCounter;
-        TreeExpander.binomial (q, m, node, stack);
-    }
-    
-    @Inline final def processLoot(loot: Rail[TreeNode], lifeline:Boolean) {
-        counter.incRx(lifeline, loot.size);
-        val time = gatherTimes ? System.nanoTime() : 0L;
-        for (var i:Int=0; i<loot.size; i++) processSubtree(loot(i));
-        if (gatherTimes) counter.incTimeComputing (System.nanoTime() - time);    
+    @Inline final def processLoot(l:Box[IndexedMemoryChunk[SHA1Rand]], lifeline:Boolean) {
+    	val loot = l();
+        counter.incRx(lifeline, loot.length());
+        for (var i:Int=0; i<loot.length(); ++i) {
+        	val node = loot(i);
+        	if (node() < q) for (var ii:Int=0; ii<m; ++ii) stack.add(SHA1Rand (node, ii));
+        }
+        counter.nodesCounter += loot.length();
     }
     
     @Inline final def processAtMostN(n:Int) {
-        val time = gatherTimes ? System.nanoTime() : 0L;
-        for (var count:Int=0; count < n; count++) {
-            val e = pop(stack);
-            processSubtree(e);
+    	val stack = this.stack;
+    	val m = this.m;
+    	val q = this.q;
+    	for (var i:Int=0; i<n; ++i) {
+        	val node = pop(stack);
+        	if (node() < q) for (var ii:Int=0; ii<m; ++ii) stack.add(SHA1Rand (node, ii));
         }
-        if (gatherTimes) counter.incTimeComputing (System.nanoTime() - time);  
+        counter.nodesCounter += n;
     }
     
     /** A trivial function to calculate minimum of 2 integers */
-    def min(i:int,j:int) = i < j ? i : j;
+    @Inline def min(i:int,j:int) = i < j ? i : j;
     
     /** Go through each element in the stack, process it (generate its
      * children, and add them to the stack) until there is nothing left
@@ -190,33 +121,17 @@ final class ParUTSBin implements Counted {
      * handle and also, distribute a chunk of the local stack (work) to 
      * our lifeline buddy.
      */
-    @Inline final def processStack(st:PLH) {
+    final def processStack() {
         while (true) {
             var n:Int = min(stack.length(), nu);
             while (n > 0) {
                 processAtMostN(n);
-                
-                val time:Long =  gatherTimes ? System.nanoTime() : 0L;
                 Runtime.probe();
-                if (gatherTimes) counter.incTimeProbing (System.nanoTime() - time);
-                val numThieves = thieves.size();
-                if (numThieves > 0) distribute(st, 1, numThieves);
+                distribute();
                 n = min(stack.length(), nu);
             }
-            val loot = attemptSteal(st);
-            if (null==loot) { 
-                if (! noLoot) {
-                    noLoot=true;
-                    continue;
-                }
-                else {
-                    break;
-                }
-            } else {
-                processLoot(loot, false);
-            }
+            if (attemptSteal()) return;
         }
-        event("Finished main loop.");
     }
     
     /** If our buddy/buddies have requested a lifeline, and we have ample supply 
@@ -224,28 +139,22 @@ final class ParUTSBin implements Counted {
      * section because it ultimately turns around and calls the distribute() function
      * below, which is timed.
      */
-    def distribute(st:PLH, depth:Int) {
-        val numThieves = thieves.size();
-        if (numThieves > 0) distribute(st, 1, numThieves);
-    }
-    
-    def distribute(st:PLH, depth:Int, var numThieves:Int) {
-        val time = gatherTimes ? System.nanoTime() : 0L;
-        val lootSize= stack.length();
-        if (lootSize > 2) {
-            numThieves = min(numThieves, lootSize-2);
-            val numToSteal = lootSize/(numThieves+1);
-            for (var i:Int=0; i < numThieves; ++i) {
+    @Inline def distribute() {
+        var numThieves:Int = thieves.size;
+        if (numThieves == 0) return;
+        val lootSize = stack.length();
+        if (lootSize >= 2) {
+            numThieves = min(numThieves+1, lootSize);
+            val numToSteal = lootSize/numThieves;
+            val victim = Runtime.hereInt();
+            val st_ = st;
+            for (var i:Int=1; i < numThieves; ++i) {
                 val thief = thieves.pop();
                 val loot = pop(stack, numToSteal);
                 counter.incTxNodes(numToSteal);
-                // event("Distributing " + loot.size + " to " + thief);
-                val victim = here.id;
-                async at(Place(thief)) 
-                st().launch(st, false, loot, depth, victim);
+                async at(Place(thief)) st_().relaunch(loot, victim);
             }
         }
-        if (gatherTimes) counter.incTimeDistributing (System.nanoTime()-time);
     }
     
     /** This is the code invoked locally by each node when there are no 
@@ -255,51 +164,31 @@ final class ParUTSBin implements Counted {
      * work from randomly chosen neighbors (for a certain number of 
      * tries). If we are not successful, we invoke our lifeline system.
      */
-    def attemptSteal(st:PLH):Rail[TreeNode] {
-        val time = gatherTimes ? System.nanoTime() : 0L;
+    def attemptSteal() {
         val P = Place.MAX_PLACES;
-        if (P == 1) return null;
-        val p = here.id;
-        for (var i:Int=0; i < width && noLoot; i++) {
+        if (P == 1) return true;
+        val p = Runtime.hereInt();
+        val st_ = st;
+        empty = true;
+        for (var i:Int=0; i < width && empty; ++i) {
             var q_:Int = 0;
-            while((q_ =  myRandom.nextInt(P)) == p) ;
+            while ((q_ = myRandom.nextInt(P)) == p);
             val q = q_;
             counter.incStealsAttempted();
-            // event("Stealing from " + q);
-            // Potential communication attempt.
-            // May receive incoming thefts or distributions.
-            val loot = at (Place(q)) st().trySteal(p);
-            if (loot != null) {
-                //event("Steal succeeded with " + 
-                //(loot == null ? 0 : loot.size) + " items");
-                if (gatherTimes) counter.incTimeStealing(System.nanoTime() - time);
-                return loot;
-            }
+            val a = ++ack;
+            async at(Place(q)) st_().trySteal(p, false, a);
+            while (a == ack && empty) Runtime.probe();
         }
-        if (! noLoot) {
-            if (gatherTimes) counter.incTimeStealing(System.nanoTime() - time);
-            return null;
-        }
-        event("No loot; establishing lifeline(s).");
-        
-        // resigned to make a lifeline steal from one of our lifelines.
-        var loot:Rail[TreeNode] = null;
-        for (var i:Int=0; 
-        (i<myLifelines.size) && (noLoot) && (0<=myLifelines(i)); 
-        ++i) {
-            val lifeline:Int = myLifelines(i);
-            if (!lifelinesActivated(lifeline) ) {
+        for (var i:Int=0; (i<lifelines.size) && empty && (0<=lifelines(i)); ++i) {
+            val lifeline:Int = lifelines(i);
+            if (!lifelinesActivated(lifeline)) {
                 lifelinesActivated(lifeline) = true;
-                loot = at(Place(lifeline)) st().trySteal(p, true);
-                // event("Lifeline steal result " + (loot==null ? 0 : loot.size));
-                if (null!=loot) {
-                    lifelinesActivated(lifeline) = false;
-                    break;
-                }
+                val a = ++ack;
+                async at(Place(lifeline)) st_().trySteal(p, true, a);
+                while (a == ack && empty) Runtime.probe();
             }
         }
-        if (gatherTimes) counter.incTimeStealing(System.nanoTime() - time);
-        return loot;
+        return empty;
     }
     
     /** Try to steal from the local stack --- invoked by either a 
@@ -307,51 +196,53 @@ final class ParUTSBin implements Counted {
      * or by the owning place itself when it wants to give work to 
      * a fallen buddy.
      */
-    def trySteal(p:Int):Rail[TreeNode]=trySteal(p, false);
-    def trySteal(p:Int, isLifeLine:Boolean) : Rail[TreeNode] {
-        counter.stealsReceived++;
+    def trySteal(p:Int, isLifeLine:Boolean, a:Int) {
+        ++counter.stealsReceived;
+        val st_ = st;
         val length = stack.length();
-        val numSteals = k==0 ? (length >=2 ? length/2 : 0)
-                : (k < length ? k : (k/2 < length ? k/2 : 0));
+        val numSteals = k==0 ? (length >= 2 ? length/2 : 0) : (k < length ? k : (k/2 < length ? k/2 : 0));
         if (numSteals==0) {
-            if (isLifeLine)
-                thieves.push(p);
-            event("Returning null");
-            return null;
+            if (isLifeLine) thieves.push(p);
+            async at (Place(p)) { if (st_().ack == a) st_().ack++; }
+        } else {
+            val loot = pop(stack, numSteals);
+            counter.nodesGiven += numSteals;
+            ++counter.stealsSuffered;
+            val victim = isLifeLine ? Runtime.hereInt() : -1;
+            async at (Place(p)) { st_().relaunch(loot, victim); }
         }
-        val loot = pop(stack, numSteals);
-        counter.nodesGiven += numSteals;
-        counter.stealsSuffered++;
-        return loot;
     }
     
-    def launch(st:PLH, 
-            init:Boolean, 
-            loot:Rail[TreeNode], 
-            depth:Int, 
-            source:Int) {
-        assert loot != null;
+    def launch(loot:Box[IndexedMemoryChunk[SHA1Rand]]) {
         try {
-            lifelinesActivated(source) = false;
-            if (active) {
-                noLoot = false;
-                processLoot(loot, true);
-                assert (! init);
-                /*
-                 * // Now you can return, the outer activity will handle the data on the stack.
-                 * if (depth > 0) distribute(st, depth+1);
-                 */
-                return;
-            }
-            active=true;
+            active = true;
             counter.startLive();
-            counter.updateDepth(depth);
             processLoot(loot, true);
-            if (depth > 0) 
-                distribute(st, depth+1);
-            processStack(st);
+            processStack();
             counter.stopLive();
-            active=false;
+            active = false;
+        } catch (v:Throwable) {
+            Console.OUT.println("Exception at " + here);
+            v.printStackTrace();
+        }
+    }
+    
+    def relaunch(loot:Box[IndexedMemoryChunk[SHA1Rand]], source:Int) {
+        val isLifeLine = source >= 0;
+        try {
+            if (isLifeLine) lifelinesActivated(source) = false;
+            if (active) {
+                empty = false;
+                processLoot(loot, isLifeLine);
+            } else {
+                active = true;
+                counter.startLive();
+                processLoot(loot, isLifeLine);
+                distribute();
+                processStack();
+                counter.stopLive();
+                active = false;
+            }
         } catch (v:Throwable) {
             Console.OUT.println("Exception at " + here);
             v.printStackTrace();
@@ -363,33 +254,29 @@ final class ParUTSBin implements Counted {
      * evenly amongst all the places. This is the bootstrap mechanism
      * for distributed UTS.
      */
-    def main (st:PLH, 
-            rootNode:TreeNode) {
-        val P=Place.MAX_PLACES;
-        event("Start main finish");
-        counter.startLive();
+    def main (st:PLH, rootNode:SHA1Rand) {
+        this.st = st;
+        val P = Place.MAX_PLACES;
         finish {
-            event("Launch main");
-            TreeExpander.processBinomialRoot (b0, rootNode, stack);
+            active = true;
+            counter.startLive();
+            processBinomialRoot(b0, rootNode, stack);
             ++counter.nodesCounter; // root node is never pushed on the stack.
             
             val lootSize = stack.length()/P;
             for (var pi:Int=1 ; pi<P ; ++pi) {
-                val time = gatherTimes ? System.nanoTime() : 0L;
                 val loot = pop(stack, lootSize);
-                if (gatherTimes) counter.incTimePreppingSteal (System.nanoTime() - time);
                 val pi_ = pi;
-                async at(Place(pi_))
-                st().launch(st, true, loot, 0, 0);
+                async at(Place(pi_)) {
+                    st().st = st;
+                    st().launch(loot);
+                }
                 counter.incTxNodes(lootSize);
             }
-            active=true;
-            processStack(st);
-            active=false;
-            event("Finish main");
+            processStack();
             counter.stopLive();
+            active = false;
         } 
-        event("End main finish");
     }
 }
 
