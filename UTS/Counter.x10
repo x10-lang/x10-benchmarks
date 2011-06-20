@@ -338,7 +338,7 @@ public class Counter {
         val ll = sumCounters.lifelines;
         Console.OUT.println("Overhead:\n\t" + (stolenSum+llN) + " total nodes stolen."); 
         val theftEfficiency = (stolenSum*1.0F)/steals;
-        Console.OUT.println("\t" + safeSubstring("" + steals, 0,5)+ " direct steals."); 
+        Console.OUT.println("\t" + steals + " direct steals."); 
         Console.OUT.println("\t" + safeSubstring("" + theftEfficiency, 0,8)+ " nodes stolen per attempt."); 
         Console.OUT.println("\t" + ll + " lifeline steals.");
         Console.OUT.println("\t" + safeSubstring("" + (1.0F*llN)/ll, 0,8) + " nodes stolen/lifeline steal.");
