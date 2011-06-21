@@ -5,6 +5,7 @@ import x10.util.Stack;
 import x10.util.List;
 import x10.util.IndexedMemoryChunk;
 import x10.compiler.Inline;
+import x10.compiler.Uncounted;
 
 final class ParUTSBin {
 	@Inline public static def processBinomialRoot (b0:Int, 
@@ -58,7 +59,7 @@ final class ParUTSBin {
     public val counter:Counter;
     var active:Boolean=false;
     @x10.compiler.Volatile transient var empty:Boolean;
-    @x10.compiler.Volatile transient var ack:Int=0;
+    @x10.compiler.Volatile transient var ack:Boolean;
     public def counters()=[counter as Counter];
     
     var st:PLH;
@@ -175,17 +176,17 @@ final class ParUTSBin {
             while ((q_ = myRandom.nextInt(P)) == p);
             val q = q_;
             counter.incStealsAttempted();
-            val a = ++ack;
-            async at(Place(q)) st_().trySteal(p, false, a);
-            while (a == ack && empty) Runtime.probe();
+            ack = true;
+            @Uncounted async at(Place(q)) st_().trySteal(p, false);
+            while (ack) Runtime.probe();
         }
         for (var i:Int=0; (i<lifelines.size) && empty && (0<=lifelines(i)); ++i) {
             val lifeline:Int = lifelines(i);
             if (!lifelinesActivated(lifeline)) {
                 lifelinesActivated(lifeline) = true;
-                val a = ++ack;
-                async at(Place(lifeline)) st_().trySteal(p, true, a);
-                while (a == ack && empty) Runtime.probe();
+                ack = true;
+                @Uncounted async at(Place(lifeline)) st_().trySteal(p, true);
+                while (ack) Runtime.probe();
             }
         }
         return empty;
@@ -196,20 +197,20 @@ final class ParUTSBin {
      * or by the owning place itself when it wants to give work to 
      * a fallen buddy.
      */
-    def trySteal(p:Int, isLifeLine:Boolean, a:Int) {
+    def trySteal(p:Int, isLifeLine:Boolean) {
         ++counter.stealsReceived;
         val st_ = st;
         val length = stack.length();
         val numSteals = k==0 ? (length >= 2 ? length/2 : 0) : (k < length ? k : (k/2 < length ? k/2 : 0));
         if (numSteals==0) {
             if (isLifeLine) thieves.push(p);
-            async at (Place(p)) { if (st_().ack == a) st_().ack++; }
+            @Uncounted async at (Place(p)) { st_().ack = false; }
         } else {
             val loot = pop(stack, numSteals);
             counter.nodesGiven += numSteals;
             ++counter.stealsSuffered;
             val victim = isLifeLine ? Runtime.hereInt() : -1;
-            async at (Place(p)) { st_().relaunch(loot, victim); }
+            @Uncounted async at (Place(p)) { st_().relaunch(loot, victim); st_().ack = false; }
         }
     }
     
