@@ -1,6 +1,4 @@
-import x10.util.Box;
 import x10.util.Random;
-import x10.util.IndexedMemoryChunk;
 import x10.compiler.Inline;
 import x10.compiler.Uncounted;
 
@@ -12,7 +10,7 @@ final class ParUTSBin {
     val lifelines:Rail[Int];
     
     // Which of the lifelines have I actually activated?
-    val lifelinesActivated: IndexedMemoryChunk[Boolean];
+    val lifelinesActivated:Rail[Boolean];
     
     val b0:Int; // root branching factor
     val q:Long;
@@ -54,17 +52,16 @@ final class ParUTSBin {
         this.width = w;
         this.counter = new Counter(false);
         thieves = new FixedSizeStack[Int](z);
-        lifelinesActivated = IndexedMemoryChunk.allocateZeroed[Boolean](Place.MAX_PLACES);
+        lifelinesActivated = new Rail[Boolean](Place.MAX_PLACES);
     }
     
-    @Inline final def processLoot(l:Box[IndexedMemoryChunk[SHA1Rand]], lifeline:Boolean) {
-    	val loot = l();
-        counter.incRx(lifeline, loot.length());
-        for (var i:Int=0; i<loot.length(); ++i) {
+    @Inline final def processLoot(loot:Rail[SHA1Rand], lifeline:Boolean) {
+        counter.incRx(lifeline, loot.size);
+        for (var i:Int=0; i<loot.size; ++i) {
         	val node = loot(i);
         	if (node() < q) for (var ii:Int=0; ii<m; ++ii) stack.push(SHA1Rand (node, ii));
         }
-        counter.nodesCounter += loot.length();
+        counter.nodesCounter += loot.size;
     }
     
     @Inline final def processAtMostN(n:Int) {
@@ -115,7 +112,7 @@ final class ParUTSBin {
             val st_ = st;
             for (var i:Int=1; i < numThieves; ++i) {
                 val thief = thieves.pop();
-                val loot = new Box(stack.pop(numToSteal));
+                val loot = stack.pop(numToSteal);
                 counter.incTxNodes(numToSteal);
                 async at(Place(thief)) st_().relaunch(loot, victim);
             }
@@ -170,7 +167,7 @@ final class ParUTSBin {
             if (isLifeLine) thieves.push(p);
             @Uncounted async at (Place(p)) { st_().ack = false; }
         } else {
-            val loot = new Box(stack.pop(numSteals));
+            val loot = stack.pop(numSteals);
             counter.nodesGiven += numSteals;
             ++counter.stealsSuffered;
             val victim = isLifeLine ? Runtime.hereInt() : -1;
@@ -178,7 +175,7 @@ final class ParUTSBin {
         }
     }
     
-    def launch(loot:Box[IndexedMemoryChunk[SHA1Rand]]) {
+    def launch(loot:Rail[SHA1Rand]) {
         try {
             active = true;
             counter.startLive();
@@ -192,7 +189,7 @@ final class ParUTSBin {
         }
     }
     
-    def relaunch(loot:Box[IndexedMemoryChunk[SHA1Rand]], source:Int) {
+    def relaunch(loot:Rail[SHA1Rand], source:Int) {
         val isLifeLine = source >= 0;
         try {
             if (isLifeLine) lifelinesActivated(source) = false;
@@ -230,7 +227,7 @@ final class ParUTSBin {
             
             val lootSize = stack.size()/P;
             for (var pi:Int=1 ; pi<P ; ++pi) {
-                val loot = new Box(stack.pop(lootSize));
+                val loot = stack.pop(lootSize);
                 val pi_ = pi;
                 async at(Place(pi_)) {
                     st().st = st;

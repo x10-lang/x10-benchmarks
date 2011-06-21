@@ -26,11 +26,11 @@ public final class MyStack[T] {
 
     @Inline public def pop():T = imc(--size);
 
-    public def pop(n:Int):IndexedMemoryChunk[T] {
+    public def pop(n:Int):Rail[T] {
         val tmp = IndexedMemoryChunk.allocateUninitialized[T](n);
-        IndexedMemoryChunk.copy(imc, size-n, tmp, 0, n);
         size -= n;
-        return tmp;
+        IndexedMemoryChunk.copy(imc, size, tmp, 0, n);
+        return new Array[T](tmp);
     }
 
     private def grow(var newCapacity:Int):void {
