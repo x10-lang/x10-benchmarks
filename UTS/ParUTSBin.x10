@@ -5,14 +5,6 @@ import x10.compiler.Inline;
 import x10.compiler.Uncounted;
 
 final class ParUTSBin {
-	@Inline public static def processBinomialRoot (b0:Int, 
-			node:SHA1Rand, 
-			deque:MyStack[SHA1Rand]) {
-		for (var i:Int=0; i<b0; ++i) deque.push(SHA1Rand (node, i));
-	}
-
-    static type PLH = PlaceLocalHandle[ParUTSBin];
-    
     val thieves:FixedSizeStack[Int];
     
     val width:Int;
@@ -37,7 +29,7 @@ final class ParUTSBin {
     @x10.compiler.Volatile transient var ack:Boolean;
     public def counters()=[counter as Counter];
     
-    var st:PLH;
+    var st:PlaceLocalHandle[ParUTSBin];
     
     /** Initialize the state. Executed at all places when executing the 
      * PlaceLocalHandle.make command in main (of UTS). BINOMIAL
@@ -227,13 +219,13 @@ final class ParUTSBin {
      * evenly amongst all the places. This is the bootstrap mechanism
      * for distributed UTS.
      */
-    def main (st:PLH, rootNode:SHA1Rand) {
+    def main (st:PlaceLocalHandle[ParUTSBin], rootNode:SHA1Rand) {
         this.st = st;
         val P = Place.MAX_PLACES;
         finish {
             active = true;
             counter.startLive();
-            processBinomialRoot(b0, rootNode, stack);
+            for (var i:Int=0; i<b0; ++i) stack.push(SHA1Rand (rootNode, i));
             ++counter.nodesCounter; // root node is never pushed on the stack.
             
             val lootSize = stack.size()/P;
