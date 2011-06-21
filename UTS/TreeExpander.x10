@@ -2,7 +2,6 @@ import x10.compiler.*;
 import x10.util.OptionsParser;
 import x10.util.Option;
 import x10.util.Stack;
-import x10.util.GrowableIndexedMemoryChunk;
 
 public class TreeExpander {
     static type TreeNode = UTS.TreeNode;
@@ -12,7 +11,8 @@ public class TreeExpander {
     @Inline public static def geometric (shapeFunction:int, /* 0..3*/
             rootBranchingFactor:int, /* self-expln */
             maxTreeDepth:int, /* cut off after this depth */
-            node:TreeNode) { /* random number generator */
+            node:TreeNode, /* random number generator */
+            deque:Stack[TreeNode]) { /* The place to store */
         /* compute branching factor at this node */
         var curNodeBranchingFactor:double;
         
@@ -55,33 +55,13 @@ public class TreeExpander {
         val probForCurNodeBranchingFactor = 1.0 / (1.0 + curNodeBranchingFactor);
         val randomNumber = node() as double;
         val normalizedRandomNumber = randomNumber / NORMALIZER;
-        return Math.floor ((Math.log (1-normalizedRandomNumber)) /
+        val numChildren = Math.floor ((Math.log (1-normalizedRandomNumber)) /
                 (Math.log 
                         (1-probForCurNodeBranchingFactor))) as int;
-    }
-    
-    @Inline public static def geometric (shapeFunction:int, /* 0..3*/
-            rootBranchingFactor:int, /* self-expln */
-            maxTreeDepth:int, /* cut off after this depth */
-            node:TreeNode, /* random number generator */
-            deque:Stack[TreeNode]) { /* The place to store */
-        val numChildren = geometric(shapeFunction, rootBranchingFactor, maxTreeDepth, node);
         
         /* Push all the children onto the Deque (stack) */
         for (var i:Int=0; i<numChildren; ++i) 
             deque.push(TreeNode (node, i, node.getDepth()+1));
-    }
-    
-    @Inline public static def geometric (shapeFunction:int, /* 0..3*/
-            rootBranchingFactor:int, /* self-expln */
-            maxTreeDepth:int, /* cut off after this depth */
-            node:TreeNode, /* random number generator */
-            deque:GrowableIndexedMemoryChunk[TreeNode]) { /* The place to store */
-        val numChildren = geometric(shapeFunction, rootBranchingFactor, maxTreeDepth, node);
-        
-        /* Push all the children onto the Deque (stack) */
-        for (var i:Int=0; i<numChildren; ++i) 
-            deque.add(TreeNode (node, i, node.getDepth()+1));
     }
     
     @Inline public static def binomial (q:Long, 
@@ -95,39 +75,9 @@ public class TreeExpander {
         for (var i:Int=0; i<numChildren; ++i) deque.push(TreeNode (node, i));
     }
     
-    @Inline public static def binomial (q:Long, 
-            m:int, 
-            node:TreeNode,
-            deque:GrowableIndexedMemoryChunk[TreeNode]) {
-        val randomNumber:Long = node();
-        val numChildren:Int = (randomNumber < q) ? m : 0;
-        
-        /* Push all the children onto the stack */
-        for (var i:Int=0; i<numChildren; ++i) deque.add(TreeNode (node, i));
-    }
-    
-    @Inline public static def binomial (q:Long, 
-            m:int, 
-            node:SHA1Rand,
-            deque:GrowableIndexedMemoryChunk[SHA1Rand]) {
-        if (node() < q) for (var i:Int=0; i<m; ++i) deque.add(SHA1Rand (node, i));
-    }
-    
     @Inline public static def processBinomialRoot (b0:Int, 
             node:TreeNode, 
             deque:Stack[TreeNode]) {
         for (var i:Int=0; i<b0; ++i) deque.push(TreeNode (node, i));
-    }
-
-    @Inline public static def processBinomialRoot (b0:Int, 
-            node:TreeNode, 
-            deque:GrowableIndexedMemoryChunk[TreeNode]) {
-        for (var i:Int=0; i<b0; ++i) deque.add(TreeNode (node, i));
-    }
-
-    @Inline public static def processBinomialRoot (b0:Int, 
-            node:SHA1Rand, 
-            deque:GrowableIndexedMemoryChunk[SHA1Rand]) {
-        for (var i:Int=0; i<b0; ++i) deque.add(SHA1Rand (node, i));
     }
 }
