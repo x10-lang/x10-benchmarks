@@ -24,10 +24,8 @@ final class ParUTSBin {
     public val counter:Counter;
     var active:Boolean=false;
     @x10.compiler.Volatile transient var empty:Boolean;
-    @x10.compiler.Volatile transient var ack:Boolean;
+    @x10.compiler.Volatile transient var waiting:Boolean;
     public def counters()=[counter as Counter];
-    
-    var st:PlaceLocalHandle[ParUTSBin];
     
     /** Initialize the state. Executed at all places when executing the 
      * PlaceLocalHandle.make command in main (of UTS). BINOMIAL
@@ -83,16 +81,16 @@ final class ParUTSBin {
      * handle and also, distribute a chunk of the local stack (work) to 
      * our lifeline buddy.
      */
-    final def processStack() {
+    final def processStack(st:PlaceLocalHandle[ParUTSBin]) {
         while (true) {
             var n:Int = min(stack.size(), nu);
             while (n > 0) {
                 processAtMostN(n);
                 Runtime.probe();
-                distribute();
+                distribute(st);
                 n = min(stack.size(), nu);
             }
-            if (attemptSteal()) return;
+            if (attemptSteal(st)) return;
         }
     }
     
@@ -101,7 +99,7 @@ final class ParUTSBin {
      * section because it ultimately turns around and calls the distribute() function
      * below, which is timed.
      */
-    @Inline def distribute() {
+    @Inline def distribute(st:PlaceLocalHandle[ParUTSBin]) {
         var numThieves:Int = thieves.size();
         if (numThieves == 0) return;
         val lootSize = stack.size();
@@ -109,12 +107,11 @@ final class ParUTSBin {
             numThieves = min(numThieves+1, lootSize);
             val numToSteal = lootSize/numThieves;
             val victim = Runtime.hereInt();
-            val st_ = st;
             for (var i:Int=1; i < numThieves; ++i) {
                 val thief = thieves.pop();
                 val loot = stack.pop(numToSteal);
                 counter.incTxNodes(numToSteal);
-                async at(Place(thief)) st_().relaunch(loot, victim);
+                async at(Place(thief)) st().deal(st, loot, victim);
             }
         }
     }
@@ -126,28 +123,27 @@ final class ParUTSBin {
      * work from randomly chosen neighbors (for a certain number of 
      * tries). If we are not successful, we invoke our lifeline system.
      */
-    def attemptSteal() {
+    def attemptSteal(st:PlaceLocalHandle[ParUTSBin]) {
         val P = Place.MAX_PLACES;
         if (P == 1) return true;
         val p = Runtime.hereInt();
-        val st_ = st;
         empty = true;
         for (var i:Int=0; i < width && empty; ++i) {
             var q_:Int = 0;
             while ((q_ = myRandom.nextInt(P)) == p);
             val q = q_;
             counter.incStealsAttempted();
-            ack = true;
-            @Uncounted async at(Place(q)) st_().trySteal(p, false);
-            while (ack) Runtime.probe();
+            waiting = true;
+            @Uncounted async at(Place(q)) st().steal(st, p, false);
+            while (waiting) Runtime.probe();
         }
         for (var i:Int=0; (i<lifelines.size) && empty && (0<=lifelines(i)); ++i) {
             val lifeline:Int = lifelines(i);
             if (!lifelinesActivated(lifeline)) {
                 lifelinesActivated(lifeline) = true;
-                ack = true;
-                @Uncounted async at(Place(lifeline)) st_().trySteal(p, true);
-                while (ack) Runtime.probe();
+                waiting = true;
+                @Uncounted async at(Place(lifeline)) st().steal(st, p, true);
+                while (waiting) Runtime.probe();
             }
         }
         return empty;
@@ -158,38 +154,23 @@ final class ParUTSBin {
      * or by the owning place itself when it wants to give work to 
      * a fallen buddy.
      */
-    def trySteal(p:Int, isLifeLine:Boolean) {
+    def steal(st:PlaceLocalHandle[ParUTSBin], thief:Int, isLifeLine:Boolean) {
         ++counter.stealsReceived;
-        val st_ = st;
         val length = stack.size();
         val numSteals = k==0 ? (length >= 2 ? length/2 : 0) : (k < length ? k : (k/2 < length ? k/2 : 0));
         if (numSteals==0) {
-            if (isLifeLine) thieves.push(p);
-            @Uncounted async at (Place(p)) { st_().ack = false; }
+            if (isLifeLine) thieves.push(thief);
+            @Uncounted async at (Place(thief)) { st().waiting = false; }
         } else {
             val loot = stack.pop(numSteals);
             counter.nodesGiven += numSteals;
             ++counter.stealsSuffered;
             val victim = isLifeLine ? Runtime.hereInt() : -1;
-            @Uncounted async at (Place(p)) { st_().relaunch(loot, victim); st_().ack = false; }
+            @Uncounted async at (Place(thief)) { st().deal(st, loot, victim); st().waiting = false; }
         }
     }
     
-    def launch(loot:Rail[SHA1Rand]) {
-        try {
-            active = true;
-            counter.startLive();
-            processLoot(loot, true);
-            processStack();
-            counter.stopLive();
-            active = false;
-        } catch (v:Throwable) {
-            Console.OUT.println("Exception at " + here);
-            v.printStackTrace();
-        }
-    }
-    
-    def relaunch(loot:Rail[SHA1Rand], source:Int) {
+    def deal(st:PlaceLocalHandle[ParUTSBin], loot:Rail[SHA1Rand], source:Int) {
         val isLifeLine = source >= 0;
         try {
             if (isLifeLine) lifelinesActivated(source) = false;
@@ -200,8 +181,8 @@ final class ParUTSBin {
                 active = true;
                 counter.startLive();
                 processLoot(loot, isLifeLine);
-                distribute();
-                processStack();
+                //distribute(st);
+                processStack(st);
                 counter.stopLive();
                 active = false;
             }
@@ -216,8 +197,7 @@ final class ParUTSBin {
      * evenly amongst all the places. This is the bootstrap mechanism
      * for distributed UTS.
      */
-    def main (st:PlaceLocalHandle[ParUTSBin], rootNode:SHA1Rand) {
-        this.st = st;
+    def main(st:PlaceLocalHandle[ParUTSBin], rootNode:SHA1Rand) {
         val P = Place.MAX_PLACES;
         finish {
             active = true;
@@ -230,12 +210,11 @@ final class ParUTSBin {
                 val loot = stack.pop(lootSize);
                 val pi_ = pi;
                 async at(Place(pi_)) {
-                    st().st = st;
-                    st().launch(loot);
+                    st().deal(st, loot, 0);
                 }
                 counter.incTxNodes(lootSize);
             }
-            processStack();
+            processStack(st);
             counter.stopLive();
             active = false;
         } 
