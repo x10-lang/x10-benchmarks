@@ -1,7 +1,5 @@
 import x10.util.Box;
 import x10.util.Random;
-import x10.lang.Math;
-import x10.util.List;
 import x10.util.IndexedMemoryChunk;
 import x10.compiler.Inline;
 import x10.compiler.Uncounted;
@@ -14,18 +12,6 @@ final class ParUTSBin {
 	}
 
     static type PLH = PlaceLocalHandle[ParUTSBin];
-    static type SHA1Rand = UTS.SHA1Rand;
-    
-    final static class FixedSizeStack[T] {
-        val data:IndexedMemoryChunk[T];
-        var size:Int;
-        def this(n:Int) {
-            data = IndexedMemoryChunk.allocateUninitialized[T](n);
-            size = 0;
-        }
-        @Inline def pop():T = data(--size);
-        @Inline def push(t:T) { data(size++) = t; }
-    }
     
     val thieves:FixedSizeStack[Int];
     
@@ -127,7 +113,7 @@ final class ParUTSBin {
      * below, which is timed.
      */
     @Inline def distribute() {
-        var numThieves:Int = thieves.size;
+        var numThieves:Int = thieves.size();
         if (numThieves == 0) return;
         val lootSize = stack.size();
         if (lootSize >= 2) {

@@ -6,7 +6,6 @@ import x10.util.GrowableIndexedMemoryChunk;
 
 public class TreeExpander {
     static type TreeNode = UTS.TreeNode;
-    static type SHA1Rand = UTS.SHA1Rand;
     static type Constants = UTS.Constants;
     private static val NORMALIZER = 2147483648.0; 
     

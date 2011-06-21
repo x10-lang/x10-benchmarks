@@ -1,5 +1,5 @@
-#ifndef __UTS__SHA1RAND_H
-#define __UTS__SHA1RAND_H
+#ifndef SHA1RAND_H
+#define SHA1RAND_H
 
 #include <x10rt.h>
 
@@ -19,29 +19,29 @@ namespace x10 {
 #include <x10aux/RTT.h>
 #include <x10aux/serialization.h>
 
-class UTS__SHA1Rand {
+class SHA1Rand {
 public:
     RTT_H_DECLS_STRUCT
         
     sha1_rand FMGL(cxx_sha1_rng);
 
-    UTS__SHA1Rand* operator->() { return this; }
+    SHA1Rand* operator->() { return this; }
     
     static x10aux::itable_entry _itables[2];
     x10aux::itable_entry* _getITables() { return _itables; }
-    static x10::lang::Any::itable<UTS__SHA1Rand > _itable_0;
+    static x10::lang::Any::itable<SHA1Rand > _itable_0;
 
     static x10aux::itable_entry _iboxitables[2];
     x10aux::itable_entry* _getIBoxITables() { return _iboxitables; }
 
-    static UTS__SHA1Rand _alloc() {
-        UTS__SHA1Rand t;
-        memset(&t, 0, sizeof(UTS__SHA1Rand));
+    static SHA1Rand _alloc() {
+        SHA1Rand t;
+        memset(&t, 0, sizeof(SHA1Rand));
         return t;
     }
 
-    inline static UTS__SHA1Rand _make(x10_int seed) {
-        UTS__SHA1Rand this_; 
+    inline static SHA1Rand _make(x10_int seed) {
+        SHA1Rand this_;
         this_->_constructor(seed);
         return this_;
     }
@@ -49,12 +49,12 @@ public:
         FMGL(cxx_sha1_rng).init((int)seed);
     }
     
-    inline static UTS__SHA1Rand _make(UTS__SHA1Rand parent, x10_int spawn_number) {
-        UTS__SHA1Rand this_; 
+    inline static SHA1Rand _make(SHA1Rand parent, x10_int spawn_number) {
+        SHA1Rand this_;
         this_->_constructor(parent, spawn_number);
         return this_;
     }
-    void _constructor(UTS__SHA1Rand parent, x10_int spawn_number) {
+    void _constructor(SHA1Rand parent, x10_int spawn_number) {
         FMGL(cxx_sha1_rng).init(parent->FMGL(cxx_sha1_rng), (int)spawn_number);
     }
 
@@ -62,21 +62,21 @@ public:
         return FMGL(cxx_sha1_rng)();
     }
         
-    static void _serialize(UTS__SHA1Rand this_, x10aux::serialization_buffer& buf);
+    static void _serialize(SHA1Rand this_, x10aux::serialization_buffer& buf);
     
-    static UTS__SHA1Rand _deserialize(x10aux::deserialization_buffer& buf) {
-        UTS__SHA1Rand this_;
+    static SHA1Rand _deserialize(x10aux::deserialization_buffer& buf) {
+        SHA1Rand this_;
         this_->_deserialize_body(buf);
         return this_;
     }
     
     void _deserialize_body(x10aux::deserialization_buffer& buf);
 
-    x10_boolean _struct_equals(UTS__SHA1Rand that);
+    x10_boolean _struct_equals(SHA1Rand that);
     
     x10_boolean equals(x10aux::ref<x10::lang::Any> that);
     
-    x10_boolean equals(UTS__SHA1Rand that);
+    x10_boolean equals(SHA1Rand that);
     
     x10aux::ref<x10::lang::String> toString();
     

@@ -21,27 +21,11 @@ final class ParUTS implements Counted {
     }
 
     static type PLH= PlaceLocalHandle[ParUTS];
-    static type SHA1Rand = UTS.SHA1Rand;
     static type TreeNode = UTS.TreeNode;
     static type Constants = UTS.Constants;
     
     static val gatherTimes = false;
     
-    final static class FixedSizeStack[T] {
-        val data:Rail[T];
-        var last:Int;
-        def this(n:Int, t:T) {
-            data = new Rail[T](n, (i:Int) => t);
-            last = -1;
-        }
-        def empty():Boolean= last < 0;
-        def pop():T = data(last--);
-        def push(t:T) {
-            data(++last)=t;
-        }
-        def size():Int=last+1;
-        
-    }
     val thieves:FixedSizeStack[Int];
     
     val width:Int;
@@ -93,7 +77,7 @@ final class ParUTS implements Counted {
         this.width=w;
         this.logEvents=e;
         this.counter = new Counter(logEvents);
-        thieves = new FixedSizeStack[Int](z, 0);
+        thieves = new FixedSizeStack[Int](z);
         lifelinesActivated = new Rail[Boolean](Place.MAX_PLACES, (Int)=>false);
         //	printLifelineNetwork();
         
@@ -125,7 +109,7 @@ final class ParUTS implements Counted {
         this.width=w;
         this.logEvents=e;
         this.counter = new Counter(logEvents);
-        thieves = new FixedSizeStack[Int](Place.MAX_PLACES, 0);
+        thieves = new FixedSizeStack[Int](Place.MAX_PLACES);
         lifelinesActivated = new Rail[Boolean](Place.MAX_PLACES, (Int)=>false);
         printLifelineNetwork();
         

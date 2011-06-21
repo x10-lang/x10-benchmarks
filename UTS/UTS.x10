@@ -20,19 +20,6 @@ public class UTS {
         public static val FIXED = 3;
     }
     
-    
-    @NativeRep ("c++", "UTS__SHA1Rand", "UTS__SHA1Rand", null)
-    @NativeCPPCompilationUnit ("sha1.c")
-    @NativeCPPCompilationUnit ("UTS__SHA1Rand.cc")
-    public static struct SHA1Rand {
-        public def this (seed:Int) { }
-        public def toString():String = "<" + hashCode()+">";
-        public def this (parent:SHA1Rand) { }
-        public def this (parent:SHA1Rand, spawnNumber:Int) { }
-        @Native ("c++", "(#0)->__apply()")
-        public operator this() : Int = 0;
-    }
-    
     // A structure that captures a node in the tree as depth + SHA1Rand
     public static struct TreeNode {
         val depth:Int;
