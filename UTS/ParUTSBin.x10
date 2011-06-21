@@ -62,12 +62,14 @@ final class ParUTSBin {
         counter.nodesCounter += loot.size;
     }
     
-    @Inline final def processAtMostN(n:Int) {
+    @Inline final def processAtMostN() {
+        val n = min(stack.size(), nu);
     	for (var i:Int=0; i<n; ++i) {
         	val node = stack.pop();
         	if (node() < q) for (var ii:Int=0; ii<m; ++ii) stack.push(SHA1Rand (node, ii));
         }
         counter.nodesCounter += n;
+        return n > 0;
     }
     
     /** A trivial function to calculate minimum of 2 integers */
@@ -82,16 +84,12 @@ final class ParUTSBin {
      * our lifeline buddy.
      */
     final def processStack(st:PlaceLocalHandle[ParUTSBin]) {
-        while (true) {
-            var n:Int = min(stack.size(), nu);
-            while (n > 0) {
-                processAtMostN(n);
+        do {
+            while (processAtMostN()) {
                 Runtime.probe();
                 distribute(st);
-                n = min(stack.size(), nu);
             }
-            if (attemptSteal(st)) return;
-        }
+        } while (steal(st));
     }
     
     /** If our buddy/buddies have requested a lifeline, and we have ample supply 
@@ -123,9 +121,9 @@ final class ParUTSBin {
      * work from randomly chosen neighbors (for a certain number of 
      * tries). If we are not successful, we invoke our lifeline system.
      */
-    def attemptSteal(st:PlaceLocalHandle[ParUTSBin]) {
+    def steal(st:PlaceLocalHandle[ParUTSBin]) {
         val P = Place.MAX_PLACES;
-        if (P == 1) return true;
+        if (P == 1) return false;
         val p = Runtime.hereInt();
         empty = true;
         for (var i:Int=0; i < width && empty; ++i) {
@@ -134,7 +132,7 @@ final class ParUTSBin {
             val q = q_;
             counter.incStealsAttempted();
             waiting = true;
-            @Uncounted async at(Place(q)) st().steal(st, p, false);
+            @Uncounted async at(Place(q)) st().request(st, p, false);
             while (waiting) Runtime.probe();
         }
         for (var i:Int=0; (i<lifelines.size) && empty && (0<=lifelines(i)); ++i) {
@@ -142,11 +140,11 @@ final class ParUTSBin {
             if (!lifelinesActivated(lifeline)) {
                 lifelinesActivated(lifeline) = true;
                 waiting = true;
-                @Uncounted async at(Place(lifeline)) st().steal(st, p, true);
+                @Uncounted async at(Place(lifeline)) st().request(st, p, true);
                 while (waiting) Runtime.probe();
             }
         }
-        return empty;
+        return !empty;
     }
     
     /** Try to steal from the local stack --- invoked by either a 
@@ -154,7 +152,7 @@ final class ParUTSBin {
      * or by the owning place itself when it wants to give work to 
      * a fallen buddy.
      */
-    def steal(st:PlaceLocalHandle[ParUTSBin], thief:Int, isLifeLine:Boolean) {
+    def request(st:PlaceLocalHandle[ParUTSBin], thief:Int, isLifeLine:Boolean) {
         ++counter.stealsReceived;
         val length = stack.size();
         val numSteals = k==0 ? (length >= 2 ? length/2 : 0) : (k < length ? k : (k/2 < length ? k/2 : 0));
