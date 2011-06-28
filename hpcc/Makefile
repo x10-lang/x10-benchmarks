@@ -5,7 +5,7 @@
 export X10CXX 		?= x10c++
 
 #leave blank by default, let x10c++ choose a sensible default
-#export X10RTTRANSPORT	?= -x10rt pgas_lapi
+export X10RTTRANSPORT	?= -x10rt pami
 
 export X10CXXFLAGS 	?= -report postcompile=5 $(X10RTTRANSPORT)
 
@@ -16,8 +16,12 @@ export X10CXXFLAGS 	?= -report postcompile=5 $(X10RTTRANSPORT)
 ifeq ($(shell uname -s),AIX)
    include arch/aix.mk
 endif
-ifeq ($(shell uname -s),Linux)
-   include arch/linux.mk
+ifeq ($(shell uname -s),Linux)	
+	ifeq ($(shell uname -p),ppc64)
+		include arch/linux_ppc64.mk
+	else
+		include arch/linux.mk
+	endif
 endif
 ifeq ($(shell uname -s),Darwin)
    include arch/darwin.mk
