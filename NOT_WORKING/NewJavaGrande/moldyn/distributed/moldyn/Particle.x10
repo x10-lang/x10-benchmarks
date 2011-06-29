@@ -5,13 +5,13 @@
  *  This file is part of X10 Test.
  *
  */
-package moldyn;
+package moldyn.distributed.moldyn;
 
 public class Particle {
 
-	public public var xcoord: doublepublic var ycoord: doublepublic var zcoord: double;
-	public public var xvelocity: doublepublic var yvelocity: doublepublic var zvelocity: double;
-	public public var xforce: doublepublic var yforce: doublepublic var zforce: double;
+	public var xcoord: double;public var ycoord: double;public var zcoord: double;
+	public var xvelocity: double;public var yvelocity: double;public var zvelocity: double;
+	public var xforce: double;public var yforce: double;public var zforce: double;
 
 	public def this(var xcoord: double, var ycoord: double, var zcoord: double, var xvelocity: double, var yvelocity: double, var zvelocity: double, var xforce: double, var yforce: double, var zforce: double): Particle = {
 		this.xcoord = xcoord;
@@ -50,9 +50,9 @@ public class Particle {
 		var sideh: double;
 		var rcoffs: double;
 
-		var xx: doublevar yy: doublevar zz: doublevar xi: doublevar yi: doublevar zi: doublevar fxi: doublevar fyi: doublevar fzi: double;
-		var rd: doublevar rrd: doublevar rrd2: doublevar rrd3: doublevar rrd4: doublevar rrd6: doublevar rrd7: doublevar r148: double;
-		var forcex: doublevar forcey: doublevar forcez: double;
+		var xx: double;var yy: double;var zz: double;var xi: double;var yi: double;var zi: double;var fxi: double;var fyi: double;var fzi: double;
+		var rd: double;var rrd: double;var rrd2: double;var rrd3: double;var rrd4: double;var rrd6: double;var rrd7: double;var r148: double;
+		var forcex: double;var forcey: double;var forcez: double;
 
 		var i: int;
 

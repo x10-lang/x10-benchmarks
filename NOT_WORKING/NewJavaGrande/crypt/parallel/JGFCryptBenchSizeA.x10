@@ -17,7 +17,10 @@
 *                         All rights reserved.                            *
 *                                                                         *
 **************************************************************************/
+package crypt.parallel;
+
 import crypt.*;
+import crypt.serial.crypt.*;
 import jgfutil.*;
 import harness.x10Test;;
 

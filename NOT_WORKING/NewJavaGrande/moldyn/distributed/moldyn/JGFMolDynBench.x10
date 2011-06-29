@@ -17,9 +17,10 @@
 *                         All rights reserved.                            *
 *                                                                         *
 **************************************************************************/
-package moldyn;
+package moldyn.distributed.moldyn;
 
-import jgfutil.*;;
+import jgfutil.*;
+import x10.array.*;
 
 /**
  * Moldyn with multiple places ported to x10.
@@ -30,8 +31,8 @@ public class JGFMolDynBench extends md implements JGFSection3 {
 
 	//int size;
 
-	const D: dist = distmakeUnique();
-	public const P: Array[md] = new Array[md](D, (var point [j]: point): md => { return new md(); });
+	val D: Dist = Dist.makeUnique();
+	public val P = DistArray.make[md](D, ([j]: Point): md => { return new md(); });
 
 	public def this(): JGFMolDynBench = {
 	}
@@ -41,34 +42,33 @@ public class JGFMolDynBench extends md implements JGFSection3 {
 	}
 
 	public def JGFinitialise(): void = {
-		finish ateach (val (j): point in D) (P(j)).initialise(j, place.MAX_PLACES);
+		finish ateach ([j]: Point in D) (P(j)).initialise(j, Place.MAX_PLACES);
 	}
 
 	public def JGFapplication(): void = {
 		JGFInstrumentor.startTimer("Section3:MolDyn:Run");
 		finish async {
-			final val C: clock = clock.factory.clock();
-			ateach (val (j): point in D) P(j).runiters(C);
+			val C: Clock = Clock.make();
+			ateach ([j]: Point in D) P(j).runiters(C);
 		}
 		JGFInstrumentor.stopTimer("Section3:MolDyn:Run");
 	}
 
 	public def JGFvalidate(): void = {
-		finish ateach (val (j): point in D) {
+		finish ateach ([j]: Point in D) {
 			var myNode: md = P(j);
-			// double refval[] = { 1731.4306625334357, 7397.392307839352 };
-			double var refval: Array[double] = { 275.97175611773514, 7397.392307839352 };
+			var refval: Array[double] = [ 275.97175611773514, 7397.392307839352 ];
 			var dev: double = Math.abs(myNode.ek - refval(size));
 			if (dev > 1.0e-10 ) {
-				System.out.println("Validation failed at place "+j);
-				System.out.println("Kinetic Energy = " + myNode.ek + "  " + dev + "  " + refval(size));
+				Console.OUT.println("Validation failed at place "+j);
+				Console.OUT.println("Kinetic Energy = " + myNode.ek + "  " + dev + "  " + refval(size));
 				throw new Error("Validation failed");
 			}
 		}
 	}
 
 	public def JGFtidyup(): void = {
-		System.gc();
+		//System.gc();
 	}
 
 	public def JGFrun(var size: int): void = {
@@ -86,7 +86,7 @@ public class JGFMolDynBench extends md implements JGFSection3 {
 
 		JGFInstrumentor.stopTimer("Section3:MolDyn:Total");
 
-		JGFInstrumentor.addOpsToTimer("Section3:MolDyn:Run", (double) interactions);
+		JGFInstrumentor.addOpsToTimer("Section3:MolDyn:Run", interactions as double);
 		JGFInstrumentor.addOpsToTimer("Section3:MolDyn:Total", 1);
 
 		JGFInstrumentor.printTimer("Section3:MolDyn:Run");

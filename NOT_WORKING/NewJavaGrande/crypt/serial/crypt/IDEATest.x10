@@ -19,9 +19,9 @@
 *                         All rights reserved.                            *
 *                                                                         *
 **************************************************************************/
-package crypt;
+package crypt.serial.crypt;
 
-import java.util.*;
+import x10.util.*;
 import jgfutil.*;;
 
 /**
@@ -66,7 +66,7 @@ public class IDEATest {
 	 *
 	 * Builds the data used for the test -- each time the test is run.
 	 */
-	def buildTestData(): void = {
+	def buildTestData(): void {
 
 		// Create three byte arrays that will be used (and reused) for
 		// encryption/decryption operations.
@@ -75,7 +75,7 @@ public class IDEATest {
 		crypt1 = new Array[int](array_rows);
 		plain2 = new Array[int](array_rows);
 
-		final val rndnum: Random = new Random(136506717L);  // Create random number generator.
+		val rndnum: Random = new Random(136506717L);  // Create random number generator.
 
 		// Allocate three arrays to hold keys: userkey is the 128-bit key.
 		// Z is the set of 16-bit encryption subkeys derived from userkey,
@@ -93,12 +93,12 @@ public class IDEATest {
 
 		// Generate user key randomly; eight 16-bit values in an array.
 
-		for (val (i): point in [0..7]) {
+		for ([i]: Point in 0..7) {
 			// Again, the random number function returns int. Converting
 			// to a short type preserves the bit pattern in the lower 16
 			// bits of the int and discards the rest.
 
-			userkey(i) = (short) rndnum.nextInt();
+			userkey(i) = rndnum.nextInt() as short;
 		}
 
 		// Compute encryption and decryption subkeys.
@@ -109,7 +109,7 @@ public class IDEATest {
 		// Fill plain1 with "text."
 		for (var i: int = 0; i < array_rows; i++)
 		{
-			plain1(i) = (byte) i;
+			plain1(i) = i as byte;
 
 			// Converting to a byte
 			// type preserves the bit pattern in the lower 8 bits of the
@@ -126,7 +126,7 @@ public class IDEATest {
 	 * and 9-bit shifts are reversed. It still works reversed, but would
 	 * encrypted code would not decrypt with someone else's IDEA code.
 	 */
-	private def calcEncryptKey(): void = {
+	private def calcEncryptKey(): void {
 		var j: int;                       // Utility variable.
 
 		for (var i: int = 0; i < 52; i++) // Zero out the 52-int Z array.
@@ -180,9 +180,12 @@ public class IDEATest {
 	 * subkeys Z[]. DK[] is a 32-bit int array holding 16-bit values as
 	 * unsigned.
 	 */
-	private def calcDecryptKey(): void = {
-		var j: intvar k: int;                 // Index counters.
-		var t1: intvar t2: intvar t3: int;           // Temps to hold decrypt subkeys.
+	private def calcDecryptKey(): void {
+		var j: int;
+		var k: int;                 // Index counters.
+		var t1: int;
+		var t2: int;
+		var t3: int;           // Temps to hold decrypt subkeys.
 
 		t1 = inv(Z(0));           // Multiplicative inverse (mod x10001).
 		t2 = - Z(1) & 0xffff;     // Additive inverse, 2nd encrypt subkey.
@@ -238,12 +241,16 @@ public class IDEATest {
 		var i1: int = 0;                 // Index into first text array.
 		var i2: int = 0;                 // Index into second text array.
 		var ik: int;                     // Index into key array.
-		var x1: intvar x2: intvar x3: intvar x4: intvar t1: intvar t2: int; // Four "16-bit" blocks, two temps.
+		var x1: int;
+		var x2: int;
+		var x3: int;
+		var x4: int;
+		var t1: int;
+		var t2: int; // Four "16-bit" blocks, two temps.
 		var r: int;                      // Eight rounds of processing.
 
-		for (var i: int = 0; i < text1.length; i += 8)
+		for (var i: int = 0; i < text1.size; i += 8)
 		{
-
 			ik = 0;                 // Restart key index.
 			r = 8;                  // Eight rounds of processing.
 
@@ -263,7 +270,7 @@ public class IDEATest {
 				// 1) Multiply (modulo 0x10001), 1st text sub-block
 				// with 1st key sub-block.
 
-				x1 = (int) ((long) x1 * key(ik++) % 0x10001L & 0xffff);
+				x1 = (x1 as long * key(ik++) % 0x10001L & 0xffff) as int;
 
 				// 2) Add (modulo 0x10000), 2nd text sub-block
 				// with 2nd key sub-block.
@@ -278,7 +285,7 @@ public class IDEATest {
 				// 4) Multiply (modulo 0x10001), 4th text sub-block
 				// with 4th key sub-block.
 
-				x4 = (int) ((long) x4 * key(ik++) % 0x10001L & 0xffff);
+				x4 = (x4 as long * key(ik++) % 0x10001L & 0xffff) as int;
 
 				// 5) XOR results from steps 1 and 3.
 
@@ -290,7 +297,7 @@ public class IDEATest {
 				// 7) Multiply (modulo 0x10001), result of step 5
 				// with 5th key sub-block.
 
-				t2 = (int) ((long) t2 * key(ik++) % 0x10001L & 0xffff);
+				t2 = (t2 as long * key(ik++) % 0x10001L & 0xffff) as int;
 
 				// 8) Add (modulo 0x10000), results of steps 6 and 7.
 
@@ -299,7 +306,7 @@ public class IDEATest {
 				// 9) Multiply (modulo 0x10001), result of step 8
 				// with 6th key sub-block.
 
-				t1 = (int) ((long) t1 * key(ik++) % 0x10001L & 0xffff);
+				t1 = (t1 as long * key(ik++) % 0x10001L & 0xffff) as int;
 
 				// 10) Add (modulo 0x10000), results of steps 7 and 9.
 
@@ -329,7 +336,7 @@ public class IDEATest {
 			// 1) Multiply (modulo 0x10001), 1st text-block
 			// with 1st key sub-block.
 
-			x1 = (int) ((long) x1 * key(ik++) % 0x10001L & 0xffff);
+			x1 = (x1 as long * key(ik++) % 0x10001L & 0xffff) as int;
 
 			// 2) Add (modulo 0x10000), 2nd text sub-block
 			// with 2nd key sub-block. It says x3, but that is to undo swap
@@ -346,18 +353,18 @@ public class IDEATest {
 			// 4) Multiply (modulo 0x10001), 4th text-block
 			// with 4th key sub-block.
 
-			x4 = (int) ((long) x4 * key(ik++) % 0x10001L & 0xffff);
+			x4 = (x4 as long * key(ik++) % 0x10001L & 0xffff) as int;
 
 			// Repackage from 16-bit sub-blocks to 8-bit byte array text2.
 
-			text2(i2++) = (byte) x1;
-			text2(i2++) = (byte) (x1 >>> 8);
-			text2(i2++) = (byte) x3;                // x3 and x2 are switched
-			text2(i2++) = (byte) (x3 >>> 8);        // only in name.
-			text2(i2++) = (byte) x2;
-			text2(i2++) = (byte) (x2 >>> 8);
-			text2(i2++) = (byte) x4;
-			text2(i2++) = (byte) (x4 >>> 8);
+			text2(i2++) = x1 as byte;
+			text2(i2++) = (x1 >>> 8) as byte;
+			text2(i2++) = x3 as byte;                // x3 and x2 are switched
+			text2(i2++) = (x3 >>> 8) as byte;        // only in name.
+			text2(i2++) = x2 as byte;
+			text2(i2++) = (x2 >>> 8) as byte;
+			text2(i2++) = x4 as byte;
+			text2(i2++) = (x4 >>> 8) as byte;
 		}   // End for loop.
 	}   // End routine.
 
@@ -383,16 +390,16 @@ public class IDEATest {
 	 * in the Symantec Caje IDE. So it's not called for now; the test
 	 * uses Java % instead.
 	 */
-	private def mul(var a: int, var b: int): int throws ArithmeticException = {
+	private def mul(var a: int, var b: int): int = {
 		var p: long;             // Large enough to catch 16-bit multiply
 		                    // without hitting sign bit.
 		if (a != 0)
 		{
 			if (b != 0)
 			{
-				p = (long) a * b;
-				b = (int) p & 0xFFFF;       // Lower 16 bits.
-				a = (int) p >>> 16;         // Upper 16 bits.
+				p = a as long * b;
+				b = p as int & 0xFFFF;       // Lower 16 bits.
+				a = p as int >>> 16;         // Upper 16 bits.
 
 				return (b - a + (b < a ? 1 : 0) & 0xFFFF);
 			}
@@ -415,8 +422,10 @@ public class IDEATest {
 	 * of the bits within is strictly unsigned 16-bit.
 	 */
 	private def inv(var x: int): int = {
-		var t0: intvar t1: int;
-		var q: intvar y: int;
+		var t0: int;
+		var t1: int;
+		var q: int;
+		var y: int;
 
 		if (x <= 1)             // Assumes positive x.
 			return (x);          // 0 and 1 are self-inverse.
@@ -454,6 +463,6 @@ public class IDEATest {
 		Z = null;
 		DK = null;
 		*/
-		System.gc();                // Force garbage collection.
+		//System.gc();                // Force garbage collection.
 	}
 }

@@ -17,12 +17,12 @@
 *                         All rights reserved.                            *
 *                                                                         *
 **************************************************************************/
-package crypt;
+package crypt.parallel.crypt;
 
 import jgfutil.*;
 import x10.io.Console;
 
-public class JGFCryptBench extends IDEATest implements JGFSection2 {
+public class JGFCryptBench extends IDEATest /*implements JGFSection2*/ {
 
 	private var size: int;
 	private val datasizes  = [ 30000, 20000000, 50000000 ];

@@ -22,47 +22,79 @@
 *                         All rights reserved.                            *
 *                                                                         *
 **************************************************************************/
-package moldyn;
+package moldyn.distributed.moldyn;
 
-import java.util.*;
-import java.text.NumberFormat;;
-
+import x10.util.*;
+import x10.util.concurrent.*;
 /**
  * Moldyn with multiple places ported to x10.
  *
  * @author kemal 3/2005
  */
 public class md {
-
-	public const ITERS: int = 100;
-	public const LENGTH: double = 50e-10;
-	public const m: double = 4.0026;
-	public const mu: double = 1.66056e-27;
-	public const kb: double = 1.38066e-23;
-	public const TSIM: double = 50;
-	public const deltat: double = 5e-16;
-	public var one: Rail[Particle] = new Array[Particle](0);
+	public val ITERS: int = 100;
+	public val LENGTH: double = 50e-10;
+	public val m: double = 4.0026;
+	public val mu: double = 1.66056e-27;
+	public val kb: double = 1.38066e-23;
+	public val TSIM: double = 50;
+	public val deltat: double = 5e-16;
+	public var one: Array[Particle] = new Array[Particle](0);
 	public var epot: double = 0.0;
 	public var vir: double = 0.0;
 	public var count: double = 0.0;
 	var size: int;
 	//int datasizes[] = { 8, 13 };
-	var datasizes: Array[int] = { 4, 13 };
+	var datasizes: Array[int] = [ 4, 13 ];
 
 	public var interactions: int = 0;
 
-	var i: intvar j: intvar k: intvar lg: intvar mdsize: intvar move: intvar mm: int;
+	var i: int;
+	var j: int;
+	var k: int;
+	var lg: int;
+	var mdsize: int;
+	var move: int;
+	var mm: int;
 
-	var l: doublevar rcoff: doublevar rcoffs: doublevar side: doublevar sideh: doublevar hsq: doublevar hsq2: doublevar vel: double;
-	var a: doublevar r: doublevar sum: doublevar tscale: doublevar sc: doublevar ekin: doublevar ek: doublevar ts: doublevar sp: double;
+	var l: double;
+	var rcoff: double;
+	var rcoffs: double;
+	var side: double;
+	var sideh: double;
+	var hsq: double;
+	var hsq2: double;
+	var vel: double;
+	var a: double;
+	var r: double;
+	var sum: double;
+	var tscale: double;
+	var sc: double;
+	var ekin: double;
+	var ek: double;
+	var ts: double;
+	var sp: double;
 	var den: double = 0.83134;
 	var tref: double = 0.722;
 	var h: double = 0.064;
-	var vaver: doublevar vaverh: doublevar rand: double;
-	var etot: doublevar temp: doublevar pres: doublevar rp: double;
-	var u1: doublevar u2: doublevar v1: doublevar v2: doublevar s: double;
+	var vaver: double;
+	var vaverh: double;
+	var rand: double;
+	var etot: double;
+	var temp: double;
+	var pres: double;
+	var rp: double;
+	var u1: double;
+	var u2: double;
+	var v1: double;
+	var v2: double;
+	var s: double;
 
-	var ijk: intvar npartm: intvar partsize: intvar iseed: intvar tint: int;
+	var ijk: int;
+	var npartm: int;
+	var partsize: int;
+	var iseed: int;
+	var tint: int;
 	var irep: int = 10;
 	var istop: int = 19;
 	var iprint: int = 10;
@@ -71,6 +103,7 @@ public class md {
 	var randnum: Random;
 	var rank: int;
 	var nprocess: int;
+
 
 	public def initialise(var rank: int, var nprocess: int): void = {
 		this.rank = rank;
@@ -195,10 +228,11 @@ public class md {
 		/* MD simulation */
 	}
 
-	public def runiters(val C: clock): void = {
+	public def runiters(val C: Clock): void = {
 
 		var n: int = 0;
 		move = 0;
+		
 		for (move = 0; move<movemx; move++) {
 
 			for (i = 0; i<mdsize; i++) {
@@ -213,9 +247,9 @@ public class md {
 			}
 
 			/* global reduction on partial sums of the forces, epot, vir and interactions */
-			next;
+			Clock.advanceAll();
 			allreduce();
-			next;
+			Clock.advanceAll();
 
 			sum = 0.0;
 
@@ -254,39 +288,44 @@ public class md {
 				rp = (count / mdsize) * 100.0;
 			}
 		}
-		next;
+		Clock.advanceAll();
 	}
 
 	def allreduce(): void = {
 		// Place holder for now to emulate allreduce. To be optimized
-
 		if (rank != 0) return;
-		final val P: Array[md] = JGFMolDynBench.P;
-		final val t: md = new md();
+		val P: DistArray[md](1) = JGFMolDynBench.P;
+		val t: md = new md();
 		t.mdsize = mdsize;
 		t.one = new Array[Particle](mdsize);
-		for (val (k): point in [0..(mdsize-1)]) t.one(k) = new Particle(0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0);
+		
+		val tref = GlobalRef(t);
+		
+		for ([k]: Point in 0..(mdsize-1)) t.one(k) = new Particle(0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0);
+
 		// sum reduction
-		for (val (j): point in P) {
-			for (val (k): point in [0..(mdsize-1)]) {
-				t.one(k).xforce += future(P.dist(j)) { P(j).one(k).xforce }.force();
-				t.one(k).yforce += future(P.dist(j)) { P(j).one(k).yforce }.force();
-				t.one(k).zforce += future(P.dist(j)) { P(j).one(k).zforce }.force();
+		for ([j]: Point in P) {
+			for ([k]: Point in 0..(mdsize-1)) {
+				val temp = () => at (P.dist(j)) P(j).one(k) ;
+				t.one(k).xforce += Future.make(() => at (P.dist(j)) P(j).one(k).xforce).force();
+				t.one(k).yforce += Future.make(() => at (P.dist(j)) P(j).one(k).yforce).force();
+				t.one(k).zforce += Future.make(() => at (P.dist(j)) P(j).one(k).zforce).force();
 			}
-			t.vir += future(P.dist(j)) { P(j).vir }.force();
-			t.epot += future(P.dist(j)) { P(j).epot }.force();
-			t.interactions += future(P.dist(j)) { P(j).interactions }.force();
+			t.vir += Future.make(() => at (P.dist(j)) P(j).vir).force();
+			t.epot += Future.make(() => at (P.dist(j)) P(j).epot).force();
+			t.interactions += Future.make(() => at (P.dist(j)) P(j).interactions).force();
 		}
+
 		// broadcast
-		finish ateach (val (j): point in P.dist) {
-			for (val (k): point in [0..(mdsize-1)]) {
-				P(j).one(k).xforce = future(t) { t.one(k).xforce }.force();
-				P(j).one(k).yforce = future(t) { t.one(k).yforce }.force();
-				P(j).one(k).zforce = future(t) { t.one(k).zforce }.force();
+		finish ateach ([j]: Point in P.dist) {
+			for ([k]: Point in 0..(mdsize-1)) {
+				P(j).one(k).xforce = Future.make(() => at (tref.home()) tref().one(k).xforce).force();
+				P(j).one(k).yforce = Future.make(() => at (tref.home()) tref().one(k).yforce).force();
+				P(j).one(k).zforce = Future.make(() => at (tref.home()) tref().one(k).zforce).force();
 			}
-			P(j).vir = future(t) { t.vir }.force();
-			P(j).epot = future(t) { t.epot }.force();
-			P(j).interactions = future(t) { t.interactions }.force();
+			P(j).vir = Future.make(() => at (tref.home()) tref().vir).force();
+			P(j).epot = Future.make(() => at (tref.home()) tref().epot).force();
+			P(j).interactions = Future.make(() => at (tref.home()) tref().interactions).force();
 		}
 	}
 }

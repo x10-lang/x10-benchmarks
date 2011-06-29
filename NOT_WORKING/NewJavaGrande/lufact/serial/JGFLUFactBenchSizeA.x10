@@ -17,7 +17,10 @@
 *                         All rights reserved.                            *
 *                                                                         *
 **************************************************************************/
+package lufact.serial;
+
 import lufact.*;
+import lufact.serial.lufact.*;
 import jgfutil.*;
 import harness.x10Test;;
 

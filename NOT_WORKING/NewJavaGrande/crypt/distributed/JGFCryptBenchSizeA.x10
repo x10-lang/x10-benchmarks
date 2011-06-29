@@ -17,55 +17,22 @@
 *                         All rights reserved.                            *
 *                                                                         *
 **************************************************************************/
-package crypt;
+package crypt.distributed;
+import crypt.*;
+import crypt.serial.crypt.*;
+import jgfutil.*;
+import harness.x10Test;
 
-import jgfutil.*;;
+public class JGFCryptBenchSizeA extends x10Test {
 
-public class JGFCryptBench extends IDEATest implements JGFSection2 {
-
-	private var size: int;
-	private var datasizes: Array[int] = { 30000, 20000000, 50000000 };
-
-	public def JGFsetsize(var size: int): void = {
-		this.size = size;
+	public def run(): boolean = {
+		JGFInstrumentor.printHeader(2, 0);
+		var cb: JGFCryptBench = new JGFCryptBench();
+		cb.JGFrun(0);
+		return true;
 	}
 
-	public def JGFinitialise(): void = {
-		array_rows = datasizes(size);
-		buildTestData();
-	}
-
-	public def JGFkernel(): void = {
-		Do();
-	}
-
-	public def JGFvalidate(): void = {
-		for (var i: int = 0; i < array_rows; i++) {
-			if (plain1(i) != plain2(i)) {
-				System.out.println("Validation failed");
-				System.out.println("Original Byte " + i + " = " + plain1(i));
-				System.out.println("Encrypted Byte " + i + " = " + crypt1(i));
-				System.out.println("Decrypted Byte " + i + " = " + plain2(i));
-				throw new Error("Validation failed");
-				//break;
-			}
-		}
-	}
-
-	public def JGFtidyup(): void = {
-		freeTestData();
-	}
-
-	public def JGFrun(var size: int): void = {
-		JGFInstrumentor.addTimer("Section2:Crypt:Kernel", "Kbyte", size);
-
-		JGFsetsize(size);
-		JGFinitialise();
-		JGFkernel();
-		JGFvalidate();
-		JGFtidyup();
-
-		JGFInstrumentor.addOpsToTimer("Section2:Crypt:Kernel", (2*array_rows)/1000.);
-		JGFInstrumentor.printTimer("Section2:Crypt:Kernel");
+	public static def main(var args: Rail[String]): void = {
+		new JGFCryptBenchSizeA().execute();
 	}
 }

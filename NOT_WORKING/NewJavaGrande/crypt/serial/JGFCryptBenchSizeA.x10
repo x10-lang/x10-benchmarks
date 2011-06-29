@@ -17,20 +17,23 @@
 *                         All rights reserved.                            *
 *                                                                         *
 **************************************************************************/
-import lufact.*;
-import jgfutil.*;
-import harness.x10Test;;
+package crypt.serial;
 
-public class JGFLUFactBenchSizeA extends x10Test {
+import crypt.*;
+import crypt.serial.crypt.*;
+import jgfutil.*;
+import harness.x10Test;
+
+public class JGFCryptBenchSizeA extends x10Test {
 
 	public def run(): boolean = {
 		JGFInstrumentor.printHeader(2, 0);
-		var lub: JGFLUFactBench = new JGFLUFactBench();
-		lub.JGFrun(0);
+		var cb: JGFCryptBench = new JGFCryptBench();
+		cb.JGFrun(0);
 		return true;
 	}
 
 	public static def main(var args: Rail[String]): void = {
-		new JGFLUFactBenchSizeA().execute();
+		new JGFCryptBenchSizeA().execute();
 	}
 }

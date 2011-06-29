@@ -5,12 +5,13 @@
  *  This file is part of X10 Test.
  *
  */
-package moldyn;
+package moldyn.distributed.moldyn;
 
 public class Random {
 
 	public var iseed: int;
-	public public var v1: doublepublic var v2: double;
+	public var v1: double;
+	public var v2: double;
 
 	public def this(var iseed: int, var v1: double, var v2: double): Random = {
 		this.iseed = iseed;
@@ -22,7 +23,7 @@ public class Random {
 		var rand: double;
 		var scale: double = 4.656612875e-10;
 
-		var is1: intvar is2: intvar iss2: int;
+		var is1: int;var is2: int;var iss2: int;
 		var imult: int = 16807;
 		var imod: int = 2147483647;
 
@@ -42,7 +43,7 @@ public class Random {
 	}
 
 	public def seed(): double = {
-		var s: doublevar u1: doublevar u2: doublevar r: double;
+		var s: double;var u1: double;var u2: double;var r: double;
 		s = 1.0;
 		do {
 			u1 = update();

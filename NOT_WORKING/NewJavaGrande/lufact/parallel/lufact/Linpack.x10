@@ -47,9 +47,10 @@
  unequal increments or equal increments not equal to 1.
  Jack Dongarra)
  */
-package lufact;
+package lufact.parallel.lufact;
 
-import jgfutil.*;;
+import x10.util.concurrent.*;
+import jgfutil.*;
 
 /**
  * Ported to X10 March 17 2005
@@ -58,52 +59,62 @@ import jgfutil.*;;
  */
 public class Linpack {
 
-	var a: Array[double];
-	var b: Array[double];
-	var x: Array[double];
-	var ops: doublevar total: doublevar norma: doublevar normx: double;
-	var resid: doublevar time: double;
+	var a: DistArray[double];
+	var b: DistArray[double];
+	var x: DistArray[double];
+	var ops: double;
+	var total: double;
+	var norma: double;
+	var normx: double;
+	var resid: double;
+	var time: double;
 	var kf: double;
-	var n: intvar i: intvar ntimes: intvar info: intvar lda: intvar ldaa: intvar kflops: int;
-	var ipvt: Array[int][];
-
-	final def read(val a: Array[double], val i: int, val j: int): double = {
-		return future (a.dist(i, j)) { a(i, j) }.force();
+	var n: int;
+	var i: int;
+	var ntimes: int;
+	var info: int;
+	var lda: int;
+	var ldaa: int;
+	var kflops: int;
+	var ipvt: Array[int];
+	
+	final def read(val a: DistArray[double], val i: int, val j: int): double = {
+		return Future.make(() => at (a.dist(i, j)) a(i, j)).force();
 	}
-	final def write(val a: Array[double], val i: int, val j: int, val val: double): void = {
-		async (a.dist(i, j)) atomic a(i, j) = val;
+	final def write(val a: DistArray[double], val i: int, val j: int, val vall: double): void = {
+		async at(a.dist(i, j)) atomic a(i, j) = vall;
 	}
-	final def plusWrite(val a: Array[double], val i: int, val j: int, val val: double): void = {
-		async (a.dist(i, j)) atomic a(i, j) += val;
+	final def plusWrite(val a: DistArray[double], val i: int, val j: int, val vall: double): void = {
+		async at(a.dist(i, j)) atomic a(i, j) += vall;
 	}
-	final def plusWrite(val a: Array[double], val i: int, val val: double): void = {
-		async (a.dist(i)) atomic a(i) += val;
+	final def plusWrite(val a: DistArray[double], val i: int, val vall: double): void = {
+		async at(a.dist(i)) atomic a(i) += vall;
 	}
-	final def timesWrite(val a: Array[double], val i: int, val j: int, val val: double): void = {
-		async (a.dist(i, j)) atomic a(i, j) *= val;
+	final def timesWrite(val a: DistArray[double], val i: int, val j: int, val vall: double): void = {
+		async at(a.dist(i, j)) atomic a(i, j) *= vall;
 	}
-	final def timesWrite(val a: Array[double], val i: int, val val: double): void = {
-		async (a.dist(i)) atomic a(i) *= val;
+	final def timesWrite(val a: DistArray[double], val i: int, val vall: double): void = {
+		async at(a.dist(i)) atomic a(i) *= vall;
 	}
 
 	final def abs(var d: double): double = {
 		return (d >= 0) ? d : -d;
 	}
 
-	final def matgen(val a: Array[double], val lda: int, val n: int, val b: Array[double]): double = {
+	final def matgen(val a: DistArray[double](2), val lda: int, val n: int, val b: DistArray[double](2)): double = {
 		var init: int = 1325;
 		var norma: double = 0.0;
 		/* Next two for() statements switched.  Solver wants
 		   matrix in column order. --dmd 3/3/97
 		 */
-		for (val (i,j): point in a) {
+		for ([i,j]: Point in a) {
 			init = 3125*init % 65536;
 			var value: double = (init - 32768.0)/16384.0;
 			finish write(a, i, j, value);
 			norma = value > norma ? value : norma;
 		}
-		finish ateach (val (i,j): point in b) b(i, j) = 0.0;
-		finish ateach (val (i,j): point in a.dist | [0..n-1, 0..n-1]) plusWrite(b, 0, j, a(i, j));
+		finish ateach ([i,j]: Point in b) b(i, j) = 0.0;
+		finish ateach ([i,j]: Point in a.dist | (0..n-1)*(0..n-1)) plusWrite(b, 0, j, a(i, j));
 		return norma;
 	}
 
@@ -152,22 +163,22 @@ public class Linpack {
 
 	 blas daxpy, dscal, idamax
 	 */
-	final def dgefa(val a: Array[double], val lda: int, val n: int, val ipvt: Array[int][]): int = {
+	final def dgefa(val a: DistArray[double], val lda: int, val n: int, val ipvt: Array[int]): int = {
 		// gaussian elimination with partial pivoting
 		infodgefa = 0;
-		final val nm1: int = n - 1;
+		val nm1: int = n - 1;
 
 		if (nm1 >=  0) {
 			// array is distributed along each column,
 
-			for (val (k): point in [0..nm1-1]) {
-				finish async(a.dist(k, 1)) { // do this on row k
-					final val kp1: int = k+1;
+			for ([k]: Point in 0..nm1-1) {
+				finish async at(a.dist(k, 1)) { // do this on row k
+					val kp1: int = k+1;
 					// would be nice to do this via an X10 reduction on a sub-array
-					final val l: int = idamax(n - k, a, k, k, 1) + k;
+					val l: int = idamax(n - k, a, k, k, 1) + k;
 					ipvt(k) = l; // must be distributed same way as a
 					// zero pivot implies this column already triangularized
-					if (a(k, l) != 0) {
+					if (a(k, l) != 0.0) {
 						if (l != k) {
 							//    interchange if necessary
 							if (l != k) {
@@ -177,15 +188,15 @@ public class Linpack {
 							}
 						}
 						// compute multipliers
-						final val tx: double = -1.0/a(k, k);
+						val tx: double = -1.0/a(k, k);
 
 						dscal(n-(kp1), tx, a, k, kp1, 1);
 
 						// row elimination with column indexing
 						// daxpy on all columns to the right in parallel
 						finish {
-							for (val (j): point in [kp1..n-1]) {
-								async(a.dist(j, l)) {
+							for ([j]: Point in kp1..n-1) {
+								async at(a.dist(j, l)) {
 									var t: double = a(j, l);
 									if (l != k) {
 										a(j, l) = a(j, k);
@@ -202,8 +213,8 @@ public class Linpack {
 			}
 		}
 		ipvt(n-1) = n-1;
-		var val: double = read(a, n-1, n-1);
-		if (val == 0) info = n-1;
+		var vall: double = read(a, n-1, n-1);
+		if (vall == 0.0) info = n-1;
 
 		return infodgefa;
 	}
@@ -263,26 +274,26 @@ public class Linpack {
 
 	 blas daxpy, ddot
 	 */
-	final def dgesl(val a: Array[double], val lda: int, val n: int, val ipvt: Array[int][], val b: Array[double], val job: int): void = {
-		final val nm1: int = n - 1;
+	final def dgesl(val a: DistArray[double], val lda: int, val n: int, val ipvt: Array[int], val b: DistArray[double], val job: int): void = {
+		val nm1: int = n - 1;
 		if (job == 0) {
 			// job = 0 , solve  a * x = b.  first solve  l*y = b
 			if (nm1 >= 1) {
-				for (val (k): point in [0..nm1-1]) {
-					final val l: int = ipvt(k);
+				for ([k]: Point in 0..nm1-1) {
+					val l: int = ipvt(k);
 					var t: double = b(0, l);
 					if (l != k) {
 						b(0, l) = b(0, k);
 						b(0, k) = t;
 					}
-					final val kp1: int = k + 1;
+					val kp1: int = k + 1;
 					daxpy(n-(kp1), t, a, k, kp1, 1, b, 0, kp1, 1); // FIXME: subarrays
 				}
 			}
 
 			// now solve  u*x = y
-			for (val (kb): point in [0..n-1]) {
-				final val k: int = n - (kb + 1);
+			for ([kb]: Point in 0..n-1) {
+				val k: int = n - (kb + 1);
 				b(0, k) /= read(a, k, k);
 				var t: double = -b(0, k);
 				daxpy(k, t, a, k, 0, 1, b, 0, 0, 1); // FIXME: subarrays
@@ -290,18 +301,18 @@ public class Linpack {
 		}
 		else {
 			// job = nonzero, solve  trans(a) * x = b.  first solve  trans(u)*y = b
-			for (val (k): point in [0..n-1]) {
+			for ([k]: Point in 0..n-1) {
 				var t: double = ddot(k, a, k, 0, 1, b, 0, 0, 1); // FIXME: subarrays not yet supported
 				b(0, k) = (b(0, k) - t) / a(k, k);
 			}
 
 			// now solve trans(l)*x = y
 			if (nm1 >= 1) {
-				for (val (kb): point in [1..nm1-1]) {
-					final val k: int = n - (kb+1);
-					final val kp1: int = k + 1;
+				for ([kb]: Point in 1..nm1-1) {
+					val k: int = n - (kb+1);
+					val kp1: int = k + 1;
 					b(0, k) += ddot(n-(kp1), a, k, kp1, 1, b, 0, kp1, 1); //FIXME: subarrays not yet supported
-					final val l: int = ipvt(k);
+					val l: int = ipvt(k);
 					if (l != k) {
 						var t: double = b(0, l);
 						b(0, l) = b(0, k);
@@ -316,15 +327,15 @@ public class Linpack {
 	 constant times a vector plus a vector.
 	 jack dongarra, linpack, 3/11/78.
 	 */
-	final def daxpy(var n: int, var da: double, val dx: Array[double], val dxCol: int, val dx_off: int, var incx: int, var dy: Array[double], var dyCol: int, var dy_off: int, var incy: int): void = {
-		if ((n > 0) && (da != 0)) {
+	final def daxpy(var n: int, var da: double, val dx: DistArray[double], val dxCol: int, val dx_off: int, var incx: int, var dy: DistArray[double], var dyCol: int, var dy_off: int, var incy: int): void = {
+		if ((n > 0) && (da != 0.0)) {
 			if (incx != 1 || incy != 1) {
 				// code for unequal increments or equal increments not equal to 1
 				var ix: int = 0;
 				var iy: int = 0;
 				if (incx < 0) ix = (-n+1)*incx;
 				if (incy < 0) iy = (-n+1)*incy;
-				for (val (i): point in [0..n-1]) {
+				for ([i]: Point in 0..n-1) {
 					// daxpy is called at dy.dist[dyCol,xx]
 					dy(dyCol, iy+dy_off) += da * read(dx, dxCol, ix+dx_off);
 					ix += incx;
@@ -333,7 +344,7 @@ public class Linpack {
 				return;
 			}
 			// code for both increments equal to 1
-			for (val (i): point in [0..n-1]) dy(dyCol, i+dy_off) += da*read(dx, dxCol, i+dx_off);
+			for ([i]: Point in 0..n-1) dy(dyCol, i+dy_off) += da*read(dx, dxCol, i+dx_off);
 		}
 	}
 
@@ -341,7 +352,7 @@ public class Linpack {
 	 forms the dot product of two vectors.
 	 jack dongarra, linpack, 3/11/78.
 	 */
-	final def ddot(val n: int, val dx: Array[double], val dxCol: int, val dx_off: int, val incx: int, val dy: Array[double], val dyCol: int, val dy_off: int, val incy: int): double = {
+	final def ddot(val n: int, val dx: DistArray[double], val dxCol: int, val dx_off: int, val incx: int, val dy: DistArray[double], val dyCol: int, val dy_off: int, val incy: int): double = {
 		var dtemp: double = 0;
 		if (n > 0) {
 			if (incx != 1 || incy != 1) {
@@ -350,14 +361,14 @@ public class Linpack {
 				var iy: int = 0;
 				if (incx < 0) ix = (-n+1)*incx;
 				if (incy < 0) iy = (-n+1)*incy;
-				for (val (i): point in [0..n-1]) {
+				for ([i]: Point in 0..n-1) {
 					dtemp += dx(dxCol, ix+dx_off)*dy(dyCol, iy+dy_off);
 					ix += incx;
 					iy += incy;
 				}
 			} else {
 				// code for both increments equal to 1
-				for (val (i): point in [0..n-1]) dtemp += dx(dxCol, i+dx_off)*dy(dyCol, i+dy_off);
+				for ([i]: Point in 0..n-1) dtemp += dx(dxCol, i+dx_off)*dy(dyCol, i+dy_off);
 			}
 		}
 		return dtemp;
@@ -367,16 +378,16 @@ public class Linpack {
 	 scales a vector by a constant.
 	 jack dongarra, linpack, 3/11/78.
 	 */
-	final def dscal(var n: int, var da: double, var dx: Array[double], var currentCol: int, var dx_off: int, var incx: int): void = {
+	final def dscal(var n: int, var da: double, var dx: DistArray[double], var currentCol: int, var dx_off: int, var incx: int): void = {
 		if (n > 0) {
 			if (incx != 1) {
 				// code for increment not equal to 1
-				final val nincx: int = n*incx;
+				val nincx: int = n*incx;
 				for (var i: int = 0; i < nincx; i += incx)
 					dx(currentCol, i+dx_off) *= da;
 			} else {
 				// code for increment equal to 1
-				for (val (i): point in [0..n-1]) dx(currentCol, i+dx_off) *= da;
+				for ([i]: Point in 0..n-1) dx(currentCol, i+dx_off) *= da;
 			}
 		}
 	}
@@ -388,7 +399,7 @@ public class Linpack {
 	 In X10: dx is now a 2 dimensional array (currently don't support
 	 sub-sections) so must explicitly address only first element
 	 */
-	final def idamax(val n: int, val dx: Array[double], val dxk: int, val dx_off: int, val incx: int): int = {
+	final def idamax(val n: int, val dx: DistArray[double], val dxk: int, val dx_off: int, val incx: int): int = {
 		if (n < 1) return -1;
 		if (n == 1) return 0;
 		if (incx != 1) {
@@ -396,7 +407,7 @@ public class Linpack {
 			var itemp: int = 0;
 			var dmax: double = abs(read(dx, dxk, 0+dx_off));
 			var ix: int = 1 + incx;
-			for (val (i): point in [1..n-1]) {
+			for ([i]: Point in 1..n-1) {
 				var dtemp: double = abs(read(dx, dxk, ix+dx_off));
 				if (dtemp > dmax)  {
 					itemp = i;
@@ -409,7 +420,7 @@ public class Linpack {
 		// code for increment equal to 1
 		var itemp: int = 0;
 		var dmax: double = abs(read(dx, dxk, 0+dx_off));
-		for (val (i): point in [1..n-1]) {
+		for ([i]: Point in 1..n-1) {
 			var dtemp: double = abs(read(dx, dxk, i+dx_off));
 			if (dtemp > dmax) {
 				itemp = i;
@@ -449,9 +460,9 @@ public class Linpack {
 	 this version dated 4/6/83.
 	 */
 	final def epslon(val x: double): double = {
-		final val a: double = 4.0e0/3.0e0;
+		val a: double = 4.0e0/3.0e0;
 		var eps: double = 0;
-		while (eps == 0) {
+		while (eps == 0.0) {
 			var b: double = a - 1.0;
 			var c: double = b + b + b;
 			eps = abs(c-1.0);
@@ -480,8 +491,8 @@ public class Linpack {
 
 	 m double [ldm,n2], matrix of n1 rows and n2 columns
 	 */
-	final def dmxpy(val n1: int, val y: Array[double], val n2: int, val ldm: int, val x: Array[double], val m: Array[double]): void = {
+	final def dmxpy(val n1: int, val y: DistArray[double], val n2: int, val ldm: int, val x: DistArray[double], val m: DistArray[double]): void = {
 		// cleanup odd vector
-		for (val (j,i): point in [0..n2-1, 0..n1-1]) y(0, i) += x(0, j)*read(m, j, i);
+		for ([j,i]: Point in (0..n2-1)*(0..n1-1)) y(0, i) += x(0, j)*read(m, j, i);
 	}
 }

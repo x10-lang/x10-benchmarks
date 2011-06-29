@@ -1,4 +1,4 @@
-package crypt;
+package crypt.parallel.crypt;
 /**************************************************************************
 *                                                                         *
 *             Java Grande Forum Benchmark Suite - Version 2.0             *
@@ -73,9 +73,9 @@ public class IDEATest {
 		// encryption/decryption operations.
 
 		val zero = (Int) => 0;
-		plain1 = Rail.makeVar[Int](array_rows, zero);
-		crypt1 = Rail.makeVar[Int](array_rows, zero);
-		plain2 = Rail.makeVar[Int](array_rows, zero);
+		plain1 = new Array[Int](array_rows, zero);
+		crypt1 = new Array[Int](array_rows, zero);
+		plain2 = new Array[Int](array_rows, zero);
 
 		val rndnum: Random = new Random(136506717L);  // Create random number generator.
 
@@ -90,13 +90,13 @@ public class IDEATest {
 		// + 4 = 52 subkeys.
 
 		
-		userkey = Rail.makeVar[Int](8, zero);  // User key has 8 16-bit shorts.
-		Z = Rail.makeVar[Int](52, zero);         // Encryption subkey (user key derived).
-		DK = Rail.makeVar[Int](52, zero);        // Decryption subkey (user key derived).
+		userkey = new Array[Int](8, zero);  // User key has 8 16-bit shorts.
+		Z = new Array[Int](52, zero);         // Encryption subkey (user key derived).
+		DK = new Array[Int](52, zero);        // Decryption subkey (user key derived).
 
 		// Generate user key randomly; eight 16-bit values in an array.
 
-		for ((i): Point in 0..7) {
+		for ([i]: Point in 0..7) {
 			// Again, the random number function returns int. Converting
 			// to a short type preserves the bit pattern in the lower 16
 			// bits of the int and discards the rest.
@@ -132,10 +132,10 @@ public class IDEATest {
 	private def calcEncryptKey() {
 		var j: Int;                       // Utility variable.
 
-		for ((i) in 0..51) // Zero out the 52-int Z array.
+		for ([i] in 0..51) // Zero out the 52-int Z array.
 			Z(i) = 0;
 
-		for ((i) in 0..7)  // First 8 subkeys are userkey itself.
+		for ([i] in 0..7)  // First 8 subkeys are userkey itself.
 		{
 			Z(i) = userkey(i) & 0xffff;     // Convert "unsigned"
 			// short to int.
@@ -152,7 +152,7 @@ public class IDEATest {
 		// two subkeys in any group of eight, those 16 bits start to
 		// wrap around to the first two members of the previous eight.
 
-		for ((i) in 8..51)
+		for ([i] in 8..51)
 		{
 			j = i % 8;
 			if (j < 6)
@@ -201,7 +201,7 @@ public class IDEATest {
 
 		j = 47;                   // Indices into temp and encrypt arrays.
 		k = 4;
-		for ((i) in 0..6)
+		for ([i] in 0..6)
 		{
 			t1 = Z(k++);
 			DK(j--) = Z(k++);
@@ -241,134 +241,137 @@ public class IDEATest {
 	 * fit in 16 bits.
 	 */
 	private def cipher_idea(text1: Rail[Int], text2: Rail[Int], key: Rail[Int])  {
-		finish for (var i:Int = 0; i < text1.length; i += 8) async {
-		//finish foreach ((ii): Point in 0..(text1.length-1/8)) {
-		    var i: Int = 8 * i;
-		    var i1: Int = i;                 // Index into first text array.
-		    var i2: Int = i;                 // Index into second text array.
-		    var ik: Int;                     // Index into key array.
-		    var x1: Int;
-		    var x2: Int;
-		    var x3: Int;
-		    var x4: Int;
-		    var t1: Int;
-		    var t2: Int; // Four "16-bit" blocks, two temps.
-		    var r: Int;                      // Eight rounds of processing.
-
-		    ik = 0;                 // Restart key index.
-		    r = 8;                  // Eight rounds of processing.
-
-		    // Load eight plain1 bytes as four 16-bit "unsigned" integers.
-		    // Masking with 0xff prevents sign extension with cast to int.
-
-		    x1 = text1(i1++) & 0xff;          // Build 16-bit x1 from 2 bytes,
-		    x1 |= (text1(i1++) & 0xff) << 8;  // assuming low-order byte first.
-		    x2 = text1(i1++) & 0xff;
-		    x2 |= (text1(i1++) & 0xff) << 8;
-		    x3 = text1(i1++) & 0xff;
-		    x3 |= (text1(i1++) & 0xff) << 8;
-		    x4 = text1(i1++) & 0xff;
-		    x4 |= (text1(i1++) & 0xff) << 8;
-
-		    do {
-			// 1) Multiply (modulo 0x10001), 1st text sub-block
-			// with 1st key sub-block.
-
-			x1 =  ( (x1 as Long) * key(ik++) % 0x10001L & 0xffff) as Int;
-
-			// 2) Add (modulo 0x10000), 2nd text sub-block
-			// with 2nd key sub-block.
-
-			x2 = x2 + key(ik++) & 0xffff;
-
-			// 3) Add (modulo 0x10000), 3rd text sub-block
-			// with 3rd key sub-block.
-
-			x3 = x3 + key(ik++) & 0xffff;
-
-			// 4) Multiply (modulo 0x10001), 4th text sub-block
-			// with 4th key sub-block.
-
-			x4 = ((x4 as Long) * key(ik++) % 0x10001L & 0xffff) as Int;
-			
-			// 5) XOR results from steps 1 and 3.
-
-			t2 = x1 ^ x3;
-
-			// 6) XOR results from steps 2 and 4.
-			// Included in step 8.
-
-			// 7) Multiply (modulo 0x10001), result of step 5
-			// with 5th key sub-block.
-
-			t2 = ((t2 as Long) * key(ik++) % 0x10001L & 0xffff) as Int;
-
-			// 8) Add (modulo 0x10000), results of steps 6 and 7.
-
-			t1 = t2 + (x2 ^ x4) & 0xffff;
-
-			// 9) Multiply (modulo 0x10001), result of step 8
-			// with 6th key sub-block.
-
-			t1 = ((t1 as Long) * key(ik++) % 0x10001L & 0xffff) as Int;
-
-			// 10) Add (modulo 0x10000), results of steps 7 and 9.
-
-			t2 = t1 + t2 & 0xffff;
-
-			// 11) XOR results from steps 1 and 9.
-
-			x1 ^= t1;
-
-			// 14) XOR results from steps 4 and 10. (Out of order).
-
-			x4 ^= t2;
-
-			// 13) XOR results from steps 2 and 10. (Out of order).
-
-			t2 ^= x2;
-
-			// 12) XOR results from steps 3 and 9. (Out of order).
-
-			x2 = x3 ^ t1;
-			
-			x3 = t2;        // Results of x2 and x3 now swapped.
-		    } while (--r != 0);  // Repeats seven more rounds.
-
-		    // Final output transform (4 steps).
-
-		    // 1) Multiply (modulo 0x10001), 1st text-block
-		    // with 1st key sub-block.
-
-		    x1 = ( (x1 as Long) * key(ik++) % 0x10001L & 0xffff) as Int;
-
-			// 2) Add (modulo 0x10000), 2nd text sub-block
-			// with 2nd key sub-block. It says x3, but that is to undo swap
-			// of subblocks 2 and 3 in 8th processing round.
-
-			x3 = x3 + key(ik++) & 0xffff;
-
-			// 3) Add (modulo 0x10000), 3rd text sub-block
-			// with 3rd key sub-block. It says x2, but that is to undo swap
-			// of subblocks 2 and 3 in 8th processing round.
-
-			x2 = x2 + key(ik++) & 0xffff;
-
-			// 4) Multiply (modulo 0x10001), 4th text-block
-			// with 4th key sub-block.
-
-			x4 =  (( x4 as Long) * key(ik++) % 0x10001L & 0xffff) as Int;
-
-			// Repackage from 16-bit sub-blocks to 8-bit byte array text2.
-
-			text2(i2++) =  x1 as Byte;
-			text2(i2++) =  (x1 >>> 8) as Byte;
-			text2(i2++) =  x3 as Byte;                // x3 and x2 are switched
-			text2(i2++) =  (x3 >>> 8) as Byte;        // only in name.
-			text2(i2++) =  x2 as Byte;
-			text2(i2++) =  (x2 >>> 8) as Byte;
-			text2(i2++) =  x4 as Byte;
-			text2(i2++) = (x4 >>> 8) as Byte;
+		finish for (var i:Int = 0; i < text1.size; i += 8) 
+		{
+			val ii: Int = 8 * i;
+			async {
+				//finish foreach ((ii): Point in 0..(text1.length-1/8)) {
+			    var i1: Int = ii;                 // Index into first text array.
+			    var i2: Int = ii;                 // Index into second text array.
+			    var ik: Int;                     // Index into key array.
+			    var x1: Int;
+			    var x2: Int;
+			    var x3: Int;
+			    var x4: Int;
+			    var t1: Int;
+			    var t2: Int; // Four "16-bit" blocks, two temps.
+			    var r: Int;                      // Eight rounds of processing.
+	
+			    ik = 0;                 // Restart key index.
+			    r = 8;                  // Eight rounds of processing.
+	
+			    // Load eight plain1 bytes as four 16-bit "unsigned" integers.
+			    // Masking with 0xff prevents sign extension with cast to int.
+	
+			    x1 = text1(i1++) & 0xff;          // Build 16-bit x1 from 2 bytes,
+			    x1 |= (text1(i1++) & 0xff) << 8;  // assuming low-order byte first.
+			    x2 = text1(i1++) & 0xff;
+			    x2 |= (text1(i1++) & 0xff) << 8;
+			    x3 = text1(i1++) & 0xff;
+			    x3 |= (text1(i1++) & 0xff) << 8;
+			    x4 = text1(i1++) & 0xff;
+			    x4 |= (text1(i1++) & 0xff) << 8;
+	
+			    do {
+				// 1) Multiply (modulo 0x10001), 1st text sub-block
+				// with 1st key sub-block.
+	
+				x1 =  ( (x1 as Long) * key(ik++) % 0x10001L & 0xffff) as Int;
+	
+				// 2) Add (modulo 0x10000), 2nd text sub-block
+				// with 2nd key sub-block.
+	
+				x2 = x2 + key(ik++) & 0xffff;
+	
+				// 3) Add (modulo 0x10000), 3rd text sub-block
+				// with 3rd key sub-block.
+	
+				x3 = x3 + key(ik++) & 0xffff;
+	
+				// 4) Multiply (modulo 0x10001), 4th text sub-block
+				// with 4th key sub-block.
+	
+				x4 = ((x4 as Long) * key(ik++) % 0x10001L & 0xffff) as Int;
+				
+				// 5) XOR results from steps 1 and 3.
+	
+				t2 = x1 ^ x3;
+	
+				// 6) XOR results from steps 2 and 4.
+				// Included in step 8.
+	
+				// 7) Multiply (modulo 0x10001), result of step 5
+				// with 5th key sub-block.
+	
+				t2 = ((t2 as Long) * key(ik++) % 0x10001L & 0xffff) as Int;
+	
+				// 8) Add (modulo 0x10000), results of steps 6 and 7.
+	
+				t1 = t2 + (x2 ^ x4) & 0xffff;
+	
+				// 9) Multiply (modulo 0x10001), result of step 8
+				// with 6th key sub-block.
+	
+				t1 = ((t1 as Long) * key(ik++) % 0x10001L & 0xffff) as Int;
+	
+				// 10) Add (modulo 0x10000), results of steps 7 and 9.
+	
+				t2 = t1 + t2 & 0xffff;
+	
+				// 11) XOR results from steps 1 and 9.
+	
+				x1 ^= t1;
+	
+				// 14) XOR results from steps 4 and 10. (Out of order).
+	
+				x4 ^= t2;
+	
+				// 13) XOR results from steps 2 and 10. (Out of order).
+	
+				t2 ^= x2;
+	
+				// 12) XOR results from steps 3 and 9. (Out of order).
+	
+				x2 = x3 ^ t1;
+				
+				x3 = t2;        // Results of x2 and x3 now swapped.
+			    } while (--r != 0);  // Repeats seven more rounds.
+	
+			    // Final output transform (4 steps).
+	
+			    // 1) Multiply (modulo 0x10001), 1st text-block
+			    // with 1st key sub-block.
+	
+			    x1 = ( (x1 as Long) * key(ik++) % 0x10001L & 0xffff) as Int;
+	
+				// 2) Add (modulo 0x10000), 2nd text sub-block
+				// with 2nd key sub-block. It says x3, but that is to undo swap
+				// of subblocks 2 and 3 in 8th processing round.
+	
+				x3 = x3 + key(ik++) & 0xffff;
+	
+				// 3) Add (modulo 0x10000), 3rd text sub-block
+				// with 3rd key sub-block. It says x2, but that is to undo swap
+				// of subblocks 2 and 3 in 8th processing round.
+	
+				x2 = x2 + key(ik++) & 0xffff;
+	
+				// 4) Multiply (modulo 0x10001), 4th text-block
+				// with 4th key sub-block.
+	
+				x4 =  (( x4 as Long) * key(ik++) % 0x10001L & 0xffff) as Int;
+	
+				// Repackage from 16-bit sub-blocks to 8-bit byte array text2.
+	
+				text2(i2++) =  x1 as Byte;
+				text2(i2++) =  (x1 >>> 8) as Byte;
+				text2(i2++) =  x3 as Byte;                // x3 and x2 are switched
+				text2(i2++) =  (x3 >>> 8) as Byte;        // only in name.
+				text2(i2++) =  x2 as Byte;
+				text2(i2++) =  (x2 >>> 8) as Byte;
+				text2(i2++) =  x4 as Byte;
+				text2(i2++) = (x4 >>> 8) as Byte;
+			}
 		}   // End for loop.
 	}   // End routine.
 
@@ -394,7 +397,7 @@ public class IDEATest {
 	 * in the Symantec Caje IDE. So it's not called for now; the test
 	 * uses Java % instead.
 	 */
-	private def mul(var a: Int, var b: Int): Int throws ArithmeticException = {
+	private def mul(var a: Int, var b: Int): Int = {
 		var p: Long;             // Large enough to catch 16-bit multiply
 		                    // without hitting sign bit.
 		if (a != 0)
