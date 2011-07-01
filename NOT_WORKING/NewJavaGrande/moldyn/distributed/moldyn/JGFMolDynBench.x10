@@ -31,8 +31,8 @@ public class JGFMolDynBench extends md implements JGFSection3 {
 
 	//int size;
 
-	val D: Dist = Dist.makeUnique();
-	public val P = DistArray.make[md](D, ([j]: Point): md => { return new md(); });
+	static val D: Dist(1) = Dist.makeUnique();
+	public static val P = DistArray.make[md](D, ([j]: Point(1)): md => { return new md(); });
 
 	public def this(): JGFMolDynBench = {
 	}

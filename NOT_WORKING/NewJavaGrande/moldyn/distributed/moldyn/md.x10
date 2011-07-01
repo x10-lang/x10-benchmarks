@@ -299,7 +299,7 @@ public class md {
 		t.mdsize = mdsize;
 		t.one = new Array[Particle](mdsize);
 		
-		val tref = GlobalRef(t);
+		val tref = GlobalRef(t); //createa  global ref to use with t
 		
 		for ([k]: Point in 0..(mdsize-1)) t.one(k) = new Particle(0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0);
 

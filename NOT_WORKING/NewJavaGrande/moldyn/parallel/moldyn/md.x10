@@ -22,7 +22,7 @@
 *                         All rights reserved.                            *
 *                                                                         *
 **************************************************************************/
-package moldyn;
+package moldyn.parallel.moldyn;
 
 /**
  * Moldyn ported to x10. Single place with multiple activities.
@@ -31,26 +31,26 @@ package moldyn;
  */
 public class md extends x10.lang.Object {
 
-  public const ITERS: Int = 100;
-  public const LENGTH: double = 50e-10;
-  public const m: double = 4.0026;
-  public const mu: double = 1.66056e-27;
-  public const kb: double = 1.38066e-23;
-  public const TSIM: double = 50;
-  public const deltat: double = 5e-16;
+  public val ITERS: Int = 100;
+  public val LENGTH: double = 50e-10;
+  public val m: double = 4.0026;
+  public val mu: double = 1.66056e-27;
+  public val kb: double = 1.38066e-23;
+  public val TSIM: double = 50;
+  public val deltat: double = 5e-16;
 
-  const den: double = 0.83134;
-  const tref: double = 0.722;
-  const h: double = 0.064;
+  val den: double = 0.83134;
+  val tref: double = 0.722;
+  val h: double = 0.064;
 
-  const irep: Int = 10;
-  const istop: Int = 19;
-  const iprint: Int = 10;
-  const movemx: Int = 50;
+  val irep: Int = 10;
+  val istop: Int = 19;
+  val iprint: Int = 10;
+  val movemx: Int = 50;
   
-  static val datasizes: ValRail[Int] = [4, 13];
+  static val datasizes: Array[Int] = [4, 13];
 
-  public val one: Rail[Particle!]!;
+  public val one: Array[Particle];
   public var epot: double = 0.0;
   public var vir: double = 0.0;
   public var interactions: Int = 0;
@@ -86,7 +86,7 @@ public class md extends x10.lang.Object {
     partsize = partsizelocal;
     mdsize = partsizelocal;
 
-    one = Rail.make[Particle!](partsizelocal);
+    one = new Array[Particle](partsizelocal);
 
     val sidelocal = Math.pow((partsizelocal/den), 0.3333333);
     side = sidelocal;
@@ -114,7 +114,7 @@ public class md extends x10.lang.Object {
   // the following constructor does not exist in v1.5, and is used to
   // initialize local variable t in allreduce(); t uses only the following
   // fields of md: mdsize, one, vir, epot, interactions
-  public def this(mdsize: Int, one: Rail[Particle!]) {
+  public def this(mdsize: int, one: Array[Particle]) {
     // dummy initializations for final fields
     rank = -1;
     nprocess = 0;
@@ -136,10 +136,10 @@ public class md extends x10.lang.Object {
   public def initialise() {
     /* Particle Generation */
     var ijk: Int = 0;
-    for ((lg) in 0..1) {
-      for ((i) in 0..mm-1) {
-        for ((j) in 0..mm-1) {
-          for ((k) in 0..mm-1) {
+    for ([lg] in 0..1) {
+      for ([i] in 0..mm-1) {
+        for ([j] in 0..mm-1) {
+          for ([k] in 0..mm-1) {
             one(ijk) = new Particle((i*a+lg*a*0.5), (j*a+lg*a*0.5), (k*a), 
                                     0.0, 0.0, 0.0, 0.0, 0.0, 0.0);
             ijk = ijk + 1;
@@ -147,10 +147,10 @@ public class md extends x10.lang.Object {
         }
       }
     }
-    for ((lg) in 1..2) {
-      for ((i) in 0..mm-1) {
-        for ((j) in 0..mm-1) {
-          for ((k) in 0..mm-1) {
+    for ([lg] in 1..2) {
+      for ([i] in 0..mm-1) {
+        for ([j] in 0..mm-1) {
+          for ([k] in 0..mm-1) {
             one(ijk) = new Particle((i*a+(2-lg)*a*0.5), (j*a+(lg-1)*a*0.5),
                                     (k*a+a*0.5), 0.0, 0.0, 0.0, 0.0, 0.0, 0.0);
             ijk = ijk + 1;
@@ -188,34 +188,34 @@ public class md extends x10.lang.Object {
     ekin = 0.0;
     sp = 0.0;
 
-    for ((i) in 0..mdsize-1) {
+    for ([i] in 0..mdsize-1) {
       sp = sp + one(i).xvelocity;
     }
     sp = sp / mdsize;
 
-    for ((i) in 0..mdsize-1) {
+    for ([i] in 0..mdsize-1) {
       one(i).xvelocity = one(i).xvelocity - sp;
       ekin = ekin + one(i).xvelocity*one(i).xvelocity;
     }
 
     sp = 0.0;
-    for ((i) in 0..mdsize-1) {
+    for ([i] in 0..mdsize-1) {
       sp = sp + one(i).yvelocity;
     }
     sp = sp / mdsize;
 
-    for ((i) in 0..mdsize-1) {
+    for ([i] in 0..mdsize-1) {
       one(i).yvelocity = one(i).yvelocity - sp;
       ekin = ekin + one(i).yvelocity*one(i).yvelocity;
     }
 
     sp = 0.0;
-    for ((i) in 0..mdsize-1) {
+    for ([i] in 0..mdsize-1) {
       sp = sp + one(i).zvelocity;
     }
     sp = sp / mdsize;
 
-    for ((i) in 0..mdsize-1) {
+    for ([i] in 0..mdsize-1) {
       one(i).zvelocity = one(i).zvelocity - sp;
       ekin = ekin + one(i).zvelocity*one(i).zvelocity;
     }
@@ -223,7 +223,7 @@ public class md extends x10.lang.Object {
     ts = tscale * ekin;
     sc = h * Math.sqrt(tref/ts);
 
-    for ((i) in 0..mdsize-1) {
+    for ([i] in 0..mdsize-1) {
       one(i).xvelocity = one(i).xvelocity * sc;
       one(i).yvelocity = one(i).yvelocity * sc;
       one(i).zvelocity = one(i).zvelocity * sc;
@@ -233,8 +233,8 @@ public class md extends x10.lang.Object {
   }
 
   public def runiters(C: Clock) {
-    for ((move) in 0..movemx-1) {
-      for ((i) in 0..mdsize-1) {
+    for ([move] in 0..movemx-1) {
+      for ([i] in 0..mdsize-1) {
         one(i).domove(side); // move the particles and update velocities
       }
 
@@ -247,19 +247,19 @@ public class md extends x10.lang.Object {
 
       // global reduction on partial sums of the forces, epot, vir and
       // interactions 
-      next;
+      Clock.advanceAll();
       allreduce();
-      next;
+      Clock.advanceAll();
 
       var sum: double = 0.0;
-      for ((i) in 0..mdsize-1) {
+      for ([i] in 0..mdsize-1) {
         sum = sum + one(i).mkekin(hsq2);  // scale forces, update velocities
       }
       ekin = sum/hsq;
 
       var vel: Double = 0.0;
       count = 0.0;
-      for ((i) in 0..mdsize-1) {
+      for ([i] in 0..mdsize-1) {
         vel = vel + one(i).velavg(vaverh, h, this); /* average velocity */
       }
       vel = vel / h;
@@ -267,7 +267,7 @@ public class md extends x10.lang.Object {
       // temperature scale if required
       if ((move < istop) && (((move+1) % irep) == 0)) {
         sc = Math.sqrt(tref / (tscale*ekin));
-        for ((i) in 0..mdsize-1) {
+        for ([i] in 0..mdsize-1) {
           one(i).dscal(sc, 1);
         }
         ekin = tref / tscale;
@@ -284,7 +284,7 @@ public class md extends x10.lang.Object {
         // rp = (count / mdsize) * 100.0; // UNUSED
       }
     }
-    next;
+    Clock.advanceAll();
   }
 
   def allreduce() {
@@ -293,15 +293,15 @@ public class md extends x10.lang.Object {
     if (rank != 0) return;
 
     val P = JGFMolDynBench.P;
-    val t = new md(mdsize, Rail.make[Particle!](mdsize));
+    val t = new md(mdsize, new Array[Particle](mdsize));
 
-    for ((k) in 0..mdsize-1) {
+    for ([k] in 0..mdsize-1) {
       t.one(k) = new Particle(0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0);
     }
 
     // sum reduction
-    for ((j) in 0..P.length-1) {
-      for ((k) in 0..mdsize-1) {
+    for ([j] in 0..P.size-1) {
+      for ([k] in 0..mdsize-1) {
         t.one(k).xforce += P(j).one(k).xforce;
         t.one(k).yforce += P(j).one(k).yforce;
         t.one(k).zforce += P(j).one(k).zforce;
@@ -312,8 +312,8 @@ public class md extends x10.lang.Object {
     }
 
     // broadcast
-    finish foreach ((j) in 0..P.length-1) {
-      for ((k) in 0..mdsize-1) {
+    finish for ([j] in 0..P.length-1) {
+      for ([k] in 0..mdsize-1) {
         P(j).one(k).xforce = t.one(k).xforce;
         P(j).one(k).yforce = t.one(k).yforce;
         P(j).one(k).zforce = t.one(k).zforce;

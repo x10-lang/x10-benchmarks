@@ -20,13 +20,13 @@ import x10.util.concurrent.*;
 public class SparseMatmultAllValues extends x10Test {
 
 	// DRIVER
-	val RANDOM_SEED: long = 10101010;
-	val size: int = 1;
-	val datasizes_M: Array[int](1) = [ 500, 100000, 500000 ];		// create 3 arrays with some values
-	val datasizes_N: Array[int](1) = [ 500, 100000, 500000 ];
-	val datasizes_nz: Array[int](1) = [ 2500, 500000, 2500000 ];
-	val SPARSE_NUM_ITER: int = 200;
-	val R: Random = new Random(RANDOM_SEED);
+	static val RANDOM_SEED: long = 10101010;
+	static val size: int = 1;
+	static val datasizes_M: Array[int](1) = [ 500, 100000, 500000 ];		// create 3 arrays with some values
+	static val datasizes_N: Array[int](1) = [ 500, 100000, 500000 ];
+	static val datasizes_nz: Array[int](1) = [ 2500, 500000, 2500000 ];
+	static val SPARSE_NUM_ITER: int = 200;
+	static val R: Random = new Random(RANDOM_SEED);
 
 	public static def main(Array[String]) {
 		Console.OUT.println( "start" ) ;
@@ -197,12 +197,11 @@ public class SparseMatmultAllValues extends x10Test {
 	}
 
 	// trivial helper
-	private def RandomVector(d: Dist): DistArray[double] = {
+	private static def RandomVector(d: Dist): DistArray[double] = {
 		val rand: double = R.nextDouble();
 		val pointy = ([i]: Point): double => {
 			return R.nextDouble() * 1e-6;
 		};
-		val temp = DistArray.make[double](d.makeUnique(), pointy); // added makeUnique to get rank 1
-		return temp; 
+		return DistArray.make[double](d.makeUnique(), pointy); // added makeUnique to get rank 1 
 	}
 }

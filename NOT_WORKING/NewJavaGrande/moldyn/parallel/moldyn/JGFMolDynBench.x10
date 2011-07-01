@@ -17,7 +17,7 @@
 *                         All rights reserved.                            *
 *                                                                         *
 **************************************************************************/
-package moldyn;
+package moldyn.parallel.moldyn;
 
 import jgfutil.*;
 
@@ -33,7 +33,7 @@ public class JGFMolDynBench implements JGFSection3 {
   val size: Int;
 
   public static val P = 
-    ValRail.make[md!](NTHREADS, (i: Int) => new md(i, NTHREADS));
+    new Array[md](NTHREADS, (i: Int) => new md(i, NTHREADS));
 
   public def this(size: Int) {
     this.size = size;
@@ -45,23 +45,23 @@ public class JGFMolDynBench implements JGFSection3 {
   }
 
   public def JGFinitialise() {
-    finish foreach ((j) in 0..P.length-1) (P(j)).initialise();
+    finish for ([j] in 0..P.size-1) (P(j)).initialise();
   }
 
   public def JGFapplication() {
     JGFInstrumentor.startTimer("Section3:MolDyn:Run");
     finish async {
       val C: Clock = Clock.make();
-      foreach ((j) in 0..P.length-1) clocked(C) P(j).runiters(C);
+      for ([j] in 0..P.size-1) P(j).runiters(C);
     }
     JGFInstrumentor.stopTimer("Section3:MolDyn:Run");
   }
 
   public def JGFvalidate() {
-    finish foreach ((j) in 0..P.length-1) {
+    finish for ([j] in 0..P.size-1) {
       val myNode = P(j);
 
-      val refval: ValRail[Double] = [ 275.97175611773514, 7397.392307839352 ];
+      val refval: Array[Double] = [ 275.97175611773514, 7397.392307839352 ];
 
       val dev: Double = Math.abs(myNode.ek - refval(size));
 

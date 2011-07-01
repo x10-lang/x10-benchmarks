@@ -17,7 +17,9 @@
 *                         All rights reserved.                            *
 *                                                                         *
 **************************************************************************/
-import moldyn.*;
+package moldyn.parallel;
+
+import moldyn.parallel.moldyn;
 import jgfutil.*;
 import harness.x10Test;
 
@@ -30,7 +32,7 @@ public class JGFMolDynBenchSizeA extends x10Test {
      return true;
    }
 
-   public static def main(args: Rail[String]!) {
+   public static def main(args: Array[String]) {
      new JGFMolDynBenchSizeA().execute();
    }
 }

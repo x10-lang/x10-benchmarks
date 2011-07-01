@@ -5,7 +5,7 @@
  *  This file is part of X10 Test.
  *
  */
-package moldyn;
+package moldyn.parallel.moldyn;
 
 public class Random {
 
