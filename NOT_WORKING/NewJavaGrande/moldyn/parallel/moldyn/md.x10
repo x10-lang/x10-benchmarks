@@ -115,7 +115,9 @@ public class md extends x10.lang.Object {
   // initialize local variable t in allreduce(); t uses only the following
   // fields of md: mdsize, one, vir, epot, interactions
   public def this(mdsize: int, one: Array[Particle]) {
-    // dummy initializations for final fields
+	  // dummy initializations for final fields
+	  this.one = one;
+	  this.mdsize = mdsize;
     rank = -1;
     nprocess = 0;
 
@@ -312,7 +314,7 @@ public class md extends x10.lang.Object {
     }
 
     // broadcast
-    finish for ([j] in 0..P.length-1) {
+    finish for ([j] in 0..P.size-1) {
       for ([k] in 0..mdsize-1) {
         P(j).one(k).xforce = t.one(k).xforce;
         P(j).one(k).yforce = t.one(k).yforce;

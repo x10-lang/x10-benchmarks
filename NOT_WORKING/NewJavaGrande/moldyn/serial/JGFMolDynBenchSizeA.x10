@@ -17,9 +17,11 @@
 *                         All rights reserved.                            *
 *                                                                         *
 **************************************************************************/
-import moldyn.*;
+package moldyn.serial;
+
+import moldyn.serial.moldyn.*;
 import jgfutil.*;
-import harness.x10Test;;
+import harness.x10Test;
 
 /**
  * Moldyn ported to x10. Sequential version.

@@ -19,7 +19,7 @@
 **************************************************************************/
 package moldyn.parallel;
 
-import moldyn.parallel.moldyn;
+import moldyn.parallel.moldyn.*;
 import jgfutil.*;
 import harness.x10Test;
 

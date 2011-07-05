@@ -17,9 +17,9 @@
 *                         All rights reserved.                            *
 *                                                                         *
 **************************************************************************/
-package moldyn;
+package moldyn.serial.moldyn;
 
-import jgfutil.*;;
+import jgfutil.*;
 
 /**
  * Moldyn ported to x10. Sequential version.
@@ -50,17 +50,17 @@ public class JGFMolDynBench extends md implements JGFSection3 {
 	public def JGFvalidate(): void = {
 		var myNode: md = this;
 		// double refval[] = { 1731.4306625334357, 7397.392307839352 };
-		double var refval: Array[double] = { 275.97175611773514, 7397.392307839352 };
+		var refval: Array[double] = [ 275.97175611773514, 7397.392307839352 ];
 		var dev: double = Math.abs(myNode.ek - refval(size));
 		if (dev > 1.0e-10 ) {
-			System.out.println("Validation failed");
-			System.out.println("Kinetic Energy = " + myNode.ek + "  " + dev + "  " + refval(size));
+			Console.OUT.println("Validation failed");
+			Console.OUT.println("Kinetic Energy = " + myNode.ek + "  " + dev + "  " + refval(size));
 			throw new Error("Validation failed");
 		}
 	}
 
 	public def JGFtidyup(): void = {
-		System.gc();
+		//System.gc();
 	}
 
 	public def JGFrun(var size: int): void = {
@@ -78,7 +78,7 @@ public class JGFMolDynBench extends md implements JGFSection3 {
 
 		JGFInstrumentor.stopTimer("Section3:MolDyn:Total");
 
-		JGFInstrumentor.addOpsToTimer("Section3:MolDyn:Run", (double) interactions);
+		JGFInstrumentor.addOpsToTimer("Section3:MolDyn:Run", interactions as double);
 		JGFInstrumentor.addOpsToTimer("Section3:MolDyn:Total", 1);
 
 		JGFInstrumentor.printTimer("Section3:MolDyn:Run");

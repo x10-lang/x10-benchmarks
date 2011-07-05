@@ -22,10 +22,8 @@
 *                         All rights reserved.                            *
 *                                                                         *
 **************************************************************************/
-package moldyn;
+package moldyn.serial.moldyn;
 
-import java.util.*;
-import java.text.NumberFormat;;
 
 /**
  * Moldyn ported to x10. Sequential version.
@@ -34,34 +32,34 @@ import java.text.NumberFormat;;
  */
 public class md {
 
-	public const ITERS: int = 100; // 100
-	public const LENGTH: double = 50e-10;
-	public const m: double = 4.0026;
-	public const mu: double = 1.66056e-27;
-	public const kb: double = 1.38066e-23;
-	public const TSIM: double = 50;
-	public const deltat: double = 5e-16;
-	public var one: Rail[Particle] = new Array[Particle](0);
+	public static val ITERS: int = 100; // 100
+	public static val LENGTH: double = 50e-10;
+	public static val m: double = 4.0026;
+	public static val mu: double = 1.66056e-27;
+	public static val kb: double = 1.38066e-23;
+	public static val TSIM: double = 50;
+	public static val deltat: double = 5e-16;
+	public var one: Array[Particle] = new Array[Particle](0);
 	public var epot: double = 0.0;
 	public var vir: double = 0.0;
 	public var count: double = 0.0;
 	var size: int;
-	var datasizes: Array[int] = { 4, 13 };
+	var datasizes: Array[int] = [ 4, 13 ];
 	// int datasizes[] = { 2, 13 };
 	public var interactions: int = 0;
 
-	var i: intvar j: intvar k: intvar lg: intvar mdsize: intvar move: intvar mm: int;
+	var i: int;var j: int;var k: int;var lg: int;var mdsize: int;var move: int;var mm: int;
 
-	var l: doublevar rcoff: doublevar rcoffs: doublevar side: doublevar sideh: doublevar hsq: doublevar hsq2: doublevar vel: double;
-	var a: doublevar r: doublevar sum: doublevar tscale: doublevar sc: doublevar ekin: doublevar ek: doublevar ts: doublevar sp: double;
+	var l: double;var rcoff: double;var rcoffs: double;var side: double;var sideh: double;var hsq: double;var hsq2: double;var vel: double;
+	var a: double;var r: double;var sum: double;var tscale: double;var sc: double;var ekin: double;var ek: double;var ts: double;var sp: double;
 	var den: double = 0.83134;
 	var tref: double = 0.722;
 	var h: double = 0.064;
-	var vaver: doublevar vaverh: doublevar rand: double;
-	var etot: doublevar temp: doublevar pres: doublevar rp: double;
-	var u1: doublevar u2: doublevar v1: doublevar v2: doublevar s: double;
+	var vaver: double;var vaverh: double;var rand: double;
+	var etot: double;var temp: double;var pres: double;var rp: double;
+	var u1: double;var u2: double;var v1: double;var v2: double;var s: double;
 
-	var ijk: intvar npartm: intvar partsize: intvar iseed: intvar tint: int;
+	var ijk: int;var npartm: int;var partsize: int;var iseed: int;var tint: int;
 	var irep: int = 10;
 	var istop: int = 19;
 	var iprint: int = 10;
