@@ -232,8 +232,14 @@ class fft {
 
         finish ateach (p in unique) {
             // FFT
-            if (unique(p).id==0) Console.OUT.println("Start FFT");
-            var secs:Double = compute(FFT, true, N);
+        	if (unique(p).id==0) Console.OUT.println("Warmup FFT");
+        	var secs:Double = compute(FFT, true, N);
+        	FFT().alltoall_timer = 0;
+        	FFT().twiddle_timer = 0;
+        	if (unique(p).id==0) Console.OUT.println("Warmup FFT complete");
+
+        	if (unique(p).id==0) Console.OUT.println("Start FFT");
+            secs = compute(FFT, true, N);
             if (unique(p).id==0) Console.OUT.println("alltoall: " + FFT().alltoall_timer/1e9 + " s");
             if (unique(p).id==0) Console.OUT.println("twiddle: " + FFT().twiddle_timer/1e9 + " s");
             if (unique(p).id==0) Console.OUT.println("FFT complete");
