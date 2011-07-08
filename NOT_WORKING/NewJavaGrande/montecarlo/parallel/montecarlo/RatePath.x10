@@ -5,12 +5,9 @@
  *  This file is part of X10 Test.
  *
  */
-package montecarlo;
+package montecarlo.parallel.montecarlo;
 
-import java.lang.Integer;
-import java.lang.Double;
-import java.util.*;
-import java.io.*;;
+import x10.util.*;
 
 /**
  * X10 port of montecarlo benchmark from Section 2 of Java Grande Forum Benchmark Suite (Version 2.0).
@@ -32,31 +29,31 @@ public class RatePath extends PathId {
 	/**
 	 * Class variable, for setting whether to print debug messages.
 	 */
-	public const debug: boolean = true;
+	public static val debug: boolean = true;
 
 	/**
 	 * The prompt to write before any debug messages.
 	 */
-	protected const prompt: String = "RatePath> ";
+	protected static val prompt: String = "RatePath> ";
 
 	/**
 	 * Class variable for determining which field in the stock data should be
 	 * used.  This is currently set to point to the 'closing price'.
 	 */
-	public const datumfield: int = 4;
+	public static val datumfield: int = 4;
 
 	/**
 	 * Class variable to represent the minimal date, whence the stock prices
 	 * appear. Used to trap any potential problems with the data.
 	 */
-	public const MINIMUMDATE: int = 19000101;
+	public static val MINIMUMDATE: int = 19000101;
 
 	/**
 	 * Class variable for defining what is meant by a small number, small enough
 	 * to cause an arithmetic overflow when dividing.  According to the
 	 * Java Nutshell book, the actual range is +/-4.9406564841246544E-324
 	 */
-	public const EPSILON: double = 10.0 * Double.MIN_VALUE;
+	public static val EPSILON: double = 10.0 * Double.MIN_VALUE;
 
 	//------------------------------------------------------------------------
 	// Instance variables.
@@ -90,7 +87,7 @@ public class RatePath extends PathId {
 	 * @exception DemoException thrown if there is a problem reading in
 	 *                          the data file.
 	 */
-	public def this(var filename: String): RatePath throws DemoException = {
+	public def this(var filename: String): RatePath = {
 		set_prompt(prompt);
 		set_DEBUG(debug);
 		readRatesFile(null, filename);
@@ -105,7 +102,7 @@ public class RatePath extends PathId {
 	 * @exception DemoException thrown if there is a problem reading in
 	 *                          the data file.
 	 */
-	public def this(var dirName: String, var filename: String): RatePath throws DemoException = {
+	public def this(var dirName: String, var filename: String): RatePath = {
 		set_prompt(prompt);
 		set_DEBUG(debug);
 		readRatesFile(dirName, filename);
@@ -133,7 +130,7 @@ public class RatePath extends PathId {
 		set_prompt(prompt);
 		set_DEBUG(debug);
 		this.pathValue = pathValue;
-		this.nAcceptedPathValue = pathValue.length;
+		this.nAcceptedPathValue = pathValue.size;
 	}
 
 	/**
@@ -145,7 +142,7 @@ public class RatePath extends PathId {
 	 * @exception DemoException thrown if there is an attempt to access
 	 *            an undefined variable.
 	 */
-	public def this(var mc: MonteCarloPath): RatePath throws DemoException = {
+	public def this(var mc: MonteCarloPath): RatePath = {
 		//
 		// Fields pertaining to the parent PathId object:
 		set_name(mc.get_name());
@@ -184,7 +181,7 @@ public class RatePath extends PathId {
 		set_prompt(prompt);
 		set_DEBUG(debug);
 		this.pathValue = new Array[double](pathValueLength);
-		this.nAcceptedPathValue = pathValue.length;
+		this.nAcceptedPathValue = pathValue.size;
 	}
 	//------------------------------------------------------------------------
 	// Methods.
@@ -198,10 +195,10 @@ public class RatePath extends PathId {
 	 * @exception DemoException thrown if there is a mismatch between the
 	 *            lengths of the operand and target arrays.
 	 */
-	public def inc_pathValue(var operandPath: Array[double]): void throws DemoException = {
-		if (pathValue.length != operandPath.length)
+	public def inc_pathValue(var operandPath: Array[double]): void = {
+		if (pathValue.size != operandPath.size)
 			throw new DemoException("The path to update has a different size to the path to update with!");
-		for (var i: int = 0; i<pathValue.length; i++)
+		for (var i: int = 0; i<pathValue.size; i++)
 			pathValue(i) += operandPath(i);
 	}
 
@@ -213,11 +210,11 @@ public class RatePath extends PathId {
 	 * @exception DemoException thrown if there is a mismatch between the
 	 *            lengths of the operand and target arrays.
 	 */
-	public def inc_pathValue(var scale: double): void throws DemoException = {
+	public def inc_pathValue(var scale: double): void = {
 		// (VIVEK) Remove null checks on non-nullable field (pathValue)
 		// if (pathValue == null)
 		//  throw new DemoException("Variable pathValue is undefined!");
-		for (var i: int = 0; i<pathValue.length; i++)
+		for (var i: int = 0; i<pathValue.size; i++)
 			pathValue(i) *= scale;
 	}
 	//------------------------------------------------------------------------
@@ -231,7 +228,7 @@ public class RatePath extends PathId {
 	 * @return Value of instance variable <code>pathValue</code>.
 	 * @exception DemoException thrown if instance variable <code>pathValue</code> is undefined.
 	 */
-	public def get_pathValue(): Array[double] throws DemoException = {
+	public def get_pathValue(): Array[double] = {
 		// (VIVEK) Remove null checks on non-nullable field (pathValue)
 		//  if (this.pathValue == null)
 		// throw new DemoException("Variable pathValue is undefined!");
@@ -253,7 +250,7 @@ public class RatePath extends PathId {
 	 * @return Value of instance variable <code>pathDate</code>.
 	 * @exception DemoException thrown if instance variable <code>pathDate</code> is undefined.
 	 */
-	public def get_pathDate(): Array[int] throws DemoException = {
+	public def get_pathDate(): Array[int] = {
 		// (VIVEK) Remove null checks on non-nullable field (pathDate)
 		// if (this.pathDate == null)
 		//  throw new DemoException("Variable pathDate is undefined!");
@@ -277,7 +274,7 @@ public class RatePath extends PathId {
 	 * @return The last value in the rate path.
 	 */
 	public def getEndPathValue(): double = {
-		return (getPathValue(pathValue.length-1));
+		return (getPathValue(pathValue.size-1));
 	}
 
 	/**
@@ -300,7 +297,7 @@ public class RatePath extends PathId {
 	 * @exception DemoException thrown if there is a problem with the
 	 *                          calculation.
 	 */
-	public def getReturnCompounded(): ReturnPath throws DemoException = {
+	public def getReturnCompounded(): ReturnPath = {
 		// (VIVEK) Remove null checks on non-nullable field (pathValue)
 		//if (pathValue == null || nAcceptedPathValue == 0) { // }
 		if (nAcceptedPathValue == 0) {
@@ -333,7 +330,7 @@ public class RatePath extends PathId {
 	 * @exception DemoException thrown if there is a problem with the
 	 *                          calculation.
 	 */
-	public def getReturnNonCompounded(): ReturnPath throws DemoException = {
+	public def getReturnNonCompounded(): ReturnPath = {
 		// (VIVEK) Remove null checks on non-nullable field (pathValue)
 		//if (pathValue == null || nAcceptedPathValue == 0) { // }
 		if (nAcceptedPathValue == 0) {
@@ -393,31 +390,33 @@ public class RatePath extends PathId {
 	 * @exception DemoException thrown if there was a problem with the data
 	 *                          file.
 	 */
-	private def readRatesFile(var ndirName: nullable<String>, var filename: String): void throws DemoException = {
-		var dirName: String = (String) ndirName;
-		var ratesFile: java.io.File = new File(dirName, filename);
-		var in: java.io.BufferedReader;
+	private def readRatesFile(var ndirName: String, var filename: String): void = {
+		var dirName: String = ndirName as String;
+		var ratesFile: x10.io.File = new File(dirName, filename);
+		var inn: x10.io.BufferedReader;
 		if (! ratesFile.canRead()) {
 			throw new DemoException("Cannot read the file "+ratesFile.toString());
 		}
 		try {
-			in = new BufferedReader(new FileReader(ratesFile));
+			inn = new BufferedReader(new FileReader(ratesFile));
 		} catch (var fnfex: FileNotFoundException) {
 			throw new DemoException(fnfex.toString());
 		}
 		//
 		// Proceed to read all the lines of data into a Vector object.
-		var iLine: int = 0var initNlines: int = 100var nLines: int = 0;
+		var iLine: int = 0;
+		var initNlines: int = 100;
+		var nLines: int = 0;
 
-		var naLine: nullable<String>;
-		var allLines: java.util.Vector = new Vector(initNlines);
+		var naLine: String;
+		var allLines: x10.util.Vector = new Vector(initNlines);
 		try {
-			while ((naLine = in.readLine()) != null) {
+			while ((naLine = inn.readLine()) != null) {
 				iLine++;
 				//
 				// Note, I'm not entirely sure whether the object passed in is copied
 				// by value, or just its reference.
-				allLines.addElement((String) naLine);
+				allLines.addElement(naLine as String);
 			}
 		} catch (var ioex: IOException) {
 			throw new DemoException("Problem reading data from the file "+ioex.toString());
@@ -429,8 +428,8 @@ public class RatePath extends PathId {
 		this.pathDate  = new Array[int](nLines);
 		nAcceptedPathValue = 0;
 		iLine = 0;
-		for (var e: java.util.Enumeration = allLines.elements(); e.hasMoreElements();) {
-			var aLine: String = (String) e.nextElement();
+		for (var e: x10.util.Enumeration = allLines.elements(); e.hasMoreElements();) {
+			var aLine: String = e.nextElement() as String;
 			var field: Rail[String] = Utilities.splitString(",", aLine);
 			var aDate: int = Integer.parseInt("19"+field(0));
 			//

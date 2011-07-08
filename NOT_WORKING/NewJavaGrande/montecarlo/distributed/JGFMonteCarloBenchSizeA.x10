@@ -5,8 +5,9 @@
  *  This file is part of X10 Test.
  *
  */
-import montecarlo.*;
+package montecarlo.distributed;
 
+import montecarlo.distributed.montecarlo.*;
 import jgfutil.*;
 import harness.x10Test;;
 

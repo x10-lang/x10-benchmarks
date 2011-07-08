@@ -5,9 +5,7 @@
  *  This file is part of X10 Test.
  *
  */
-package montecarlo;
-
-import x10.lang.Boolean;;
+package montecarlo.parallel.montecarlo;
 
 /**
  * X10 port of montecarlo benchmark from Section 2 of Java Grande Forum Benchmark Suite (Version 2.0).
@@ -20,8 +18,8 @@ import x10.lang.Boolean;;
  * 3) Add declaration to extend x10.lang.Object
  */
 final public class Utilities {
-	public const debug: Boolean = new Boolean(false);
-	private const className: String = "Utilities";
+	public static val debug: Boolean = false;
+	private static val className: String = "Utilities";
 
 	/**
 	 * Static method which behaves like the Unix `which' command.  OS
@@ -36,18 +34,18 @@ final public class Utilities {
 	 */
 	public static def which(var executable: String, var pathEnv: String): String = {
 		var executablePath: String;
-		String var paths: Rail[String][];
+		var paths: Rail[String];
 
 		paths = splitString(System.getProperty("path.separator"), pathEnv);
 		for (var i: int = 0; i<paths.length; i++) {
 			if (paths(i).length() > 0) {
-				var pathFile: java.io.File = new java.io.File(paths(i));
+				var pathFile: x10.io.File = new x10.io.File(paths(i));
 				if (pathFile.isDirectory()) {
-					String var filesInDirectory: Rail[String][];
+					var filesInDirectory: Rail[String];
 					filesInDirectory = pathFile.list();
 					for (var j: int = 0; j<filesInDirectory.length; j++) {
-						if (debug.val) {
-							System.out.println("DBG: Matching "+filesInDirectory(j));
+						if (debug) {
+							Console.OUT.println("DBG: Matching "+filesInDirectory(j));
 						}
 						if (filesInDirectory(j).equals(executable)) {
 							executablePath = paths(i)+System.getProperty("file.separator")+executable;
@@ -55,8 +53,8 @@ final public class Utilities {
 						}
 					}
 				} else {
-					if (debug.val) {
-						System.out.println("DBG: path "+paths(i)+" is not a directory!");
+					if (debug) {
+						Console.OUT.println("DBG: path "+paths(i)+" is not a directory!");
 					}
 				}
 			}
@@ -72,7 +70,7 @@ final public class Utilities {
 	 * @param stringArray The array of strings to join.
 	 * @return            A string of the joined string array.
 	 */
-	public static def joinString(var joinChar: String, var stringArray: Rail[String][]): String = {
+	public static def joinString(var joinChar: String, var stringArray: Rail[String]): String = {
 		return joinString(joinChar, stringArray, 0);
 	}
 
@@ -84,7 +82,7 @@ final public class Utilities {
 	 * @param index       The array index on which to start joining.
 	 * @return            A string of the joined string array.
 	 */
-	public static def joinString(var joinChar: String, var stringArray: Rail[String][], var index: int): String = {
+	public static def joinString(var joinChar: String, var stringArray: Rail[String], var index: int): String = {
 		var methodName: String = "join";
 		var tmpString: StringBuffer;
 
@@ -110,23 +108,24 @@ final public class Utilities {
 	public static def splitString(var splitChar: String, var arg: String): Rail[String] = {
 		var methodName: String = "split";
 
-		String var myArgs: Rail[String][];
+		var myArgs: Rail[String];
 		var nArgs: int = 0;
-		var foundIndex: int = 0var fromIndex: int = 0;
+		var foundIndex: int = 0;
+		var fromIndex: int = 0;
 
 		while ((foundIndex = arg.indexOf(splitChar, fromIndex)) > -1) {
 			nArgs++;
 			fromIndex = foundIndex+1;
 		}
-		if (debug.val) {
-			System.out.println("DBG "+className+"."+methodName+": "+nArgs);
+		if (debug) {
+			Console.OUT.println("DBG "+className+"."+methodName+": "+nArgs);
 		}
 		myArgs = new Array[String](nArgs+1);
 		nArgs = 0;
 		fromIndex = 0;
 		while ((foundIndex = arg.indexOf(splitChar, fromIndex)) > -1) {
-			if (debug.val) {
-				System.out.println("DBG "+className+"."+methodName+": "+fromIndex+" "+foundIndex);
+			if (debug) {
+				Console.OUT.println("DBG "+className+"."+methodName+": "+fromIndex+" "+foundIndex);
 			}
 			myArgs(nArgs) = arg.substring(fromIndex, foundIndex);
 			nArgs++;

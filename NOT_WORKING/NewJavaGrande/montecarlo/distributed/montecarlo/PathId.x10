@@ -5,10 +5,7 @@
  *  This file is part of X10 Test.
  *
  */
-package montecarlo;
-
-import x10.lang.Boolean;
-import java.lang.Double;;
+package montecarlo.distributed.montecarlo;
 
 /**
  * X10 port of montecarlo benchmark from Section 2 of Java Grande Forum Benchmark Suite (Version 2.0).
@@ -28,12 +25,12 @@ public class PathId extends Universal {
 	/**
 	 * A class variable.
 	 */
-	public const debug: boolean = true;
+	public static val debug: boolean = true;
 
 	/**
 	 * The prompt to write before any debug messages.
 	 */
-	protected const prompt: String = "PathId> ";
+	protected static val prompt: String = "PathId> ";
 
 	//------------------------------------------------------------------------
 	// Instance variables.
@@ -96,7 +93,7 @@ public class PathId extends Universal {
 	 * @return Value of instance variable <code>name</code>.
 	 * @exception DemoException thrown if instance variable <code>name</code> is undefined.
 	 */
-	public def get_name(): String throws DemoException = {
+	public def get_name(): String = {
 		// (VIVEK) The following test is no longer necessary because name is not nullable
 		//if (this.name == null)
 		//	throw new DemoException("Variable name is undefined!");
@@ -116,7 +113,7 @@ public class PathId extends Universal {
 	 * @return Value of instance variable <code>startDate</code>.
 	 * @exception DemoException thrown if instance variable <code>startDate</code> is undefined.
 	 */
-	public def get_startDate(): int throws DemoException = {
+	public def get_startDate(): int = {
 		if (this.startDate == 0)
 			throw new DemoException("Variable startDate is undefined!");
 		return (this.startDate);
@@ -135,7 +132,7 @@ public class PathId extends Universal {
 	 * @return Value of instance variable <code>endDate</code>.
 	 * @exception DemoException thrown if instance variable <code>endDate</code> is undefined.
 	 */
-	public def get_endDate(): int throws DemoException = {
+	public def get_endDate(): int = {
 		if (this.endDate == 0)
 			throw new DemoException("Variable endDate is undefined!");
 		return (this.endDate);
@@ -154,7 +151,7 @@ public class PathId extends Universal {
 	 * @return Value of instance variable <code>dTime</code>.
 	 * @exception DemoException thrown if instance variable <code>dTime</code> is undefined.
 	 */
-	public def get_dTime(): double throws DemoException = {
+	public def get_dTime(): double = {
 		if (this.dTime == Double.NaN)
 			throw new DemoException("Variable dTime is undefined!");
 		return (this.dTime);
@@ -178,7 +175,7 @@ public class PathId extends Universal {
 	 * @exception DemoException thrown if the values to be copied contain
 	 *                          any undefined objects.
 	 */
-	public def copyInstanceVariables(var obj: PathId): void throws DemoException = {
+	public def copyInstanceVariables(var obj: PathId): void = {
 		this.name      = obj.get_name();
 		this.startDate = obj.get_startDate();
 		this.endDate   = obj.get_endDate();

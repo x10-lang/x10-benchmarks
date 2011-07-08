@@ -5,7 +5,7 @@
  *  This file is part of X10 Test.
  *
  */
-package montecarlo;
+package montecarlo.parallel.montecarlo;
 
 /**
  * X10 port of montecarlo benchmark from Section 2 of Java Grande Forum Benchmark Suite (Version 2.0).
@@ -14,11 +14,12 @@ package montecarlo;
  *
  * Porting issues identified:
  */
-public class DemoException extends java.lang.Exception {
+public class DemoException extends x10.lang.Exception {
+
 	/**
 	 * Flag for selecting whether to print the stack-trace dump.
 	 */
-	public const debug: boolean = true;
+	public static val debug: boolean = true;
 
 	/**
 	 * Default constructor.

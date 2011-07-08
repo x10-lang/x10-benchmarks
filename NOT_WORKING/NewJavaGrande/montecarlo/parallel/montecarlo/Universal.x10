@@ -5,9 +5,8 @@
  *  This file is part of X10 Test.
  *
  */
-package montecarlo;
+package montecarlo.parallel.montecarlo;
 
-import x10.lang.Boolean;;
 
 /**
  * X10 port of montecarlo benchmark from Section 2 of Java Grande Forum Benchmark Suite (Version 2.0).
@@ -24,7 +23,7 @@ public class Universal {
 	 * Class variable, for whether to print debug messages.  This one is
 	 * unique to this class, and can hence be set in the one place.
 	 */
-	private const universal_debug: Boolean = new Boolean(true);
+	private var universal_debug: Boolean = true;
 
 	//------------------------------------------------------------------------
 	// Instance variables.
@@ -42,11 +41,11 @@ public class Universal {
 	private var prompt: String;
 
 	//------------------------------------------------------------------------
-	// Constructors.
+	// static val ructors.
 	//------------------------------------------------------------------------
 
 	/**
-	 * Default constructor.
+	 * Default static val ructor.
 	 */
 	public def this(): Universal = {
 		super();
@@ -83,7 +82,7 @@ public class Universal {
 	 * @return Value of instance variable <code>UNIVERSAL_DEBUG</code>.
 	 */
 	public def get_UNIVERSAL_DEBUG(): boolean = {
-		return (this.universal_debug.val);
+		return (this.universal_debug);
 	}
 
 	/**
@@ -92,7 +91,7 @@ public class Universal {
 	 *        variable <code>UNIVERSAL_DEBUG</code>.
 	 */
 	public def set_UNIVERSAL_DEBUG(var UNIVERSAL_DEBUG: boolean): void = {
-		this.universal_debug.val = UNIVERSAL_DEBUG;
+		this.universal_debug = UNIVERSAL_DEBUG;
 	}
 
 	/**
@@ -118,8 +117,8 @@ public class Universal {
 	 * @param s The debug message to print out, to PrintStream "out".
 	 */
 	public def dbgPrintln(var s: String): void = {
-		if ( debug || universal_debug.val) {
-			System.out.println("DBG "+prompt+s);
+		if (debug || universal_debug) {
+			Console.OUT.println("DBG "+prompt+s);
 		}
 	}
 
@@ -128,8 +127,8 @@ public class Universal {
 	 * @param s The debug message to print out, to PrintStream "out".
 	 */
 	public def dbgPrint(var s: String): void = {
-		if ( debug || universal_debug.val ) {
-			System.out.print("DBG "+prompt+s);
+		if (debug || universal_debug) {
+			Console.OUT.print("DBG "+prompt+s);
 		}
 	}
 
@@ -138,7 +137,7 @@ public class Universal {
 	 * @param s The error message to print out, to PrintStream "err".
 	 */
 	public def errPrintln(var s: String): void = {
-		System.err.println(prompt+s);
+		Console.ERR.println(prompt+s);
 	}
 
 	/**
@@ -146,6 +145,6 @@ public class Universal {
 	 * @param s The error message to print out, to PrintStream "err".
 	 */
 	public def errPrint(var s: String): void = {
-		System.err.print(prompt+s);
+		Console.ERR.print(prompt+s);
 	}
 }

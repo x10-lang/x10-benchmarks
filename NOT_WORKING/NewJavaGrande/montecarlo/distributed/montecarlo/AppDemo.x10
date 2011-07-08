@@ -5,10 +5,8 @@
  *  This file is part of X10 Test.
  *
  */
-package montecarlo;
+package montecarlo.distributed.montecarlo;
 
-import java.util.*;
-import x10.lang.Double;;
 
 /**
  * X10 port of montecarlo benchmark from Section 3 of Java Grande Forum Benchmark Suite (Version 2.0).
@@ -19,7 +17,7 @@ import x10.lang.Double;;
  *
  * Porting issues identified:
  *
- * 2) Add nullable ToInitAllTasks type constructor for declaration of
+ * 2) Add nullable ToInitAllTasks type static valructor for declaration of
  *    initAllTasks, and cast to non-nullable ToInitAllTasks when
  *    passing initAllTasks as a parameter.
  */
@@ -28,20 +26,20 @@ public class AppDemo extends Universal {
 	// Class variables.
 	//------------------------------------------------------------------------
 
-	public const JGFavgExpectedReturnRateMC: Double = new Double(0.0);
-	public static def JGFavgExpectedReturnRateMC(): double = { return JGFavgExpectedReturnRateMC.val; }
+	public val JGFavgExpectedReturnRateMC: Double = 0.0;
+	public def JGFavgExpectedReturnRateMC(): double = { return JGFavgExpectedReturnRateMC; }
 
 	/**
 	 * A class variable.
 	 */
-	public const DEBUG: boolean = true;
+	public static val DEBUG: boolean = true;
 
 	/**
 	 * The prompt to write before any debug messages.
 	 */
-	protected const prompt: String = "AppDemo> ";
+	protected static val prompt: String = "AppDemo> ";
 
-	public const Serial: int = 1;
+	public static val Serial: int = 1;
 	//------------------------------------------------------------------------
 	// Instance variables.
 	//------------------------------------------------------------------------
@@ -81,19 +79,19 @@ public class AppDemo extends Universal {
 	 * Variable to determine which deployment scenario to run.
 	 */
 	private var runMode: int;
-	private var D: dist;
-	private var tasks: Array[ToTask];
-	private val expectedReturnRate: Array[double];
-	private val volatility: Array[double];
+	private var D: Dist;
+	private var tasks: DistArray[ToTask];
+	private val expectedReturnRate: DistArray[double];
+	private val volatility: DistArray[double];
 	public def this(var dataDirname: String, var dataFilename: String, var nTimeStepsMC: int, var nRunsMC: int): AppDemo = {
 		this.dataDirname    = dataDirname;
 		this.dataFilename   = dataFilename;
 		this.nTimeStepsMC   = nTimeStepsMC;
 		this.nRunsMC        = nRunsMC;
 		this.initialised    = false;
-		D = distmakeBlock([0..(nRunsMC-1)]);
-		expectedReturnRate = new Array[double](D);
-		volatility = new Array[double](D);
+		D = Dist.makeBlock(0..(nRunsMC-1));
+		expectedReturnRate = DistArray.make[double](D);
+		volatility = DistArray.make[double](D);
 		set_prompt(prompt);
 		set_DEBUG(DEBUG);
 	}
@@ -106,7 +104,7 @@ public class AppDemo extends Universal {
 	var avgExpectedReturnRateMC: double = 0.0;
 	var avgVolatilityMC: double = 0.0;
 
-	var initAllTasks: nullable<ToInitAllTasks> = null;
+	var initAllTasks: nullable[ToInitAllTasks] = null;
 
 	/**
 	 * Single point of contact for running this increasingly bloated
@@ -142,13 +140,13 @@ public class AppDemo extends Universal {
 	}
 
 	public def runSerial(): void = {
-		final val t: ToInitAllTasks = (ToInitAllTasks) initAllTasks;
-		finish ateach (val (i): point in expectedReturnRate) {
+		val t: ToInitAllTasks = initAllTasks as ToInitAllTasks;
+		finish ateach ([i]: Point in expectedReturnRate) {
 			var ps: PriceStock = new PriceStock();
 			ps.setInitAllTasks(t);
 			ps.setTask(tasks(i));
 			ps.run();
-			var r: ToResult = (ToResult) ps.getResult();
+			var r: ToResult = ps.getResult() as ToResult;
 			expectedReturnRate(i) = r.get_expectedReturnRate();
 			volatility(i) = r.get_volatility();
 		};
@@ -161,7 +159,7 @@ public class AppDemo extends Universal {
 			processResults();
 		} catch (var demoEx: DemoException) {
 			dbgPrintln(demoEx.toString());
-			System.exit(-1);
+			//System.exit(-1);
 		}
 	}
 
@@ -174,7 +172,7 @@ public class AppDemo extends Universal {
 	 *        produce.
 	 */
 	private def initTasks(var nRunsMC: int): void = {
-		tasks = new Array[ToTask](D, (var point [i]: point): ToTask => { return new ToTask("MC run " + i, (long)i*11); });
+		tasks = DistArray.make[ToTask](D, ([i]: Point): ToTask => { return new ToTask("MC run " + i, i as long*11); });
 	}
 
 	/**
@@ -185,7 +183,7 @@ public class AppDemo extends Universal {
 	 * @exception DemoException thrown if there is a problem with reading in
 	 *            any values.
 	 */
-	private def processResults(): void throws DemoException = {
+	private def processResults(): void = {
 		var avgExpectedReturnRateMC: double = expectedReturnRate.sum()/nRunsMC;
 		var avgVolatilityMC: double = volatility.sum()/nRunsMC;
 		/*
@@ -203,7 +201,7 @@ public class AppDemo extends Universal {
 		// with a custom sum() method that adds path components pointwise, and then
 		// scaling with 1/nRunsMC.
 		*/
-		JGFavgExpectedReturnRateMC.val = avgExpectedReturnRateMC;
+		JGFavgExpectedReturnRateMC = avgExpectedReturnRateMC;
 
 		//dbgPrintln("Average over "+nRunsMC+": expectedReturnRate = "+
 		//		avgExpectedReturnRateMC+" volatility = "+avgVolatilityMC + JGFavgExpectedReturnRateMC);

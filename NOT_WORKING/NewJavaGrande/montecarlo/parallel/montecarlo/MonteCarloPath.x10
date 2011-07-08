@@ -5,11 +5,9 @@
  *  This file is part of X10 Test.
  *
  */
-package montecarlo;
+package montecarlo.parallel.montecarlo;
 
-import java.util.*;
-import java.io.*;
-import java.lang.Double;;
+import x10.util.*;
 
 /**
  * X10 port of montecarlo benchmark from Section 2 of Java Grande Forum Benchmark Suite (Version 2.0).
@@ -28,23 +26,24 @@ public class MonteCarloPath extends PathId {
 	//------------------------------------------------------------------------
 	// Class variables.
 	//------------------------------------------------------------------------
+
 	/**
 	 * Class variable for determining whether to switch on debug output or
 	 * not.
 	 */
-	public const debug: boolean = true;
+	public static val debug: boolean = true;
 
 	/**
 	 * Class variable for defining the debug message prompt.
 	 */
-	protected const prompt: String = "MonteCarloPath> ";
+	protected static val prompt: String = "MonteCarloPath> ";
 
 	/**
 	 * Class variable for determining which field in the stock data should be
 	 * used.  This is currently set to point to the 'closing price', as
 	 * defined in class RatePath.
 	 */
-	public const datumfield: int = RatePath.datumfield;
+	public static val datumfield: int = RatePath.datumfield;
 
 	//------------------------------------------------------------------------
 	// Instance variables.
@@ -90,6 +89,7 @@ public class MonteCarloPath extends PathId {
 	//------------------------------------------------------------------------
 	// Constructors.
 	//------------------------------------------------------------------------
+
 	/**
 	 * Default constructor.  Needed by the HPT library to start create
 	 * new instances of this class.  The instance variables for this should
@@ -112,7 +112,7 @@ public class MonteCarloPath extends PathId {
 	 * @exception DemoException Thrown if there is a problem initialising the
 	 *                          object's instance variables.
 	 */
-	public def this(var returnPath: ReturnPath, var nTimeSteps: int): MonteCarloPath throws DemoException = {
+	public def this(var returnPath: ReturnPath, var nTimeSteps: int): MonteCarloPath = {
 		/**
 		 * These instance variables are members of PathId class.
 		 */
@@ -120,6 +120,7 @@ public class MonteCarloPath extends PathId {
 		this.nTimeSteps = nTimeSteps;
 		this.pathValue = new Array[double](nTimeSteps);
 		this.fluctuations = new Array[double](nTimeSteps);
+
 		/**
 		 * Whether to debug, and how.
 		 */
@@ -143,7 +144,7 @@ public class MonteCarloPath extends PathId {
 	 * @exception DemoException Thrown if there is a problem initialising the
 	 *                          object's instance variables.
 	 */
-	public def this(var pathId: PathId, var returnDefinition: int, var expectedReturnRate: double, var volatility: double, var nTimeSteps: int): MonteCarloPath throws DemoException = {
+	public def this(var pathId: PathId, var returnDefinition: int, var expectedReturnRate: double, var volatility: double, var nTimeSteps: int): MonteCarloPath = {
 		/**
 		 * These instance variables are members of PathId class.
 		 * Invoking with this particular signature should point to the
@@ -156,6 +157,7 @@ public class MonteCarloPath extends PathId {
 		this.nTimeSteps         = nTimeSteps;
 		this.pathValue          = new Array[double](nTimeSteps);
 		this.fluctuations       = new Array[double](nTimeSteps);
+
 		/**
 		 * Whether to debug, and how.
 		 */
@@ -196,6 +198,7 @@ public class MonteCarloPath extends PathId {
 		this.nTimeSteps         = nTimeSteps;
 		this.pathValue          = new Array[double](nTimeSteps);
 		this.fluctuations       = new Array[double](nTimeSteps);
+
 		/**
 		 * Whether to debug, and how.
 		 */
@@ -213,20 +216,18 @@ public class MonteCarloPath extends PathId {
 
 	/**
 	 * Accessor method for private instance variable <code>fluctuations</code>.
-	 *
 	 * @return Value of instance variable <code>fluctuations</code>.
 	 * @exception DemoException thrown if instance variable <code>fluctuations</code>
 	 * is undefined.
 	 */
-	public def get_fluctuations(): Array[double] throws DemoException = {
-		//if (this.fluctuations == null)
-		//	throw new DemoException("Variable fluctuations is undefined!");
+	public def get_fluctuations(): Array[double] = {
+		// if ( this.fluctuations == null )
+		//   throw new DemoException("Variable fluctuations is undefined!");
 		return (this.fluctuations);
 	}
 
 	/**
 	 * Set method for private instance variable <code>fluctuations</code>.
-	 *
 	 * @param fluctuations the value to set for the instance variable
 	 * <code>fluctuations</code>.
 	 */
@@ -236,20 +237,18 @@ public class MonteCarloPath extends PathId {
 
 	/**
 	 * Accessor method for private instance variable <code>pathValue</code>.
-	 *
 	 * @return Value of instance variable <code>pathValue</code>.
 	 * @exception DemoException thrown if instance variable <code>pathValue</code>
 	 * is undefined.
 	 */
-	public def get_pathValue(): Array[double] throws DemoException = {
-		//if (this.pathValue == null)
-		//	throw new DemoException("Variable pathValue is undefined!");
+	public def get_pathValue(): Array[double] = {
+		// if ( this.pathValue == null )
+		//  throw new DemoException("Variable pathValue is undefined!");
 		return (this.pathValue);
 	}
 
 	/**
 	 * Set method for private instance variable <code>pathValue</code>.
-	 *
 	 * @param pathValue the value to set for the instance variable <code>pathValue</code>.
 	 */
 	public def set_pathValue(var pathValue: Array[double]): void = {
@@ -258,20 +257,18 @@ public class MonteCarloPath extends PathId {
 
 	/**
 	 * Accessor method for private instance variable <code>returnDefinition</code>.
-	 *
 	 * @return Value of instance variable <code>returnDefinition</code>.
 	 * @exception DemoException thrown if instance variable <code>returnDefinition</code>
 	 * is undefined.
 	 */
-	public def get_returnDefinition(): int throws DemoException = {
-		if (this.returnDefinition == 0)
+	public def get_returnDefinition(): int = {
+		if ( this.returnDefinition == 0 )
 			throw new DemoException("Variable returnDefinition is undefined!");
 		return (this.returnDefinition);
 	}
 
 	/**
 	 * Set method for private instance variable <code>returnDefinition</code>.
-	 *
 	 * @param returnDefinition the value to set for the instance variable
 	 * <code>returnDefinition</code>.
 	 */
@@ -281,42 +278,39 @@ public class MonteCarloPath extends PathId {
 
 	/**
 	 * Accessor method for private instance variable <code>expectedReturnRate</code>.
-	 *
 	 * @return Value of instance variable <code>expectedReturnRate</code>.
 	 * @exception DemoException thrown if instance variable <code>expectedReturnRate</code>
 	 * is undefined.
 	 */
-	public def get_expectedReturnRate(): double throws DemoException = {
-		if (this.expectedReturnRate == Double.NaN)
+	public def get_expectedReturnRate(): double = {
+		if ( this.expectedReturnRate == Double.NaN )
 			throw new DemoException("Variable expectedReturnRate is undefined!");
 		return (this.expectedReturnRate);
 	}
 
 	/**
 	 * Set method for private instance variable <code>expectedReturnRate</code>.
-	 *
 	 * @param expectedReturnRate the value to set for the instance variable
 	 * <code>expectedReturnRate</code>.
 	 */
 	public def set_expectedReturnRate(var expectedReturnRate: double): void = {
 		this.expectedReturnRate = expectedReturnRate;
 	}
+
 	/**
 	 * Accessor method for private instance variable <code>volatility</code>.
-	 *
 	 * @return Value of instance variable <code>volatility</code>.
 	 * @exception DemoException thrown if instance variable <code>volatility</code>
 	 * is undefined.
 	 */
-	public def get_volatility(): double throws DemoException = {
-		if (this.volatility == Double.NaN)
+	public def get_volatility(): double = {
+		if ( this.volatility == Double.NaN )
 			throw new DemoException("Variable volatility is undefined!");
 		return (this.volatility);
 	}
 
 	/**
 	 * Set method for private instance variable <code>volatility</code>.
-	 *
 	 * @param volatility the value to set for the instance variable
 	 * <code>volatility</code>.
 	 */
@@ -326,20 +320,18 @@ public class MonteCarloPath extends PathId {
 
 	/**
 	 * Accessor method for private instance variable <code>nTimeSteps</code>.
-	 *
 	 * @return Value of instance variable <code>nTimeSteps</code>.
 	 * @exception DemoException thrown if instance variable <code>nTimeSteps</code>
 	 * is undefined.
 	 */
-	public def get_nTimeSteps(): int throws DemoException = {
-		if (this.nTimeSteps == 0)
+	public def get_nTimeSteps(): int = {
+		if ( this.nTimeSteps == 0 )
 			throw new DemoException("Variable nTimeSteps is undefined!");
 		return (this.nTimeSteps);
 	}
 
 	/**
 	 * Set method for private instance variable <code>nTimeSteps</code>.
-	 *
 	 * @param nTimeSteps the value to set for the instance variable
 	 * <code>nTimeSteps</code>.
 	 */
@@ -349,20 +341,18 @@ public class MonteCarloPath extends PathId {
 
 	/**
 	 * Accessor method for private instance variable <code>pathStartValue</code>.
-	 *
 	 * @return Value of instance variable <code>pathStartValue</code>.
 	 * @exception DemoException thrown if instance variable <code>pathStartValue</code>
 	 * is undefined.
 	 */
-	public def get_pathStartValue(): double throws DemoException = {
-		if (this.pathStartValue == Double.NaN)
+	public def get_pathStartValue(): double = {
+		if ( this.pathStartValue == Double.NaN )
 			throw new DemoException("Variable pathStartValue is undefined!");
 		return (this.pathStartValue);
 	}
 
 	/**
 	 * Set method for private instance variable <code>pathStartValue</code>.
-	 *
 	 * @param pathStartValue the value to set for the instance variable
 	 * <code>pathStartValue</code>.
 	 */
@@ -371,6 +361,7 @@ public class MonteCarloPath extends PathId {
 	}
 
 	//------------------------------------------------------------------------
+
 	/**
 	 * Method for copying the suitable instance variable from a
 	 * <code>ReturnPath</code> object.
@@ -380,7 +371,7 @@ public class MonteCarloPath extends PathId {
 	 * @exception DemoException thrown if there is a problem accessing the
 	 *                          instance variables from the target objetct.
 	 */
-	private def copyInstanceVariables(var obj: ReturnPath): void throws DemoException = {
+	private def copyInstanceVariables(var obj: ReturnPath): void = {
 		//
 		// Instance variables defined in the PathId object.
 		set_name(obj.get_name());
@@ -427,12 +418,12 @@ public class MonteCarloPath extends PathId {
 	 * @exception DemoException thrown if there was a problem with the data
 	 *                          file.
 	 */
-	public def writeFile(var dirName: String, var filename: String): void throws DemoException = {
+	public def writeFile(var dirName: String, var filename: String): void = {
 		try {
-			var ratesFile: java.io.File = new File(dirName, filename);
-			if (ratesFile.exists() && ! ratesFile.canWrite())
+			var ratesFile: x10.io.File = new File(dirName, filename);
+			if ( ratesFile.exists() && ! ratesFile.canWrite() )
 				throw new DemoException("Cannot write to specified filename!");
-			var out: java.io.PrintWriter = new PrintWriter(new BufferedWriter(
+			var out: x10.io.PrintWriter = new PrintWriter(new BufferedWriter(
 						new FileWriter(ratesFile)));
 			for (var i: int = 0; i < nTimeSteps; i++) {
 				out.print("19990101,");
@@ -443,7 +434,7 @@ public class MonteCarloPath extends PathId {
 				out.println("0.0000,0.0000");
 			}
 			out.close();
-		} catch (var ioex: java.io.IOException) {
+		} catch (var ioex: x10.io.IOException) {
 			throw new DemoException(ioex.toString());
 		}
 	}
@@ -457,7 +448,7 @@ public class MonteCarloPath extends PathId {
 	 * @exception DemoException thrown if there was a problem creating
 	 *            the RatePath object.
 	 */
-	public def getRatePath(): RatePath throws DemoException = {
+	public def getRatePath(): RatePath = {
 		return (new RatePath(this));
 	}
 
@@ -473,13 +464,13 @@ public class MonteCarloPath extends PathId {
 	 * @exception DemoException thrown if there are any problems with
 	 *                          the computation.
 	 */
-	public def computeFluctuationsGaussian(var randomSeed: long): void throws DemoException = {
-		if (nTimeSteps > fluctuations.length)
+	public def computeFluctuationsGaussian(var randomSeed: long): void = {
+		if ( nTimeSteps > fluctuations.length )
 			throw new DemoException("Number of timesteps requested is greater than the allocated array!");
 		//
 		// First, make use of the passed in seed value.
 		var rnd: Random;
-		if (randomSeed == -1) {
+		if ( randomSeed == -1 ) {
 			rnd = new Random();
 		} else {
 			rnd = new Random(randomSeed);
@@ -488,19 +479,21 @@ public class MonteCarloPath extends PathId {
 		// Determine the mean and standard-deviation, from the mean-drift and volatility.
 		var mean: double = (expectedReturnRate-0.5*volatility*volatility)*get_dTime();
 		var sd: double = volatility*Math.sqrt(get_dTime());
-		var gauss: doublevar meanGauss: double = 0.0var variance: double = 0.0;
-		for (var i: int = 0; i < nTimeSteps; i++) {
+		var gauss: double;
+		var meanGauss: double = 0.0;
+		var variance: double = 0.0;
+		for ( var i: int = 0; i < nTimeSteps; i++ ) {
 			gauss = rnd.nextGaussian();
 			meanGauss += gauss;
 			variance += (gauss*gauss);
 			//
 			// Now map this onto a general Gaussian of given mean and variance.
 			fluctuations(i) = mean + sd*gauss;
-			//dbgPrintln("gauss = "+gauss+" fluctuations = "+fluctuations[i]);
+			//      dbgPrintln("gauss = "+gauss+" fluctuations = "+fluctuations[i]);
 		}
-		meanGauss /= (double)nTimeSteps;
-		variance /= (double)nTimeSteps;
-		//dbgPrintln("meanGauss = "+meanGauss+" variance = "+variance);
+		meanGauss /= nTimeSteps as double;
+		variance /= nTimeSteps as double;
+		//    dbgPrintln("meanGauss = "+meanGauss+" variance = "+variance);
 	}
 
 	/**
@@ -514,7 +507,7 @@ public class MonteCarloPath extends PathId {
 	 * @exception DemoException thrown if there are any problems with
 	 *                          the computation.
 	 */
-	public def computeFluctuationsGaussian(): void throws DemoException = {
+	public def computeFluctuationsGaussian(): void = {
 		// TODO: support unary operators in X10
 		computeFluctuationsGaussian(-1L);
 	}
@@ -528,9 +521,9 @@ public class MonteCarloPath extends PathId {
 	 * @exception DemoException thrown if there are any problems with
 	 *                          the computation.
 	 */
-	public def computePathValue(var startValue: double): void throws DemoException = {
+	public def computePathValue(var startValue: double): void = {
 		pathValue(0) = startValue;
-		if (returnDefinition == ReturnPath.COMPOUNDED ||
+		if ( returnDefinition == ReturnPath.COMPOUNDED ||
 				returnDefinition == ReturnPath.NONCOMPOUNDED) {
 			for (var i: int = 1; i < nTimeSteps; i++ ) {
 				pathValue(i) = pathValue(i-1) * Math.exp(fluctuations(i));

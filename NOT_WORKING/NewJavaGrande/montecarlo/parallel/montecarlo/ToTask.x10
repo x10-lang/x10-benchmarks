@@ -5,7 +5,7 @@
  *  This file is part of X10 Test.
  *
  */
-package montecarlo;
+package montecarlo.parallel.montecarlo;
 
 /**
  * X10 port of montecarlo benchmark from Section 2 of Java Grande Forum Benchmark Suite (Version 2.0).
@@ -16,7 +16,7 @@ package montecarlo;
  * 1) Remove Java package structure
  * 2) Add declaration to extend x10.lang.Object
  */
-public class ToTask implements java.io.Serializable {
+public class ToTask {//implements java.io.Serializable {
 	private var header: String;
 	private var randomSeed: long;
 

@@ -5,7 +5,7 @@
  *  This file is part of X10 Test.
  *
  */
-package montecarlo;
+package montecarlo.parallel.montecarlo;
 
 /**
  * X10 port of montecarlo benchmark from Section 2 of Java Grande Forum Benchmark Suite (Version 2.0).
@@ -15,9 +15,9 @@ package montecarlo;
 public class CallAppDemo {
 	protected var size: int;
 	// protected int[] datasizes = { 10000, 60000 };
-	protected var datasizes: Array[int] = { 1000, 60000 };
+	protected var datasizes: Array[int] = [ 1000, 60000 ];
 	var input: Array[int] = new Array[int](2);
-	var ap: nullable<AppDemo> = null;
+	var ap: AppDemo = null;
 
 	public def initialise(): void = {
 

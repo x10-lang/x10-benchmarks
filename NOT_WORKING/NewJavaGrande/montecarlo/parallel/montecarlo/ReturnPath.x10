@@ -5,10 +5,7 @@
  *  This file is part of X10 Test.
  *
  */
-package montecarlo;
-
-import x10.lang.Boolean;
-import java.lang.Double;;
+package montecarlo.parallel.montecarlo;
 
 /**
  * X10 port of montecarlo benchmark from Section 2 of Java Grande Forum Benchmark Suite (Version 2.0).
@@ -31,27 +28,27 @@ public class ReturnPath extends PathId {
 	/**
 	 * A class variable, for setting whether to print debug messages or not.
 	 */
-	public const debug: boolean = true;
+	public static val debug: boolean = true;
 
 	/**
 	 * Class variable, for defining the prompt to print in front of debug
 	 * messages.
 	 */
-	protected const prompt: String = "ReturnPath> ";
+	protected static val prompt: String = "ReturnPath> ";
 
 	/**
 	 * Flag for indicating one of the return definitions, via:
 	 *       u_i = \ln { \frac { S_i } { S_ { i-1 } } }
 	 * corresponding to the instantaneous compounded return.
 	 */
-	public const COMPOUNDED: int = 1;
+	public static val COMPOUNDED: int = 1;
 
 	/**
 	 * Flag for indicating one of the return definitions, via:
 	 *       u_i = \frac { S_i - S_ { i-1 } } { S_i }
 	 * corresponding to the instantaneous non-compounded return.
 	 */
-	public const NONCOMPOUNDED: int = 2;
+	public static val NONCOMPOUNDED: int = 2;
 
 	//------------------------------------------------------------------------
 	// Instance variables.
@@ -141,7 +138,7 @@ public class ReturnPath extends PathId {
 	 * @return Value of instance variable <code>pathValue</code>.
 	 * @exception DemoException thrown if instance variable <code>pathValue</code> is undefined.
 	 */
-	public def get_pathValue(): Array[double] throws DemoException = {
+	public def get_pathValue(): Array[double] = {
 		// (VIVEK) The following test is no longer necessary because pathValue is not nullable
 		// if (this.pathValue == null)
 		// throw new DemoException("Variable pathValue is undefined!");
@@ -161,7 +158,7 @@ public class ReturnPath extends PathId {
 	 * @return Value of instance variable <code>nPathValue</code>.
 	 * @exception DemoException thrown if instance variable <code>nPathValue</code> is undefined.
 	 */
-	public def get_nPathValue(): int throws DemoException = {
+	public def get_nPathValue(): int = {
 		if (this.nPathValue == 0)
 			throw new DemoException("Variable nPathValue is undefined!");
 		return (this.nPathValue);
@@ -180,7 +177,7 @@ public class ReturnPath extends PathId {
 	 * @return Value of instance variable <code>returnDefinition</code>.
 	 * @exception DemoException thrown if instance variable <code>returnDefinition</code> is undefined.
 	 */
-	public def get_returnDefinition(): int throws DemoException = {
+	public def get_returnDefinition(): int = {
 		if (this.returnDefinition == 0)
 			throw new DemoException("Variable returnDefinition is undefined!");
 		return (this.returnDefinition);
@@ -199,7 +196,7 @@ public class ReturnPath extends PathId {
 	 * @return Value of instance variable <code>expectedReturnRate</code>.
 	 * @exception DemoException thrown if instance variable <code>expectedReturnRate</code> is undefined.
 	 */
-	public def get_expectedReturnRate(): double throws DemoException = {
+	public def get_expectedReturnRate(): double = {
 		if (this.expectedReturnRate == Double.NaN)
 			throw new DemoException("Variable expectedReturnRate is undefined!");
 		return (this.expectedReturnRate);
@@ -218,7 +215,7 @@ public class ReturnPath extends PathId {
 	 * @return Value of instance variable <code>volatility</code>.
 	 * @exception DemoException thrown if instance variable <code>volatility</code> is undefined.
 	 */
-	public def get_volatility(): double throws DemoException = {
+	public def get_volatility(): double = {
 		if (this.volatility == Double.NaN)
 			throw new DemoException("Variable volatility is undefined!");
 		return (this.volatility);
@@ -237,7 +234,7 @@ public class ReturnPath extends PathId {
 	 * @return Value of instance variable <code>volatility2</code>.
 	 * @exception DemoException thrown if instance variable <code>volatility2</code> is undefined.
 	 */
-	public def get_volatility2(): double throws DemoException = {
+	public def get_volatility2(): double = {
 		if (this.volatility2 == Double.NaN)
 			throw new DemoException("Variable volatility2 is undefined!");
 		return (this.volatility2);
@@ -256,7 +253,7 @@ public class ReturnPath extends PathId {
 	 * @return Value of instance variable <code>mean</code>.
 	 * @exception DemoException thrown if instance variable <code>mean</code> is undefined.
 	 */
-	public def get_mean(): double throws DemoException = {
+	public def get_mean(): double = {
 		if (this.mean == Double.NaN)
 			throw new DemoException("Variable mean is undefined!");
 		return (this.mean);
@@ -275,7 +272,7 @@ public class ReturnPath extends PathId {
 	 * @return Value of instance variable <code>variance</code>.
 	 * @exception DemoException thrown if instance variable <code>variance</code> is undefined.
 	 */
-	public def get_variance(): double throws DemoException = {
+	public def get_variance(): double = {
 		if (this.variance == Double.NaN)
 			throw new DemoException("Variable variance is undefined!");
 		return (this.variance);
@@ -298,7 +295,7 @@ public class ReturnPath extends PathId {
 	 *
 	 * @exception DemoException thrown one tries to obtain an undefined variable.
 	 */
-	public def computeExpectedReturnRate(): void throws DemoException = {
+	public def computeExpectedReturnRate(): void = {
 		this.expectedReturnRate = mean/get_dTime() + 0.5*volatility2;
 	}
 
@@ -311,7 +308,7 @@ public class ReturnPath extends PathId {
 	 * @exception DemoException thrown if one of the quantites in the
 	 *                          computation are undefined.
 	 */
-	public def computeVolatility(): void throws DemoException = {
+	public def computeVolatility(): void = {
 		if (this.variance == Double.NaN)
 			throw new DemoException("Variable variance is not defined!");
 		this.volatility2 = variance / get_dTime();
@@ -325,14 +322,14 @@ public class ReturnPath extends PathId {
 	 * @exception DemoException thrown if <code>nPathValue</code> is
 	 *            undefined.
 	 */
-	public def computeMean(): void throws DemoException = {
+	public def computeMean(): void = {
 		if (this.nPathValue == 0)
 			throw new DemoException("Variable nPathValue is undefined!");
 		this.mean = 0.0;
 		for (var i: int = 1; i < nPathValue; i++) {
 			mean += pathValue(i);
 		}
-		this.mean /= ((double)(nPathValue - 1.0));
+		this.mean /= ((nPathValue - 1.0) as double);
 	}
 
 	/**
@@ -342,14 +339,14 @@ public class ReturnPath extends PathId {
 	 * @exception DemoException thrown if the <code>mean</code> or
 	 *            <code>nPathValue</code> values are undefined.
 	 */
-	public def computeVariance(): void throws DemoException = {
+	public def computeVariance(): void = {
 		if (this.mean == Double.NaN || this.nPathValue == 0)
 			throw new DemoException("Variable mean and/or nPathValue are undefined!");
 		this.variance = 0.0;
 		for (var i: int = 1; i < nPathValue; i++) {
 			variance += (pathValue(i) - mean)*(pathValue(i) - mean);
 		}
-		this.variance /= ((double)(nPathValue - 1.0));
+		this.variance /= ((nPathValue - 1.0) as double);
 	}
 
 	/**
@@ -359,7 +356,7 @@ public class ReturnPath extends PathId {
 	 * @exception DemoException thrown if there is a problem reading any
 	 *            variables.
 	 */
-	public def estimatePath(): void throws DemoException = {
+	public def estimatePath(): void = {
 		computeMean();
 		computeVariance();
 		computeExpectedReturnRate();

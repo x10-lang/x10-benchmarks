@@ -5,14 +5,14 @@
  *  This file is part of X10 Test.
  *
  */
-package montecarlo;
+package montecarlo.distributed.montecarlo;
 
-import java.io.*;
 import jgfutil.*;;
 
 /**
  * X10 port of montecarlo benchmark from Section 3 of Java Grande Forum Benchmark Suite (Version 2.0).
  *
+ * @author Vivek Sarkar (vsarkar@us.ibm.com)
  * @author vj
  *
  * Porting issues identified:
@@ -30,7 +30,7 @@ public class JGFMonteCarloBench extends CallAppDemo implements JGFSection3 {
 	}
 
 	public def JGFapplication(): void = {
-		System.out.println("JGFMonteCarloBench size = " + datasizes(size));
+		Console.OUT.println("JGFMonteCarloBench size = " + datasizes(size));
 		JGFInstrumentor.startTimer("Section3:MonteCarlo:Run");
 
 		runiters();
@@ -41,18 +41,18 @@ public class JGFMonteCarloBench extends CallAppDemo implements JGFSection3 {
 	}
 
 	public def JGFvalidate(): void = {
-		//double[]  refval = { -0.0333976656762814D, -0.03215796752868655D };
-		var refval: Array[double] = { -0.03234469082617506D, -0.03215796752868655D };
+		// double[] refval = { -0.0333976656762814D, -0.03215796752868655D };
+		var refval: Array[double] = [ -0.03234469082617506D, -0.03215796752868655D ];
 		var dev: double = Math.abs(AppDemo.JGFavgExpectedReturnRateMC() - refval(size));
 		if (dev > 1.0e-12 ) {
-			System.out.println("Validation failed");
-			System.out.println(" expectedReturnRate = " + AppDemo.JGFavgExpectedReturnRateMC() + "  " + dev + "  " + size);
+			Console.OUT.println("Validation failed");
+			Console.OUT.println(" expectedReturnRate = " + AppDemo.JGFavgExpectedReturnRateMC() + "  " + dev + "  " + size);
 			throw new Error("Validation failed");
 		}
 	}
 
 	public def JGFtidyup(): void = {
-		System.gc();
+		//System.gc();
 	}
 
 	public def JGFrun(var size: int): void = {
@@ -70,7 +70,7 @@ public class JGFMonteCarloBench extends CallAppDemo implements JGFSection3 {
 
 		JGFInstrumentor.stopTimer("Section3:MonteCarlo:Total");
 
-		JGFInstrumentor.addOpsToTimer("Section3:MonteCarlo:Run", (double) input(1) );
+		JGFInstrumentor.addOpsToTimer("Section3:MonteCarlo:Run", input(1) as double );
 		JGFInstrumentor.addOpsToTimer("Section3:MonteCarlo:Total", 1);
 
 		JGFInstrumentor.printTimer("Section3:MonteCarlo:Run");

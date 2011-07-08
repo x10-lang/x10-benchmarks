@@ -5,9 +5,7 @@
  *  This file is part of X10 Test.
  *
  */
-package montecarlo;
-
-import java.lang.Double;;
+package montecarlo.parallel.montecarlo;
 
 /**
  * X10 port of montecarlo benchmark from Section 2 of Java Grande Forum Benchmark Suite (Version 2.0).
@@ -26,12 +24,12 @@ public class PriceStock extends Universal {
 	 * Class variable for determining whether to switch on debug output or
 	 * not.
 	 */
-	public const DEBUG: boolean = true;
+	public static val DEBUG: boolean = true;
 
 	/**
 	 * Class variable for defining the debug message prompt.
 	 */
-	protected const prompt: String = "PriceStock> ";
+	protected static val prompt: String = "PriceStock> ";
 
 	//------------------------------------------------------------------------
 	// Instance variables.
@@ -95,8 +93,8 @@ public class PriceStock extends Universal {
 	 * @param obj Object representing data which are common to all tasks.
 	 */
 	public def setInitAllTasks(var obj: ToInitAllTasks): void = {
-		final val initAllTasks: ToInitAllTasks = (ToInitAllTasks) obj;
-		finish async (mcPath) {
+		val initAllTasks: ToInitAllTasks = obj as ToInitAllTasks;
+		finish async at (mcPath) {
 			mcPath.set_name(initAllTasks.get_name());
 			mcPath.set_startDate(initAllTasks.get_startDate());
 			mcPath.set_endDate(initAllTasks.get_endDate());
@@ -120,7 +118,7 @@ public class PriceStock extends Universal {
 	 * @param obj Object representing the data which defines a given task.
 	 */
 	public def setTask(var obj: x10.lang.Object): void = {
-		var task: ToTask = (ToTask) obj;
+		var task: ToTask = obj as ToTask;
 		this.taskHeader     = task.get_header();
 		this.randomSeed     = task.get_randomSeed();
 	}
@@ -148,12 +146,13 @@ public class PriceStock extends Universal {
 
 	/**
 	 * Method which returns the results of a computation back to the caller.
+	 *
 	 * @return An object representing the computed results.
 	 */
 	public def getResult(): x10.lang.Object = {
 		var resultHeader: String = "Result of task with Header = "+taskHeader+": randomSeed = "+randomSeed+": pathStartValue = "+pathStartValue;
-		var res: ToResult = new ToResult(resultHeader,expectedReturnRate,volatility,
-									volatility2,finalStockPrice,pathValue);
+		var res: ToResult = new ToResult(resultHeader, expectedReturnRate, volatility,
+									volatility2, finalStockPrice, pathValue);
 		return res;
 	}
 }

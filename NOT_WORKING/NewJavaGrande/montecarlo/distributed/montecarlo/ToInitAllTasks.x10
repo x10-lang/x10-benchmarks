@@ -5,35 +5,14 @@
  *  This file is part of X10 Test.
  *
  */
-package montecarlo;/*
- *
- * (C) Copyright IBM Corporation 2006
- *
- *  This file is part of X10 Test.
- *
- */
-package montecarlo;
+package montecarlo.distributed.montecarlo;
 
 /**
  * X10 port of montecarlo benchmark from Section 2 of Java Grande Forum Benchmark Suite (Version 2.0).
  *
  * @author Vivek Sarkar (vsarkar@us.ibm.com)
  */
-public value ToInitAllTasks {.{.{*
- *
- * (C) Copyright IBM Corporation 2006
- *
- *  This file is part of X10 Test.
- *
- */
-package montecarlo;
-
-/**
- * X10 port of montecarlo benchmark from Section 2 of Java Grande Forum Benchmark Suite (Version 2.0).
- *
- * @author Vivek Sarkar (vsarkar@us.ibm.com)
- */
-public value ToInitAllTasks {
+public class ToInitAllTasks {
 	private val header: String;
 	private val name: String;
 	private val startDate: int;
@@ -95,7 +74,7 @@ public value ToInitAllTasks {
 	 * @exception DemoException thrown if there is a problem accessing the
 	 *                          instance variables from the target objetct.
 	 */
-	public def this(var obj: ReturnPath, var nTimeSteps_: int, var pathStartValue_: double): ToInitAllTasks throws DemoException = {
+	public def this(var obj: ReturnPath, var nTimeSteps_: int, var pathStartValue_: double): ToInitAllTasks = {
 		//
 		// Instance variables defined in the PathId object.
 		header = ""; //vj
