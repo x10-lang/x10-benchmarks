@@ -6,6 +6,7 @@
  *
  */
 package montecarlo.distributed.montecarlo;
+import x10.compiler.*;
 
 /**
  * X10 port of montecarlo benchmark from Section 2 of Java Grande Forum Benchmark Suite (Version 2.0).
@@ -104,7 +105,7 @@ public class PathId extends Universal {
 	 * Set method for private instance variable <code>name</code>.
 	 * @param name the value to set for the instance variable <code>name</code>.
 	 */
-	public def set_name(var name: String): void = {
+	@NonEscaping final public def set_name(var name: String): void = {
 		this.name = name;
 	}
 
@@ -123,7 +124,7 @@ public class PathId extends Universal {
 	 * Set method for private instance variable <code>startDate</code>.
 	 * @param startDate the value to set for the instance variable <code>startDate</code>.
 	 */
-	public def set_startDate(var startDate: int): void = {
+	@NonEscaping final public def set_startDate(var startDate: int): void = {
 		this.startDate = startDate;
 	}
 
@@ -142,7 +143,7 @@ public class PathId extends Universal {
 	 * Set method for private instance variable <code>endDate</code>.
 	 * @param endDate the value to set for the instance variable <code>endDate</code>.
 	 */
-	public def set_endDate(var endDate: int): void = {
+	@NonEscaping final public def set_endDate(var endDate: int): void = {
 		this.endDate = endDate;
 	}
 
@@ -161,7 +162,7 @@ public class PathId extends Universal {
 	 * Set method for private instance variable <code>dTime</code>.
 	 * @param dTime the value to set for the instance variable <code>dTime</code>.
 	 */
-	public def set_dTime(var dTime: double): void = {
+	@NonEscaping final public def set_dTime(var dTime: double): void = {
 		this.dTime = dTime;
 	}
 
@@ -175,7 +176,7 @@ public class PathId extends Universal {
 	 * @exception DemoException thrown if the values to be copied contain
 	 *                          any undefined objects.
 	 */
-	public def copyInstanceVariables(var obj: PathId): void = {
+	@NonEscaping final public def copyInstanceVariables(var obj: PathId): void = {
 		this.name      = obj.get_name();
 		this.startDate = obj.get_startDate();
 		this.endDate   = obj.get_endDate();

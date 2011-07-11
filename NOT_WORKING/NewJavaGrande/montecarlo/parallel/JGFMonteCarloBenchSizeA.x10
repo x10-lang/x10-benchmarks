@@ -5,10 +5,11 @@
  *  This file is part of X10 Test.
  *
  */
-import montecarlo.*;
+package montecarlo.parallel;
 
+import montecarlo.parallel.*;
 import jgfutil.*;
-import harness.x10Test;;
+import harness.x10Test;
 
 /**
  * X10 port of montecarlo benchmark from Section 2 of Java Grande Forum Benchmark Suite (Version 2.0).

@@ -7,6 +7,7 @@
  */
 package montecarlo.parallel.montecarlo;
 
+import x10.compiler.NonEscaping;
 
 /**
  * X10 port of montecarlo benchmark from Section 2 of Java Grande Forum Benchmark Suite (Version 2.0).
@@ -73,7 +74,7 @@ public class Universal {
 	 * set method for private instance variable <code>DEBUG</code>.
 	 * @param DEBUG the value to set for the instance variable <code>DEBUG</code>.
 	 */
-	public def set_DEBUG(var debug: boolean): void = {
+	@NonEscaping final public def set_DEBUG(var debug: boolean): void = {
 		this.debug = debug;
 	}
 
@@ -106,7 +107,8 @@ public class Universal {
 	 * Set method for private instance variable <code>prompt</code>.
 	 * @param prompt the value to set for the instance variable <code>prompt</code>.
 	 */
-	public def set_prompt(var prompt: String): void = {
+	
+	@NonEscaping final def set_prompt(var prompt: String): void = {
 		this.prompt = prompt;
 	}
 

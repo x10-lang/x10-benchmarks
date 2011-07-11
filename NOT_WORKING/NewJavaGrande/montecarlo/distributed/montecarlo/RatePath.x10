@@ -7,6 +7,8 @@
  */
 package montecarlo.distributed.montecarlo;
 
+import x10.util.*;
+
 /**
  * X10 port of montecarlo benchmark from Section 2 of Java Grande Forum Benchmark Suite (Version 2.0).
  *
@@ -100,7 +102,7 @@ public class RatePath extends PathId {
 	 * @exception DemoException thrown if there is a problem reading in
 	 *                          the data file.
 	 */
-	public def this(var dirName: String, var filename: String): RatePath = {
+	public def this(var dirName: Box[String], var filename: String): RatePath = {
 		set_prompt(prompt);
 		set_DEBUG(debug);
 		readRatesFile(dirName, filename);
@@ -128,7 +130,7 @@ public class RatePath extends PathId {
 		set_prompt(prompt);
 		set_DEBUG(debug);
 		this.pathValue = pathValue;
-		this.nAcceptedPathValue = pathValue.length;
+		this.nAcceptedPathValue = pathValue.size;
 	}
 
 	/**
@@ -179,7 +181,7 @@ public class RatePath extends PathId {
 		set_prompt(prompt);
 		set_DEBUG(debug);
 		this.pathValue = new Array[double](pathValueLength);
-		this.nAcceptedPathValue = pathValue.length;
+		this.nAcceptedPathValue = pathValue.size;
 	}
 	//------------------------------------------------------------------------
 	// Methods.
@@ -191,12 +193,12 @@ public class RatePath extends PathId {
 	 *
 	 * @param operandPath the path value array to use for the update.
 	 * @exception DemoException thrown if there is a mismatch between the
-	 *            lengths of the operand and target arrays.
+	 *            sizes of the operand and target arrays.
 	 */
 	public def inc_pathValue(var operandPath: Array[double]): void = {
-		if (pathValue.length != operandPath.length)
+		if (pathValue.size != operandPath.size)
 			throw new DemoException("The path to update has a different size to the path to update with!");
-		for (var i: int = 0; i<pathValue.length; i++)
+		for (var i: int = 0; i<pathValue.size; i++)
 			pathValue(i) += operandPath(i);
 	}
 
@@ -206,13 +208,13 @@ public class RatePath extends PathId {
 	 * @param scale the constant with which to multiply to all the path
 	 *        values.
 	 * @exception DemoException thrown if there is a mismatch between the
-	 *            lengths of the operand and target arrays.
+	 *            sizes of the operand and target arrays.
 	 */
 	public def inc_pathValue(var scale: double): void = {
 		// (VIVEK) Remove null checks on non-nullable field (pathValue)
 		//if (pathValue == null)
 		//	throw new DemoException("Variable pathValue is undefined!");
-		for (var i: int = 0; i<pathValue.length; i++)
+		for (var i: int = 0; i<pathValue.size; i++)
 			pathValue(i) *= scale;
 	}
 	//------------------------------------------------------------------------
@@ -273,7 +275,7 @@ public class RatePath extends PathId {
 	 * @return The last value in the rate path.
 	 */
 	public def getEndPathValue(): double = {
-		return (getPathValue(pathValue.length-1));
+		return (getPathValue(pathValue.size-1));
 	}
 
 	/**
@@ -389,31 +391,33 @@ public class RatePath extends PathId {
 	 * @exception DemoException thrown if there was a problem with the data
 	 *                          file.
 	 */
-	private def readRatesFile(var ndirName: nullable<String>, var filename: String): void = {
-		var dirName: String = ndirName as String;
-		var ratesFile: x10.io.File = new File(dirName, filename);
-		var in: x10.io.BufferedReader;
+	private def readRatesFile(var ndirName: Box[String], var filename: String): void = {
+		var dirName: String = ndirName.value as String;
+		var ratesFile: x10.io.File = new x10.io.File(dirName, filename);
+		var inn: x10.io.BufferedReader;
 		if (!ratesFile.canRead()) {
 			throw new DemoException("Cannot read the file "+ratesFile.toString());
 		}
 		try {
-			in = new BufferedReader(new FileReader(ratesFile));
+			inn = new BufferedReader(new FileReader(ratesFile));
 		} catch (var fnfex: FileNotFoundException) {
 			throw new DemoException(fnfex.toString());
 		}
 		//
 		// Proceed to read all the lines of data into a Vector object.
-		var iLine: int = 0var initNlines: int = 100var nLines: int = 0;
+		var iLine: int = 0;
+		var initNlines: int = 100;
+		var nLines: int = 0;
 
-		var naLine: nullable<String>;
-		var allLines: java.util.Vector = new Vector(initNlines);
+		var naLine: Box[String];
+		var allLines: x10.util.Vector = new Vector(initNlines);
 		try {
-			while ((naLine = in.readLine()) != null) {
+			while ((naLine = inn.readLine()) != null) {
 				iLine++;
 				//
 				// Note, I'm not entirely sure whether the object passed in is copied
 				// by value, or just its reference.
-				allLines.addElement((String) naLine);
+				allLines.addElement(naLine.value as String);
 			}
 		} catch (var ioex: IOException) {
 			throw new DemoException("Problem reading data from the file "+ioex.toString());

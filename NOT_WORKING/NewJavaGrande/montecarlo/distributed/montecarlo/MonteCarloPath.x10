@@ -472,12 +472,12 @@ public class MonteCarloPath extends PathId {
 	 *                          the computation.
 	 */
 	public def computeFluctuationsGaussian(var randomSeed: long): void = {
-		if (nTimeSteps > fluctuations.length)
+		if (nTimeSteps > fluctuations.size)
 			throw new DemoException("Number of timesteps requested is greater than the allocated array!");
 		//
 		// First, make use of the passed in seed value.
 		var rnd: Random;
-		if (randomSeed == -1) {
+		if (randomSeed == -1 as long) {
 			rnd = new Random();
 		} else {
 			rnd = new Random(randomSeed);

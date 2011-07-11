@@ -26,8 +26,8 @@ public class AppDemo extends Universal {
 	// Class variables.
 	//------------------------------------------------------------------------
 
-	public val JGFavgExpectedReturnRateMC: Double = 0.0;
-	public def JGFavgExpectedReturnRateMC(): double = { return JGFavgExpectedReturnRateMC; }
+	public static val JGFavgExpectedReturnRateMC: Double = 0.0;
+	public static def JGFavgExpectedReturnRateMC(): double = { return JGFavgExpectedReturnRateMC; }
 
 	/**
 	 * A class variable.
@@ -104,7 +104,7 @@ public class AppDemo extends Universal {
 	var avgExpectedReturnRateMC: double = 0.0;
 	var avgVolatilityMC: double = 0.0;
 
-	var initAllTasks: nullable[ToInitAllTasks] = null;
+	var initAllTasks: Box[ToInitAllTasks] = null;
 
 	/**
 	 * Single point of contact for running this increasingly bloated

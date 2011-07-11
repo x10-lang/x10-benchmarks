@@ -26,8 +26,8 @@ public class AppDemo extends Universal {
 	// Class variables.
 	//------------------------------------------------------------------------
 
-	public var JGFavgExpectedReturnRateMC: Double = 0.0;
-	public def JGFavgExpectedReturnRateMC(): double = { return JGFavgExpectedReturnRateMC; }
+	public static val JGFavgExpectedReturnRateMC: Double = 0.0;
+	public static def JGFavgExpectedReturnRateMC(): double = { return JGFavgExpectedReturnRateMC; }
 
 	/**
 	 * A class variable.
@@ -82,7 +82,7 @@ public class AppDemo extends Universal {
 	private var runMode: int;
 	private var D: Dist(1);
 	private var tasks: DistArray[ToTask](1);
-	private val expectedReturnRate: DistArray[double];
+	private val expectedReturnRate: DistArray[double](1);
 	private val volatility: DistArray[double];
 	public def this(var dataDirname: String, var dataFilename: String, var nTimeStepsMC: int, var nRunsMC: int): AppDemo = {
 		this.dataDirname    = dataDirname;
@@ -185,8 +185,8 @@ public class AppDemo extends Universal {
 	 *            any values.
 	 */
 	private def processResults(): void = {
-		var avgExpectedReturnRateMC: double = expectedReturnRate.sum()/nRunsMC;
-		var avgVolatilityMC: double = volatility.sum()/nRunsMC;
+		var avgExpectedReturnRateMC: double = expectedReturnRate.reduce((a:double,b:double)=>a+b, 0)/nRunsMC;
+		var avgVolatilityMC: double = volatility.reduce((a:double,b:double)=>a+b, 0)/nRunsMC;
 
 		/* The other computations are not actually used. But if needed here
 		 * is how they would be represented:
@@ -206,6 +206,12 @@ public class AppDemo extends Universal {
 
 		//  dbgPrintln("Average over "+nRunsMC+": expectedReturnRate = "+
 		//   avgExpectedReturnRateMC+" volatility = "+avgVolatilityMC + JGFavgExpectedReturnRateMC);
+	}
+	
+	private def distSum( dist : DistArray[double] ):double
+	{
+		
+		return 0.0;
 	}
 
 	//
