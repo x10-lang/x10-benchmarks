@@ -45,20 +45,20 @@ public class JGFMolDynBench implements JGFSection3 {
   }
 
   public def JGFinitialise() {
-    finish for ([j] in 0..P.size-1) (P(j)).initialise();
+    finish for ([j] in 0..(P.size-1)) (P(j)).initialise();
   }
 
   public def JGFapplication() {
     JGFInstrumentor.startTimer("Section3:MolDyn:Run");
     finish async {
       val C: Clock = Clock.make();
-      for ([j] in 0..P.size-1) P(j).runiters(C);
+      for ([j] in 0..(P.size-1)) P(j).runiters(C);
     }
     JGFInstrumentor.stopTimer("Section3:MolDyn:Run");
   }
 
   public def JGFvalidate() {
-    finish for ([j] in 0..P.size-1) {
+    finish for ([j] in 0..(P.size-1)) {
       val myNode = P(j);
 
       val refval: Array[Double] = [ 275.97175611773514, 7397.392307839352 ];

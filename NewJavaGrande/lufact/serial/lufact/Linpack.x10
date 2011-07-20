@@ -96,7 +96,7 @@ public class Linpack {
 			norma = (a(j, i) > norma) ? a(j, i) : norma;
 		}
 		for ([i]: Point in b) b(i) = 0.0;
-		for ([i,j]: Point in (0..n-1)*(0..n-1)) b(i) += a(j, i);
+		for ([i,j]: Point in (0..(n-1))*(0..(n-1))) b(i) += a(j, i);
 		return norma;
 	}
 
@@ -150,7 +150,7 @@ public class Linpack {
 		val nm1: int = n - 1;
 
 		if (nm1 >=  0) {
-			for ([k]: Point in 0..nm1-1) {
+			for ([k]: Point in 0..(nm1-1)) {
 				val kp1: int = k + 1;
 				// find l = pivot index
 				val l: int = idamax(n-k, a, k, k, 1) + k;
@@ -170,7 +170,7 @@ public class Linpack {
 
 					// row elimination with column indexing
 
-					for ([j]: Point in kp1..n-1) {
+					for ([j]: Point in kp1..(n-1)) {
 						var tt: double = a(j, l);
 						if (l != k) {
 							a(j, l) = a(j, k);
@@ -250,7 +250,7 @@ public class Linpack {
 		if (job == 0) {
 			// job = 0 , solve  a * x = b.  first solve  l*y = b
 			if (nm1 >= 1) {
-				for ([k]: Point in 0..nm1-1) {
+				for ([k]: Point in 0..(nm1-1)) {
 					val l: int = ipvt(k);
 					var t: double = b(l);
 					if (l != k) {
@@ -263,7 +263,7 @@ public class Linpack {
 			}
 
 			// now solve  u*x = y
-			for ([kb]: Point in 0..n-1) {
+			for ([kb]: Point in 0..(n-1)) {
 				val k: int = n - (kb + 1);
 				b(k) /= a(k, k);
 				val t: double = -b(k);
@@ -272,14 +272,14 @@ public class Linpack {
 		}
 		else {
 			// job = nonzero, solve  trans(a) * x = b.  first solve  trans(u)*y = b
-			for ([k]: Point in 0..n-1) {
+			for ([k]: Point in 0..(n-1)) {
 				val t: double = ddot(k, a, k, 0, 1, b, 0, 1);
 				b(k) = (b(k) - t) / a(k, k);
 			}
 
 			// now solve trans(l)*x = y
 			if (nm1 >= 1) {
-				for ([kb]: Point in 1..nm1-1) {
+				for ([kb]: Point in 1..(nm1-1)) {
 					val k: int = n - (kb+1);
 					val kp1: int = k + 1;
 					b(k) += ddot(n-(kp1),a,k,kp1,1,b,kp1,1);
@@ -306,7 +306,7 @@ public class Linpack {
 				var iy: int = 0;
 				if (incx < 0) ix = (-n+1)*incx;
 				if (incy < 0) iy = (-n+1)*incy;
-				for ([i]: Point in 0..n-1) {
+				for ([i]: Point in 0..(n-1)) {
 					dy(dyk, iy+dy_off) += da*dx(dxk, ix+dx_off);
 					ix += incx;
 					iy += incy;
@@ -314,7 +314,7 @@ public class Linpack {
 				return;
 			}
 			// code for both increments equal to 1
-			for ([i]: Point in 0..n-1) dy(dyk, i+dy_off) += da*dx(dxk, i+dx_off);
+			for ([i]: Point in 0..(n-1)) dy(dyk, i+dy_off) += da*dx(dxk, i+dx_off);
 		}
 	}
 
@@ -330,7 +330,7 @@ public class Linpack {
 				var iy: int = 0;
 				if (incx < 0) ix = (-n+1)*incx;
 				if (incy < 0) iy = (-n+1)*incy;
-				for ([i]: Point in 0..n-1) {
+				for ([i]: Point in 0..(n-1)) {
 					dy(iy+dy_off) += da*dx(dxk, ix+dx_off);
 					ix += incx;
 					iy += incy;
@@ -338,7 +338,7 @@ public class Linpack {
 				return;
 			}
 			// code for both increments equal to 1
-			for ([i]: Point in 0..n-1) dy(i+dy_off) += da*dx(dxk, i+dx_off);
+			for ([i]: Point in 0..(n-1)) dy(i+dy_off) += da*dx(dxk, i+dx_off);
 		}
 	}
 
@@ -355,14 +355,14 @@ public class Linpack {
 				var iy: int = 0;
 				if (incx < 0) ix = (-n+1)*incx;
 				if (incy < 0) iy = (-n+1)*incy;
-				for ([i]: Point in 0..n-1) {
+				for ([i]: Point in 0..(n-1)) {
 					dtemp += dx(dxk, ix+dx_off)*dy(iy+dy_off);
 					ix += incx;
 					iy += incy;
 				}
 			} else {
 				// code for both increments equal to 1
-				for ([i]: Point in 0..n-1) dtemp += dx(dxk, i+dx_off)*dy(i+dy_off);
+				for ([i]: Point in 0..(n-1)) dtemp += dx(dxk, i+dx_off)*dy(i+dy_off);
 			}
 		}
 		return dtemp;
@@ -381,7 +381,7 @@ public class Linpack {
 					dx(dxk, i+dx_off) *= da;
 			} else {
 				// code for increment equal to 1
-				for ([i]: Point in 0..n-1) dx(dxk, i+dx_off) *= da;
+				for ([i]: Point in 0..(n-1)) dx(dxk, i+dx_off) *= da;
 			}
 		}
 	}
@@ -398,7 +398,7 @@ public class Linpack {
 			var itemp: int = 0;
 			var dmax: double = abs(dx(dxk, 0+dx_off));
 			var ix: int = 1 + incx;
-			for ([i]: Point in 1..n-1) {
+			for ([i]: Point in 1..(n-1)) {
 				var dtemp: double = abs(dx(dxk, ix+dx_off));
 				if (dtemp > dmax)  {
 					itemp = i;
@@ -411,7 +411,7 @@ public class Linpack {
 		// code for increment equal to 1
 		var itemp: int = 0;
 		var dmax: double = abs(dx(dxk, 0+dx_off));
-		for ([i]: Point in 1..n-1) {
+		for ([i]: Point in 1..(n-1)) {
 			var dtemp: double = abs(dx(dxk, i+dx_off));
 			if (dtemp > dmax) {
 				itemp = i;
@@ -484,6 +484,6 @@ public class Linpack {
 	 */
 	final def dmxpy(val n1: int, val y: DistArray[double], val n2: int, val ldm: int, val x: DistArray[double], val m: DistArray[double]): void = {
 		// cleanup odd vector
-		for ([j,i]: Point in (0..n2-1)*(0..n1-1)) y(i) += x(j)*m(j, i);
+		for ([j,i]: Point in (0..(n2-1))*(0..(n1-1))) y(i) += x(j)*m(j, i);
 	}
 }

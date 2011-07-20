@@ -17,12 +17,11 @@
 *                         All rights reserved.                            *
 *                                                                         *
 **************************************************************************/
-package lufact.distributed;
+package lufact.parallel;
 
-import lufact.distributed.lufact.*;
-import lufact.*;
+import lufact.parallel.lufact.*;
 import jgfutil.*;
-import harness.x10Test;;
+import harness.x10Test;
 
 public class JGFLUFactBenchSizeA extends x10Test {
 
@@ -33,7 +32,7 @@ public class JGFLUFactBenchSizeA extends x10Test {
 		return true;
 	}
 
-	public static def main(var args: Rail[String]): void {
+	public static def main(var args: Rail[String]): void = {
 		new JGFLUFactBenchSizeA().execute();
 	}
 }

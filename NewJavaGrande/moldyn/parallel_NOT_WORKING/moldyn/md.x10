@@ -139,9 +139,9 @@ public class md extends x10.lang.Object {
     /* Particle Generation */
     var ijk: Int = 0;
     for ([lg] in 0..1) {
-      for ([i] in 0..mm-1) {
-        for ([j] in 0..mm-1) {
-          for ([k] in 0..mm-1) {
+      for ([i] in 0..(mm-1)) {
+        for ([j] in 0..(mm-1)) {
+          for ([k] in 0..(mm-1)) {
             one(ijk) = new Particle((i*a+lg*a*0.5), (j*a+lg*a*0.5), (k*a), 
                                     0.0, 0.0, 0.0, 0.0, 0.0, 0.0);
             ijk = ijk + 1;
@@ -150,9 +150,9 @@ public class md extends x10.lang.Object {
       }
     }
     for ([lg] in 1..2) {
-      for ([i] in 0..mm-1) {
-        for ([j] in 0..mm-1) {
-          for ([k] in 0..mm-1) {
+      for ([i] in 0..(mm-1)) {
+        for ([j] in 0..(mm-1)) {
+          for ([k] in 0..(mm-1)) {
             one(ijk) = new Particle((i*a+(2-lg)*a*0.5), (j*a+(lg-1)*a*0.5),
                                     (k*a+a*0.5), 0.0, 0.0, 0.0, 0.0, 0.0, 0.0);
             ijk = ijk + 1;
@@ -190,34 +190,34 @@ public class md extends x10.lang.Object {
     ekin = 0.0;
     sp = 0.0;
 
-    for ([i] in 0..mdsize-1) {
+    for ([i] in 0..(mdsize-1)) {
       sp = sp + one(i).xvelocity;
     }
     sp = sp / mdsize;
 
-    for ([i] in 0..mdsize-1) {
+    for ([i] in 0..(mdsize-1)) {
       one(i).xvelocity = one(i).xvelocity - sp;
       ekin = ekin + one(i).xvelocity*one(i).xvelocity;
     }
 
     sp = 0.0;
-    for ([i] in 0..mdsize-1) {
+    for ([i] in 0..(mdsize-1)) {
       sp = sp + one(i).yvelocity;
     }
     sp = sp / mdsize;
 
-    for ([i] in 0..mdsize-1) {
+    for ([i] in 0..(mdsize-1)) {
       one(i).yvelocity = one(i).yvelocity - sp;
       ekin = ekin + one(i).yvelocity*one(i).yvelocity;
     }
 
     sp = 0.0;
-    for ([i] in 0..mdsize-1) {
+    for ([i] in 0..(mdsize-1)) {
       sp = sp + one(i).zvelocity;
     }
     sp = sp / mdsize;
 
-    for ([i] in 0..mdsize-1) {
+    for ([i] in 0..(mdsize-1)) {
       one(i).zvelocity = one(i).zvelocity - sp;
       ekin = ekin + one(i).zvelocity*one(i).zvelocity;
     }
@@ -225,7 +225,7 @@ public class md extends x10.lang.Object {
     ts = tscale * ekin;
     sc = h * Math.sqrt(tref/ts);
 
-    for ([i] in 0..mdsize-1) {
+    for ([i] in 0..(mdsize-1)) {
       one(i).xvelocity = one(i).xvelocity * sc;
       one(i).yvelocity = one(i).yvelocity * sc;
       one(i).zvelocity = one(i).zvelocity * sc;
@@ -235,8 +235,8 @@ public class md extends x10.lang.Object {
   }
 
   public def runiters(C: Clock) {
-    for ([move] in 0..movemx-1) {
-      for ([i] in 0..mdsize-1) {
+    for ([move] in 0..(movemx-1)) {
+      for ([i] in 0..(mdsize-1)) {
         one(i).domove(side); // move the particles and update velocities
       }
 
@@ -254,14 +254,14 @@ public class md extends x10.lang.Object {
       Clock.advanceAll();
 
       var sum: double = 0.0;
-      for ([i] in 0..mdsize-1) {
+      for ([i] in 0..(mdsize-1)) {
         sum = sum + one(i).mkekin(hsq2);  // scale forces, update velocities
       }
       ekin = sum/hsq;
 
       var vel: Double = 0.0;
       count = 0.0;
-      for ([i] in 0..mdsize-1) {
+      for ([i] in 0..(mdsize-1)) {
         vel = vel + one(i).velavg(vaverh, h, this); /* average velocity */
       }
       vel = vel / h;
@@ -269,7 +269,7 @@ public class md extends x10.lang.Object {
       // temperature scale if required
       if ((move < istop) && (((move+1) % irep) == 0)) {
         sc = Math.sqrt(tref / (tscale*ekin));
-        for ([i] in 0..mdsize-1) {
+        for ([i] in 0..(mdsize-1)) {
           one(i).dscal(sc, 1);
         }
         ekin = tref / tscale;
@@ -297,13 +297,13 @@ public class md extends x10.lang.Object {
     val P = JGFMolDynBench.P;
     val t = new md(mdsize, new Array[Particle](mdsize));
 
-    for ([k] in 0..mdsize-1) {
+    for ([k] in 0..(mdsize-1)) {
       t.one(k) = new Particle(0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0);
     }
 
     // sum reduction
-    for ([j] in 0..P.size-1) {
-      for ([k] in 0..mdsize-1) {
+    for ([j] in 0..(P.size-1)) {
+      for ([k] in 0..(mdsize-1)) {
         t.one(k).xforce += P(j).one(k).xforce;
         t.one(k).yforce += P(j).one(k).yforce;
         t.one(k).zforce += P(j).one(k).zforce;
@@ -314,8 +314,8 @@ public class md extends x10.lang.Object {
     }
 
     // broadcast
-    finish for ([j] in 0..P.size-1) {
-      for ([k] in 0..mdsize-1) {
+    finish for ([j] in 0..(P.size-1)) {
+      for ([k] in 0..(mdsize-1)) {
         P(j).one(k).xforce = t.one(k).xforce;
         P(j).one(k).yforce = t.one(k).yforce;
         P(j).one(k).zforce = t.one(k).zforce;

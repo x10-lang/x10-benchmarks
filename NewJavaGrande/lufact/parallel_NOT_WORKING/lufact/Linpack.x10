@@ -114,7 +114,7 @@ public class Linpack {
 			norma = value > norma ? value : norma;
 		}
 		finish ateach ([i,j]: Point in b) b(i, j) = 0.0;
-		finish ateach ([i,j]: Point in a.dist | (0..n-1)*(0..n-1)) plusWrite(b, 0, j, a(i, j));
+		finish ateach ([i,j]: Point in a.dist | (0..(n-1))*(0..(n-1))) plusWrite(b, 0, j, a(i, j));
 		return norma;
 	}
 
@@ -171,7 +171,7 @@ public class Linpack {
 		if (nm1 >=  0) {
 			// array is distributed along each column,
 
-			for ([k]: Point in 0..nm1-1) {
+			for ([k]: Point in 0..(nm1-1)) {
 				finish async at(a.dist(k, 1)) { // do this on row k
 					val kp1: int = k+1;
 					// would be nice to do this via an X10 reduction on a sub-array
@@ -195,7 +195,7 @@ public class Linpack {
 						// row elimination with column indexing
 						// daxpy on all columns to the right in parallel
 						finish {
-							for ([j]: Point in kp1..n-1) {
+							for ([j]: Point in kp1..(n-1)) {
 								async at(a.dist(j, l)) {
 									var t: double = a(j, l);
 									if (l != k) {
@@ -279,7 +279,7 @@ public class Linpack {
 		if (job == 0) {
 			// job = 0 , solve  a * x = b.  first solve  l*y = b
 			if (nm1 >= 1) {
-				for ([k]: Point in 0..nm1-1) {
+				for ([k]: Point in 0..(nm1-1)) {
 					val l: int = ipvt(k);
 					var t: double = b(0, l);
 					if (l != k) {
@@ -292,7 +292,7 @@ public class Linpack {
 			}
 
 			// now solve  u*x = y
-			for ([kb]: Point in 0..n-1) {
+			for ([kb]: Point in 0..(n-1)) {
 				val k: int = n - (kb + 1);
 				b(0, k) /= read(a, k, k);
 				var t: double = -b(0, k);
@@ -301,14 +301,14 @@ public class Linpack {
 		}
 		else {
 			// job = nonzero, solve  trans(a) * x = b.  first solve  trans(u)*y = b
-			for ([k]: Point in 0..n-1) {
+			for ([k]: Point in 0..(n-1)) {
 				var t: double = ddot(k, a, k, 0, 1, b, 0, 0, 1); // FIXME: subarrays not yet supported
 				b(0, k) = (b(0, k) - t) / a(k, k);
 			}
 
 			// now solve trans(l)*x = y
 			if (nm1 >= 1) {
-				for ([kb]: Point in 1..nm1-1) {
+				for ([kb]: Point in 1..(nm1-1)) {
 					val k: int = n - (kb+1);
 					val kp1: int = k + 1;
 					b(0, k) += ddot(n-(kp1), a, k, kp1, 1, b, 0, kp1, 1); //FIXME: subarrays not yet supported
@@ -335,7 +335,7 @@ public class Linpack {
 				var iy: int = 0;
 				if (incx < 0) ix = (-n+1)*incx;
 				if (incy < 0) iy = (-n+1)*incy;
-				for ([i]: Point in 0..n-1) {
+				for ([i]: Point in 0..(n-1)) {
 					// daxpy is called at dy.dist[dyCol,xx]
 					dy(dyCol, iy+dy_off) += da * read(dx, dxCol, ix+dx_off);
 					ix += incx;
@@ -344,7 +344,7 @@ public class Linpack {
 				return;
 			}
 			// code for both increments equal to 1
-			for ([i]: Point in 0..n-1) dy(dyCol, i+dy_off) += da*read(dx, dxCol, i+dx_off);
+			for ([i]: Point in 0..(n-1)) dy(dyCol, i+dy_off) += da*read(dx, dxCol, i+dx_off);
 		}
 	}
 
@@ -361,14 +361,14 @@ public class Linpack {
 				var iy: int = 0;
 				if (incx < 0) ix = (-n+1)*incx;
 				if (incy < 0) iy = (-n+1)*incy;
-				for ([i]: Point in 0..n-1) {
+				for ([i]: Point in 0..(n-1)) {
 					dtemp += dx(dxCol, ix+dx_off)*dy(dyCol, iy+dy_off);
 					ix += incx;
 					iy += incy;
 				}
 			} else {
 				// code for both increments equal to 1
-				for ([i]: Point in 0..n-1) dtemp += dx(dxCol, i+dx_off)*dy(dyCol, i+dy_off);
+				for ([i]: Point in 0..(n-1)) dtemp += dx(dxCol, i+dx_off)*dy(dyCol, i+dy_off);
 			}
 		}
 		return dtemp;
@@ -387,7 +387,7 @@ public class Linpack {
 					dx(currentCol, i+dx_off) *= da;
 			} else {
 				// code for increment equal to 1
-				for ([i]: Point in 0..n-1) dx(currentCol, i+dx_off) *= da;
+				for ([i]: Point in 0..(n-1)) dx(currentCol, i+dx_off) *= da;
 			}
 		}
 	}
@@ -407,7 +407,7 @@ public class Linpack {
 			var itemp: int = 0;
 			var dmax: double = abs(read(dx, dxk, 0+dx_off));
 			var ix: int = 1 + incx;
-			for ([i]: Point in 1..n-1) {
+			for ([i]: Point in 1..(n-1)) {
 				var dtemp: double = abs(read(dx, dxk, ix+dx_off));
 				if (dtemp > dmax)  {
 					itemp = i;
@@ -420,7 +420,7 @@ public class Linpack {
 		// code for increment equal to 1
 		var itemp: int = 0;
 		var dmax: double = abs(read(dx, dxk, 0+dx_off));
-		for ([i]: Point in 1..n-1) {
+		for ([i]: Point in 1..(n-1)) {
 			var dtemp: double = abs(read(dx, dxk, i+dx_off));
 			if (dtemp > dmax) {
 				itemp = i;
@@ -493,6 +493,6 @@ public class Linpack {
 	 */
 	final def dmxpy(val n1: int, val y: DistArray[double], val n2: int, val ldm: int, val x: DistArray[double], val m: DistArray[double]): void = {
 		// cleanup odd vector
-		for ([j,i]: Point in (0..n2-1)*(0..n1-1)) y(0, i) += x(0, j)*read(m, j, i);
+		for ([j,i]: Point in (0..(n2-1))*(0..(n1-1))) y(0, i) += x(0, j)*read(m, j, i);
 	}
 }

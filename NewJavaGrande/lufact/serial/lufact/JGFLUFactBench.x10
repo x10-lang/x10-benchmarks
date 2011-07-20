@@ -17,70 +17,71 @@
 *                         All rights reserved.                            *
 *                                                                         *
 **************************************************************************/
-package lufact.distributed.lufact;
+package lufact.serial.lufact;
 
 import jgfutil.*;
 
-/**
- * Ported to x10 March 18th 2005
- * @author ahk
- * @author cmd
- */
-public class JGFLUFactBench extends Linpack /*implements JGFSection2*/ {
+public class JGFLUFactBench extends Linpack implements JGFSection2 {
+
 	private var size: int;
-	private var datasizes: Array[int] = [ 150, 1000, 2000 ];
-	public def JGFsetsize(var size: int): void {
+	 private var datasizes: Array[int] = [ 500, 1000, 2000 ];
+	// private int datasizes[] = { 50, 1000, 2000 };
+	public def JGFsetsize(var size: int): void = {
 		this.size = size;
 	}
-	
-	public def JGFinitialise(): void {
+
+	public def JGFinitialise(): void = {
 		n = datasizes(size);
 		Console.OUT.println("ATTENTION: Running with smaller size (" + n + " instead of 500)");
 		ldaa = n;
 		lda = ldaa + 1;
-		
-		var vectorRegion: Region = 0..ldaa;
-		var rectangularRegion: Region = 0..ldaa * 0..lda;
-		var slimRegion: Region = 0..0 * 0..lda; //fake out because we don't support array sections
-		var rectangular_distribution: Dist = Dist.makeBlockCyclic(rectangularRegion, 0, lda+1);
-		
-		a = DistArray.make[double](rectangular_distribution);
-		b = DistArray.make[double](Dist.makeConstant(slimRegion, here));
-		x = DistArray.make[double](Dist.makeConstant(slimRegion, here));
-		ipvt = new Array[int](ldaa);
+
+		var RR: Region = (0..(ldaa-1))*(0..(lda-1));
+		var R: Region = 0..(ldaa-1);
+		a = DistArray.make[double](Dist.makeConstant(RR, here));
+		b = DistArray.make[double](Dist.makeConstant(R, here));
+		x = DistArray.make[double](Dist.makeConstant(R, here));
+		ipvt = DistArray.make[int](Dist.makeConstant(R, here));
+
+		var nl: long = n as long;   //avoid integer overflow
+		ops = (2.0*(nl*nl*nl))/3.0 + 2.0*(nl*nl);
+
+		norma = matgen(a, lda, n, b);
 	}
-	
-	public def JGFkernel(): void {
+
+	public def JGFkernel(): void = {
 		JGFInstrumentor.startTimer("Section2:LUFact:Kernel");
+
 		info = dgefa(a, lda, n, ipvt);
 		dgesl(a, lda, n, ipvt, b, 0);
+
 		JGFInstrumentor.stopTimer("Section2:LUFact:Kernel");
 	}
-	
-	public def JGFvalidate(): void {
+
+	public def JGFvalidate(): void = {
 		var i: int;
 		var eps: double;
 		var residn: double;
 		val ref: Array[double] = [ 6.0, 12.0, 20.0 ];
 
 		for (i = 0; i < n; i++) {
-			x(0, i) = b(0, i);
+			x(i) = b(i);
 		}
 		norma = matgen(a, lda, n, b);
 		for (i = 0; i < n; i++) {
-			b(0, i) = -b(0, i);
+			b(i) = -b(i);
 		}
 
 		dmxpy(n, b, n, lda, x, a);
 		resid = 0.0;
 		normx = 0.0;
 		for (i = 0; i < n; i++) {
-			resid = (resid > abs(b(0, i))) ? resid : abs(b(0, i));
-			normx = (normx > abs(x(0, i))) ? normx : abs(x(0, i));
+			resid = (resid > abs(b(i))) ? resid : abs(b(i));
+			normx = (normx > abs(x(i))) ? normx : abs(x(i));
 		}
 
 		eps =  epslon(1.0 as double);
-		residn = resid / (n*norma*normx*eps);
+		residn = resid/( n*norma*normx*eps );
 
 		if (residn > ref(size)) {
 			Console.OUT.println("Validation failed");
@@ -90,22 +91,16 @@ public class JGFLUFactBench extends Linpack /*implements JGFSection2*/ {
 		}
 	}
 
-	public def JGFtidyup(): void {
+	public def JGFtidyup(): void = {
 		// Make sure large arrays are gc'd.
-
-		/* CMD
-		 * this causes problems in X10, and strictly spreaking, is
-		 * unnecessary
-
-		 * a = null;
-		 * b = null;
-		 * x = null;
-		 * ipvt = null;
-		 * System.gc();
-		 */
+		/*a = null;  // X10: avoid nullable!
+		  b = null;
+		  x = null;
+		  ipvt = null; */
+		//System.gc();
 	}
-	
-	public def JGFrun(var size: int): void {
+
+	public def JGFrun(var size: int): void = {
 		JGFInstrumentor.addTimer("Section2:LUFact:Kernel", "Mflops", size);
 
 		JGFsetsize(size);

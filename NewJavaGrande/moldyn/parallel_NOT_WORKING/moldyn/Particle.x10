@@ -71,7 +71,7 @@ public class Particle {
     fzi = 0.0;
 
     // for (i = x + 1; i < mdsize; i++) {
-    for ([i] in x+1..mdsize-1) {
+    for ([i] in (x+1)..(mdsize-1)) {
       xx = xi - md1.one(i).xcoord;
       yy = yi - md1.one(i).ycoord;
       zz = zi - md1.one(i).zcoord;
