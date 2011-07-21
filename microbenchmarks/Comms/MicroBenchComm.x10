@@ -6,7 +6,7 @@ public class MicroBenchComm {
     public static def main (args : Array[String]) {
         val team = Team.WORLD;
         finish for ([p] in 0..(Place.MAX_PLACES-1)) async at (Place(p)) {
-            val payload = new Array[Byte](1024*1024);
+            val payload = new Array[Byte](4*1024*1024);
             team.barrier(here.id);
             val before_x10rt = Runtime.getX10RTMessageStats();
             val before = System.currentTimeMillis();
