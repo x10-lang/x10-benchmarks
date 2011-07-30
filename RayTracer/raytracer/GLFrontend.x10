@@ -111,11 +111,11 @@ public class GLFrontend {
 
             fb.update(()=>{
                 Team.WORLD.barrier(here.id);
-                val before_frame = System.nanoTime();
+                //val before_frame = System.nanoTime();
                 rts().renderFrame();
-                val after_frame = System.nanoTime();
-                val seconds = (after_frame-before_frame)/1E9;
-                Console.OUT.println("Render Frame time: " + seconds + "s " + 1/seconds + " FPS.");
+                //val after_frame = System.nanoTime();
+                //val seconds = (after_frame-before_frame)/1E9;
+                //Console.OUT.println("Render Frame time: " + seconds + "s " + 1/seconds + " FPS.");
                 Team.WORLD.barrier(here.id);
             });
 

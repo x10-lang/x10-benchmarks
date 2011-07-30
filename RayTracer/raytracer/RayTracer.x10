@@ -163,7 +163,7 @@ public class RayTracer {
             if (p.intersectRay(origin, dir, res)) {
                 val the_dot = ((res.normal.dot(sun_dir)) + 1.0f) * 0.5f;
                 val diffuse = the_dot * the_dot;
-                val ambient = 0.25f;
+                val ambient = 0.15f;
                 val l = diffuse + ambient;
                 return RGB(l, l, l);
                 //return to_col(res.normal);
@@ -184,37 +184,35 @@ public class RayTracer {
 
 
         val before = Runtime.getX10RTStats();
+        val render_before = System.nanoTime();
         finish {
-            for (var y_thread_:Int=0 ; y_thread_<4 ; ++y_thread_) {
-                val y_thread=y_thread_;
-                async {
-                    val res = new RayResult();
-                    val lw = localWidth;
-                    val lh = localHeight;
-                    val gw = globalWidth;
-                    val gh = globalHeight;
-                    val ray_top_right = Vector3(gw/gh,1,1);
-                    for (var y_:Int=y_thread ; y_<lh ; y_+=4) {
-                        val y = y_;
-                        val y_norm = -(y+0.5f+offset_y)/gh*2.0f + 1.0f;
-                        for (var x:Int=0 ; x<lw ; ++x) {
-                            // linear projection
-                            val x_norm = (x+0.5f+offset_x)/gw*2.0f - 1.0f;
-                            val ray = Vector3(x_norm,1,y_norm) * ray_top_right;
-                            localFrame(y*lw + x) = castRay(Vector3(0,0,0), ray, res);
-                        }
-                        val local_off = y*lw;
-                        val remote_off = offset_x + (offset_y+y)*gw;
-                        val lb = localFrameRemoteRef;
-                        val fb = frameBuffer;
-                        async at (Place.FIRST_PLACE) {
-                            fb().receive(lb, local_off, remote_off, lw);
-                        }
-                    }
+            val res = new RayResult();
+            val lw = localWidth;
+            val lh = localHeight;
+            val gw = globalWidth;
+            val gh = globalHeight;
+            val ray_top_right = Vector3(gw/gh,1,1);
+            for (var y_:Int=0 ; y_<lh ; y_+=1) {
+                val y = y_;
+                val y_norm = -(y+0.5f+offset_y)/gh*2.0f + 1.0f;
+                for (var x:Int=0 ; x<lw ; ++x) {
+                    // linear projection
+                    val x_norm = (x+0.5f+offset_x)/gw*2.0f - 1.0f;
+                    val ray = Vector3(x_norm,1,y_norm) * ray_top_right;
+                    localFrame(y*lw + x) = castRay(Vector3(0,0,0), ray, res);
                 }
+                val local_off = y*lw;
+                val remote_off = offset_x + (offset_y+y)*gw;
+                val lb = localFrameRemoteRef;
+                val fb = frameBuffer;
+                async at (Place.FIRST_PLACE) {
+                    fb().receive(lb, local_off, remote_off, lw);
+                }
+                Runtime.probe();
             }
         }
-        Console.OUT.println(Runtime.getX10RTStats() - before);
+        Console.OUT.println(here+" "+(System.nanoTime() - render_before)/1E9);
+        Console.OUT.println(here+" "+(Runtime.getX10RTStats() - before));
     }
 
 }

@@ -70,8 +70,8 @@ public class Benchmark {
                 val rt = rts();
 
                 for ([iteration] in 1..iters) {
-                    val before = System.nanoTime();
                     Team.WORLD.barrier(here.id);
+                    val before = System.nanoTime();
                     rt.renderFrame();
                     Team.WORLD.barrier(here.id);
                     val taken = (System.nanoTime()-before)/1E9;
