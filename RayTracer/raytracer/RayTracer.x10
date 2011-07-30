@@ -5,6 +5,8 @@ import x10.util.OptionsParser;
 import x10.util.Option;
 import x10.util.Team;
 import x10.util.Pair;
+import x10.util.IndexedMemoryChunk;
+import x10.util.RemoteIndexedMemoryChunk;
 
 import x10.io.File;
 
@@ -16,13 +18,14 @@ public class RayTracer {
     localHeight:Int;
     horzSplits:Int;
     vertSplits:Int;
-    remoteFrame:RemoteArray[RGB]{rank==1, home==Place.FIRST_PLACE};
+    frameBuffer:GlobalRef[FrameBuffer]{home==Place.FIRST_PLACE};
     localFrame:Array[RGB](1){self!=null};
+    localFrameRemoteRef:RemoteIndexedMemoryChunk[RGB];
     verbose:Boolean;
     quiet:Boolean;
 
     public def this (opts:OptionsParser, global_width:Int, global_height:Int,
-                     remote_frame:RemoteArray[RGB]{rank==1, home==Place.FIRST_PLACE}) {
+                     frameBuffer:GlobalRef[FrameBuffer]{home==Place.FIRST_PLACE}) {
 
         verbose = opts("-v");
         quiet = opts("-q");
@@ -58,8 +61,9 @@ public class RayTracer {
             Console.OUT.println("localHeight: "+localHeight);
         }
 
-        remoteFrame = remote_frame;
+        this.frameBuffer = frameBuffer;
         localFrame = new Array[RGB](localWidth * localHeight);
+        localFrameRemoteRef = RemoteIndexedMemoryChunk.wrap(localFrame.raw());
 
     }
 
@@ -115,7 +119,26 @@ public class RayTracer {
             val t = t0 < 0 ? t1 : t0;
 
             res.pos = ray_origin_w + t * ray_dir;
-            res.normal = (res.pos - worldPos) / radius;
+            val hit_pos_os = (res.pos - worldPos);
+            res.normal = hit_pos_os / radius;
+
+            val sc = 100*(Math.PI/(2*4.0f)) as Float;
+
+            val F = (v:Vector3) => {
+                val f = Math.sin(sc * v.x) as Float * Math.sin(sc * v.y) as Float * Math.sin(sc * v.z) as Float;
+                return  (1.0f + f) / 2.0f;
+            };
+
+            val bump = F(hit_pos_os);
+
+            val mu = 4.5f/Math.PI as Float;
+            val dF = Vector3(
+                F(hit_pos_os + Vector3(mu, 0, 0)),
+                F(hit_pos_os + Vector3(0, mu, 0)),
+                F(hit_pos_os + Vector3(0, 0,  mu))
+            );
+
+            res.normal -= dF - bump*Vector3(1,1,1);
 
             return true;
 
@@ -129,14 +152,21 @@ public class RayTracer {
      ];
     val sun_dir = Vector3(0,0,1);
 
+    public static def to_col(x:Vector3) {
+        val scaled = x*0.5f + Vector3(0.5f,0.5f,0.5f);
+        return RGB(scaled.x, scaled.y, scaled.z);
+    }
+
     public final def castRay (origin:Vector3, dir:Vector3, res:RayResult) : RGB {
         for (var i:Int=0 ; i<scene.size ; ++i) {
             val p = scene(i);
             if (p.intersectRay(origin, dir, res)) {
-                val diffuse = Math.max(0.0f,res.normal.dot(sun_dir));
+                val the_dot = ((res.normal.dot(sun_dir)) + 1.0f) * 0.5f;
+                val diffuse = the_dot * the_dot;
                 val ambient = 0.25f;
                 val l = diffuse + ambient;
                 return RGB(l, l, l);
+                //return to_col(res.normal);
             }
         }
         return RGB.DARK_BLUE;
@@ -159,8 +189,6 @@ public class RayTracer {
                 val y_thread=y_thread_;
                 async {
                     val res = new RayResult();
-                    val rf = remoteFrame;
-                    val source = new RemoteArray[RGB](localFrame);
                     val lw = localWidth;
                     val lh = localHeight;
                     val gw = globalWidth;
@@ -175,8 +203,12 @@ public class RayTracer {
                             val ray = Vector3(x_norm,1,y_norm) * ray_top_right;
                             localFrame(y*lw + x) = castRay(Vector3(0,0,0), ray, res);
                         }
+                        val local_off = y*lw;
+                        val remote_off = offset_x + (offset_y+y)*gw;
+                        val lb = localFrameRemoteRef;
+                        val fb = frameBuffer;
                         async at (Place.FIRST_PLACE) {
-                            Array.asyncCopy(source, y*lw, rf(), offset_x + (offset_y+y)*gw, lw);
+                            fb().receive(lb, local_off, remote_off, lw);
                         }
                     }
                 }

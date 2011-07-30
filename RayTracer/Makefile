@@ -13,16 +13,16 @@ RAYTRACER_SRC = \
         raytracer/Quat.x10 \
         raytracer/RGB.x10
 
-raytracer.Benchmark.sockets.opt: $(RAYTRACER_SRC)
+Benchmark.opt: $(RAYTRACER_SRC)
 	$(OPTX10CPP) -d out-opt raytracer/Benchmark.x10 -o $@
 
-raytracer.Benchmark.sockets.dbg: $(RAYTRACER_SRC)
+Benchmark.dbg: $(RAYTRACER_SRC)
 	$(DBGX10CPP) -d out-dbg raytracer/Benchmark.x10 -o $@
 
-raytracer.GLFrontend.sockets.opt: $(RAYTRACER_SRC)
+GLFrontend.opt: $(RAYTRACER_SRC)
 	$(OPTX10CPP) -d out-opt raytracer/GLFrontend.x10 -x10lib ~/x10-opt/x10.gl/x10_gl.properties -o $@
 
-raytracer.GLFrontend.sockets.dbg: $(RAYTRACER_SRC)
+GLFrontend.dbg: $(RAYTRACER_SRC)
 	$(DBGX10CPP) -d out-dbg raytracer/GLFrontend.x10 -x10lib ~/x10-dbg/x10.gl/x10_gl.properties -o $@
 
 # vim: tabstop=8:shiftwidth=8:noexpandtab

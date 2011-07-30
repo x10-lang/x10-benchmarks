@@ -5,6 +5,9 @@ import x10.util.OptionsParser;
 import x10.util.Option;
 import x10.util.Team;
 import x10.util.Pair;
+import x10.util.IndexedMemoryChunk;
+import x10.util.RemoteIndexedMemoryChunk;
+
 
 import x10.io.File;
 
@@ -12,56 +15,90 @@ import x10.gl.GL;
 
 public class GLFrontend {
 
-    val pboFront = new Array[Int](1);
-    val pboBack = new Array[Int](1);
-    val tex = new Array[Int](1);
-    val mappedBuffer : Array[RGB]{rank==1,rail,rect};
-    val mappedBufferRemote : RemoteArray[RGB]{rank==1,home==Place.FIRST_PLACE};
+    // use a class to get a level of indirection -- this allows to update the actual frame buffer for PBO write
+    public static final class GLFrameBuffer extends FrameBuffer {
 
-    val width:Int, height:Int, size:Int;
+        var pboFront:Int;
+        var pboBack:Int;
+
+        private val width:Int, height:Int, size:Int;
+
+        public def this (width:Int, height:Int, size:Int) {
+            super(width, height);
+
+            this.width = width;
+            this.height = height;
+            this.size = size;
+
+            val ptr = new Array[Int](1);
+
+            GL.glGenBuffers(1, ptr, 0);
+            pboFront = ptr(0);
+            GL.glBindBuffer(GL.GL_PIXEL_UNPACK_BUFFER, pboFront);
+            GL.glBufferData[Byte](GL.GL_PIXEL_UNPACK_BUFFER, size, null, 0, GL.GL_STREAM_DRAW);
+            GL.glBindBuffer(GL.GL_PIXEL_UNPACK_BUFFER, 0);
+
+            GL.glGenBuffers(1, ptr, 0);
+            pboBack = ptr(0);
+            GL.glBindBuffer(GL.GL_PIXEL_UNPACK_BUFFER, pboBack);
+            GL.glBufferData[Byte](GL.GL_PIXEL_UNPACK_BUFFER, size, null, 0, GL.GL_STREAM_DRAW);
+            GL.glBindBuffer(GL.GL_PIXEL_UNPACK_BUFFER, 0);
+        }
+
+        public def update (write:()=>void) {
+            // background dma
+            GL.glBindBuffer(GL.GL_PIXEL_UNPACK_BUFFER, pboBack);
+            GL.glTexSubImage2D(GL.GL_TEXTURE_2D, 0, 0, 0, width, height, GL.GL_RGB, GL.GL_UNSIGNED_BYTE, 0);
+            
+            
+            // update other pbo
+            GL.glBindBuffer(GL.GL_PIXEL_UNPACK_BUFFER, pboFront);
+            GL.glBufferData[Byte](GL.GL_PIXEL_UNPACK_BUFFER, size, null, 0, GL.GL_STREAM_DRAW); // discard
+            try {
+                raw = GL.glMapBuffer[RGB](GL.GL_PIXEL_UNPACK_BUFFER, GL.GL_WRITE_ONLY, width*height);
+                write();
+            } finally {
+                GL.glUnmapBuffer(GL.GL_PIXEL_UNPACK_BUFFER);
+            }
+            GL.glBindBuffer(GL.GL_PIXEL_UNPACK_BUFFER, 0);
+            
+            // swap pbos
+            val tmp = pboFront;
+            pboFront = pboBack;
+            pboBack = tmp;
+        }
+
+    }
+
+
+    val tex : Int;
+    val fb : FrameBuffer;
+
 
     val rts : PlaceLocalHandle[RayTracer];
 
+    
+    val width:Int, height:Int;
     var winWidth:Int, winHeight:Int;
 
-    public def this (opts:OptionsParser, width:Int, height:Int, mappedBuffer : Array[RGB]{rank==1,rail,rect}, mappedBufferRemote : RemoteArray[RGB]{rank==1,home==Place.FIRST_PLACE} ) {
+    public def this (opts:OptionsParser, width:Int, height:Int, fb:FrameBuffer, fbr:GlobalRef[FrameBuffer]{home==Place.FIRST_PLACE} ) {
 
         this.width = this.winWidth = width;
         this.height = this.winHeight = height;
+        this.fb = fb;
 
-        this.size = width * height * 3;
+        val ptr = new Array[Int](1);
         val pixel_format = GL.GL_RGB8;
 
-        GL.glutInitDisplayMode(GL.GLUT_RGB | GL.GLUT_DOUBLE); // double buffered
-
-        GL.glutInitWindowSize(width, height);
-
-        GL.glutCreateWindow("X10 Distributed Raytracer");
-
-        GL.glewInit();
-
-        GL.glGenTextures(1, tex, 0);
-        GL.glBindTexture(GL.GL_TEXTURE_2D, tex(0));
+        GL.glGenTextures(1, ptr, 0);
+        tex = ptr(0);
+        GL.glBindTexture(GL.GL_TEXTURE_2D, tex);
         GL.glTexParameteri(GL.GL_TEXTURE_2D, GL.GL_TEXTURE_MIN_FILTER, GL.GL_LINEAR);
         GL.glTexParameteri(GL.GL_TEXTURE_2D, GL.GL_TEXTURE_MAG_FILTER, GL.GL_LINEAR);
         GL.glTexImage2D[Byte](GL.GL_TEXTURE_2D, 0, pixel_format, width, height, 0, GL.GL_RGB, GL.GL_UNSIGNED_BYTE, null, 0);
         GL.glBindTexture(GL.GL_TEXTURE_2D, 0);
 
-        GL.glGenBuffers(1, pboFront, 0);
-        GL.glBindBuffer(GL.GL_PIXEL_UNPACK_BUFFER, pboFront(0));
-        GL.glBufferData[Byte](GL.GL_PIXEL_UNPACK_BUFFER, size, null, 0, GL.GL_STREAM_DRAW);
-        GL.glBindBuffer(GL.GL_PIXEL_UNPACK_BUFFER, 0);
-
-        GL.glGenBuffers(1, pboBack, 0);
-        GL.glBindBuffer(GL.GL_PIXEL_UNPACK_BUFFER, pboBack(0));
-        GL.glBufferData[Byte](GL.GL_PIXEL_UNPACK_BUFFER, size, null, 0, GL.GL_STREAM_DRAW);
-        GL.glBindBuffer(GL.GL_PIXEL_UNPACK_BUFFER, 0);
-
-        this.mappedBuffer = mappedBuffer;
-        this.mappedBufferRemote = mappedBufferRemote;
-
-        val first_rt = new RayTracer(opts, width, height, mappedBufferRemote);
-        rts = PlaceLocalHandle.make[RayTracer](Dist.makeUnique(), ()=>first_rt);
+        rts = PlaceLocalHandle.make[RayTracer](Dist.makeUnique(), ()=>new RayTracer(opts, width, height, fbr));
 
     }
 
@@ -70,27 +107,17 @@ public class GLFrontend {
 
             val before = System.nanoTime();
 
-            GL.glBindTexture(GL.GL_TEXTURE_2D, tex(0));
+            GL.glBindTexture(GL.GL_TEXTURE_2D, tex);
 
-            // background dma
-            GL.glBindBuffer(GL.GL_PIXEL_UNPACK_BUFFER, pboBack(0));
-            GL.glTexSubImage2D(GL.GL_TEXTURE_2D, 0, 0, 0, width, height, GL.GL_RGB, GL.GL_UNSIGNED_BYTE, 0);
-            
-            
-            // update other pbo
-            GL.glBindBuffer(GL.GL_PIXEL_UNPACK_BUFFER, pboFront(0));
-            GL.glBufferData[Byte](GL.GL_PIXEL_UNPACK_BUFFER, size, null, 0, GL.GL_STREAM_DRAW); // discard
-            GL.glMapBuffer(GL.GL_PIXEL_UNPACK_BUFFER, GL.GL_WRITE_ONLY, mappedBuffer);
-            Team.WORLD.barrier(here.id);
-            rts().renderFrame();
-            Team.WORLD.barrier(here.id);
-            GL.glUnmapBuffer(GL.GL_PIXEL_UNPACK_BUFFER);
-            GL.glBindBuffer(GL.GL_PIXEL_UNPACK_BUFFER, 0);
-            
-            // swap pbos
-            val tmp = pboFront(0);
-            pboFront(0) = pboBack(0);
-            pboBack(0) = tmp;
+            fb.update(()=>{
+                Team.WORLD.barrier(here.id);
+                val before_frame = System.nanoTime();
+                rts().renderFrame();
+                val after_frame = System.nanoTime();
+                val seconds = (after_frame-before_frame)/1E9;
+                Console.OUT.println("Render Frame time: " + seconds + "s " + 1/seconds + " FPS.");
+                Team.WORLD.barrier(here.id);
+            });
 
             GL.glClear(GL.GL_COLOR_BUFFER_BIT);
             
@@ -173,7 +200,7 @@ public class GLFrontend {
 
     public static def main (args : Array[String]{rail,rank==1,rect}) {here == Place.FIRST_PLACE} {
         try {
-            GL.glutInit(args);
+            //GL.glutInit(args);
             val opts = new OptionsParser(args, [
                 Option("q","quiet","print out less"),
                 Option("v","verbose","print out more"),
@@ -199,12 +226,21 @@ public class GLFrontend {
             val quiet = opts("-q");
             val global_width = opts("-W",800);
             val global_height = opts("-H",600);
+            val size = global_width * global_height * 3;
 
-            val buf = new Array[RGB](global_width*global_height);
-            val buf_remote = new RemoteArray[RGB](buf);
-            val fe = new GLFrontend(opts, global_width, global_height, buf, buf_remote);
+
+            GL.glutInit(args);
+            GL.glutInitDisplayMode(GL.GLUT_RGB | GL.GLUT_DOUBLE); // double buffered
+            GL.glutCreateWindow("X10 Distributed Raytracer");
+            GL.glewInit();
+
+            val fb = new GLFrameBuffer(global_width, global_height, size);
+            val fbr = new GlobalRef[FrameBuffer](fb);
+
+            val fe = new GLFrontend(opts, global_width, global_height, fb, fbr);
 
             fe.run();
+
 
         } catch (e:Throwable) { e.printStackTrace(); }
     }
