@@ -5,9 +5,11 @@
  *  This file is part of X10 Test.
  *
  */
-import sor.*;
+package sor.serial;
+
+import sor.serial.sor.*;
 import jgfutil.*;
-import harness.x10Test;;
+import harness.x10Test;
 
 /**
  * X10 port of jgfutil from Java Grande Forum Benchmark Suite (Version 2.0).

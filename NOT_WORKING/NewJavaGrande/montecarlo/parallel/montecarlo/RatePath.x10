@@ -451,6 +451,6 @@ public class RatePath extends PathId {
 		set_name(ratesFile.getName());
 		set_startDate(pathDate(0));
 		set_endDate(pathDate(nAcceptedPathValue-1));
-		set_dTime((double)(1.0/365.0));
+		set_dTime((1.0/365.0) as double);
 	}
 }

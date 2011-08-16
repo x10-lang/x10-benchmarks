@@ -102,7 +102,7 @@ public class RatePath extends PathId {
 	 * @exception DemoException thrown if there is a problem reading in
 	 *                          the data file.
 	 */
-	public def this(var dirName: Box[String], var filename: String): RatePath = {
+	public def this(var dirName: String, var filename: String): RatePath = {
 		set_prompt(prompt);
 		set_DEBUG(debug);
 		readRatesFile(dirName, filename);
@@ -391,8 +391,8 @@ public class RatePath extends PathId {
 	 * @exception DemoException thrown if there was a problem with the data
 	 *                          file.
 	 */
-	private def readRatesFile(var ndirName: Box[String], var filename: String): void = {
-		var dirName: String = ndirName.value as String;
+	private def readRatesFile(var ndirName: String, var filename: String): void = {
+		var dirName: String = ndirName as String;
 		var ratesFile: x10.io.File = new x10.io.File(dirName, filename);
 		var inn: x10.io.BufferedReader;
 		if (!ratesFile.canRead()) {

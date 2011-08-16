@@ -5,7 +5,9 @@
  *  This file is part of X10 Test.
  *
  */
-import sor.*;
+package sor.distributed;
+
+import sor.distributed.sor.*;
 import jgfutil.*;
 import harness.x10Test;
 /**

@@ -8,13 +8,13 @@
 package montecarlo.parallel.montecarlo;
 
 /**
- * X10 port of montecarlo benchmark from Section 2 of Java Grande Forum Benchmark Suite (Version 2.0).
+ * X10 port of montecarlo benchmark from Section 2 of x10 Grande Forum Benchmark Suite (Version 2.0).
  *
  * @author Vivek Sarkar (vsarkar@us.ibm.com)
  *
  * Porting issues identified:
  * 1) Variables/fields starting with an upper case letter have to be renamed if not final (DEBUG)
- * 2) Remove Java package structure
+ * 2) Remove x10 package structure
  * 3) Add declaration to extend x10.lang.Object
  */
 final public class Utilities {
@@ -23,7 +23,7 @@ final public class Utilities {
 
 	/**
 	 * Static method which behaves like the Unix `which' command.  OS
-	 * specific dependencies are handled by the Java.lang.System
+	 * specific dependencies are handled by the x10.lang.System
 	 * properties.
 	 *
 	 * @param executable The executable to search for.
@@ -37,13 +37,13 @@ final public class Utilities {
 		var paths: Rail[String];
 
 		paths = splitString(System.getProperty("path.separator"), pathEnv);
-		for (var i: int = 0; i<paths.length; i++) {
+		for (var i: int = 0; i<paths.size; i++) {
 			if (paths(i).length() > 0) {
 				var pathFile: x10.io.File = new x10.io.File(paths(i));
 				if (pathFile.isDirectory()) {
 					var filesInDirectory: Rail[String];
 					filesInDirectory = pathFile.list();
-					for (var j: int = 0; j<filesInDirectory.length; j++) {
+					for (var j: int = 0; j<filesInDirectory.size; j++) {
 						if (debug) {
 							Console.OUT.println("DBG: Matching "+filesInDirectory(j));
 						}
@@ -86,7 +86,7 @@ final public class Utilities {
 		var methodName: String = "join";
 		var tmpString: StringBuffer;
 
-		var nStrings: int = java.lang.reflect.Array.getLength(stringArray);
+		var nStrings: int = x10.lang.reflect.Array.getLength(stringArray);
 		if (nStrings <= index) {
 			tmpString = new StringBuffer();
 		} else {

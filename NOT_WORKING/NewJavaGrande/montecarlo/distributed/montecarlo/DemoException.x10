@@ -26,7 +26,7 @@ public class DemoException extends x10.lang.Exception {
 	public def this(): DemoException = {
 		super();
 		if (debug) {
-			printStackTrace();
+			//printStackTrace();
 		}
 	}
 
@@ -36,7 +36,7 @@ public class DemoException extends x10.lang.Exception {
 	public def this(var s: String): DemoException = {
 		super(s);
 		if (debug) {
-			printStackTrace();
+			//printStackTrace();
 		}
 	}
 
@@ -46,7 +46,7 @@ public class DemoException extends x10.lang.Exception {
 	public def this(var ierr: int): DemoException = {
 		super(String.valueOf(ierr));
 		if (debug) {
-			printStackTrace();
+			//printStackTrace();
 		}
 	}
 }

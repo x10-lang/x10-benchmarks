@@ -17,7 +17,7 @@ public class CallAppDemo {
 	// protected int[] datasizes = { 10000, 60000 };
 	protected var datasizes: Array[int] = [ 1000, 60000 ];
 	var input: Array[int] = new Array[int](2);
-	var ap: nullable[AppDemo] = null;
+	var ap: AppDemo = null;
 
 	public def initialise(): void = {
 		input(0) = 1000;

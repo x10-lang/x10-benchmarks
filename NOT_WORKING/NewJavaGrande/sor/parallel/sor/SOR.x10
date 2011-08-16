@@ -5,7 +5,7 @@
  *  This file is part of X10 Test.
  *
  */
-package sor;
+package sor.parallel.sor;
 
 import jgfutil.*;
 import x10.lang.Double;
@@ -19,9 +19,10 @@ import x10.lang.Double;
  */
 public class SOR {
     var gTotal:Double = 0.0D;
-    final public def SORrun(omega: Double, G: Array[Double], numIter: Int) {
-	val M = G.region().max(0);
-	val N = G.region().max(1);
+    
+    public def SORrun(omega: Double, G: Array[Double], numIter: Int) {
+	val M = G.region.max(0);
+	val N = G.region.max(1);
 	
 	val omega_over_four  = omega * 0.25;
 	val one_minus_omega = 1.0 - omega;
@@ -30,16 +31,16 @@ public class SOR {
 	 //
 	 JGFInstrumentor.startTimer("Section2:SOR:Kernel");
 
-	 for ((p) in 1..numIter) 
-	     for ((o) in 0..1) 
-		 finish foreach ((ii) in 0..(((M-2-(1+o))/2))) {
-		 val i = 2 * ii + 1 + o;
-		 for ((j) in 1..N-2) 
-		     G(i, j) = omega_over_four * (G(i-1, j) + G(i+1, j) + G(i, j-1)
-						  + G(i, j+1)) + one_minus_omega * G(i, j);
-	     }
+	 for ([p] in 1..numIter) 
+	     for ([o] in 0..1) 
+		 	finish for ([ii] in 0..(((M-2-(1+o))/2))) {
+		 		val i = 2 * ii + 1 + o;
+		 		for ([j] in 1..(N-2)) 
+		 			G(i, j) = omega_over_four * (G(i-1, j) + G(i+1, j) + G(i, j-1)
+		 					+ G(i, j+1)) + one_minus_omega * G(i, j);
+	     	}
 
 	 JGFInstrumentor.stopTimer("Section2:SOR:Kernel");
-	 gTotal = G.reduce(Double.+, 0);
+	 gTotal = G.reduce((a:double, b:double) => a+b, 0.0 as double);
     }
 }

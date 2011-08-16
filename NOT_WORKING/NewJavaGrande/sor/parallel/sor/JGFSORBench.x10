@@ -5,10 +5,10 @@
  *  This file is part of X10 Test.
  *
  */
-package sor;
+package sor.parallel.sor;
 
 import jgfutil.*;
-import x10.util.Random;;
+import x10.util.*;
 
 /**
  * X10 port of sor benchmark from Section 2 of Java Grande Forum Benchmark Suite.
@@ -22,8 +22,8 @@ public class JGFSORBench extends SOR implements JGFSection2 {
 
     private var size: Int;
     private val datasizes =  [10, 1500, 2000];
-    private const JACOBI_NUM_ITER = 100;
-    private const RANDOM_SEED  = 10101010L;
+    private static val JACOBI_NUM_ITER = 100;
+    private static val RANDOM_SEED  = 10101010L;
 
     val R  = new Random(RANDOM_SEED);
 
@@ -67,8 +67,8 @@ public class JGFSORBench extends SOR implements JGFSection2 {
     }
 
     private static def RandomMatrix(M: int, N: int, R: Random): Array[Double] {
-	val t = Array.make[Double]([0..M-1, 0..N-1]);
-    for ((i,j) in t.region) 
+	val t = new Array[Double](0..(M-1)*0..(N-1));
+    for ([i,j] in t.region) 
 	t(i, j) = R.nextDouble() * 1e-6;
     return t;
     }

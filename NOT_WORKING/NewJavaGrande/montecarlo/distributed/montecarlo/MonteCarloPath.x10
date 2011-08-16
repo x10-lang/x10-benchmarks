@@ -427,7 +427,7 @@ public class MonteCarloPath extends PathId {
 	 */
 	public def writeFile(var dirName: String, var filename: String): void = {
 		try {
-			var ratesFile: x10.io.File = new File(dirName, filename);
+			var ratesFile: x10.io.File = new x10.io.File(dirName, filename);
 			if (ratesFile.exists() && ! ratesFile.canWrite())
 				throw new DemoException("Cannot write to specified filename!");
 			var out: x10.io.PrintWriter = new PrintWriter(new BufferedWriter(

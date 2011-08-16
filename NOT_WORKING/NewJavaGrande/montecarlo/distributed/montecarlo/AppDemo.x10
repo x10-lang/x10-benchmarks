@@ -79,9 +79,9 @@ public class AppDemo extends Universal {
 	 * Variable to determine which deployment scenario to run.
 	 */
 	private var runMode: int;
-	private var D: Dist;
+	private var D: Dist(1);
 	private var tasks: DistArray[ToTask];
-	private val expectedReturnRate: DistArray[double];
+	private val expectedReturnRate: DistArray[double](1);
 	private val volatility: DistArray[double];
 	public def this(var dataDirname: String, var dataFilename: String, var nTimeStepsMC: int, var nRunsMC: int): AppDemo = {
 		this.dataDirname    = dataDirname;
@@ -104,7 +104,7 @@ public class AppDemo extends Universal {
 	var avgExpectedReturnRateMC: double = 0.0;
 	var avgVolatilityMC: double = 0.0;
 
-	var initAllTasks: Box[ToInitAllTasks] = null;
+	var initAllTasks: ToInitAllTasks = null;
 
 	/**
 	 * Single point of contact for running this increasingly bloated
@@ -135,7 +135,7 @@ public class AppDemo extends Universal {
 			//
 		} catch (var demoEx: DemoException) {
 			dbgPrintln(demoEx.toString());
-			System.exit(-1);
+			//System.exit(-1);
 		}
 	}
 
@@ -184,8 +184,8 @@ public class AppDemo extends Universal {
 	 *            any values.
 	 */
 	private def processResults(): void = {
-		var avgExpectedReturnRateMC: double = expectedReturnRate.sum()/nRunsMC;
-		var avgVolatilityMC: double = volatility.sum()/nRunsMC;
+		var avgExpectedReturnRateMC: double = expectedReturnRate.reduce((a:double, b:double)=>a+b, 0 as double)/nRunsMC;
+		var avgVolatilityMC: double = volatility.reduce((a:double, b:double)=>a+b,0 as double)/nRunsMC;
 		/*
 		 * The other computations are not actually used. But if needed here
 		 * is how they would be represented:
@@ -281,7 +281,7 @@ public class AppDemo extends Universal {
 	 * Accessor method for private instance variable <code>tasks</code>.
 	 * @return Value of instance variable <code>tasks</code>.
 	 */
-	public def get_tasks(): Array[ToTask] = {
+	public def get_tasks(): DistArray[ToTask] = {
 		return (this.tasks);
 	}
 
@@ -289,7 +289,7 @@ public class AppDemo extends Universal {
 	 * Set method for private instance variable <code>tasks</code>.
 	 * @param tasks the value to set for the instance variable <code>tasks</code>.
 	 */
-	public def set_tasks(var tasks: Array[ToTask]): void = {
+	public def set_tasks(var tasks: DistArray[ToTask]): void = {
 		this.tasks = tasks;
 	}
 

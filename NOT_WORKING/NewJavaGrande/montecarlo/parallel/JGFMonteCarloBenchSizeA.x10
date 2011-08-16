@@ -7,7 +7,7 @@
  */
 package montecarlo.parallel;
 
-import montecarlo.parallel.*;
+import montecarlo.parallel.montecarlo.*;
 import jgfutil.*;
 import harness.x10Test;
 
