@@ -470,11 +470,11 @@ public final class Brandes(N:Int) {
            Option("f", "", "Graph file name"),
            Option("t", "", "File type: 0: NET, 1:NWB, 2:GUOJING, 3:CSR"),
            Option("i", "", "Starting index of vertices"),
-           Option("debug", "", "Debug"),
-           Option("chunk", "", "Chunk size, defaults to 100"),
-           Option("permute", "", "true, false"),
-           Option("weighted", "", "true, false"),
-           Option("dump", "", "true, false"),
+           Option(null, "debug", "Debug"),
+           Option(null, "chunk", "Chunk size, defaults to 100"),
+           Option(null, "permute", "true, false"),
+           Option(null, "weighted", "true, false"),
+           Option(null, "dump", "true, false"),
            Option("o", "", "Output file name")]);
       
       val seed:Long = cmdLineParams ("-s", 2);
