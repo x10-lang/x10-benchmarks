@@ -18,6 +18,7 @@ TEX=bc.tex \
     background.tex \
     rmat.tex \
     ops.tex \
+    open_problems.tex \
     references.bib 
 
 all: pdf 
