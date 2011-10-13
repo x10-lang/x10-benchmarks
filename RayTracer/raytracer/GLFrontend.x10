@@ -95,11 +95,40 @@ public class GLFrontend {
     val width:Int, height:Int;
     var winWidth:Int, winHeight:Int;
 
+    val keyDown = new Array[Boolean](256);
+    var currMouseX: Float;
+    var currMouseY: Float;
+    var lastMouseX: Float;
+    var lastMouseY: Float;
     var pos: Vector3;
     var yaw: Float;
     var pitch: Float;
-    public def orientation() = Quat.angleAxis(pitch/180 * (Math.PI as Float),1,0,0)
-                             * Quat.angleAxis(yaw/180 * (Math.PI as Float),0,0,-1);
+    public def orientation() = Quat.angleAxis(yaw/180 * (Math.PI as Float),0,0,-1)
+                             * Quat.angleAxis(pitch/180 * (Math.PI as Float),1,0,0);
+    public def updatePosOrientation () {
+        val mouse_move_x = currMouseX - lastMouseX;
+        val mouse_move_y = currMouseY - lastMouseY;
+        lastMouseX = currMouseX;
+        lastMouseY = currMouseY;
+
+        val turn_speed = 5.0f;
+        val rot_right = (keyDown('3'.ord()) ? 1.0f : 0.0f) - (keyDown('1'.ord()) ? 1.0f : 0.0f);
+        val rot_up = (keyDown('2'.ord()) ? 1.0f : 0.0f) - (keyDown('5'.ord()) ? 1.0f : 0.0f);
+        yaw += mouse_move_x * 0.2f;
+        pitch += mouse_move_y * 0.2f;
+        yaw += turn_speed * rot_right;
+        pitch += turn_speed * rot_up;
+        pitch = Math.min(Math.max(pitch, -90.0f), 90.0f);
+
+        val move_speed = 0.3f;
+        val forwards = (keyDown('w'.ord()) ? 1.0f : 0.0f) - (keyDown('s'.ord()) ? 1.0f : 0.0f);
+        val right = (keyDown('d'.ord()) ? 1.0f : 0.0f) - (keyDown('a'.ord()) ? 1.0f : 0.0f);
+        val up = (keyDown(' '.ord()) ? 1.0f : 0.0f) - (keyDown('c'.ord()) ? 1.0f : 0.0f);
+        val pos_change = forwards * move_speed * Vector3(0,1,0)
+                       + right * move_speed * Vector3(1,0,0)
+                       + up * move_speed * Vector3(0,0,1);
+        pos += orientation() * pos_change;
+    }
 
     public def this (opts:OptionsParser, width:Int, height:Int, fb:FrameBuffer, fbr:GlobalRef[FrameBuffer]{home==Place.FIRST_PLACE} ) {
 
@@ -131,6 +160,7 @@ public class GLFrontend {
 
             fb.update(()=>{
                 val pos_ = pos;
+                updatePosOrientation();
                 val orientation_ = orientation();
                 //Console.OUT.println("yaw="+yaw+" pitch="+pitch+" orientation="+orientation_);
                 finish for (p in Place.places()) async at (p) {
@@ -207,41 +237,39 @@ public class GLFrontend {
         }
 
         public def motion (x:Int, y:Int) : void {
-            Console.OUT.println("MOTION: " + x + ", " + y);
+            currMouseX = x;
+            currMouseY = y;
+            //Console.OUT.println("MOTION: " + x + ", " + y);
         }
 
-        public def passiveMotion (x:Int, y:Int) : void {
-            Console.OUT.println("PASSIVE MOTION: " + x + ", " + y);
-        }
+        //public def passiveMotion (x:Int, y:Int) : void {
+        //    Console.OUT.println("PASSIVE MOTION: " + x + ", " + y);
+        //}
 
-        public def keyboard (key: Char, x:Int, y:Int) {
-            val move_speed = 0.3f;
-            val turn_speed = 5.0f;
-            if (key == 'w') {
-                pos += orientation() * (move_speed * Vector3(0,1,0));
-            } else if (key == 's') {
-                pos += orientation() * (move_speed * Vector3(0,-1,0));
-            } else if (key == 'a') {
-                pos += orientation() * (move_speed * Vector3(-1,0,0));
-            } else if (key == 'd') {
-                pos += orientation() * (move_speed * Vector3(1,0,0));
-            } else if (key == ' ') {
-                pos += orientation() * (move_speed * Vector3(0,0,1));
-            } else if (key == 'c') {
-                pos += orientation() * (move_speed * Vector3(0,0,-1));
-            } else if (key == '5') {
-                pitch += turn_speed;
-                if (pitch > 80) pitch = 80;
-            } else if (key == '2') {
-                pitch -= turn_speed;
-                if (pitch < -80) pitch = -80;
-            } else if (key == '1') {
-                yaw -= turn_speed;
-            } else if (key == '3') {
-                yaw += turn_speed;
-            } else {
-                Console.OUT.println("key press: "+key);
+        public def mouse (button:Int, state:Int, x:Int, y:Int) {
+            if (button==0 && state==0) {
+                lastMouseX = x;
+                lastMouseY = y;
+                currMouseX = x;
+                currMouseY = y;
             }
+        }
+
+        public def keyboardUp (key_: Char, x:Int, y:Int) {
+            val key = key_.toLowerCase();
+            keyDown(key.ord()) = false;
+        }
+
+        public def keyboard (key_: Char, x:Int, y:Int) {
+            val key = key_.toLowerCase();
+            keyDown(key.ord()) = true;
+            Console.OUT.println("key press: "+key.ord());
+/*
+            if (key == 'w') {
+                forwards += 1.0f;
+            } else {
+            }
+*/
 
         }
 
