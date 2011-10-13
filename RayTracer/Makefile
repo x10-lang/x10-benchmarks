@@ -25,4 +25,7 @@ GLFrontend.opt: $(RAYTRACER_SRC)
 GLFrontend.dbg: $(RAYTRACER_SRC)
 	$(DBGX10CPP) -d out-dbg raytracer/GLFrontend.x10 -x10lib ~/x10-dbg/x10.gl/x10_gl.properties -o $@
 
+clean:
+	rm -rfv Benchmark.opt Benchmark.dbg GLFrontend.opt GLFrontend.dbg out-opt out-dbg
+
 # vim: tabstop=8:shiftwidth=8:noexpandtab

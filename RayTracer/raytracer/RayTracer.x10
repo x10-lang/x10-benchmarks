@@ -24,6 +24,9 @@ public class RayTracer {
     verbose:Boolean;
     quiet:Boolean;
 
+    var orientation:Quat = Quat(1,0,0,0);
+    var pos:Vector3 = Vector3(0,0,0);
+
     public def this (opts:OptionsParser, global_width:Int, global_height:Int,
                      frameBuffer:GlobalRef[FrameBuffer]{home==Place.FIRST_PLACE}) {
 
@@ -183,23 +186,32 @@ public class RayTracer {
             Console.OUT.println(here+" rendering "+horz_split+","+vert_split+"    "+offset_x+","+offset_y);
 
 
-        val before = Runtime.getX10RTStats();
-        val render_before = System.nanoTime();
+        //val before = Runtime.getX10RTStats();
+        //val render_before = System.nanoTime();
         finish {
             val res = new RayResult();
             val lw = localWidth;
             val lh = localHeight;
             val gw = globalWidth;
             val gh = globalHeight;
-            val ray_top_right = Vector3(gw/gh,1,1);
+            val forwards = orientation * Vector3(0,1,0);
+            val right = orientation * Vector3(1,0,0);
+            val up = orientation * Vector3(0,0,1);
+            //Console.OUT.println("forwards: "+forwards);
             for (var y_:Int=0 ; y_<lh ; y_+=1) {
                 val y = y_;
+                // y_norm: centre of pixel, normalised to -1 -> 1 range
+                // note inversion of axis so -1,-1 is bottom left of screen
                 val y_norm = -(y+0.5f+offset_y)/gh*2.0f + 1.0f;
                 for (var x:Int=0 ; x<lw ; ++x) {
                     // linear projection
+                    // x_norm: center of pixel, normalised to -1 -> 1 range
                     val x_norm = (x+0.5f+offset_x)/gw*2.0f - 1.0f;
-                    val ray = Vector3(x_norm,1,y_norm) * ray_top_right;
-                    localFrame(y*lw + x) = castRay(Vector3(0,0,0), ray, res);
+                    // FOV of 90
+                    val ray = x_norm * gw/gh * right
+                            + forwards
+                            + y_norm * up;
+                    localFrame(y*lw + x) = castRay(pos, ray * 800, res);
                 }
                 val local_off = y*lw;
                 val remote_off = offset_x + (offset_y+y)*gw;
@@ -211,8 +223,8 @@ public class RayTracer {
                 Runtime.probe();
             }
         }
-        Console.OUT.println(here+" "+(System.nanoTime() - render_before)/1E9);
-        Console.OUT.println(here+" "+(Runtime.getX10RTStats() - before));
+        //Console.OUT.println(here+" "+(System.nanoTime() - render_before)/1E9);
+        //Console.OUT.println(here+" "+(Runtime.getX10RTStats() - before));
     }
 
 }

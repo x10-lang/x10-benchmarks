@@ -1,6 +1,14 @@
 package raytracer;
 
-public struct Quat(w:Float, x:Float,y:Float,z:Float) {
+public struct Quat (w:Float, x:Float,y:Float,z:Float) {
+
+    public static ID:Quat = Quat(1,0,0,0);
+
+    public static def angleAxis (a:Float, x:Float, y:Float, z:Float) {
+        val c = Math.cos(a*0.5f) as Float;
+        val s = Math.sin(a*0.5f) as Float;
+        return Quat(c, x*s, y*s, z*s);
+    }
 
     public operator this + (v:Quat) = Quat(w+v.w, x+v.x, y+v.y, z+v.z);
     public operator this - (v:Quat) = Quat(w-v.w, x-v.x, y-v.y, z-v.z);
@@ -14,7 +22,7 @@ public struct Quat(w:Float, x:Float,y:Float,z:Float) {
         val uuv = axis.cross(uv);
         val uv2 = uv * (2.0f * w);
         val uuv2 = uuv * 2.0f;
-        return v + uv + uuv;
+        return v + uv2 + uuv2;
     }
     public operator this * (v:Quat) = Quat(w*v.w - x*v.x - y*v.y - z*v.z,
                                            w*v.x + x*v.w + y*v.z - z*v.y,
@@ -31,6 +39,8 @@ public struct Quat(w:Float, x:Float,y:Float,z:Float) {
     public def dot (v:Quat) = w*v.w + x*v.x + y*v.y + z*v.z;
     public def unitInverse () = Quat(w,-x,-y,-z);
     public def inverse () = normalised().unitInverse();
+
+    public def toString () = "Quat("+w+", "+x+", "+y+", "+z+")";
 
 }
 

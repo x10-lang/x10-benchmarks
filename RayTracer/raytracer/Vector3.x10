@@ -18,5 +18,7 @@ public struct Vector3(x:Float,y:Float,z:Float) {
     public def dot (v:Vector3) = x*v.x + y*v.y + z*v.z;
     public def cross (v:Vector3) = Vector3(y*v.z - z*v.y,  z*v.x - x*v.z,  x*v.y - y*v.x);
     public def normalised() = this/length();
+
+    public def toString () = "Vector3("+x+", "+y+", "+z+")";
 }
 

@@ -21,6 +21,8 @@ public class GLFrontend {
         var pboFront:Int;
         var pboBack:Int;
 
+        var h:Int = 0;
+
         private val width:Int, height:Int, size:Int;
 
         public def this (width:Int, height:Int, size:Int) {
@@ -56,6 +58,17 @@ public class GLFrontend {
             GL.glBufferData[Byte](GL.GL_PIXEL_UNPACK_BUFFER, size, null, 0, GL.GL_STREAM_DRAW); // discard
             try {
                 raw = GL.glMapBuffer[RGB](GL.GL_PIXEL_UNPACK_BUFFER, GL.GL_WRITE_ONLY, width*height);
+                /*
+                for (y in 0..(height-1)) {
+                    for (x in 0..(width-1)) {
+                        val c1 = ((x*x) / 256 + 3 * y + h*10) as UByte;
+                        val c2 = ((y*y) / 256 + x + h*10) as UByte;
+                        val c3 = ((y*y + x*x) / 256 + h*10) as UByte;
+                        raw(y*width + x) = RGB(c1, c2, c3);
+                    }
+                }
+                h++;
+                */
                 write();
             } finally {
                 GL.glUnmapBuffer(GL.GL_PIXEL_UNPACK_BUFFER);
@@ -67,6 +80,7 @@ public class GLFrontend {
             pboFront = pboBack;
             pboBack = tmp;
         }
+
 
     }
 
@@ -80,6 +94,12 @@ public class GLFrontend {
     
     val width:Int, height:Int;
     var winWidth:Int, winHeight:Int;
+
+    var pos: Vector3;
+    var yaw: Float;
+    var pitch: Float;
+    public def orientation() = Quat.angleAxis(pitch/180 * (Math.PI as Float),1,0,0)
+                             * Quat.angleAxis(yaw/180 * (Math.PI as Float),0,0,-1);
 
     public def this (opts:OptionsParser, width:Int, height:Int, fb:FrameBuffer, fbr:GlobalRef[FrameBuffer]{home==Place.FIRST_PLACE} ) {
 
@@ -110,13 +130,22 @@ public class GLFrontend {
             GL.glBindTexture(GL.GL_TEXTURE_2D, tex);
 
             fb.update(()=>{
-                Team.WORLD.barrier(here.id);
-                //val before_frame = System.nanoTime();
-                rts().renderFrame();
-                //val after_frame = System.nanoTime();
-                //val seconds = (after_frame-before_frame)/1E9;
-                //Console.OUT.println("Render Frame time: " + seconds + "s " + 1/seconds + " FPS.");
-                Team.WORLD.barrier(here.id);
+                val pos_ = pos;
+                val orientation_ = orientation();
+                //Console.OUT.println("yaw="+yaw+" pitch="+pitch+" orientation="+orientation_);
+                finish for (p in Place.places()) async at (p) {
+                    val rt = rts();
+                    //while (true) {
+                        //val before = System.nanoTime();
+                        rt.pos = pos_;
+                        rt.orientation = orientation_;
+                        rt.renderFrame();
+                        //val taken = (System.nanoTime()-before)/1E9/100;
+                        //if (!quiet && here == Place.FIRST_PLACE) {
+                        //    Console.OUT.println("Frame time: "+taken+"    FPS: "+1/taken);
+                        //}
+                    //}
+                }
             });
 
             GL.glClear(GL.GL_COLOR_BUFFER_BIT);
@@ -176,24 +205,52 @@ public class GLFrontend {
             GL.glViewport(0, 0, x, y);
             setMatrixes();
         }
+
+        public def motion (x:Int, y:Int) : void {
+            Console.OUT.println("MOTION: " + x + ", " + y);
+        }
+
+        public def passiveMotion (x:Int, y:Int) : void {
+            Console.OUT.println("PASSIVE MOTION: " + x + ", " + y);
+        }
+
+        public def keyboard (key: Char, x:Int, y:Int) {
+            val move_speed = 0.3f;
+            val turn_speed = 5.0f;
+            if (key == 'w') {
+                pos += orientation() * (move_speed * Vector3(0,1,0));
+            } else if (key == 's') {
+                pos += orientation() * (move_speed * Vector3(0,-1,0));
+            } else if (key == 'a') {
+                pos += orientation() * (move_speed * Vector3(-1,0,0));
+            } else if (key == 'd') {
+                pos += orientation() * (move_speed * Vector3(1,0,0));
+            } else if (key == ' ') {
+                pos += orientation() * (move_speed * Vector3(0,0,1));
+            } else if (key == 'c') {
+                pos += orientation() * (move_speed * Vector3(0,0,-1));
+            } else if (key == '5') {
+                pitch += turn_speed;
+                if (pitch > 80) pitch = 80;
+            } else if (key == '2') {
+                pitch -= turn_speed;
+                if (pitch < -80) pitch = -80;
+            } else if (key == '1') {
+                yaw -= turn_speed;
+            } else if (key == '3') {
+                yaw += turn_speed;
+            } else {
+                Console.OUT.println("key press: "+key);
+            }
+
+        }
+
+
     }
 
 
     public def run () {
         finish {
-            for (p in Place.places()) if (p!=here) async at (p) {
-                val rt = rts();
-                while (true) {
-                    //val before = System.nanoTime();
-                    Team.WORLD.barrier(here.id);
-                    rt.renderFrame();
-                    Team.WORLD.barrier(here.id);
-                    //val taken = (System.nanoTime()-before)/1E9/100;
-                    //if (!quiet && here == Place.FIRST_PLACE) {
-                    //    Console.OUT.println("Frame time: "+taken+"    FPS: "+1/taken);
-                    //}
-                }
-            }
             GL.glutMainLoop(new FrameEventHandler());
         }
     }
