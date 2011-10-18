@@ -96,10 +96,11 @@ public class GLFrontend {
     var winWidth:Int, winHeight:Int;
 
     val keyDown = new Array[Boolean](256);
-    var currMouseX: Float;
-    var currMouseY: Float;
-    var lastMouseX: Float;
-    var lastMouseY: Float;
+    var currMouseX: Int;
+    var currMouseY: Int;
+    var lastMouseX: Int;
+    var lastMouseY: Int;
+    var mouseDown: Boolean;
     var pos: Vector3;
     var yaw: Float;
     var pitch: Float;
@@ -108,8 +109,12 @@ public class GLFrontend {
     public def updatePosOrientation () {
         val mouse_move_x = currMouseX - lastMouseX;
         val mouse_move_y = currMouseY - lastMouseY;
+        currMouseX = GL.glutGet(GL.GLUT_WINDOW_WIDTH)/2;
+        currMouseY = GL.glutGet(GL.GLUT_WINDOW_HEIGHT)/2;
         lastMouseX = currMouseX;
         lastMouseY = currMouseY;
+        if (mouseDown)
+            GL.glutWarpPointer(currMouseX, currMouseY);
 
         val turn_speed = 5.0f;
         val rot_right = (keyDown('3'.ord()) ? 1.0f : 0.0f) - (keyDown('1'.ord()) ? 1.0f : 0.0f);
@@ -247,11 +252,18 @@ public class GLFrontend {
         //}
 
         public def mouse (button:Int, state:Int, x:Int, y:Int) {
-            if (button==0 && state==0) {
-                lastMouseX = x;
-                lastMouseY = y;
-                currMouseX = x;
-                currMouseY = y;
+            if (button==0) {
+                if (state==0) {
+                    lastMouseX = x;
+                    lastMouseY = y;
+                    currMouseX = x;
+                    currMouseY = y;
+                    mouseDown = true;
+                    GL.glutSetCursor(GL.GLUT_CURSOR_NONE);
+                } else {
+                    mouseDown = false;
+                    GL.glutSetCursor(GL.GLUT_CURSOR_INHERIT);
+                }
             }
         }
 
@@ -263,7 +275,7 @@ public class GLFrontend {
         public def keyboard (key_: Char, x:Int, y:Int) {
             val key = key_.toLowerCase();
             keyDown(key.ord()) = true;
-            Console.OUT.println("key press: "+key.ord());
+            //Console.OUT.println("key press: "+key.ord());
 /*
             if (key == 'w') {
                 forwards += 1.0f;

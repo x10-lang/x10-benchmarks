@@ -11,6 +11,7 @@ RAYTRACER_SRC = \
         raytracer/Benchmark.x10 \
         raytracer/Vector3.x10 \
         raytracer/Quat.x10 \
+        raytracer/Octree.x10 \
         raytracer/RGB.x10
 
 Benchmark.opt: $(RAYTRACER_SRC)

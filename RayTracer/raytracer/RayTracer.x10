@@ -85,7 +85,7 @@ public class RayTracer {
         public def intersectRay (ray_origin_w:Vector3, ray_dir:Vector3, res:RayResult) : Boolean;
     }
 
-    public static final class Sphere(worldPos:Vector3, radius:Float) implements Primitive {
+    public static final struct Sphere(worldPos:Vector3, radius:Float) implements Primitive {
         public def intersectRay (ray_origin_w:Vector3, ray_dir:Vector3, res:RayResult) : Boolean {
             // stolen from http://wiki.cgsociety.org/index.php/Ray_Sphere_Intersection#Example_Code
             val ray_origin_o = ray_origin_w - worldPos;
@@ -132,7 +132,7 @@ public class RayTracer {
         }
     }
 
-    public static final class SpeckledSphere(worldPos:Vector3, radius:Float) implements Primitive {
+    public static final struct SpeckledSphere(worldPos:Vector3, radius:Float) implements Primitive {
         // FIXME: code duplicated from Sphere, extends Sphere(worldPos, radius) gives a type error...
         public def intersectRay (ray_origin_w:Vector3, ray_dir:Vector3, res:RayResult) : Boolean {
             // stolen from http://wiki.cgsociety.org/index.php/Ray_Sphere_Intersection#Example_Code
@@ -199,7 +199,7 @@ public class RayTracer {
         }
     }
 
-    public static final class Triangle(p1:Vector3, p2:Vector3, p3:Vector3) implements Primitive {
+    public static final struct Triangle(p1:Vector3, p2:Vector3, p3:Vector3) implements Primitive {
         public def intersectRay (ray_origin_w:Vector3, ray_dir:Vector3, res:RayResult) : Boolean {
             // Stolen from http://www.lighthouse3d.com/tutorials/maths/ray-triangle-intersection/
 
