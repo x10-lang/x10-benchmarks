@@ -15,9 +15,8 @@ RAYTRACER_SRC = \
         raytracer/Primitive.x10 \
         raytracer/Quat.x10 \
         raytracer/RayTracer.x10 \
-        raytracer/RayResult.x10 \
+        raytracer/RayState.x10 \
         raytracer/RGB.x10 \
-        raytracer/ScreenResult.x10 \
         raytracer/Vector3.x10 \
 
 
@@ -29,27 +28,26 @@ GLFrontend.dbg: $(RAYTRACER_SRC) raytracer/GLFrontend.x10
 
 Benchmark.opt: $(RAYTRACER_SRC) raytracer/Benchmark.x10
 	$(OPTX10CPP) -d out-opt raytracer/Benchmark.x10 -o $@
-
 Benchmark.dbg: $(RAYTRACER_SRC) raytracer/Benchmark.x10
 	$(DBGX10CPP) -d out-dbg raytracer/Benchmark.x10 -o $@
 
+QuatTest.opt: raytracer/QuatTest.x10 raytracer/Quat.x10
+	$(OPTX10CPP) -d out-opt raytracer/QuatTest.x10 -o $@
 QuatTest.dbg: raytracer/QuatTest.x10 raytracer/Quat.x10
 	$(DBGX10CPP) -d out-dbg raytracer/QuatTest.x10 -o $@
-QuatTest.opt: raytracer/QuatTest.x10 raytracer/Quat.x10
-	$(OPTX10CPP) -d out-dbg raytracer/QuatTest.x10 -o $@
 
+Vector3Test.opt: raytracer/Vector3Test.x10 raytracer/Vector3.x10
+	$(OPTX10CPP) -d out-opt raytracer/Vector3Test.x10 -o $@
 Vector3Test.dbg: raytracer/Vector3Test.x10 raytracer/Vector3.x10
 	$(DBGX10CPP) -d out-dbg raytracer/Vector3Test.x10 -o $@
-Vector3Test.opt: raytracer/Vector3Test.x10 raytracer/Vector3.x10
-	$(OPTX10CPP) -d out-dbg raytracer/Vector3Test.x10 -o $@
 
+OctreeTest.opt: raytracer/OctreeTest.x10 raytracer/Octree.x10
+	$(OPTX10CPP) -d out-opt raytracer/OctreeTest.x10 -o $@
 OctreeTest.dbg: raytracer/OctreeTest.x10 raytracer/Octree.x10
 	$(DBGX10CPP) -d out-dbg raytracer/OctreeTest.x10 -o $@
-OctreeTest.opt: raytracer/OctreeTest.x10 raytracer/Octree.x10
-	$(OPTX10CPP) -d out-dbg raytracer/OctreeTest.x10 -o $@
 
 
 clean:
-	rm -rfv {Benchmark,GLFrontend,QuatTest,OctreeTest}.{opt,dbg} out-opt out-dbg xxx_main_xxx.cc
+	rm -rfv "{Benchmark,GLFrontend,QuatTest,OctreeTest,Vector3Test}.{opt,dbg}" out-opt out-dbg xxx_main_xxx.cc
 
 # vim: tabstop=8:shiftwidth=8:noexpandtab

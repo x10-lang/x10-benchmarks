@@ -73,15 +73,18 @@ public class RayTracer {
         localFrame = new Array[RGB](localWidth * localHeight);
     }
 
-    val scene = new Octree(4, AABB(Vector3(-100,-100,-100),Vector3(100,100,100)));
+    val scene = new Octree(12, AABB(Vector3(-100,-100,-100),Vector3(100,100,100)));
     public def init() {
-        //scene.insert(new Sphere(Vector3(0,3,0), 1));
-        //scene.insert(new Sphere(Vector3(-1,3,-1), 1));
-        //scene.insert(new Sphere(Vector3( 2,3,-1), 1));
-        //scene.insert(new Sphere(Vector3( 2,4,-2), 2));
-        //scene.insert(new Sphere(Vector3( 3,-2,-4), 1.5f));
-        //scene.insert(new SpeckledSphere(Vector3(2,3,0.5f), 1));
-        //scene.insert(new Triangle(Vector3(-5,3,0.5f), Vector3(-3,3.0f,0.6f), Vector3(-4,0,0.2f)));
+        ///*
+        scene.insert(new Sphere(Vector3(0,3,0), 1));
+        scene.insert(new Sphere(Vector3(-1,3,-1), 1));
+        scene.insert(new Sphere(Vector3( 2,3,-1), 1));
+        scene.insert(new Sphere(Vector3( 2,4,-2), 2));
+        scene.insert(new Sphere(Vector3( 3,-2,-4), 1.5f));
+        scene.insert(new SpeckledSphere(Vector3(2,3,0.5f), 1));
+        scene.insert(new Triangle(Vector3(-5,3,0.5f), Vector3(-3,3.0f,0.6f), Vector3(-4,0,0.2f)));
+        //*/
+        /*
         for (z in -5..4) {
             for (y in -5..4) {
                 for (x in -5..4) {
@@ -92,48 +95,32 @@ public class RayTracer {
                 }
             }
         }
+        */
         //Console.OUT.println(scene);
         return this;
     }
 
-    val sun_dir = Vector3(0,0,1);
+    val sunDir = Vector3(0,0,1);
 
     public static def to_col(x:Vector3) {
         val scaled = x*0.5f + Vector3(0.5f,0.5f,0.5f);
         return RGB(scaled.x, scaled.y, scaled.z);
     }
 
-    public final def castRay (origin:Vector3, dir:Vector3, res:RayResult, res2:ScreenResult) {
-        res2.colour = RGB.DARK_BLUE;
-        res2.t = Float.MAX_VALUE;
+    public final def castRay (s:RayState) {
+        s.screenColour = RGB.DARK_BLUE;
+        s.screenT = Float.MAX_VALUE;
         //scene.iterateCargo((p:Primitive) => {
-        scene.castRay(origin, dir, this, res, res2);
-        //return colour;
-        if (res2.t < Float.MAX_VALUE) return;
-        //res2.colour = to_col(dir.normalised());
-        val dn = dir.normalised();
-        if (dn.x > 0 && Math.abs(dn.y/dn.x) < 1 && Math.abs(dn.z/dn.x) < 1) res2.colour = to_col(Vector3( 1,0,0));
-        if (dn.x < 0 && Math.abs(dn.y/dn.x) < 1 && Math.abs(dn.z/dn.x) < 1) res2.colour = to_col(Vector3(-1,0,0));
-        if (dn.y > 0 && Math.abs(dn.x/dn.y) < 1 && Math.abs(dn.z/dn.y) < 1) res2.colour = to_col(Vector3(0, 1,0));
-        if (dn.y < 0 && Math.abs(dn.x/dn.y) < 1 && Math.abs(dn.z/dn.y) < 1) res2.colour = to_col(Vector3(0,-1,0));
-        if (dn.z > 0 && Math.abs(dn.x/dn.z) < 1 && Math.abs(dn.y/dn.z) < 1) res2.colour = to_col(Vector3(0,0, 1));
-        if (dn.z < 0 && Math.abs(dn.x/dn.z) < 1 && Math.abs(dn.y/dn.z) < 1) res2.colour = to_col(Vector3(0,0,-1));
-    }
-
-    @Inline public def castRayPrimitive (p:Primitive, o:Vector3, d:Vector3, res:RayResult, res2:ScreenResult) {
-        if (p.intersectRay(o, d, res)) { 
-            if (res.t > res2.t) return; 
-            res2.t = res.t; 
-            val the_dot = res.normal.dot(sun_dir); 
-            // half lambert shading 
-            val diffuse = (the_dot * 0.5f + 0.5f) * (the_dot * 0.5f + 0.5f); 
-            // standard shading 
-            //val diffuse = Math.max(0.0f, the_dot); 
-            val ambient = 0.15f; 
-            val l = diffuse + ambient; 
-            val lb = (l * 255) as UByte;
-            res2.colour = RGB(lb, lb, lb); 
-            //res2.colour = to_col(res.normal); 
+        scene.castRay(s);
+        if (false && s.screenT == Float.MAX_VALUE) {
+            //s.screenColour = to_col(o.d.normalised());
+            val dn = s.d.normalised();
+            if (dn.x > 0 && Math.abs(dn.y/dn.x) < 1 && Math.abs(dn.z/dn.x) < 1) s.screenColour = to_col(Vector3( 1,0,0));
+            if (dn.x < 0 && Math.abs(dn.y/dn.x) < 1 && Math.abs(dn.z/dn.x) < 1) s.screenColour = to_col(Vector3(-1,0,0));
+            if (dn.y > 0 && Math.abs(dn.x/dn.y) < 1 && Math.abs(dn.z/dn.y) < 1) s.screenColour = to_col(Vector3(0, 1,0));
+            if (dn.y < 0 && Math.abs(dn.x/dn.y) < 1 && Math.abs(dn.z/dn.y) < 1) s.screenColour = to_col(Vector3(0,-1,0));
+            if (dn.z > 0 && Math.abs(dn.x/dn.z) < 1 && Math.abs(dn.y/dn.z) < 1) s.screenColour = to_col(Vector3(0,0, 1));
+            if (dn.z < 0 && Math.abs(dn.x/dn.z) < 1 && Math.abs(dn.y/dn.z) < 1) s.screenColour = to_col(Vector3(0,0,-1));
         }
     }
 
@@ -151,8 +138,8 @@ public class RayTracer {
         //val before = Runtime.getX10RTStats();
         //val render_before = System.nanoTime();
         finish {
-            val res = new RayResult();
-            val res2 = new ScreenResult();
+            val state = new RayState(this);
+            state.o = pos;
 
             val forwards = orientation * Vector3(0,1,0);
             val right = orientation * Vector3(1,0,0);
@@ -172,8 +159,9 @@ public class RayTracer {
                     val ray = x_norm * globalWidth/globalHeight * right
                             + forwards
                             + y_norm * up;
-                    castRay(pos, ray * 800, res, res2);
-                    localFrame(y*localWidth + x) = res2.colour;
+                    state.d = ray * 800;
+                    castRay(state);
+                    localFrame(y*localWidth + x) = state.screenColour;
                 }
                 IndexedMemoryChunk.asyncCopy(localFrame.raw(), y*localWidth, raw, offset_x + (offset_y+y)*globalWidth, localWidth);
             }

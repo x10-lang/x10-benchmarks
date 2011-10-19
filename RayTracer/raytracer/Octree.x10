@@ -78,11 +78,11 @@ public final class Octree {
         }
     }
 
-    public def castRay(o:Vector3, d:Vector3, rt:RayTracer, res:RayResult, res2:ScreenResult) {
+    public def castRay (s:RayState) {
 
         // in the equation P = o + t.d, the following t0 and t1 are such that...
-        val t0 = (bounds.min - o) / d;
-        val t1 = (bounds.max - o) / d;
+        val t0 = (bounds.min - s.o) / s.d;
+        val t1 = (bounds.max - s.o) / s.d;
         // o.x + d.x * t0.x == bounds.min.x
         // o.x + d.x * t1.x == bounds.max.x
         // (similarly for y, z)
@@ -90,11 +90,15 @@ public final class Octree {
         //Console.OUT.println("Casting octree ray: o="+o+"  d="+d);
 
         // max ensures vector is positive
-        castRay2(o, d, rt, res, res2, t0, t1);
+        castRay2(s, t0.x,t0.y,t0.z, t1.x,t1.y,t1.z);
+        //castRay2(s, t0, t1);
     }
 
     // components of t0, t1 MUST be positive
-    private def castRay2(o:Vector3, d:Vector3, rt:RayTracer, res:RayResult, res2:ScreenResult, t0:Vector3, t1:Vector3) {
+    private def castRay2 (s:RayState, t0x:Float,t0y:Float,t0z:Float, t1x:Float,t1y:Float,t1z:Float) {
+        val t0 = Vector3(t0x,t0y,t0z);
+        val t1 = Vector3(t1x,t1y,t1z);
+    //private def castRay2(t0:Vector3, t1:Vector3) {
         //Console.OUT.println("\033[1m"+depth+":  is octant:  "+bounds+"\033[0m");
         //Console.OUT.println("t0="+t0+"  t1="+t1);
         val t0_ = Vector3.min(t0,t1);
@@ -107,7 +111,8 @@ public final class Octree {
         val t1_Bar_ = t1_.minElement();
         //Console.OUT.println("in="+t0_Bar_+"  out="+t1_Bar_);
 
-        if (Math.max(t0_Bar_,0.0f) >= Math.max(t1_Bar_,0.0f)) {
+        //if (Math.max(t0_Bar_,0.0f) >= Math.max(t1_Bar_,0.0f)) {
+        if (Math.max(t0_Bar_,0.0f) >= t1_Bar_) {
             // misses entire octant
             return;
         }
@@ -116,8 +121,10 @@ public final class Octree {
         //Console.OUT.println("hits octant: "+bounds);
 
         // process cargo...
-        if (false && cargo!=null) for (i in 0..(cargo.size()-1)) {
-            rt.castRayPrimitive(cargo(i), o, d, res, res2);
+        if (cargo!=null) for (i in 0..(cargo.size()-1)) {
+            s.castRayPrimitive(cargo(i));
+            //s.t = t0_Bar_;
+            //s.normal = Vector3(0,0,1);
         }
 
         //recurse to children...
@@ -128,7 +135,8 @@ public final class Octree {
 
         val process_child = (i:Int, t0:Vector3, t1:Vector3) => {
             val child = children(i);
-            if (child != null) child.castRay2(o,d,rt,res,res2,t0,t1);
+            if (child != null) child.castRay2(s, t0.x,t0.y,t0.z, t1.x,t1.y,t1.z);
+            //if (child != null) child.castRay2(s,t0,t1);
         };
 
         process_child(0, Vector3(t0.x, t0.y, t0.z), Vector3(th.x, th.y, th.z));

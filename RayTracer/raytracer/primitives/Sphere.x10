@@ -4,12 +4,12 @@ import raytracer.*;
 
 public final class Sphere(worldPos:Vector3, radius:Float) extends Primitive {
     public def getAABB() = AABB(worldPos-radius*Vector3(1,1,1), worldPos+radius*Vector3(1,1,1));
-    public def intersectRay (ray_origin_w:Vector3, ray_dir:Vector3, res:RayResult) : Boolean {
+    public def intersectRay (s:RayState) : Boolean {
         // stolen from http://wiki.cgsociety.org/index.php/Ray_Sphere_Intersection#Example_Code
-        val ray_origin_o = ray_origin_w - worldPos;
+        val ray_origin_o = s.o - worldPos;
         //Compute A, B and C coefficients
-        val a = ray_dir.length2();
-        val b = 2 * ray_dir.dot(ray_origin_o);
+        val a = s.d.length2();
+        val b = 2 * s.d.dot(ray_origin_o);
         val c = ray_origin_o.length2() - radius * radius;
 
         val discriminant = b * b - 4 * a * c;
@@ -40,10 +40,10 @@ public final class Sphere(worldPos:Vector3, radius:Float) extends Primitive {
         // if t0 is less than zero, the intersection point is at t1
         val t = t0 < 0 ? t1 : t0;
 
-        res.t = t;
-        res.pos = ray_origin_w + t * ray_dir;
-        val hit_pos_os = (res.pos - worldPos);
-        res.normal = hit_pos_os / radius;
+        s.t = t;
+        val hit_pos_ws = s.o + t*s.d;
+        val hit_pos_os = (hit_pos_ws - worldPos);
+        s.normal = hit_pos_os / radius;
 
         return true;
 
