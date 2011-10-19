@@ -1,5 +1,7 @@
 package raytracer;
 
+import x10.compiler.Inline;
+
 // axis-aligned bounding box
 public struct AABB (min:Vector3, max:Vector3) { 
 

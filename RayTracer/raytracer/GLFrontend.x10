@@ -104,9 +104,13 @@ public class GLFrontend {
     var pos: Vector3;
     var yaw: Float;
     var pitch: Float;
+    var lastFrameTime : Long = System.nanoTime();
     public def orientation() = Quat.angleAxis(yaw/180 * (Math.PI as Float),0,0,-1)
                              * Quat.angleAxis(pitch/180 * (Math.PI as Float),1,0,0);
     public def updatePosOrientation () {
+        val thisFrameTime = System.nanoTime();
+        val elapsed = (thisFrameTime - lastFrameTime)/1E9f;
+        lastFrameTime = thisFrameTime;
         val mouse_move_x = currMouseX - lastMouseX;
         val mouse_move_y = currMouseY - lastMouseY;
         currMouseX = GL.glutGet(GL.GLUT_WINDOW_WIDTH)/2;
@@ -116,22 +120,22 @@ public class GLFrontend {
         if (mouseDown)
             GL.glutWarpPointer(currMouseX, currMouseY);
 
-        val turn_speed = 5.0f;
+        val turn_speed = 50.0f;
         val rot_right = (keyDown('3'.ord()) ? 1.0f : 0.0f) - (keyDown('1'.ord()) ? 1.0f : 0.0f);
         val rot_up = (keyDown('2'.ord()) ? 1.0f : 0.0f) - (keyDown('5'.ord()) ? 1.0f : 0.0f);
         yaw += mouse_move_x * 0.2f;
         pitch += mouse_move_y * 0.2f;
-        yaw += turn_speed * rot_right;
-        pitch += turn_speed * rot_up;
+        yaw += elapsed * turn_speed * rot_right;
+        pitch += elapsed * turn_speed * rot_up;
         pitch = Math.min(Math.max(pitch, -90.0f), 90.0f);
 
-        val move_speed = 0.3f;
+        val move_speed = 3f;
         val forwards = (keyDown('w'.ord()) ? 1.0f : 0.0f) - (keyDown('s'.ord()) ? 1.0f : 0.0f);
         val right = (keyDown('d'.ord()) ? 1.0f : 0.0f) - (keyDown('a'.ord()) ? 1.0f : 0.0f);
         val up = (keyDown(' '.ord()) ? 1.0f : 0.0f) - (keyDown('c'.ord()) ? 1.0f : 0.0f);
-        val pos_change = forwards * move_speed * Vector3(0,1,0)
-                       + right * move_speed * Vector3(1,0,0)
-                       + up * move_speed * Vector3(0,0,1);
+        val pos_change = forwards * elapsed * move_speed * Vector3(0,1,0)
+                       + right * elapsed * move_speed * Vector3(1,0,0)
+                       + up * elapsed * move_speed * Vector3(0,0,1);
         pos += orientation() * pos_change;
     }
 
@@ -152,7 +156,7 @@ public class GLFrontend {
         GL.glTexImage2D[Byte](GL.GL_TEXTURE_2D, 0, pixel_format, width, height, 0, GL.GL_RGB, GL.GL_UNSIGNED_BYTE, null, 0);
         GL.glBindTexture(GL.GL_TEXTURE_2D, 0);
 
-        rts = PlaceLocalHandle.make[RayTracer](Dist.makeUnique(), ()=>new RayTracer(opts, width, height, fbr));
+        rts = PlaceLocalHandle.make[RayTracer](Dist.makeUnique(), ()=>new RayTracer(opts, width, height, fbr).init());
 
     }
 
@@ -167,20 +171,22 @@ public class GLFrontend {
                 val pos_ = pos;
                 updatePosOrientation();
                 val orientation_ = orientation();
+                val raw_ = RemoteIndexedMemoryChunk.wrap[RGB](fb.raw());
                 //Console.OUT.println("yaw="+yaw+" pitch="+pitch+" orientation="+orientation_);
-                finish for (p in Place.places()) async at (p) {
-                    val rt = rts();
+                val rts_ = rts;
+                //finish for (p in Place.places()) async at (p) {
+                    val rt = rts_();
                     //while (true) {
                         //val before = System.nanoTime();
                         rt.pos = pos_;
                         rt.orientation = orientation_;
-                        rt.renderFrame();
+                        rt.renderFrame(raw_);
                         //val taken = (System.nanoTime()-before)/1E9/100;
                         //if (!quiet && here == Place.FIRST_PLACE) {
                         //    Console.OUT.println("Frame time: "+taken+"    FPS: "+1/taken);
                         //}
                     //}
-                }
+                //}
             });
 
             GL.glClear(GL.GL_COLOR_BUFFER_BIT);

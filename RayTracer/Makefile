@@ -6,27 +6,50 @@ DBGX10CPP  = time $(HOME)/x10-dbg/x10.dist/bin/x10c++ -STATIC_CHECKS -DEBUG $(CO
 
 
 RAYTRACER_SRC = \
-        raytracer/GLFrontend.x10 \
-        raytracer/RayTracer.x10 \
+        raytracer/AABB.x10 \
         raytracer/Benchmark.x10 \
-        raytracer/Vector3.x10 \
-        raytracer/Quat.x10 \
         raytracer/Octree.x10 \
-        raytracer/RGB.x10
+        raytracer/primitives/SpeckledSphere.x10 \
+        raytracer/primitives/Sphere.x10 \
+        raytracer/primitives/Triangle.x10 \
+        raytracer/Primitive.x10 \
+        raytracer/Quat.x10 \
+        raytracer/RayTracer.x10 \
+        raytracer/RayResult.x10 \
+        raytracer/RGB.x10 \
+        raytracer/ScreenResult.x10 \
+        raytracer/Vector3.x10 \
 
-Benchmark.opt: $(RAYTRACER_SRC)
-	$(OPTX10CPP) -d out-opt raytracer/Benchmark.x10 -o $@
 
-Benchmark.dbg: $(RAYTRACER_SRC)
-	$(DBGX10CPP) -d out-dbg raytracer/Benchmark.x10 -o $@
-
-GLFrontend.opt: $(RAYTRACER_SRC)
+GLFrontend.opt: $(RAYTRACER_SRC) raytracer/GLFrontend.x10
 	$(OPTX10CPP) -d out-opt raytracer/GLFrontend.x10 -x10lib ~/x10-opt/x10.gl/x10_gl.properties -o $@
 
-GLFrontend.dbg: $(RAYTRACER_SRC)
+GLFrontend.dbg: $(RAYTRACER_SRC) raytracer/GLFrontend.x10
 	$(DBGX10CPP) -d out-dbg raytracer/GLFrontend.x10 -x10lib ~/x10-dbg/x10.gl/x10_gl.properties -o $@
 
+Benchmark.opt: $(RAYTRACER_SRC) raytracer/Benchmark.x10
+	$(OPTX10CPP) -d out-opt raytracer/Benchmark.x10 -o $@
+
+Benchmark.dbg: $(RAYTRACER_SRC) raytracer/Benchmark.x10
+	$(DBGX10CPP) -d out-dbg raytracer/Benchmark.x10 -o $@
+
+QuatTest.dbg: raytracer/QuatTest.x10 raytracer/Quat.x10
+	$(DBGX10CPP) -d out-dbg raytracer/QuatTest.x10 -o $@
+QuatTest.opt: raytracer/QuatTest.x10 raytracer/Quat.x10
+	$(OPTX10CPP) -d out-dbg raytracer/QuatTest.x10 -o $@
+
+Vector3Test.dbg: raytracer/Vector3Test.x10 raytracer/Vector3.x10
+	$(DBGX10CPP) -d out-dbg raytracer/Vector3Test.x10 -o $@
+Vector3Test.opt: raytracer/Vector3Test.x10 raytracer/Vector3.x10
+	$(OPTX10CPP) -d out-dbg raytracer/Vector3Test.x10 -o $@
+
+OctreeTest.dbg: raytracer/OctreeTest.x10 raytracer/Octree.x10
+	$(DBGX10CPP) -d out-dbg raytracer/OctreeTest.x10 -o $@
+OctreeTest.opt: raytracer/OctreeTest.x10 raytracer/Octree.x10
+	$(OPTX10CPP) -d out-dbg raytracer/OctreeTest.x10 -o $@
+
+
 clean:
-	rm -rfv Benchmark.opt Benchmark.dbg GLFrontend.opt GLFrontend.dbg out-opt out-dbg
+	rm -rfv {Benchmark,GLFrontend,QuatTest,OctreeTest}.{opt,dbg} out-opt out-dbg xxx_main_xxx.cc
 
 # vim: tabstop=8:shiftwidth=8:noexpandtab

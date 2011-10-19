@@ -17,10 +17,8 @@ public abstract class FrameBuffer {
 
     public operator this (i:Int) = raw(i);
 
-    public def receive (from:RemoteIndexedMemoryChunk[RGB], from_off:Int, to_off:Int, len:Int) {
-        IndexedMemoryChunk.asyncCopy(from, from_off, raw, to_off, len);
-    }
-       
+    public def raw() = raw;
+
 }
 
 
