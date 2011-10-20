@@ -2,6 +2,8 @@ package raytracer;
 
 import x10.util.IndexedMemoryChunk;
 import x10.util.RemoteIndexedMemoryChunk;
+import x10.util.HashMap;
+import x10.util.ArrayList;
 
 public abstract class FrameBuffer {
 

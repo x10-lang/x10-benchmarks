@@ -5,7 +5,7 @@ import x10.util.*;
 import x10.io.Console;
 
 // power of 2 width/height required
-// max of 256 in either direction
+// max of 512 in either direction
 public final class Texture2D {
     public static final class MipMap {
         val buffer:IndexedMemoryChunk[RGB];
@@ -19,7 +19,7 @@ public final class Texture2D {
         }
         public static def mortonEncode (x:Int, y:Int) {
             var r:Int = 0;
-            for (i in 0..7) { // 0..255
+            for (i in 0..8) { // 0..512
                 val inputMask = 1<<i;
                 if ((x & inputMask) != 0) r |= 1<<(2*i+0);
                 if ((y & inputMask) != 0) r |= 1<<(2*i+1);
@@ -27,7 +27,7 @@ public final class Texture2D {
             return r;
         }
         public def raw () = buffer;
-        public def unsafeLookup (x:Int, y:Int) = buffer(mortonEncode(x,y));
+        public def unsafeLookup (x:Int, y:Int) = buffer(mortonEncode(x,height-y));
         public def wrappedLookup (x:Int, y:Int) = unsafeLookup(x&(width-1), y&(height-1));
         // filtered with linear interpolation
         public operator this (x:Float, y:Float) {

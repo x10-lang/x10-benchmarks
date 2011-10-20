@@ -1,0 +1,10 @@
+MAT_TEX PoolSidesHigh 512 256 scenes/marble1.raw
+MAT_TEX PoolSidesLow 512 256 scenes/marble1.raw
+MAT_TEX StoneBlock 512 512 scenes/stone1.raw
+MAT_TEX MainFloor 512 512 scenes/cfloor.raw
+MAT_TEX OuterWallLow 512 512 scenes/wall3.raw
+MAT_TEX MarbleFloor 512 512 scenes/marble2.raw
+MAT_TEX BlueTile 512 512 scenes/bluetile.raw
+MAT_TEX RimSKirting 512 128 scenes/skirting.raw
+MAT_TEX ColumnMarble 512 512 scenes/marble3.raw
+MAT_TEX ColumnBlock 512 512 scenes/stone1.raw

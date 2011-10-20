@@ -2,10 +2,10 @@ package raytracer;
 
 public class Texture2DTest {
     public static def main (args : Array[String]) {
-        val tex = new Texture2D(256,256);
+        val tex = new Texture2D(512,512);
         tex.init((x_:Int, y_:Int)=> {
-            val x = (x_-128) / 128.0f;
-            val y = (y_-128) / 128.0f;
+            val x = (x_-256) / 256.0f;
+            val y = (y_-256) / 256.0f;
             return (x*x + y*y > 1) ? RGB.BLACK : RGB.RED;
         });
         //for (var y:Int=0 ; y<128 ; ++y) {
@@ -16,7 +16,7 @@ public class Texture2DTest {
         //}
         for (var y:Float=-3 ; y<=3 ; y+=0.1) {
             for (var x:Float=-3 ; x<=3 ; x+=0.1) {
-                Console.OUT.print(tex(x,y,3).x > 0.5 ? " " : "X");
+                Console.OUT.print(tex(x,y,0).x > 0.5 ? " " : "X");
             }
             Console.OUT.println();
         }

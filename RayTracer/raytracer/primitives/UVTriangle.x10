@@ -10,6 +10,7 @@ public final class UVTriangle extends Primitive {
     val n:Vector3;
     val m:Material;
     val u:Vector3, v:Vector3; // unusual grouping because we don't have Vector2
+    val stretch:Float;
     public def this (p1:Vector3, p2:Vector3, p3:Vector3, u:Vector3, v:Vector3, m:Material) {
         this.p1 = p1;
         this.e1 = p2 - p1;
@@ -18,6 +19,14 @@ public final class UVTriangle extends Primitive {
         this.v = v;
         this.m = m;
         this.n = e1.cross(e2).normalised();
+        val space_area = e1.cross(e2).length()*0.5f;
+        val uv1 = Vector3(u.x, v.x, 0);
+        val uv2 = Vector3(u.y, v.y, 0);
+        val uv3 = Vector3(u.z, v.z, 0);
+        val uv_e1 = uv2 - uv1;
+        val uv_e2 = uv3 - uv1;
+        val uv_area = uv_e1.cross(uv_e2).length()*0.5f;
+        stretch = uv_area / space_area;
     }
     public def getAABB() = AABB(Vector3.min(p1,Vector3.min(p1+e1, p1+e2)), Vector3.max(p1,Vector3.max(p1+e1, p1+e2)));
     public def intersectRay (st:RayState) {
@@ -54,6 +63,8 @@ public final class UVTriangle extends Primitive {
         val tex_coord_u = (1-E1_-E2_)*u.x + E1_*u.y + E2_*u.z;
         val tex_coord_v = (1-E1_-E2_)*v.x + E1_*v.y + E2_*v.z;
         st.texCoord = Pair[Float,Float](tex_coord_u, tex_coord_v);
+
+        //st.obliqueness = stretch / (-st.d.dot(n));
     }
 }
 

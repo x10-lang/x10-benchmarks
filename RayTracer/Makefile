@@ -9,6 +9,8 @@ RAYTRACER_SRC = \
         raytracer/AABB.x10 \
         raytracer/Benchmark.x10 \
         raytracer/Octree.x10 \
+        raytracer/materials/SolidColour.x10 \
+        raytracer/materials/Textured.x10 \
         raytracer/primitives/DoubleTriangle.x10 \
         raytracer/primitives/SpeckledSphere.x10 \
         raytracer/primitives/Sphere.x10 \
@@ -16,9 +18,10 @@ RAYTRACER_SRC = \
         raytracer/primitives/UVTriangle.x10 \
         raytracer/Primitive.x10 \
         raytracer/Quat.x10 \
-        raytracer/RayTracer.x10 \
+        raytracer/Engine.x10 \
         raytracer/RayState.x10 \
         raytracer/RGB.x10 \
+        raytracer/SceneLoader.x10 \
         raytracer/Texture2D.x10 \
         raytracer/Vector3.x10 \
 

@@ -16,6 +16,10 @@ public struct RGB(r:UByte,g:UByte,b:UByte) {
                  Math.min(Math.max(g * 255, 0.0f),255.0f) as UByte,
                  Math.min(Math.max(b * 255, 0.0f),255.0f) as UByte);
     }
+
+    @Inline public operator this + (v:RGB) = RGB(r+v.r, g+v.g, b+v.b);
+    @Inline public operator this - (v:RGB) = RGB(r-v.r, g-v.g, b-v.b);
+
     static WHITE = RGB(255,255,255);
     static GREY = RGB(127,127,127);
     static BLACK = RGB(0,0,0);

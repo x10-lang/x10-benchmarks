@@ -58,7 +58,6 @@ public class GLFrontend {
             GL.glBufferData[Byte](GL.GL_PIXEL_UNPACK_BUFFER, size, null, 0, GL.GL_STREAM_DRAW); // discard
             try {
                 raw = GL.glMapBuffer[RGB](GL.GL_PIXEL_UNPACK_BUFFER, GL.GL_WRITE_ONLY, width*height);
-                /*
                 for (y in 0..(height-1)) {
                     for (x in 0..(width-1)) {
                         val c1 = ((x*x) / 256 + 3 * y + h*10) as UByte;
@@ -68,7 +67,6 @@ public class GLFrontend {
                     }
                 }
                 h++;
-                */
                 write();
             } finally {
                 GL.glUnmapBuffer(GL.GL_PIXEL_UNPACK_BUFFER);
@@ -89,7 +87,7 @@ public class GLFrontend {
     val fb : FrameBuffer;
 
 
-    val rts : PlaceLocalHandle[RayTracer];
+    val rts : PlaceLocalHandle[Engine];
 
     
     val width:Int, height:Int;
@@ -140,7 +138,7 @@ public class GLFrontend {
         pos += orientation() * pos_change;
     }
 
-    public def this (opts:OptionsParser, width:Int, height:Int, fb:FrameBuffer, fbr:GlobalRef[FrameBuffer]{home==Place.FIRST_PLACE} ) {
+    public def this (opts:OptionsParser, width:Int, height:Int, fb:FrameBuffer, sl:SceneLoader) {
 
         this.width = this.winWidth = width;
         this.height = this.winHeight = height;
@@ -157,7 +155,13 @@ public class GLFrontend {
         GL.glTexImage2D[Byte](GL.GL_TEXTURE_2D, 0, pixel_format, width, height, 0, GL.GL_RGB, GL.GL_UNSIGNED_BYTE, null, 0);
         GL.glBindTexture(GL.GL_TEXTURE_2D, 0);
 
-        rts = PlaceLocalHandle.make[RayTracer](Dist.makeUnique(), ()=>new RayTracer(opts, width, height, fbr).init());
+        val prims = sl.prims.toArray();
+
+        pos = sl.camPos;
+        yaw = sl.camYaw;
+        pitch = sl.camPitch;
+
+        rts = PlaceLocalHandle.make[Engine](Dist.makeUnique(), ()=>new Engine(opts, width, height, prims));
 
     }
 
@@ -175,19 +179,15 @@ public class GLFrontend {
                 val raw_ = RemoteIndexedMemoryChunk.wrap[RGB](fb.raw());
                 //Console.OUT.println("yaw="+yaw+" pitch="+pitch+" orientation="+orientation_);
                 val rts_ = rts;
-                //finish for (p in Place.places()) async at (p) {
+                finish for (p in Place.places()) async at (p) {
                     val rt = rts_();
-                    //while (true) {
-                        //val before = System.nanoTime();
-                        rt.pos = pos_;
-                        rt.orientation = orientation_;
-                        rt.renderFrame(raw_);
-                        //val taken = (System.nanoTime()-before)/1E9/100;
-                        //if (!quiet && here == Place.FIRST_PLACE) {
-                        //    Console.OUT.println("Frame time: "+taken+"    FPS: "+1/taken);
-                        //}
-                    //}
-                //}
+                    //val before = System.nanoTime();
+                    rt.pos = pos_;
+                    rt.orientation = orientation_;
+                    rt.renderFrame(raw_);
+                    //val taken = (System.nanoTime()-before)/1E9;
+                    //Console.OUT.println(here+": Render time: "+taken);
+                }
             });
 
             GL.glClear(GL.GL_COLOR_BUFFER_BIT);
@@ -273,7 +273,7 @@ public class GLFrontend {
                     mouseDown = false;
                     GL.glutSetCursor(GL.GLUT_CURSOR_INHERIT);
                 }
-            } else if (button==1) {
+            } else if (button==2) {
                 if (state==0) {
                     fastDown = true;
                 } else {
@@ -322,20 +322,10 @@ public class GLFrontend {
                 Option("W","width","width of rendered output"),
                 Option("H","height","height of rendered output"),
                 Option("w","horz-splits","number of times to split width-ways"),
-                Option("h","vert-splits","number of times to split height-ways")
+                Option("h","vert-splits","number of times to split height-ways"),
+                Option("x","horz-blocks","number of times to split width-ways within a place"),
+                Option("y","vert-blocks","number of times to split height-ways within a place")
             ]);
-            if (opts.filteredArgs().size>1) {
-                Console.ERR.println("Unexpected arguments: "+opts.filteredArgs());
-                Console.ERR.println("Use -? or --help.");
-                System.setExitCode(1);
-                return;
-            }
-            if (opts.filteredArgs().size==0) {
-                Console.ERR.println("Usage: [opts] <scene.txt>");
-                Console.ERR.println("Use -? or --help.");
-                System.setExitCode(1);
-                return;
-            }
             if (opts("-?")) {
                 Console.OUT.println(opts.usage());
                 return;
@@ -353,10 +343,15 @@ public class GLFrontend {
             GL.glutCreateWindow("X10 Distributed Raytracer");
             GL.glewInit();
 
-            val fb = new GLFrameBuffer(global_width, global_height, size);
-            val fbr = new GlobalRef[FrameBuffer](fb);
+            val sl = new SceneLoader();
+            
+            for (s in opts.filteredArgs().values()) {
+                sl.loadScene(s);
+            }
 
-            val fe = new GLFrontend(opts, global_width, global_height, fb, fbr);
+            val fb = new GLFrameBuffer(global_width, global_height, size);
+
+            val fe = new GLFrontend(opts, global_width, global_height, fb, sl);
 
             fe.run();
 
