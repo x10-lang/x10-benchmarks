@@ -324,7 +324,9 @@ public class GLFrontend {
                 Option("w","horz-splits","number of times to split width-ways"),
                 Option("h","vert-splits","number of times to split height-ways"),
                 Option("x","horz-blocks","number of times to split width-ways within a place"),
-                Option("y","vert-blocks","number of times to split height-ways within a place")
+                Option("y","vert-blocks","number of times to split height-ways within a place"),
+                Option("b","mipmap-bias","skip this many mipmap levels"),
+                Option("d","octree-depth","bottom out the octree at this depth")
             ]);
             if (opts("-?")) {
                 Console.OUT.println(opts.usage());

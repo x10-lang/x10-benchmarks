@@ -23,6 +23,8 @@ public class Engine {
     verbose:Boolean;
     quiet:Boolean;
     dumpOctree:Boolean;
+    public mipmapBias:Int;
+    
 
     var orientation:Quat = Quat(1,0,0,0);
     var pos:Vector3 = Vector3(0,0,0);
@@ -77,11 +79,15 @@ public class Engine {
 
         localFrame = new Array[RGB](localWidth * localHeight);
 
-        if (dumpOctree) Console.OUT.println(scene);
+        scene = new Octree(opts("-d",12), AABB(Vector3(-100,-100,-100),Vector3(100,100,100)));
+        mipmapBias = opts("-b",0);
 
         for (p in prims.values()) {
             scene.insert(p);
         }
+
+        if (dumpOctree) Console.OUT.println(scene);
+
     }
 
     val sunDir = Vector3(0,0,1);
@@ -105,7 +111,7 @@ public class Engine {
     }
 
 
-    val scene = new Octree(12, AABB(Vector3(-100,-100,-100),Vector3(100,100,100)));
+    val scene : Octree;
 
     public static def to_col(x:Vector3) {
         val scaled = x*0.5f + Vector3(0.5f,0.5f,0.5f);

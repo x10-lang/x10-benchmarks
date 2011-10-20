@@ -23,6 +23,8 @@ public class SceneLoader {
 
         val white = new SolidColour(RGB.WHITE);
 
+        matTable.put("REFLECTIVE", new Reflective());
+
         val file = new File(fileName);
         for (line_ in file.lines()) {
             val line = line_.trim();

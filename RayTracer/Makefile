@@ -11,6 +11,7 @@ RAYTRACER_SRC = \
         raytracer/Octree.x10 \
         raytracer/materials/SolidColour.x10 \
         raytracer/materials/Textured.x10 \
+        raytracer/materials/Reflective.x10 \
         raytracer/primitives/DoubleTriangle.x10 \
         raytracer/primitives/SpeckledSphere.x10 \
         raytracer/primitives/Sphere.x10 \
