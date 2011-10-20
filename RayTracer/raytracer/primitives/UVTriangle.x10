@@ -1,16 +1,21 @@
 package raytracer.primitives;
 
+import x10.util.Pair;
+
 import raytracer.*;
 
-public final class Triangle extends Primitive {
+public final class UVTriangle extends Primitive {
     val p1:Vector3;
     val e1:Vector3, e2:Vector3;
-    val m:Material;
     val n:Vector3;
-    public def this (p1:Vector3, p2:Vector3, p3:Vector3, m:Material) {
+    val m:Material;
+    val u:Vector3, v:Vector3; // unusual grouping because we don't have Vector2
+    public def this (p1:Vector3, p2:Vector3, p3:Vector3, u:Vector3, v:Vector3, m:Material) {
         this.p1 = p1;
         this.e1 = p2 - p1;
         this.e2 = p3 - p1;
+        this.u = u;
+        this.v = v;
         this.m = m;
         this.n = e1.cross(e2).normalised();
     }
@@ -23,29 +28,32 @@ public final class Triangle extends Primitive {
         if (a < 0.00001) return;
 
         val s = st.o - p1;
-        val u = s.dot(h);
+        val E1 = s.dot(h);
 
-        if (u < 0.0 || u > a) return;
+        if (E1 < 0.0 || E1 > a) return;
 
         val q = s.cross(e1);
-        val v = st.d.dot(q);
+        val E2 = st.d.dot(q);
 
-        if (v < 0.0 || u + v > a) return;
+        if (E2 < 0.0 || E1 + E2 > a) return;
 
         val t = e2.dot(q);
 
         val f = 1/a;
 
         val t_ = t * f;
-        //val u_ = u * f;
-        //val v_ = v * f;
-        
+        val E1_ = E1 * f;
+        val E2_ = E2 * f;
+
         if (t_ < 0.00001) return;
         if (t_ >= st.t) return;
 
         st.t = t_;
         st.normal = n;
         st.mat = m;
+        val tex_coord_u = (1-E1_-E2_)*u.x + E1_*u.y + E2_*u.z;
+        val tex_coord_v = (1-E1_-E2_)*v.x + E1_*v.y + E2_*v.z;
+        st.texCoord = Pair[Float,Float](tex_coord_u, tex_coord_v);
     }
 }
 

@@ -9,14 +9,17 @@ RAYTRACER_SRC = \
         raytracer/AABB.x10 \
         raytracer/Benchmark.x10 \
         raytracer/Octree.x10 \
+        raytracer/primitives/DoubleTriangle.x10 \
         raytracer/primitives/SpeckledSphere.x10 \
         raytracer/primitives/Sphere.x10 \
         raytracer/primitives/Triangle.x10 \
+        raytracer/primitives/UVTriangle.x10 \
         raytracer/Primitive.x10 \
         raytracer/Quat.x10 \
         raytracer/RayTracer.x10 \
         raytracer/RayState.x10 \
         raytracer/RGB.x10 \
+        raytracer/Texture2D.x10 \
         raytracer/Vector3.x10 \
 
 
@@ -45,6 +48,11 @@ OctreeTest.opt: raytracer/OctreeTest.x10 raytracer/Octree.x10
 	$(OPTX10CPP) -d out-opt raytracer/OctreeTest.x10 -o $@
 OctreeTest.dbg: raytracer/OctreeTest.x10 raytracer/Octree.x10
 	$(DBGX10CPP) -d out-dbg raytracer/OctreeTest.x10 -o $@
+
+Texture2DTest.opt: raytracer/Texture2DTest.x10 raytracer/Texture2D.x10
+	$(OPTX10CPP) -d out-opt raytracer/Texture2DTest.x10 -o $@
+Texture2DTest.dbg: raytracer/Texture2DTest.x10 raytracer/Texture2D.x10
+	$(DBGX10CPP) -d out-dbg raytracer/Texture2DTest.x10 -o $@
 
 
 clean:

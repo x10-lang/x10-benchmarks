@@ -30,5 +30,9 @@ public struct Vector3(x:Float,y:Float,z:Float) {
     @Inline public static def min (a:Vector3, b:Vector3) = Vector3(Math.min(a.x, b.x), Math.min(a.y, b.y), Math.min(a.z, b.z));
     @Inline public def max (o:Vector3) = Vector3(Math.max(x, o.x), Math.max(y, o.y), Math.max(z, o.z));
     @Inline public def min (o:Vector3) = Vector3(Math.min(x, o.x), Math.min(y, o.y), Math.min(z, o.z));
+
+    @Inline public static def lerp (v1:Vector3, v2:Vector3, alpha:Float) = (1-alpha)*v1 + alpha*v2;
+    @Inline public static operator (rgb:RGB) as Vector3 = Vector3(rgb.r/255.0f, rgb.g/255.0f, rgb.b/255.0f);
+
 }
 

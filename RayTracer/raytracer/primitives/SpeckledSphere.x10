@@ -2,10 +2,10 @@ package raytracer.primitives;
 
 import raytracer.*;
 
-public final class SpeckledSphere(worldPos:Vector3, radius:Float) extends Primitive {
+public final class SpeckledSphere(worldPos:Vector3, radius:Float, m:Material) extends Primitive {
     public def getAABB() = AABB(worldPos-radius*Vector3(1,1,1), worldPos+radius*Vector3(1,1,1));
     // FIXME: code duplicated from Sphere, extends Sphere(worldPos, radius) gives a type error...
-    public def intersectRay (s:RayState) : Boolean {
+    public def intersectRay (s:RayState) {
         // stolen from http://wiki.cgsociety.org/index.php/Ray_Sphere_Intersection#Example_Code
         val ray_origin_o = s.o - worldPos;
         //Compute A, B and C coefficients
@@ -18,7 +18,7 @@ public final class SpeckledSphere(worldPos:Vector3, radius:Float) extends Primit
         // if dworldPos-radius*Vector3(1,1,1)iscriminant is negative there are no real roots, so return 
         // false as ray misses sphere
         if (discriminant < 0)
-            return false;
+            return;
 
         // compute q as described above
         val dist_sqrt = Math.sqrtf(discriminant);
@@ -31,8 +31,12 @@ public final class SpeckledSphere(worldPos:Vector3, radius:Float) extends Primit
         val t1_ = c / q;
 
         val t0 = Math.min(t0_, t1_);
-        val t1 = Math.max(t0_, t1_);
+        //val t1 = Math.max(t0_, t1_);
 
+        val t = t0;
+        if (t < 0) return;
+        if (t >= s.t) return;
+        /*
         // if t1 is less than zero, the object is in the ray's negative direction
         // and consequently the ray misses the sphere
         if (t1 < 0)
@@ -40,6 +44,7 @@ public final class SpeckledSphere(worldPos:Vector3, radius:Float) extends Primit
 
         // if t0 is less than zero, the intersection point is at t1
         val t = t0 < 0 ? t1 : t0;
+        */
 
         s.t = t;
         val hit_pos_ws = s.o + t * s.d;
@@ -64,8 +69,7 @@ public final class SpeckledSphere(worldPos:Vector3, radius:Float) extends Primit
         );
 
         s.normal -= dF - bump*Vector3(1,1,1);
-
-        return true;
+        s.mat = m;
 
     }
 }

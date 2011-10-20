@@ -122,7 +122,7 @@ public final class Octree {
 
         // process cargo...
         if (cargo!=null) for (i in 0..(cargo.size()-1)) {
-            s.castRayPrimitive(cargo(i));
+            cargo(i).intersectRay(s);
             //s.t = t0_Bar_;
             //s.normal = Vector3(0,0,1);
         }

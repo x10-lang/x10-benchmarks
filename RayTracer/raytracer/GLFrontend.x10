@@ -101,6 +101,7 @@ public class GLFrontend {
     var lastMouseX: Int;
     var lastMouseY: Int;
     var mouseDown: Boolean;
+    var fastDown: Boolean;
     var pos: Vector3;
     var yaw: Float;
     var pitch: Float;
@@ -129,7 +130,7 @@ public class GLFrontend {
         pitch += elapsed * turn_speed * rot_up;
         pitch = Math.min(Math.max(pitch, -90.0f), 90.0f);
 
-        val move_speed = 3f;
+        val move_speed = fastDown ? 15.0f : 3.0f;
         val forwards = (keyDown('w'.ord()) ? 1.0f : 0.0f) - (keyDown('s'.ord()) ? 1.0f : 0.0f);
         val right = (keyDown('d'.ord()) ? 1.0f : 0.0f) - (keyDown('a'.ord()) ? 1.0f : 0.0f);
         val up = (keyDown(' '.ord()) ? 1.0f : 0.0f) - (keyDown('c'.ord()) ? 1.0f : 0.0f);
@@ -248,9 +249,11 @@ public class GLFrontend {
         }
 
         public def motion (x:Int, y:Int) : void {
-            currMouseX = x;
-            currMouseY = y;
-            //Console.OUT.println("MOTION: " + x + ", " + y);
+            if (mouseDown) {
+                currMouseX = x;
+                currMouseY = y;
+                //Console.OUT.println("MOTION: " + x + ", " + y);
+            }
         }
 
         //public def passiveMotion (x:Int, y:Int) : void {
@@ -269,6 +272,12 @@ public class GLFrontend {
                 } else {
                     mouseDown = false;
                     GL.glutSetCursor(GL.GLUT_CURSOR_INHERIT);
+                }
+            } else if (button==1) {
+                if (state==0) {
+                    fastDown = true;
+                } else {
+                    fastDown = false;
                 }
             }
         }
@@ -307,6 +316,7 @@ public class GLFrontend {
             val opts = new OptionsParser(args, [
                 Option("q","quiet","print out less"),
                 Option("v","verbose","print out more"),
+                Option("o","octree","dump the octree of the scene"),
                 Option("?","help","this information")
             ], [
                 Option("W","width","width of rendered output"),
@@ -314,8 +324,14 @@ public class GLFrontend {
                 Option("w","horz-splits","number of times to split width-ways"),
                 Option("h","vert-splits","number of times to split height-ways")
             ]);
-            if (opts.filteredArgs().size!=0) {
+            if (opts.filteredArgs().size>1) {
                 Console.ERR.println("Unexpected arguments: "+opts.filteredArgs());
+                Console.ERR.println("Use -? or --help.");
+                System.setExitCode(1);
+                return;
+            }
+            if (opts.filteredArgs().size==0) {
+                Console.ERR.println("Usage: [opts] <scene.txt>");
                 Console.ERR.println("Use -? or --help.");
                 System.setExitCode(1);
                 return;
