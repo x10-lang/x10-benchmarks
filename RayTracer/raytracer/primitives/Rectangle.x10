@@ -11,10 +11,10 @@ public class Rectangle extends Primitive {
     mat:Material;
 
     tc1:Vector2; // texture coord
-    tcx:Vector2;
-    tcy:Vector2;
-    tcw:Float;
-    tch:Float;
+    uvx:Vector2;
+    uvy:Vector2;
+
+    texSquash:Float;
 
     // order of points:
     // p1----p4
@@ -27,17 +27,16 @@ public class Rectangle extends Primitive {
         this.tc1 = tc1;
         val e_tcx = tc4 - tc1;
         val e_tcy = tc2 - tc1;
-        this.tcw = e_tcx.length();
-        this.tch = e_tcy.length();
-        this.tcx = e_tcx / tcw;
-        this.tcy = e_tcy / tch;
         this.w = e_x.length();
         this.h = e_y.length();
+        this.uvx = e_tcx/w;
+        this.uvy = e_tcy/h;
         this.x = e_x / w;
         this.y = e_y / h;
         this.n = y.cross(x);
         this.d = p1.dot(n);
         this.mat = mat;
+        this.texSquash = e_tcx.length() * e_tcy.length() / (w*h);
     }
 
     public def getAABB() {
@@ -61,10 +60,11 @@ public class Rectangle extends Primitive {
         if (b<0 || b>h) return;
 
         // use a and b to get tex coords
-        s.texCoord = tc1 + a/w*tcw*tcx + b/h*tch*tcy;
+        s.texCoord = tc1 + a*uvx + b*uvy;
         s.t = t;
         s.normal = n;
         s.mat = mat;
+        s.texSquash = texSquash / (-facing);
     }
 }
 

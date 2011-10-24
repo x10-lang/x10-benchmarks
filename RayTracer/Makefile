@@ -14,16 +14,13 @@ RAYTRACER_SRC = \
         raytracer/materials/SolidColour.x10 \
         raytracer/materials/Textured.x10 \
         raytracer/materials/Reflective.x10 \
-        raytracer/materials/Water.x10 \
+        raytracer/materials/RefractingWater.x10 \
         raytracer/MeshVertex.x10 \
         raytracer/MeshTriangle.x10 \
         raytracer/Octree.x10 \
-        raytracer/primitives/DoubleTriangle.x10 \
         raytracer/primitives/Rectangle.x10 \
         raytracer/primitives/SpeckledSphere.x10 \
         raytracer/primitives/Sphere.x10 \
-        raytracer/primitives/Triangle.x10 \
-        raytracer/primitives/UVTriangle.x10 \
         raytracer/primitives/WaveyRectangle.x10 \
         raytracer/Primitive.x10 \
         raytracer/Quat.x10 \

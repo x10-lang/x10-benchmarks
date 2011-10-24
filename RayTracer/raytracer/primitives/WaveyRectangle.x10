@@ -5,13 +5,29 @@ import x10.compiler.Native;
 
 import raytracer.*;
 
-public class WaveyRectangle extends Rectangle {
+public class WaveyRectangle extends Primitive {
 
-    static val dir = Vector2(8,5).normalised();
+    p1:Vector3; //position of one of the vertexes, where x/y are minimal
+    w:Float, h:Float; // dimensions in the z plane
+    mat:Material;
 
-    public def this (p1:Vector3, tc1:Vector2, p2:Vector3, tc2:Vector2, p3:Vector3, tc3:Vector2, p4:Vector3, tc4:Vector2, mat:Material) {
-        super(p1,tc1,p2,tc2,p3,tc3,p4,tc4,mat);
+    // order of points:
+    // p1----p3
+    // |      |
+    // p2-----*
+    public def this (p1:Vector3, w:Float, h:Float, mat:Material) {
+        this.p1 = p1;
+        this.w = w;
+        this.h = h;
+        this.mat = mat;
     }
+
+    public def getAABB() {
+        return AABB(p1, p1+Vector3(w,h,0));
+    }
+
+    static val dir = Vector2(1,2.6f);
+    static val scaledDir = 0.1f * dir.normalised();
 
     @Native("c++", "::fabsf(#x)")
     private static def absf(x:Float) : Float = Math.abs(x) as Float;
@@ -22,26 +38,27 @@ public class WaveyRectangle extends Rectangle {
     }
 
     public def intersectRay (s:RayState) {
-        val facing = n.dot(s.d);
+        val facing = s.d.z;
         if (facing > 0) return; // quad is facing away from the camera
-        val t = (d - n.dot(s.o)) / facing; // solve the plane equation
+        val t_ = (p1.z - s.o.z); // solve the plane equation
+        val t = t_ / facing; // solve the plane equation
         if (t < 0) return;
         if (t >= s.t) return;
         val ipos = s.o + t*s.d; // intersection point, on the plane
         val ipos2 = ipos - p1;
-        val a = ipos2.dot(x);
+        val a = ipos2.x;
         if (a<0 || a>w) return;
-        val b = ipos2.dot(y);
+        val b = ipos2.y;
         if (b<0 || b>h) return;
 
         // use a and b to get tex coords
-        s.texCoord = tc1 + a/w*tcw*tcx + b/h*tch*tcy;
+        s.texCoord = Vector2(a,b);
         s.t = t;
-        s.normal = n;
+        s.normal = Vector3(0,0,1);
         s.mat = mat;
 
         val wave = waveFunc(0.5f * s.time + s.texCoord.dot(dir));
-        val perturb = 0.20f * wave * dir;
+        val perturb = wave * scaledDir;
         //s.normal = (s.normal + wave * Vector3(dir.x, dir.y, 0)).normalised();
         s.normal = Vector3(perturb.x, perturb.y, Math.sqrtf(1-perturb.x*perturb.x-perturb.y*perturb.y));
 

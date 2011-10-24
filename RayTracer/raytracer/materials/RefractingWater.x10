@@ -4,7 +4,7 @@ import raytracer.*;
 
 import x10.compiler.Native;
 
-public class Water(sub:Material, fresnel:Float, refractiveIndex:Float, refractMask:Vector3, reflectMask:Vector3) extends Material {
+public class RefractingWater(sub:Material, fresnel:Float, refractiveIndex:Float, refractMask:Vector3, reflectMask:Vector3) extends Material {
     public def reflectRender (rt:Engine, s:RayState, hit_point:Vector3) {
         val s2 = s.child;
         if (s2 == null) return RGB.DARK_BLUE as Vector3;

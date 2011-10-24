@@ -64,7 +64,7 @@ public class SceneLoader {
                 } else {
                     Console.ERR.println("Did not understand: "+line_);
                 }
-            } else if (splits(0).equalsIgnoreCase("MAT_WATER")) {
+            } else if (splits(0).equalsIgnoreCase("MAT_REFRACTINGWATER")) {
                 if (splits.size == 11) {
                     val name = splits(1);
                     val subname = splits(2);
@@ -77,7 +77,7 @@ public class SceneLoader {
                     val em_g = Float.parse(splits(9));
                     val em_b = Float.parse(splits(10));
                     val sm = matTable.getOrElse(subname,white);
-                    matTable.put(name, new Water(sm, fresnel, refractive_index, Vector3(am_r,am_g,am_b),Vector3(em_r,em_g,em_b)));
+                    matTable.put(name, new RefractingWater(sm, fresnel, refractive_index, Vector3(am_r,am_g,am_b),Vector3(em_r,em_g,em_b)));
                 } else {
                     Console.ERR.println("Did not understand: "+line_);
                 }
@@ -144,33 +144,16 @@ public class SceneLoader {
                     Console.ERR.println("Did not understand: "+line_);
                 }
             } else if (splits(0).equalsIgnoreCase("WAVEY_RECT")) {
-                if (splits.size == 22) {
-                    val x1 = Float.parse(splits(0+1));
-                    val y1 = Float.parse(splits(0+2));
-                    val z1 = Float.parse(splits(0+3));
-                    val u1 = Float.parse(splits(0+4));
-                    val v1 = Float.parse(splits(0+5));
+                if (splits.size == 7) {
+                    val x = Float.parse(splits(1));
+                    val y = Float.parse(splits(2));
+                    val z = Float.parse(splits(3));
 
-                    val x2 = Float.parse(splits(5+1));
-                    val y2 = Float.parse(splits(5+2));
-                    val z2 = Float.parse(splits(5+3));
-                    val u2 = Float.parse(splits(5+4));
-                    val v2 = Float.parse(splits(5+5));
+                    val w = Float.parse(splits(4));
+                    val h = Float.parse(splits(5));
 
-                    val x3 = Float.parse(splits(10+1));
-                    val y3 = Float.parse(splits(10+2));
-                    val z3 = Float.parse(splits(10+3));
-                    val u3 = Float.parse(splits(10+4));
-                    val v3 = Float.parse(splits(10+5));
-
-                    val x4 = Float.parse(splits(15+1));
-                    val y4 = Float.parse(splits(15+2));
-                    val z4 = Float.parse(splits(15+3));
-                    val u4 = Float.parse(splits(15+4));
-                    val v4 = Float.parse(splits(15+5));
-
-                    val m = matTable.getOrElse(splits(21),white);
-                    prims.add(new WaveyRectangle(Vector3(x1,y1,z1),Vector2(u1,v1),Vector3(x2,y2,z2),Vector2(u2,v2),Vector3(x3,y3,z3),Vector2(u3,v3),Vector3(x4,y4,z4),Vector2(u4,v4),m));
+                    val m = matTable.getOrElse(splits(6),white);
+                    prims.add(new WaveyRectangle(Vector3(x,y,z),w,h,m));
                 } else {
                     Console.ERR.println("Did not understand: "+line_);
                 }
@@ -202,67 +185,6 @@ public class SceneLoader {
 
                     val m = matTable.getOrElse(splits(21),white);
                     prims.add(new Rectangle(Vector3(x1,y1,z1),Vector2(u1,v1),Vector3(x2,y2,z2),Vector2(u2,v2),Vector3(x3,y3,z3),Vector2(u3,v3),Vector3(x4,y4,z4),Vector2(u4,v4),m));
-                } else {
-                    Console.ERR.println("Did not understand: "+line_);
-                }
-            } else if (splits(0).equalsIgnoreCase("TRI")) {
-                if (splits.size == 11) {
-                    val x1 = Float.parse(splits(0+1));
-                    val y1 = Float.parse(splits(0+2));
-                    val z1 = Float.parse(splits(0+3));
-
-                    val x2 = Float.parse(splits(3+1));
-                    val y2 = Float.parse(splits(3+2));
-                    val z2 = Float.parse(splits(3+3));
-
-                    val x3 = Float.parse(splits(6+1));
-                    val y3 = Float.parse(splits(6+2));
-                    val z3 = Float.parse(splits(6+3));
-                    val m = matTable.getOrElse(splits(10),white);
-                    prims.add(new Triangle(Vector3(x1,y1,z1),Vector3(x2,y2,z2),Vector3(x3,y3,z3),m));
-                } else {
-                    Console.ERR.println("Did not understand: "+line_);
-                }
-            } else if (splits(0).equalsIgnoreCase("DTRI")) {
-                if (splits.size == 11) {
-                    val x1 = Float.parse(splits(0+1));
-                    val y1 = Float.parse(splits(0+2));
-                    val z1 = Float.parse(splits(0+3));
-
-                    val x2 = Float.parse(splits(3+1));
-                    val y2 = Float.parse(splits(3+2));
-                    val z2 = Float.parse(splits(3+3));
-
-                    val x3 = Float.parse(splits(6+1));
-                    val y3 = Float.parse(splits(6+2));
-                    val z3 = Float.parse(splits(6+3));
-                    val m = matTable.getOrElse(splits(10),white);
-                    prims.add(new DoubleTriangle(Vector3(x1,y1,z1),Vector3(x2,y2,z2),Vector3(x3,y3,z3),m));
-                } else {
-                    Console.ERR.println("Did not understand: "+line_);
-                }
-            } else if (splits(0).equalsIgnoreCase("UVTRI")) {
-                if (splits.size == 17) {
-                    val x1 = Float.parse(splits(0+1));
-                    val y1 = Float.parse(splits(0+2));
-                    val z1 = Float.parse(splits(0+3));
-                    val u1 = Float.parse(splits(0+4));
-                    val v1 = Float.parse(splits(0+5));
-
-                    val x2 = Float.parse(splits(5+1));
-                    val y2 = Float.parse(splits(5+2));
-                    val z2 = Float.parse(splits(5+3));
-                    val u2 = Float.parse(splits(5+4));
-                    val v2 = Float.parse(splits(5+5));
-
-                    val x3 = Float.parse(splits(10+1));
-                    val y3 = Float.parse(splits(10+2));
-                    val z3 = Float.parse(splits(10+3));
-                    val u3 = Float.parse(splits(10+4));
-                    val v3 = Float.parse(splits(10+5));
-
-                    val m = matTable.getOrElse(splits(16),white);
-                    prims.add(new UVTriangle(Vector3(x1,y1,z1),Vector2(u1,v1),Vector3(x2,y2,z2),Vector2(u2,v2),Vector3(x3,y3,z3),Vector2(u3,v3),m));
                 } else {
                     Console.ERR.println("Did not understand: "+line_);
                 }
