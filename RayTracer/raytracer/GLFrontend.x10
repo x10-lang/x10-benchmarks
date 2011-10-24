@@ -58,6 +58,7 @@ public class GLFrontend {
             GL.glBufferData[Byte](GL.GL_PIXEL_UNPACK_BUFFER, size, null, 0, GL.GL_STREAM_DRAW); // discard
             try {
                 raw = GL.glMapBuffer[RGB](GL.GL_PIXEL_UNPACK_BUFFER, GL.GL_WRITE_ONLY, width*height);
+                /*
                 for (y in 0..(height-1)) {
                     for (x in 0..(width-1)) {
                         val c1 = ((x*x) / 256 + 3 * y + h*10) as UByte;
@@ -67,6 +68,7 @@ public class GLFrontend {
                     }
                 }
                 h++;
+                */
                 write();
             } finally {
                 GL.glUnmapBuffer(GL.GL_PIXEL_UNPACK_BUFFER);
