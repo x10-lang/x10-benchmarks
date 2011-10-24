@@ -16,7 +16,7 @@ public class Texture2DTest {
         //}
         for (var y:Float=-3 ; y<=3 ; y+=0.1) {
             for (var x:Float=-3 ; x<=3 ; x+=0.1) {
-                Console.OUT.print(tex(x,y,0).x > 0.5 ? " " : "X");
+                Console.OUT.print(tex(Vector2(x,y),0).x > 0.5 ? " " : "X");
             }
             Console.OUT.println();
         }
