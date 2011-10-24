@@ -34,5 +34,19 @@ public struct Vector3(x:Float,y:Float,z:Float) {
     @Inline public static def lerp (v1:Vector3, v2:Vector3, alpha:Float) = (1-alpha)*v1 + alpha*v2;
     @Inline public static operator (rgb:RGB) as Vector3 = Vector3(rgb.r/255.0f, rgb.g/255.0f, rgb.b/255.0f);
 
+    @Inline public static def reflect (v:Vector3, n:Vector3) {
+        val d = v.dot(n);
+        return v - 2*d*n;
+    }   
+
+    // v and n must be normalised
+    @Inline public static def refract (v:Vector3, n:Vector3, n1_n2:Float) {
+        // taken from http://www.devmaster.net/articles/raytracing/
+        val cosI = v.dot(n); // -1 to 0 for one-sided surfaces
+        val c2 = Math.sqrtf(1 - n1_n2*n1_n2*(1 - cosI*cosI)); // 0 if v,n aligned
+        return (n1_n2*v + (n1_n2*cosI - c2)*n).normalised();
+    }
+
+
 }
 

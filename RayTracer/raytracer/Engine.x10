@@ -9,27 +9,30 @@ import x10.compiler.Inline;
 
 public class Engine {
 
-    globalWidth:Int;
-    globalHeight:Int;
-    localBlockWidth:Int;
-    localBlockHeight:Int;
-    localWidth:Int;
-    localHeight:Int;
-    horzSplits:Int;
-    vertSplits:Int;
-    horzBlocks:Int;
-    vertBlocks:Int;
-    localFrame:Array[RGB](1){self!=null};
-    verbose:Boolean;
-    quiet:Boolean;
-    dumpOctree:Boolean;
+    public globalWidth:Int;
+    public globalHeight:Int;
+    public localBlockWidth:Int;
+    public localBlockHeight:Int;
+    public localWidth:Int;
+    public localHeight:Int;
+    public horzSplits:Int;
+    public vertSplits:Int;
+    public horzBlocks:Int;
+    public vertBlocks:Int;
+    public localFrame:Array[RGB](1){self!=null};
+    public verbose:Boolean;
+    public quiet:Boolean;
+    public dumpOctree:Boolean;
     public mipmapBias:Int;
     
 
     var orientation:Quat = Quat(1,0,0,0);
     var pos:Vector3 = Vector3(0,0,0);
 
-    public def this (opts:OptionsParser, global_width:Int, global_height:Int, prims:Array[Primitive](1)) {
+    val vertexes : Array[MeshVertex](1);
+    val skybox : Array[Texture2D](1);
+
+    public def this (opts:OptionsParser, global_width:Int, global_height:Int, prims:Array[Primitive](1), vertexes:Array[MeshVertex](1), skybox:Array[Texture2D](1)) {
 
         verbose = opts("-v");
         quiet = opts("-q");
@@ -79,39 +82,65 @@ public class Engine {
 
         localFrame = new Array[RGB](localWidth * localHeight);
 
-        scene = new Octree(opts("-d",12), AABB(Vector3(-100,-100,-100),Vector3(100,100,100)));
+        octree = new LooseOctree(opts("-d",10), AABB(Vector3(-10,-10,-10),Vector3(10,10,10)), 20.0f);
         mipmapBias = opts("-b",0);
 
+        this.vertexes = vertexes;
+        this.skybox = skybox;
+
         for (p in prims.values()) {
-            scene.insert(p);
+            octree.insert(p);
         }
 
-        if (dumpOctree) Console.OUT.println(scene);
+        octree.bake();
+
+        if (dumpOctree) Console.OUT.println(octree);
 
     }
 
-    val sunDir = Vector3(0,0,1);
-    val ambLight = 0.15f;
-    val diffLightCol = Vector3(1,1,1);
+    public static struct DirectionalLight(dir:Vector3, diff:Vector3, spec:Vector3) {
+    };
 
-    public final def lightingEquation(diff_surf_col:Vector3, amb_surf_col:Vector3, normal:Vector3, pos:Vector3) {
-            val the_dot = normal.dot(sunDir); 
+    val sun = DirectionalLight(Vector3(0.4f,0.6f,1.0f).normalised(), Vector3(1,1,1), Vector3(2,2,2));
 
-            // half lambert shading 
-            val diff_exp = (the_dot * 0.5f + 0.5f) * (the_dot * 0.5f + 0.5f); 
-            // standard shading 
-            //val diff_exp = Math.max(0.0f, the_dot); 
+    val ambLight = 0.3f;
 
-            val amb_comp  =            ambLight     * amb_surf_col;
-            val diff_comp = diff_exp * diffLightCol * diff_surf_col;
-            //val spec_comp = spec_exp * specLightCol * scol;
+    public final def lightingEquation(s:RayState,
+                                      surf_amb:Vector3, surf_diff:Vector3, surf_spec:Vector3, surf_gloss:Float, surf_normal:Vector3,
+                                      surf_pos:Vector3, cam_dir:Vector3) {
 
-            // sum up all the various components
-            return (amb_comp + diff_comp) as RGB;
+        // ambient component
+        val amb_comp = ambLight * surf_amb;
+
+        // shadow test
+        var shadowyness : Float = 0;
+        if (s != null) {
+            s.o = surf_pos;
+            s.d = sun.dir;
+            s.l = 50.0f;
+            castRay(s);
+            if (s.t < s.l) shadowyness = 1.0f;
+        }
+
+        // diffuse component
+        val diff_exp = surf_normal.dot(sun.dir); 
+        // half lambert shading 
+        //val diff_ill = (diff_exp * 0.5f + 0.5f) * (diff_exp * 0.5f + 0.5f); 
+        // standard shading 
+        val diff_ill = Math.max(0.0f, diff_exp); 
+        val diff_comp = (1 - shadowyness) * diff_ill * sun.diff * surf_diff;
+
+        // specular component (phong)
+        val spec_exp = -cam_dir.dot(Vector3.reflect(sun.dir, surf_normal));
+        val spec_ill = Math.pow(Math.max(0.0000001f,spec_exp),surf_gloss) as Float;
+        val spec_comp = (1 - shadowyness) * spec_ill * sun.spec * surf_spec;
+
+        // sum up all the components for the final colour
+        return (amb_comp + diff_comp + spec_comp);
     }
 
 
-    val scene : Octree;
+    val octree : LooseOctree;
 
     public static def to_col(x:Vector3) {
         val scaled = x*0.5f + Vector3(0.5f,0.5f,0.5f);
@@ -119,25 +148,32 @@ public class Engine {
     }
 
     public final def castRay (s:RayState) {
-        s.t = Float.MAX_VALUE;
-        //scene.iterateCargo((p:Primitive) => { p.intersectRay(s); });
-        scene.castRay(s);
-        if (s.t == Float.MAX_VALUE) {
-            val dn = s.d.normalised();
-            //return RGB.BLACK;
-            //return to_col(dn);
-            if (dn.x > 0 && Math.abs(dn.y/dn.x) < 1 && Math.abs(dn.z/dn.x) < 1) return to_col(Vector3( 1,0,0));
-            else if (dn.x < 0 && Math.abs(dn.y/dn.x) < 1 && Math.abs(dn.z/dn.x) < 1) return to_col(Vector3(-1,0,0));
-            else if (dn.y > 0 && Math.abs(dn.x/dn.y) < 1 && Math.abs(dn.z/dn.y) < 1) return to_col(Vector3(0, 1,0));
-            else if (dn.y < 0 && Math.abs(dn.x/dn.y) < 1 && Math.abs(dn.z/dn.y) < 1) return to_col(Vector3(0,-1,0));
-            else if (dn.z > 0 && Math.abs(dn.x/dn.z) < 1 && Math.abs(dn.y/dn.z) < 1) return to_col(Vector3(0,0, 1));
-            else                                                                     return to_col(Vector3(0,0,-1));
+        s.t = s.l;
+        // use line below to bypass octree optimisation
+        //octree.iterateCargo((p:Primitive) => { p.intersectRay(s); });
+        octree.castRay(s);
+    }
+
+    public final def skyboxRender(d:Vector3) : Vector3 {
+        // <front> <back> <left> <right> <up> <down>
+        if (d.y > 0 && Math.abs(d.x/d.y) <= 1 && Math.abs(d.z/d.y) <= 1) return skybox(0).clampedLookup(Vector2(d.x/d.y+1.0f,-d.z/d.y+1.0f)*0.5f,mipmapBias); 
+        if (d.y < 0 && Math.abs(d.x/d.y) <= 1 && Math.abs(d.z/d.y) <= 1) return skybox(1).clampedLookup(Vector2(d.x/d.y+1.0f,  d.z/d.y+1.0f)*0.5f,mipmapBias);
+        if (d.x < 0 && Math.abs(d.y/d.x) <= 1 && Math.abs(d.z/d.x) <= 1) return skybox(2).clampedLookup(Vector2(-d.y/d.x+1.0f,  d.z/d.x+1.0f)*0.5f,mipmapBias);
+        if (d.x > 0 && Math.abs(d.y/d.x) <= 1 && Math.abs(d.z/d.x) <= 1) return skybox(3).clampedLookup(Vector2(-d.y/d.x+1.0f,-d.z/d.x+1.0f)*0.5f,mipmapBias);
+        if (d.z > 0 && Math.abs(d.x/d.z) <= 1 && Math.abs(d.y/d.z) <= 1) return skybox(4).clampedLookup(Vector2(d.x/d.z+1.0f,  d.y/d.z+1.0f)*0.5f,mipmapBias);
+        return skybox(5).clampedLookup(Vector2(-d.x/d.z+1.0f,  d.y/d.z+1.0f)*0.5f,mipmapBias);
+    }
+
+    public final def castRayAndRender (s:RayState) {
+        castRay(s);
+        if (s.t >= s.l) {
+            return skybox==null ? RGB.DARK_BLUE as Vector3 : skyboxRender(s.d);
         } else {
-            return s.mat.render(this,s);
+            return s.mat.render(this,s) ;
         }
     }
 
-    public def renderFrame (frameBuffer:RemoteIndexedMemoryChunk[RGB]) {
+    public def renderFrame (frameBuffer:RemoteIndexedMemoryChunk[RGB], time:Float) {
         val horz_split = here.id % horzSplits;
         val vert_split = here.id / horzSplits;
 
@@ -160,7 +196,7 @@ public class Engine {
                 val block_off_y = by * localBlockHeight;
                 finish for (bx in 0..(horzBlocks-1)) async {
                     val block_off_x = bx * localBlockWidth;
-                    val state = new RayState(this);
+                    val state = new RayState(vertexes, time, 4);
                     state.o = pos;
                     for (y_ in 0..(localBlockHeight-1)) {
                         val y = y_ + block_off_y;
@@ -172,7 +208,9 @@ public class Engine {
                                     + forwards
                                     + y_norm * up;
                             state.d = ray * 800;
-                            localFrame(y*localWidth + x) = castRay(state);
+                            state.l = state.d.length();
+                            state.d /= state.l;
+                            localFrame(y*localWidth + x) = castRayAndRender(state) as RGB;
                         }
                     }
                 }
@@ -197,7 +235,9 @@ public class Engine {
                             + forwards
                             + y_norm * up;
                     state.d = ray * 800;
-                    localFrame(y*localWidth + x) = castRay(state);
+                    state.l = state.d.length();
+                    state.d /= state.l;
+                    localFrame(y*localWidth + x) = castRayAndRender(state);
                 }
                 IndexedMemoryChunk.asyncCopy(localFrame.raw(), y*localWidth, frameBuffer, offset_x + (offset_y+y)*globalWidth, localWidth);
             }

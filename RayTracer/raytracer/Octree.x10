@@ -2,7 +2,9 @@ package raytracer;
 
 import x10.util.ArrayList;
 import x10.util.StringBuilder;
+import x10.util.IndexedMemoryChunk;
 
+import x10.compiler.Inline;
 
 public final class Octree {
 
@@ -11,6 +13,16 @@ public final class Octree {
 
     var children : Array[Octree](1);
     var cargo : ArrayList[Primitive];
+    var meshTriangleCargo : ArrayList[MeshTriangle];
+
+    var bakedChildren : IndexedMemoryChunk[Octree] = IndexedMemoryChunk.allocateUninitialized[Octree](0);
+    var bakedCargo : IndexedMemoryChunk[Primitive] = IndexedMemoryChunk.allocateUninitialized[Primitive](0);
+    var bakedMeshTriangleCargo : IndexedMemoryChunk[MeshTriangle] = IndexedMemoryChunk.allocateUninitialized[MeshTriangle](0);
+
+    public def this (depth:Int, bounds:AABB, Float) {
+        this.bounds = bounds;
+        this.depth = depth;
+    }
 
     public def this (depth:Int, bounds:AABB) {
         this.bounds = bounds;
@@ -18,8 +30,14 @@ public final class Octree {
     }
 
     public def insertLocally (o:Primitive) {
-        if (cargo==null) cargo = new ArrayList[Primitive]();
-        cargo.add(o);
+        if (o instanceof MeshTriangle) {
+            val mt = o as MeshTriangle;
+            if (meshTriangleCargo==null) meshTriangleCargo = new ArrayList[MeshTriangle]();
+            meshTriangleCargo.add(mt);
+        } else {
+            if (cargo==null) cargo = new ArrayList[Primitive]();
+            cargo.add(o);
+        }
     }
 
     public def insert (o:Primitive) {
@@ -37,6 +55,15 @@ public final class Octree {
             }
         }
         insertLocally(o);
+    }
+
+    public def bake () {
+        if (children!=null) bakedChildren = children.raw();
+        if (cargo!=null) bakedCargo = cargo.toIndexedMemoryChunk(); // does a copy
+        if (meshTriangleCargo!=null) bakedMeshTriangleCargo = meshTriangleCargo.toIndexedMemoryChunk(); // does a copy
+        for (i in 0..(bakedChildren.length()-1)) {
+            if (bakedChildren(i) != null) bakedChildren(i).bake();
+        }
     }
 
     public def calcChildAABB(i:Int) {
@@ -60,45 +87,23 @@ public final class Octree {
     }
 
     public def countCargo() : Int {
-        var r:Int = cargo == null ? 0 : cargo.size();
-        if (children != null) {
-            for (i in 0..7) {
-                if (children(i) != null) {
-                    r += children(i).countCargo();
-                }
+        var r:Int = bakedCargo.length() + bakedMeshTriangleCargo.length();
+        for (i in 0..(bakedChildren.length()-1)) {
+            if (bakedChildren(i) != null) {
+                r += bakedChildren(i).countCargo();
             }
         }
         return r;
     }
     public def iterateCargo(cb:(Primitive)=>void) {
-        if (cargo!=null) for (i in 0..(cargo.size()-1)) cb(cargo(i));
-        if (children == null) return;
-        for (i in 0..7) {
-            if (children(i) != null) children(i).iterateCargo(cb);
+        for (i in 0..(bakedCargo.length()-1)) cb(bakedCargo(i));
+        for (i in 0..(bakedMeshTriangleCargo.length()-1)) cb(bakedMeshTriangleCargo(i));
+        for (i in 0..(bakedChildren.length()-1)) {
+            if (bakedChildren(i) != null) bakedChildren(i).iterateCargo(cb);
         }
     }
 
-    public def castRay (s:RayState) {
-
-        // in the equation P = o + t.d, the following t0 and t1 are such that...
-        val t0 = (bounds.min - s.o) / s.d;
-        val t1 = (bounds.max - s.o) / s.d;
-        // o.x + d.x * t0.x == bounds.min.x
-        // o.x + d.x * t1.x == bounds.max.x
-        // (similarly for y, z)
-
-        //Console.OUT.println("Casting octree ray: o="+o+"  d="+d);
-
-        // max ensures vector is positive
-        castRay2(s, t0.x,t0.y,t0.z, t1.x,t1.y,t1.z);
-        //castRay2(s, t0, t1);
-    }
-
-    // components of t0, t1 MUST be positive
-    private def castRay2 (s:RayState, t0x:Float,t0y:Float,t0z:Float, t1x:Float,t1y:Float,t1z:Float) {
-        val t0 = Vector3(t0x,t0y,t0z);
-        val t1 = Vector3(t1x,t1y,t1z);
-    //private def castRay2(t0:Vector3, t1:Vector3) {
+    @Inline private static def octantHit (s:RayState, t0:Vector3, t1:Vector3) {
         //Console.OUT.println("\033[1m"+depth+":  is octant:  "+bounds+"\033[0m");
         //Console.OUT.println("t0="+t0+"  t1="+t1);
         val t0_ = Vector3.min(t0,t1);
@@ -110,33 +115,45 @@ public final class Octree {
         val t0_Bar_ = t0_.maxElement();
         val t1_Bar_ = t1_.minElement();
         //Console.OUT.println("in="+t0_Bar_+"  out="+t1_Bar_);
+        return Math.max(t0_Bar_,0.0f) <= Math.min(t1_Bar_, s.l);
+    }
 
-        //if (Math.max(t0_Bar_,0.0f) >= Math.max(t1_Bar_,0.0f)) {
-        if (Math.max(t0_Bar_,0.0f) >= t1_Bar_) {
-            // misses entire octant
-            return;
-        }
+    public def castRay (s:RayState) {
+        // in the equation P = o + t.d, the following t0 and t1 are such that...
+        val t0 = (bounds.min - s.o) / s.d;
+        val t1 = (bounds.max - s.o) / s.d;
+        // o.x + d.x * t0.x == bounds.min.x
+        // o.x + d.x * t1.x == bounds.max.x
+        // (similarly for y, z)
+
+        //Console.OUT.println("Casting octree ray: o="+o+"  d="+d);
+        castRay2(s, t0.x,t0.y,t0.z, t1.x,t1.y,t1.z);
+    }
+
+    private def castRay2 (s:RayState, t0x:Float,t0y:Float,t0z:Float, t1x:Float,t1y:Float,t1z:Float) {
+        val t0 = Vector3(t0x,t0y,t0z);
+        val t1 = Vector3(t1x,t1y,t1z);
 
         // hits octant
         //Console.OUT.println("hits octant: "+bounds);
 
         // process cargo...
-        if (cargo!=null) for (i in 0..(cargo.size()-1)) {
-            cargo(i).intersectRay(s);
-            //s.t = t0_Bar_;
-            //s.normal = Vector3(0,0,1);
+        for (i in 0..(bakedMeshTriangleCargo.length()-1)) {
+            bakedMeshTriangleCargo(i).intersectRay(s);
+        }
+        for (i in 0..(bakedCargo.length()-1)) {
+            bakedCargo(i).intersectRay(s);
         }
 
         //recurse to children...
-        if (children==null) return; // leaf node
+        if (bakedChildren.length()==0) return; // leaf node
 
         // calculate midplanes (it's linear -- they are halfway between outer planes)
         val th = (t0+t1)*0.5f;
 
         val process_child = (i:Int, t0:Vector3, t1:Vector3) => {
-            val child = children(i);
-            if (child != null) child.castRay2(s, t0.x,t0.y,t0.z, t1.x,t1.y,t1.z);
-            //if (child != null) child.castRay2(s,t0,t1);
+            val child = bakedChildren(i);
+            if (child!=null && octantHit(s,t0,t1)) child.castRay2(s, t0.x,t0.y,t0.z, t1.x,t1.y,t1.z);
         };
 
         process_child(0, Vector3(t0.x, t0.y, t0.z), Vector3(th.x, th.y, th.z));
@@ -157,13 +174,14 @@ public final class Octree {
         return sb.toString();
     }
     private def toString(depth:Int) {
-        var r : String = indent(depth, "    ") + bounds + (cargo==null?"":"{"+cargo.size()+"}");
-        if (children==null) {
+        val num_cargo = bakedCargo.length() + bakedMeshTriangleCargo.length();
+        var r : String = indent(depth, "    ") + bounds + (num_cargo==0?"":"{"+num_cargo+"}");
+        if (bakedChildren.length()==0) {
             return r;
         } else {
             for (i in 0..7) {
-                if (children(i) != null)
-                    r = r + "\n" + children(i).toString(depth+1);
+                if (bakedChildren(i) != null)
+                    r = r + "\n" + bakedChildren(i).toString(depth+1);
             }
             return r;
         }

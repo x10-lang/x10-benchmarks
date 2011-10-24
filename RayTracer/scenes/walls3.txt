@@ -24,7 +24,25 @@ MAT_SOLID DarkYellow 0.5 0.5 0  0.5 0.5 0  1 1 1  10
 MAT_SOLID DarkCyan 0 0.5 0.5   0 0.5 0.5  1 1 1  10
 MAT_SOLID DarkMagenta 0.5 0 0.5   0.5 0 0.5  1 1 1  10
 
-UVTRI -5 -3 -10 0 0 5 -3 -10 1 0 0 6 -10 0 1 White
-SPHERE -5 -3 -10 1 Red
-SPHERE 5 -3 -10 1 Red
-SPHERE 0 6 -10 1 Red
+MAT_TEX Logo 512 512 scenes/logo.raw  1 1 1  1 1 1  0.3 0.3 0.3  30
+
+#MAT_TEX Logo 512 256 scenes/marble1.raw  1 1 1  1 1 1  0 0 0 10
+#MAT_TEX Logo 512 512 scenes/cfloor.raw  1 1 1  1 1 1  0 0 0 10
+#MAT_TEX Logo 512 512 scenes/wall3.raw  1 1 1  1 1 1  0 0 0 10
+#MAT_TEX Logo 512 512 scenes/marble2.raw  1 1 1  1 1 1  0.3 0.3 0.3 10
+#MAT_TEX Logo 512 512 scenes/bluetile.raw  1 1 1  1 1 1  0.3 0.3 0.3 30
+#MAT_TEX Logo 512 128 scenes/skirting.raw  1 1 1  1 1 1  0 0 0 10
+#MAT_TEX Logo 512 512 scenes/marble3.raw  1 1 1  1 1 1  0 0 0 10
+#MAT_TEX Logo 512 512 scenes/stone1.raw  1 1 1  1 1 1  0 0 0 10
+
+#MAT_TEX Logo 512 512 scenes/testpattern.raw  1 1 1  1 1 1  0 0 0  10
+
+
+CAMERA 0 -60 0 0 0
+
+#SPHERE 0 -42 0 10 REFLECTIVE
+RECT -30 -30 20 0 4  -30 -30 -20 0 0  30 -30 -20 6 0  30 -30 20 6 4 Logo 
+RECT  30 30 20 0 4   30 30 -20 0 0  -30 30 -20 6 0  -30 30 20 6 4 Logo 
+RECT  -30 30 20 0 4   -30 30 -20 0 0  -30 -30 -20 6 0  -30 -30 20 6 4 Logo 
+RECT  30 -30 20 0 4   30 -30 -20 0 0  30 30 -20 6 0  30 30 20 6 4 Logo 
+RECT  -30 30 20 0 6   -30 -30 20 0 0  30 -30 20 6 0  30 30 20 6 6  Logo 

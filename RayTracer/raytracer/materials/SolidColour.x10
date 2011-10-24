@@ -2,7 +2,9 @@ package raytracer.materials;
 
 import raytracer.*;
 
-public class SolidColour(col:RGB) extends Material {
-    public def render (rt:Engine, s:RayState) : RGB = rt.lightingEquation(col as Vector3, col as Vector3, s.normal, s.o + s.t*s.d);
+public class SolidColour(amb:Vector3, diff:Vector3, spec:Vector3, gloss:Float) extends Material {
+    public def render (rt:Engine, s:RayState) {
+        return rt.lightingEquation(s.child, amb, diff, spec, gloss, s.normal, s.o + s.t*s.d, -s.d);
+    }
 }
 

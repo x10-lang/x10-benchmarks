@@ -4,6 +4,8 @@ import x10.util.*;
 
 import x10.io.Console;
 
+import x10.compiler.Inline;
+
 // power of 2 width/height required
 // max of 512 in either direction
 public final class Texture2D {
@@ -17,7 +19,9 @@ public final class Texture2D {
             height = h_==0 ? 1 : h_;
             buffer = IndexedMemoryChunk.allocateUninitialized[RGB](width*height);
         }
-        public static def mortonEncode (x:Int, y:Int) {
+        @Inline public def coordEncode (x:Int, y:Int) {
+            return y * width + x;
+            /*
             var r:Int = 0;
             for (i in 0..8) { // 0..512
                 val inputMask = 1<<i;
@@ -25,14 +29,16 @@ public final class Texture2D {
                 if ((y & inputMask) != 0) r |= 1<<(2*i+1);
             }
             return r;
+            */
         }
         public def raw () = buffer;
-        public def unsafeLookup (x:Int, y:Int) = buffer(mortonEncode(x,height-y));
+        public def unsafeLookup (x:Int, y:Int) = buffer(coordEncode(x,y));
         public def wrappedLookup (x:Int, y:Int) = unsafeLookup(x&(width-1), y&(height-1));
+        public def clampedLookup (x:Int, y:Int) = unsafeLookup(Math.min(Math.max(x,0),width-1), Math.min(Math.max(y,0),height-1));
         // filtered with linear interpolation
-        public operator this (x:Float, y:Float) {
-            val xs = x * width - 0.5f; // scaled and with the mid-pixel offset
-            val ys = y * height - 0.5f;
+        public def wrappedLookup (uv:Vector2) {
+            val xs = uv.x * width - 0.5f; // scaled and with the mid-pixel offset
+            val ys = uv.y * height - 0.5f;
             val xi = xs as Int;
             val yi = ys as Int;
             val xm = xs - xi; // mantissa
@@ -45,23 +51,69 @@ public final class Texture2D {
             val c1 = Vector3.lerp(c10, c11, xm);
             return Vector3.lerp(c0, c1, ym);
         }
+        public def clampedLookup (uv:Vector2) {
+            val xs = uv.x * width - 0.5f; // scaled and with the mid-pixel offset
+            val ys = uv.y * height - 0.5f;
+            val xi = xs as Int;
+            val yi = ys as Int;
+            val xm = xs - xi; // mantissa
+            val ym = ys - yi;
+            val c00 = clampedLookup(xi+0,yi+0) as Vector3;
+            val c01 = clampedLookup(xi+1,yi+0) as Vector3;
+            val c10 = clampedLookup(xi+0,yi+1) as Vector3;
+            val c11 = clampedLookup(xi+1,yi+1) as Vector3;
+            val c0 = Vector3.lerp(c00, c01, xm);
+            val c1 = Vector3.lerp(c10, c11, xm);
+            return Vector3.lerp(c0, c1, ym);
+        }
+        public def wrappedNearestLookup (uv:Vector2) {
+            val xs = uv.x * width - 0.5f; // scaled and with the mid-pixel offset
+            val ys = uv.y * height - 0.5f;
+            val xi = xs as Int;
+            val yi = ys as Int;
+            val xm = xs - xi; // mantissa
+            val ym = ys - yi;
+            val c00 = wrappedLookup(xi+0,yi+0) as Vector3;
+            val c01 = wrappedLookup(xi+1,yi+0) as Vector3;
+            val c10 = wrappedLookup(xi+0,yi+1) as Vector3;
+            val c11 = wrappedLookup(xi+1,yi+1) as Vector3;
+            val c0 = xm < 0.5 ? c00 : c01;
+            val c1 = xm < 0.5 ? c10 : c11;
+            return ym < 0.5 ? c0 : c1;
+        }
         public def init (closure:(x:Int, y:Int)=>RGB) {
             for (y in 0..(height-1)) {
                 for (x in 0..(width-1)) {
-                    buffer(mortonEncode(x,y)) = closure(x,y);
+                    buffer(coordEncode(x,y)) = closure(x,y);
                 }
             }
         }
         public def initFromLevelAbove(above:MipMap) {
-            for (i in 0..(buffer.length()-1)) {
-                val c0 = above.buffer(4*i+0);
-                val c1 = above.buffer(4*i+1);
-                val c2 = above.buffer(4*i+2);
-                val c3 = above.buffer(4*i+3);
-                val box_filter = RGB((c0.r as UInt + c1.r + c2.r + c3.r)/4,
-                                     (c0.g as UInt + c1.g + c2.g + c3.g)/4,
-                                     (c0.b as UInt + c1.b + c2.b + c3.b)/4);
-                buffer(i) = box_filter;
+            if (above.width == 1) {
+                for (y in 0..(height-1)) {
+                    val c0 = above.buffer(above.coordEncode(0, 2*y+0));
+                    val c1 = above.buffer(above.coordEncode(0, 2*y+1));
+                    val box_filter = 0.5f*c0+0.5f*c1;
+                    buffer(coordEncode(0,y)) = box_filter;
+                }
+            } else if (above.height == 1) {
+                for (x in 0..(width-1)) {
+                    val c0 = above.buffer(above.coordEncode(2*x+0,0));
+                    val c1 = above.buffer(above.coordEncode(2*x+1,0));
+                    val box_filter = 0.5f*c0+0.5f*c1;
+                    buffer(coordEncode(x,0)) = box_filter;
+                }
+            } else {
+                for (y in 0..(height-1)) {
+                    for (x in 0..(width-1)) {
+                        val c0 = above.buffer(above.coordEncode(2*x+0,2*y+0));
+                        val c1 = above.buffer(above.coordEncode(2*x+1,2*y+0));
+                        val c2 = above.buffer(above.coordEncode(2*x+0,2*y+1));
+                        val c3 = above.buffer(above.coordEncode(2*x+1,2*y+1));
+                        val box_filter = 0.25f*c0+0.25f*c1+0.25f*c2+0.25f*c3;
+                        buffer(coordEncode(x,y)) = box_filter;
+                    }
+                }
             }
         }
     }
@@ -78,12 +130,10 @@ public final class Texture2D {
         }
         return r;
     }
-    public def this (w_:Int, h_:Int) {
-        val wdepth = bitDepth(w_);
-        val hdepth = bitDepth(h_);
+    public def this (w:Int, h:Int) {
+        val wdepth = bitDepth(w);
+        val hdepth = bitDepth(h);
         val levels = Math.max(wdepth,hdepth);
-        val w = 1 << levels;
-        val h = 1 << levels;
         this.mipmaps = new Array[MipMap](levels, (i:Int)=>new MipMap(w>>i, h>>i));
     }
     public def init (closure:(x:Int, y:Int)=>RGB) {
@@ -92,7 +142,15 @@ public final class Texture2D {
             mipmaps(i).initFromLevelAbove(mipmaps(i-1));
         }
     }
-    public operator this (x:Float, y:Float, level:Int) = mipmaps(level)(x,y);
+
+    public def mipmapLevel(level:Int) = mipmaps(Math.max(0, Math.min(mipmaps.size-1, level)));;
+
+    public operator this (uv:Vector2, level:Int) = mipmapLevel(level).wrappedLookup(uv);
+    public def clampedLookup (uv:Vector2, level:Int) = mipmapLevel(level).clampedLookup(uv);
+    public def wrappedNearestLookup (uv:Vector2, level:Int) = mipmapLevel(level).wrappedNearestLookup(uv);
+
+    public def width () = mipmap(0).width;
+    public def height () = mipmap(0).height;
 }
 
 // vim: shiftwidth=4:tabstop=4:expandtab

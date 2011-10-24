@@ -132,14 +132,17 @@ public class GLFrontend {
         val forwards = (keyDown('w'.ord()) ? 1.0f : 0.0f) - (keyDown('s'.ord()) ? 1.0f : 0.0f);
         val right = (keyDown('d'.ord()) ? 1.0f : 0.0f) - (keyDown('a'.ord()) ? 1.0f : 0.0f);
         val up = (keyDown(' '.ord()) ? 1.0f : 0.0f) - (keyDown('c'.ord()) ? 1.0f : 0.0f);
-        val pos_change = forwards * elapsed * move_speed * Vector3(0,1,0)
-                       + right * elapsed * move_speed * Vector3(1,0,0)
+        val pos_change = forwards * elapsed * move_speed * (orientation()*Vector3(0,1,0))
+                       + right * elapsed * move_speed * (orientation()*Vector3(1,0,0))
                        + up * elapsed * move_speed * Vector3(0,0,1);
-        pos += orientation() * pos_change;
+        pos += pos_change;
     }
+
+    val startTime : Long;
 
     public def this (opts:OptionsParser, width:Int, height:Int, fb:FrameBuffer, sl:SceneLoader) {
 
+        this.startTime = System.nanoTime();
         this.width = this.winWidth = width;
         this.height = this.winHeight = height;
         this.fb = fb;
@@ -156,12 +159,14 @@ public class GLFrontend {
         GL.glBindTexture(GL.GL_TEXTURE_2D, 0);
 
         val prims = sl.prims.toArray();
+        val vertexes = sl.vertexes.toArray();
+        val skybox = sl.skybox;
 
         pos = sl.camPos;
         yaw = sl.camYaw;
         pitch = sl.camPitch;
 
-        rts = PlaceLocalHandle.make[Engine](Dist.makeUnique(), ()=>new Engine(opts, width, height, prims));
+        rts = PlaceLocalHandle.make[Engine](Dist.makeUnique(), ()=>new Engine(opts, width, height, prims, vertexes, skybox));
 
     }
 
@@ -179,12 +184,13 @@ public class GLFrontend {
                 val raw_ = RemoteIndexedMemoryChunk.wrap[RGB](fb.raw());
                 //Console.OUT.println("yaw="+yaw+" pitch="+pitch+" orientation="+orientation_);
                 val rts_ = rts;
+                val time = (before - startTime) / 1.0E9f;
                 finish for (p in Place.places()) async at (p) {
                     val rt = rts_();
                     //val before = System.nanoTime();
                     rt.pos = pos_;
                     rt.orientation = orientation_;
-                    rt.renderFrame(raw_);
+                    rt.renderFrame(raw_, time);
                     //val taken = (System.nanoTime()-before)/1E9;
                     //Console.OUT.println(here+": Render time: "+taken);
                 }
