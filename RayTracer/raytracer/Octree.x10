@@ -6,6 +6,8 @@ import x10.util.IndexedMemoryChunk;
 
 import x10.compiler.Inline;
 
+import raytracer.primitives.MeshTriangle;
+
 public final class Octree {
 
     val bounds : AABB;
@@ -103,15 +105,12 @@ public final class Octree {
         }
     }
 
-    @Inline private static def octantHit (s:RayState, t0:Vector3, t1:Vector3) {
+    @Inline private static def queryOctantHit (s:RayState, t0:Vector3, t1:Vector3) {
         //Console.OUT.println("\033[1m"+depth+":  is octant:  "+bounds+"\033[0m");
         //Console.OUT.println("t0="+t0+"  t1="+t1);
         val t0_ = Vector3.min(t0,t1);
         val t1_ = Vector3.max(t0,t1);
         //Console.OUT.println("t0_="+t0_+"  t1_="+t1_);
-        //val t0_Bar = t0_.max(Vector3(0,0,0));
-        //val t1_Bar = t1_.max(Vector3(0,0,0));
-        //Console.OUT.println("|t0_|="+t0_Bar+"  |t1_|="+t1_Bar);
         val t0_Bar_ = t0_.maxElement();
         val t1_Bar_ = t1_.minElement();
         //Console.OUT.println("in="+t0_Bar_+"  out="+t1_Bar_);
@@ -127,15 +126,12 @@ public final class Octree {
         // (similarly for y, z)
 
         //Console.OUT.println("Casting octree ray: o="+o+"  d="+d);
-        castRay2(s, t0.x,t0.y,t0.z, t1.x,t1.y,t1.z);
+        octantHit(s, t0.x,t0.y,t0.z, t1.x,t1.y,t1.z);
     }
 
-    private def castRay2 (s:RayState, t0x:Float,t0y:Float,t0z:Float, t1x:Float,t1y:Float,t1z:Float) {
+    private def octantHit (s:RayState, t0x:Float,t0y:Float,t0z:Float, t1x:Float,t1y:Float,t1z:Float) {
         val t0 = Vector3(t0x,t0y,t0z);
         val t1 = Vector3(t1x,t1y,t1z);
-
-        // hits octant
-        //Console.OUT.println("hits octant: "+bounds);
 
         // process cargo...
         for (i in 0..(bakedMeshTriangleCargo.length()-1)) {
@@ -153,7 +149,7 @@ public final class Octree {
 
         val process_child = (i:Int, t0:Vector3, t1:Vector3) => {
             val child = bakedChildren(i);
-            if (child!=null && octantHit(s,t0,t1)) child.castRay2(s, t0.x,t0.y,t0.z, t1.x,t1.y,t1.z);
+            if (child!=null && queryOctantHit(s,t0,t1)) child.octantHit(s, t0.x,t0.y,t0.z, t1.x,t1.y,t1.z);
         };
 
         process_child(0, Vector3(t0.x, t0.y, t0.z), Vector3(th.x, th.y, th.z));

@@ -1,1 +1,0 @@
-SKYBOX 512 scenes/skybox_FR.raw scenes/skybox_BK.raw scenes/skybox_LF.raw scenes/skybox_RT.raw scenes/skybox_UP.raw scenes/skybox_DN.raw 

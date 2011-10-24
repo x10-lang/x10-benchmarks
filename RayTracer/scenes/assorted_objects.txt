@@ -1,5 +1,5 @@
 MAT_SOLID White 1 1 1  1 1 1  1 1 1  10
-MAT_SOLID Black 1 1 1  1 1 1  1 1 1  10
+MAT_SOLID Black 0 0 0  .1 .1 .1  1 1 1  10
 MAT_SOLID Grey 0.5 0.5 0.5  0.5 0.5 0.5  1 1 1  10
 MAT_SOLID DarkGrey 0.25 0.25 0.25  0.25 0.25 0.25  1 1 1  10
 MAT_SOLID LightGrey 0.75 0.75 0.75  0.75 0.75 0.75  1 1 1  10
@@ -24,14 +24,27 @@ MAT_SOLID DarkYellow 0.5 0.5 0  0.5 0.5 0  1 1 1  10
 MAT_SOLID DarkCyan 0 0.5 0.5   0 0.5 0.5  1 1 1  10
 MAT_SOLID DarkMagenta 0.5 0 0.5   0.5 0 0.5  1 1 1  10
 
-MAT_SOLID metallic_grey 0.5 0.5 0.5  0.5 0.5 0.5  0.5 0.5 0.5  20
-MAT_REFLECTIVE mirror metallic_grey 0.5 0.5 0.5
-
-Sphere 0 3 1 1 mirror
-Sphere 2 3 1 1 Black
-Sphere 2 4 2 2 Blue
-Sphere 3 -2 1.5 1.5 Magenta
-SpeckledSphere 2 3 0.5 1 White
+MAT_SOLID MetallicGrey 0.5 0.5 0.5  0.5 0.5 0.5  0.5 0.5 0.5  20
+MAT_REFLECTIVE Mirror MetallicGrey 0.5 0.5 0.5
+MAT_REFLECTIVE DarkMirror Black 0.10 0.10 0.10
+MAT_REFLECTIVE RedMirror DarkRed 0.5 0.0 0.0
+MAT_REFLECTIVE BlueMirror DarkBlue 0.0 0.0 0.4
+MAT_REFLECTIVE CyanMirror DarkCyan 0.0 0.4 0.4
 
 MAT_TEX Logo 512 512 scenes/logo.raw  1 1 1  1 1 1  0.3 0.3 0.3  30
-Rect 0 30 0 0 10  0 0 0 0 0  30 0 0 10 0  30 30 0 10 10  Logo
+RECT -30 30 0 0 0  -30 -30 0 0 10  30 -30 0 10 10  30 30 0 10 0  Logo
+
+RECT -5 -7 4 0.00 1  -5 -7 0 0.00 0  -4 -7 0 0.25 0  -4 -7 4 0.25 1  DarkMirror
+RECT -4 -7 4 0.25 1  -4 -7 0 0.25 0  -4 -6 0 0.50 0  -4 -6 4 0.50 1  DarkMirror
+RECT -4 -6 4 0.50 1  -4 -6 0 0.50 0  -5 -6 0 0.75 0  -5 -6 4 0.75 1  DarkMirror
+RECT -5 -6 4 0.25 1  -5 -6 0 0.25 0  -5 -7 0 0.50 0  -5 -7 4 0.50 1  DarkMirror
+RECT -5 -6 4 0.25 1  -5 -7 4 0.25 0  -4 -7 4 0.50 0  -4 -6 4 0.50 1  DarkMirror
+
+SPHERE 5 2 1 1 Mirror
+SPHERE 2 5 3 3 DarkMirror
+SPHERE -3 7 1 1 RedMirror
+SPHERE 2 -2 2 2 BlueMirror
+SPHERE -3 -2 1.5 1.5 CyanMirror
+SPECKLEDSPHERE -5 3 1 1 DarkMirror
+
+SKYBOX 512 scenes/skybox_FR.raw scenes/skybox_BK.raw scenes/skybox_LF.raw scenes/skybox_RT.raw scenes/skybox_UP.raw scenes/skybox_DN.raw 

@@ -9,7 +9,7 @@ public final class Sphere(worldPos:Vector3, radius:Float, m:Material) extends Pr
         // stolen from http://wiki.cgsociety.org/index.php/Ray_Sphere_Intersection#Example_Code
         val ray_origin_o = s.o - worldPos;
         //Compute A, B and C coefficients
-        val a = 1; //s.d.length2():
+        val a = 1;
         val b = 2 * s.d.dot(ray_origin_o);
         val c = ray_origin_o.length2() - radius * radius;
 

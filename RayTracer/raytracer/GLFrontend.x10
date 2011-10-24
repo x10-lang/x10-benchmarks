@@ -182,17 +182,13 @@ public class GLFrontend {
                 updatePosOrientation();
                 val orientation_ = orientation();
                 val raw_ = RemoteIndexedMemoryChunk.wrap[RGB](fb.raw());
-                //Console.OUT.println("yaw="+yaw+" pitch="+pitch+" orientation="+orientation_);
                 val rts_ = rts;
                 val time = (before - startTime) / 1.0E9f;
                 finish for (p in Place.places()) async at (p) {
                     val rt = rts_();
-                    //val before = System.nanoTime();
                     rt.pos = pos_;
                     rt.orientation = orientation_;
                     rt.renderFrame(raw_, time);
-                    //val taken = (System.nanoTime()-before)/1E9;
-                    //Console.OUT.println(here+": Render time: "+taken);
                 }
             });
 
@@ -258,13 +254,8 @@ public class GLFrontend {
             if (mouseDown) {
                 currMouseX = x;
                 currMouseY = y;
-                //Console.OUT.println("MOTION: " + x + ", " + y);
             }
         }
-
-        //public def passiveMotion (x:Int, y:Int) : void {
-        //    Console.OUT.println("PASSIVE MOTION: " + x + ", " + y);
-        //}
 
         public def mouse (button:Int, state:Int, x:Int, y:Int) {
             if (button==0) {
@@ -296,14 +287,6 @@ public class GLFrontend {
         public def keyboard (key_: Char, x:Int, y:Int) {
             val key = key_.toLowerCase();
             keyDown(key.ord()) = true;
-            //Console.OUT.println("key press: "+key.ord());
-/*
-            if (key == 'w') {
-                forwards += 1.0f;
-            } else {
-            }
-*/
-
         }
 
 
@@ -318,7 +301,6 @@ public class GLFrontend {
 
     public static def main (args : Array[String]{rail,rank==1,rect}) {here == Place.FIRST_PLACE} {
         try {
-            //GL.glutInit(args);
             val opts = new OptionsParser(args, [
                 Option("q","quiet","print out less"),
                 Option("v","verbose","print out more"),

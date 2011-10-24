@@ -82,7 +82,7 @@ public class Engine {
 
         localFrame = new Array[RGB](localWidth * localHeight);
 
-        octree = new LooseOctree(opts("-d",10), AABB(Vector3(-10,-10,-10),Vector3(10,10,10)), 20.0f);
+        octree = new Octree(opts("-d",10), AABB(Vector3(-10,-10,-10),Vector3(10,10,10)), 20.0f);
         mipmapBias = opts("-b",0);
 
         this.vertexes = vertexes;
@@ -140,7 +140,7 @@ public class Engine {
     }
 
 
-    val octree : LooseOctree;
+    val octree : Octree;
 
     public static def to_col(x:Vector3) {
         val scaled = x*0.5f + Vector3(0.5f,0.5f,0.5f);
@@ -184,8 +184,6 @@ public class Engine {
             Console.OUT.println(here+" rendering "+horz_split+","+vert_split+"    "+offset_x+","+offset_y);
 
 
-        //val before = Runtime.getX10RTStats();
-        //val render_before = System.nanoTime();
         finish {
             val forwards = orientation * Vector3(0,1,0);
             val right = orientation * Vector3(1,0,0);
@@ -219,29 +217,6 @@ public class Engine {
                     IndexedMemoryChunk.asyncCopy(localFrame.raw(), y*localWidth, frameBuffer, offset_x + (offset_y+y)*globalWidth, localWidth);
                 }
             }
-
-            /*
-            for (y in 0..(localHeight-1)) {
-                // y_norm: centre of pixel, normalised to -1 -> 1 range
-                // note inversion of axis so -1,-1 is bottom left of screen
-                val y_norm = -(y+0.5f+offset_y)/globalHeight*2.0f + 1.0f;
-
-                for (x in 0..(localWidth-1)) {
-                    // linear projection
-                    // x_norm: center of pixel, normalised to -1 -> 1 range
-                    val x_norm = (x+0.5f+offset_x)/globalWidth*2.0f - 1.0f;
-                    // FOV of 90
-                    val ray = x_norm * globalWidth/globalHeight * right
-                            + forwards
-                            + y_norm * up;
-                    state.d = ray * 800;
-                    state.l = state.d.length();
-                    state.d /= state.l;
-                    localFrame(y*localWidth + x) = castRayAndRender(state);
-                }
-                IndexedMemoryChunk.asyncCopy(localFrame.raw(), y*localWidth, frameBuffer, offset_x + (offset_y+y)*globalWidth, localWidth);
-            }
-            */
         }
         //Console.OUT.println(here+" "+(System.nanoTime() - render_before)/1E9);
         //Console.OUT.println(here+" "+(Runtime.getX10RTStats() - before));

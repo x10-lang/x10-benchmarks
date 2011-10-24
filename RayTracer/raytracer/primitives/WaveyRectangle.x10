@@ -59,13 +59,8 @@ public class WaveyRectangle extends Primitive {
 
         val wave = waveFunc(0.5f * s.time + s.texCoord.dot(dir));
         val perturb = wave * scaledDir;
-        //s.normal = (s.normal + wave * Vector3(dir.x, dir.y, 0)).normalised();
         s.normal = Vector3(perturb.x, perturb.y, Math.sqrtf(1-perturb.x*perturb.x-perturb.y*perturb.y));
 
-        // perturb normal
-        //val x = 0.1f*(Math.cos(s.texCoord.x) as Float);
-        //val y = 0.1f*(Math.sin(s.texCoord.y) as Float);
-        //s.normal = Vector3(x,y,Math.sqrtf(1-x*x-y*y));
     }
 }
 

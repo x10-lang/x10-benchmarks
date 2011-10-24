@@ -16,8 +16,8 @@ RAYTRACER_SRC = \
         raytracer/materials/Reflective.x10 \
         raytracer/materials/RefractingWater.x10 \
         raytracer/MeshVertex.x10 \
-        raytracer/MeshTriangle.x10 \
         raytracer/Octree.x10 \
+        raytracer/primitives/MeshTriangle.x10 \
         raytracer/primitives/Rectangle.x10 \
         raytracer/primitives/SpeckledSphere.x10 \
         raytracer/primitives/Sphere.x10 \

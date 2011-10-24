@@ -1,4 +1,6 @@
-package raytracer;
+package raytracer.primitives;
+
+import raytracer.*;
 
 public final class MeshTriangle extends Primitive {
     val v1:UShort, v2:UShort, v3:UShort;

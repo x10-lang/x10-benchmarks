@@ -6,6 +6,8 @@ import x10.util.IndexedMemoryChunk;
 
 import x10.compiler.Inline;
 
+import raytracer.primitives.MeshTriangle;
+
 public final class LooseOctree {
 
     val bounds : AABB;
@@ -106,9 +108,6 @@ public final class LooseOctree {
         val t0_ = Vector3.min(t0,t1);
         val t1_ = Vector3.max(t0,t1);
         //Console.OUT.println("t0_="+t0_+"  t1_="+t1_);
-        //val t0_Bar = t0_.max(Vector3(0,0,0));
-        //val t1_Bar = t1_.max(Vector3(0,0,0));
-        //Console.OUT.println("|t0_|="+t0_Bar+"  |t1_|="+t1_Bar);
         val t0_Bar_ = t0_.maxElement();
         val t1_Bar_ = t1_.minElement();
         //Console.OUT.println("in="+t0_Bar_+"  out="+t1_Bar_);
@@ -131,9 +130,6 @@ public final class LooseOctree {
     private def octantHit (s:RayState, t0x:Float,t0y:Float,t0z:Float, t1x:Float,t1y:Float,t1z:Float) {
         val t0 = Vector3(t0x,t0y,t0z);
         val t1 = Vector3(t1x,t1y,t1z);
-
-        // hits octant
-        //Console.OUT.println("hits octant: "+bounds);
 
         // process cargo...
         for (i in 0..(bakedMeshTriangleCargo.length()-1)) {
