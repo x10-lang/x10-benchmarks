@@ -45,7 +45,7 @@ class fft {
             B = new Array[Double](localSize);
             //C = Rail.make[Double](localSize);
              C = Cs();
-            D = verify ? new Array[Double](localSize) : null;
+            if (verify) D = new Array[Double](localSize); else D = null;
             fftwPlan = create_plan(SQRTN, -1, 0);
             fftwInversePlan = create_plan(SQRTN, 1, 0);
             nCopy = 0;
