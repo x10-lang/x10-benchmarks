@@ -42,12 +42,8 @@ public class Engine {
 
     val gpu : Place;
 
-    val gpuHeightField0 : RemoteArray[Float]{rank==1, home==gpu};
-    val gpuHeightField1 : RemoteArray[Float]{rank==1, home==gpu};
+    val gpuHeightField : RemoteArray[Float]{rank==1, home==gpu};
     val gpuVelocityField : RemoteArray[Float]{rank==1, home==gpu};
-
-    var gpuHeightFieldFront : RemoteArray[Float]{rank==1, home==gpu};
-    var gpuHeightFieldBack : RemoteArray[Float]{rank==1, home==gpu};
 
     static val RADIUS = 1;
     static val BLOCK_DIMX = 16;
@@ -164,12 +160,9 @@ public class Engine {
 
         gpu = here.children().size==0 ? here : here.child(0);
 
-        gpuHeightField0 = CUDAUtilities.makeRemoteArray[Float](gpu, heightFieldDimX*heightFieldDimY, heightFieldHost);
-        gpuHeightField1 = CUDAUtilities.makeRemoteArray[Float](gpu, heightFieldDimX*heightFieldDimY, 0.0f);
+        gpuHeightField = CUDAUtilities.makeRemoteArray[Float](gpu, heightFieldDimX*heightFieldDimY, heightFieldHost);
         gpuVelocityField = CUDAUtilities.makeRemoteArray[Float](gpu, heightFieldDimX*heightFieldDimY, 0.0f);
 
-        gpuHeightFieldFront = gpuHeightField1;
-        gpuHeightFieldBack = gpuHeightField0;
     }
 
     public static struct DirectionalLight(dir:Vector3, diff:Vector3, spec:Vector3) {
@@ -266,7 +259,7 @@ public class Engine {
             if (hit_pos_x>=0 && hit_pos_x< heightFieldDimX && hit_pos_y>=0 && hit_pos_y<heightFieldDimY) {
                 val index = hit_pos_y*heightFieldDimX + hit_pos_x;
                 heightFieldHost(index) = 1.0f;
-                finish Array.asyncCopy(heightFieldHost, index, gpuHeightFieldBack, index, 1);
+                finish Array.asyncCopy(heightFieldHost, index, gpuHeightField, index, 1);
             }
             
         }
@@ -276,8 +269,7 @@ public class Engine {
 
             if (gpu != here) {
                 // update heightfield front buffer
-                val back = gpuHeightFieldBack;
-                val front = gpuHeightFieldFront;
+                val heightField = gpuHeightField;
                 val vel = gpuVelocityField;
                 val dimx = heightFieldDimX;
                 val dimy = heightFieldDimY;
@@ -297,7 +289,7 @@ public class Engine {
                                 for (var sx:Int=thread ; sx<BLOCK_DIMX+2*RADIUS ; sx+=THREADS) {
                                     val gx = sx - RADIUS + blockidx*BLOCK_DIMX;
                                     if (gx>=0 && gx< dimx && gy>=0 && gy<dimy) {
-                                        s_data_h(sy*S_DATA_STRIDE + sx) = back(gy*dimx + gx);
+                                        s_data_h(sy*S_DATA_STRIDE + sx) = heightField(gy*dimx + gx);
                                     } else {
                                         s_data_h(sy*S_DATA_STRIDE + sx) = 0.0f;
                                     }
@@ -320,7 +312,7 @@ public class Engine {
                             val new_v = 0.995f * (curr_v + 0.25f*disp - curr_h);
                             vel(gty*dimx + gtx) = new_v;
 
-                            front(gty*dimx + gtx) = curr_h + new_v;
+                            heightField(gty*dimx + gtx) = curr_h + new_v;
                         }
                     }
                 }
@@ -358,15 +350,11 @@ public class Engine {
                     IndexedMemoryChunk.asyncCopy(localFrame.raw(), y*localWidth, frameBuffer, offset_x + (offset_y+y)*globalWidth, localWidth);
                 }
             }
-        }
 
-        if (gpu != here) {
-            finish Array.asyncCopy(gpuHeightFieldFront, 0, heightFieldHost, 0, heightFieldHost.size);
+            if (gpu != here) {
+                Array.asyncCopy(gpuHeightField, 0, heightFieldHost, 0, heightFieldHost.size);
+            }
 
-            // flip heightfield pointers
-            val tmp = gpuHeightFieldFront;
-            gpuHeightFieldFront = gpuHeightFieldBack;
-            gpuHeightFieldBack = tmp;
         }
 
         //Console.OUT.println(here+" "+(System.nanoTime() - render_before)/1E9);
