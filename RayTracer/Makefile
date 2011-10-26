@@ -5,7 +5,7 @@ OPTNOGCX10CPP  = time $(HOME)/x10-opt-nogc/x10.dist/bin/x10c++ -STATIC_CHECKS -D
 OPTX10CPP  = time $(HOME)/x10-opt/x10.dist/bin/x10c++ -STATIC_CHECKS -DEBUG -O -NO_CHECKS $(COMP_OPTS)
 DBGX10CPP  = time $(HOME)/x10-dbg/x10.dist/bin/x10c++ -STATIC_CHECKS -DEBUG $(COMP_OPTS)
 
-ALL_TARGETS = Benchmark.opt Benchmark.dbg GLFrontend.opt GLFrontend.dbg QuatTest.opt QuatTest.dbg OctreeTest.opt OctreeTest.dbg Texture2DTest.opt Texture2DTest.dbg Vector3Test.opt Vector3Test.dbg
+ALL_TARGETS = Benchmark.opt Benchmark.dbg GLFrontend.opt GLFrontend.dbg QuatTest.opt QuatTest.dbg Texture2DTest.opt Texture2DTest.dbg Vector3Test.opt Vector3Test.dbg
 
 RAYTRACER_SRC = \
         raytracer/AABB.x10 \
@@ -17,6 +17,7 @@ RAYTRACER_SRC = \
         raytracer/materials/RefractingWater.x10 \
         raytracer/MeshVertex.x10 \
         raytracer/Octree.x10 \
+        raytracer/primitives/CUDARectangle.x10 \
         raytracer/primitives/MeshTriangle.x10 \
         raytracer/primitives/Rectangle.x10 \
         raytracer/primitives/SpeckledSphere.x10 \

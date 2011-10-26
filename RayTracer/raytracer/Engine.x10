@@ -6,6 +6,11 @@ import x10.util.IndexedMemoryChunk;
 import x10.util.RemoteIndexedMemoryChunk;
 
 import x10.compiler.Inline;
+import x10.compiler.Native;
+import x10.compiler.CUDA;
+import x10.compiler.CUDADirectParams;
+
+import x10.util.CUDAUtilities;
 
 public class Engine {
 
@@ -26,11 +31,67 @@ public class Engine {
     public mipmapBias:Int;
     
 
-    var orientation:Quat = Quat(1,0,0,0);
-    var pos:Vector3 = Vector3(0,0,0);
+    val octree : SpatialDatastructure;
 
     val vertexes : Array[MeshVertex](1);
     val skybox : Array[Texture2D](1);
+
+    static val heightFieldDimX = 128;
+    static val heightFieldDimY = 256;
+    val heightFieldHost : Array[Float](1){rail};
+
+    val gpu : Place;
+
+    val gpuHeightField0 : RemoteArray[Float]{rank==1, home==gpu};
+    val gpuHeightField1 : RemoteArray[Float]{rank==1, home==gpu};
+    val gpuVelocityField : RemoteArray[Float]{rank==1, home==gpu};
+
+    var gpuHeightFieldFront : RemoteArray[Float]{rank==1, home==gpu};
+    var gpuHeightFieldBack : RemoteArray[Float]{rank==1, home==gpu};
+
+    static val RADIUS = 1;
+    static val BLOCK_DIMX = 16;
+    static val BLOCK_DIMY = BLOCK_DIMX;
+    static val THREADS = BLOCK_DIMX*BLOCK_DIMY;
+    static val BLOCKS_X = heightFieldDimX/BLOCK_DIMX;
+    static val BLOCKS_Y = heightFieldDimY/BLOCK_DIMY;
+    static val S_DATA_STRIDE = BLOCK_DIMX+2*RADIUS;
+    static val S_DATA_SIZE = (BLOCK_DIMY+2*RADIUS)*S_DATA_STRIDE;
+
+    @Inline private static def lerp (v1:Float, v2:Float, a:Float) = (1-a)*v1 + a*v2;
+
+    @Inline private final def heightFieldHeight(x:Int, y:Int) = heightFieldHost(y*heightFieldDimX + x);
+
+    public final def heightFieldPerturb(xm:Int, ym:Int) {
+        val x = Math.max(0, xm-1);
+        val X = Math.min(heightFieldDimX, xm+1);
+        val y = Math.max(0, ym-1);
+        val Y = Math.min(heightFieldDimY, ym+1);
+
+        val hy = heightFieldHeight(xm, y);
+        val hY = heightFieldHeight(xm, Y);
+        val hx = heightFieldHeight(x, ym);
+        val hX = heightFieldHeight(X, ym);
+        val r = 0.5f*Vector2(hx-hX, hy-hY);
+        return Vector3(r.x, r.y, 1);
+    }
+
+    public final def heightFieldNormal(coord:Vector2) {
+        val coord2 = coord * Vector2(heightFieldDimX,heightFieldDimY);
+        val x0 = coord2.x as Int;
+        val y0 = coord2.y as Int;
+        val coord_fract = coord2 - Vector2(x0,y0);
+        val n00 = heightFieldPerturb(x0+0,y0+0);
+        val n01 = heightFieldPerturb(x0+1,y0+0);
+        val n10 = heightFieldPerturb(x0+0,y0+1);
+        val n11 = heightFieldPerturb(x0+1,y0+1);
+        val n0 = Vector3.lerp(n00, n01, coord_fract.x);
+        val n1 = Vector3.lerp(n10, n11, coord_fract.x);
+        val n = Vector3.lerp(n0, n1, coord_fract.y);
+        return n.normalised();
+        //return Vector3(n00.x, n00.y, Math.sqrtf(1 - n00.x*n00.x - n00.y*n00.y));
+        //return Vector3(n.x, n.y, Math.sqrtf(1 - n.x*n.x - n.y*n.y));
+    }
 
     public def this (opts:OptionsParser, global_width:Int, global_height:Int, prims:Array[Primitive](1), vertexes:Array[MeshVertex](1), skybox:Array[Texture2D](1)) {
 
@@ -82,7 +143,10 @@ public class Engine {
 
         localFrame = new Array[RGB](localWidth * localHeight);
 
-        octree = new Octree(opts("-d",10), AABB(Vector3(-10,-10,-10),Vector3(10,10,10)), 20.0f);
+        octree = opts("-l")
+               ? new LooseOctree(opts("-d",10), AABB(Vector3(-10,-10,-10),Vector3(10,10,10)), 20.0f)
+               : new      Octree(opts("-d",10), AABB(Vector3(-10,-10,-10),Vector3(10,10,10)));
+
         mipmapBias = opts("-b",0);
 
         this.vertexes = vertexes;
@@ -96,6 +160,16 @@ public class Engine {
 
         if (dumpOctree) Console.OUT.println(octree);
 
+        heightFieldHost = new Array[Float](heightFieldDimX * heightFieldDimY, 0.0f);
+
+        gpu = here.children().size==0 ? here : here.child(0);
+
+        gpuHeightField0 = CUDAUtilities.makeRemoteArray[Float](gpu, heightFieldDimX*heightFieldDimY, heightFieldHost);
+        gpuHeightField1 = CUDAUtilities.makeRemoteArray[Float](gpu, heightFieldDimX*heightFieldDimY, 0.0f);
+        gpuVelocityField = CUDAUtilities.makeRemoteArray[Float](gpu, heightFieldDimX*heightFieldDimY, 0.0f);
+
+        gpuHeightFieldFront = gpuHeightField1;
+        gpuHeightFieldBack = gpuHeightField0;
     }
 
     public static struct DirectionalLight(dir:Vector3, diff:Vector3, spec:Vector3) {
@@ -140,8 +214,6 @@ public class Engine {
     }
 
 
-    val octree : Octree;
-
     public static def to_col(x:Vector3) {
         val scaled = x*0.5f + Vector3(0.5f,0.5f,0.5f);
         return RGB(scaled.x, scaled.y, scaled.z);
@@ -173,7 +245,7 @@ public class Engine {
         }
     }
 
-    public def renderFrame (frameBuffer:RemoteIndexedMemoryChunk[RGB], time:Float) {
+    public def renderFrame (frameBuffer:RemoteIndexedMemoryChunk[RGB], denting_water:Boolean, pos:Vector3, orientation:Quat, time:Float) {
         val horz_split = here.id % horzSplits;
         val vert_split = here.id / horzSplits;
 
@@ -183,8 +255,77 @@ public class Engine {
         if (verbose)
             Console.OUT.println(here+" rendering "+horz_split+","+vert_split+"    "+offset_x+","+offset_y);
 
+        if (denting_water) {
+            val dir = orientation * Vector3(0,1,0);
+            val t = - pos.z / dir.z;
+            val hit_pos = pos + t*dir;
+            val hit_pos2 = (Vector2(hit_pos.x/7.0f, hit_pos.y/13.0f) + Vector2(0.5f,0.5f));
+            val hit_pos_x = (hit_pos2.x * heightFieldDimX) as Int;
+            val hit_pos_y = (hit_pos2.y * heightFieldDimY) as Int;
+
+            if (hit_pos_x>=0 && hit_pos_x< heightFieldDimX && hit_pos_y>=0 && hit_pos_y<heightFieldDimY) {
+                val index = hit_pos_y*heightFieldDimX + hit_pos_x;
+                heightFieldHost(index) = 1.0f;
+                finish Array.asyncCopy(heightFieldHost, index, gpuHeightFieldBack, index, 1);
+            }
+            
+        }
+
 
         finish {
+
+            if (gpu != here) {
+                // update heightfield front buffer
+                val back = gpuHeightFieldBack;
+                val front = gpuHeightFieldFront;
+                val vel = gpuVelocityField;
+                val dimx = heightFieldDimX;
+                val dimy = heightFieldDimY;
+                val BLOCKS_X_ = BLOCKS_X;
+                async at (gpu) @CUDA @CUDADirectParams {
+                    finish for (block in 0..(BLOCKS_X_*BLOCKS_Y-1)) async {
+                        val s_data_h = new Array[Float](S_DATA_SIZE, 0.0f);
+                        clocked finish for (thread in 0..(THREADS-1)) clocked async {
+                            val blockidx = block%BLOCKS_X_;
+                            val blockidy = block/BLOCKS_X_;
+                            val threadidx = thread%BLOCK_DIMX;
+                            val threadidy = thread/BLOCK_DIMX;
+
+                            // populate s_data_h
+                            for (sy in 0..(BLOCK_DIMY + 2*RADIUS - 1)) {
+                                val gy = sy - RADIUS + blockidy*BLOCK_DIMY;
+                                for (var sx:Int=thread ; sx<BLOCK_DIMX+2*RADIUS ; sx+=THREADS) {
+                                    val gx = sx - RADIUS + blockidx*BLOCK_DIMX;
+                                    if (gx>=0 && gx< dimx && gy>=0 && gy<dimy) {
+                                        s_data_h(sy*S_DATA_STRIDE + sx) = back(gy*dimx + gx);
+                                    } else {
+                                        s_data_h(sy*S_DATA_STRIDE + sx) = 0.0f;
+                                    }
+                                }
+                            }
+
+                            Clock.advanceAll();
+
+                            val gtx = (blockidx*BLOCK_DIMX+threadidx);
+                            val gty = (blockidy*BLOCK_DIMY+threadidy);
+
+                            val curr_h = s_data_h((threadidy+RADIUS)*S_DATA_STRIDE + threadidx+RADIUS);
+
+                            val curr_v:Float = vel(gty*dimx + gtx);
+                            var disp:Float = 0.0f;
+                            disp += s_data_h((threadidy+RADIUS-1)*S_DATA_STRIDE + threadidx+RADIUS+0);
+                            disp += s_data_h((threadidy+RADIUS+0)*S_DATA_STRIDE + threadidx+RADIUS-1);
+                            disp += s_data_h((threadidy+RADIUS+0)*S_DATA_STRIDE + threadidx+RADIUS+1);
+                            disp += s_data_h((threadidy+RADIUS+1)*S_DATA_STRIDE + threadidx+RADIUS+0);
+                            val new_v = 0.995f * (curr_v + 0.25f*disp - curr_h);
+                            vel(gty*dimx + gtx) = new_v;
+
+                            front(gty*dimx + gtx) = curr_h + new_v;
+                        }
+                    }
+                }
+            }
+
             val forwards = orientation * Vector3(0,1,0);
             val right = orientation * Vector3(1,0,0);
             val up = orientation * Vector3(0,0,1);
@@ -194,7 +335,7 @@ public class Engine {
                 val block_off_y = by * localBlockHeight;
                 finish for (bx in 0..(horzBlocks-1)) async {
                     val block_off_x = bx * localBlockWidth;
-                    val state = new RayState(vertexes, time, 4);
+                    val state = new RayState(this, time, 4);
                     state.o = pos;
                     for (y_ in 0..(localBlockHeight-1)) {
                         val y = y_ + block_off_y;
@@ -218,6 +359,16 @@ public class Engine {
                 }
             }
         }
+
+        if (gpu != here) {
+            finish Array.asyncCopy(gpuHeightFieldFront, 0, heightFieldHost, 0, heightFieldHost.size);
+
+            // flip heightfield pointers
+            val tmp = gpuHeightFieldFront;
+            gpuHeightFieldFront = gpuHeightFieldBack;
+            gpuHeightFieldBack = tmp;
+        }
+
         //Console.OUT.println(here+" "+(System.nanoTime() - render_before)/1E9);
         //Console.OUT.println(here+" "+(Runtime.getX10RTStats() - before));
     }

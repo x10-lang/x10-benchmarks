@@ -186,11 +186,9 @@ public class GLFrontend {
                 val raw_ = RemoteIndexedMemoryChunk.wrap[RGB](fb.raw());
                 val rts_ = rts;
                 val time = (before - startTime) / 1.0E9f;
+                val denting_water = keyDown('f'.ord());
                 finish for (p in Place.places()) async at (p) {
-                    val rt = rts_();
-                    rt.pos = pos_;
-                    rt.orientation = orientation_;
-                    rt.renderFrame(raw_, time);
+                    rts_().renderFrame(raw_, denting_water, pos_, orientation_, time);
                 }
             });
 
@@ -316,7 +314,8 @@ public class GLFrontend {
                 Option("x","horz-blocks","number of times to split width-ways within a place"),
                 Option("y","vert-blocks","number of times to split height-ways within a place"),
                 Option("b","mipmap-bias","skip this many mipmap levels"),
-                Option("d","octree-depth","bottom out the octree at this depth")
+                Option("d","octree-depth","bottom out the octree at this depth"),
+                Option("l","loose","use a loose octree")
             ]);
             if (opts("-?")) {
                 Console.OUT.println(opts.usage());
@@ -325,8 +324,8 @@ public class GLFrontend {
 
             val verbose = opts("-v");
             val quiet = opts("-q");
-            val global_width = opts("-W",800);
-            val global_height = opts("-H",600);
+            val global_width = opts("-W",320);
+            val global_height = opts("-H",240);
             val size = global_width * global_height * 3;
 
 

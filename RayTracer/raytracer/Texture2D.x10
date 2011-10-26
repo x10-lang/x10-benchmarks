@@ -41,7 +41,7 @@ public final class Texture2D {
             val ys = uv.y * height - 0.5f;
             val xi = xs as Int;
             val yi = ys as Int;
-            val xm = xs - xi; // mantissa
+            val xm = xs - xi; // fractional part
             val ym = ys - yi;
             val c00 = wrappedLookup(xi+0,yi+0) as Vector3;
             val c01 = wrappedLookup(xi+1,yi+0) as Vector3;
@@ -56,7 +56,7 @@ public final class Texture2D {
             val ys = uv.y * height - 0.5f;
             val xi = xs as Int;
             val yi = ys as Int;
-            val xm = xs - xi; // mantissa
+            val xm = xs - xi; // fractional part
             val ym = ys - yi;
             val c00 = clampedLookup(xi+0,yi+0) as Vector3;
             val c01 = clampedLookup(xi+1,yi+0) as Vector3;
@@ -71,7 +71,7 @@ public final class Texture2D {
             val ys = uv.y * height - 0.5f;
             val xi = xs as Int;
             val yi = ys as Int;
-            val xm = xs - xi; // mantissa
+            val xm = xs - xi; // fractional part
             val ym = ys - yi;
             val c00 = wrappedLookup(xi+0,yi+0) as Vector3;
             val c01 = wrappedLookup(xi+1,yi+0) as Vector3;

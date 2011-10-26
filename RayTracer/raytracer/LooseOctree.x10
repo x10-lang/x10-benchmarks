@@ -8,11 +8,11 @@ import x10.compiler.Inline;
 
 import raytracer.primitives.MeshTriangle;
 
-public final class LooseOctree {
+public final class LooseOctree extends SpatialDatastructure {
 
+    val size : Float;
     val bounds : AABB;
     val depth : Int; // how many more levels of children are allowed
-    val size : Float;
 
     var children : Array[LooseOctree](1);
     var cargo : ArrayList[Primitive];
@@ -22,21 +22,11 @@ public final class LooseOctree {
     var bakedCargo : IndexedMemoryChunk[Primitive] = IndexedMemoryChunk.allocateUninitialized[Primitive](0);
     var bakedMeshTriangleCargo : IndexedMemoryChunk[MeshTriangle] = IndexedMemoryChunk.allocateUninitialized[MeshTriangle](0);
 
+
     public def this (depth:Int, bounds:AABB, size:Float) {
         this.bounds = bounds;
         this.depth = depth;
         this.size = size;
-    }
-
-    public def insertLocally (o:Primitive) {
-        if (o instanceof MeshTriangle) {
-            val mt = o as MeshTriangle;
-            if (meshTriangleCargo==null) meshTriangleCargo = new ArrayList[MeshTriangle]();
-            meshTriangleCargo.add(mt);
-        } else {
-            if (cargo==null) cargo = new ArrayList[Primitive]();
-            cargo.add(o);
-        }
     }
 
     public def insert (o:Primitive) {
@@ -56,63 +46,7 @@ public final class LooseOctree {
         }
     }
 
-    public def bake () {
-        if (children!=null) bakedChildren = children.raw();
-        if (cargo!=null) bakedCargo = cargo.toIndexedMemoryChunk(); // does a copy
-        if (meshTriangleCargo!=null) bakedMeshTriangleCargo = meshTriangleCargo.toIndexedMemoryChunk(); // does a copy
-        for (i in 0..(bakedChildren.length()-1)) {
-            if (bakedChildren(i) != null) bakedChildren(i).bake();
-        }
-    }
-
-    public def calcChildAABB(i:Int) {
-        // each axis is either 0 or 0.5
-        val min = Vector3((i >> 0) & 1, (i >> 1) & 1, (i >> 2) & 1) * 0.5f;
-        // each axis is either 0.5 or 1
-        val max = min + Vector3(0.5f, 0.5f, 0.5f);
-        return AABB(bounds.lerp(min), bounds.lerp(max));
-    }
-
-    public def ensureChildren () {
-        if (children!=null) return;
-        if (depth==0) return;
-        children = new Array[LooseOctree](8);
-    }
-
-    public def ensureChild (i:Int) {
-        if (depth==0) return;
-        if (children(i) != null) return;
-        children(i) = new LooseOctree(depth-1, calcChildAABB(i), size*0.5f);
-    }
-
-    public def countCargo() : Int {
-        var r:Int = bakedCargo.length() + bakedMeshTriangleCargo.length();
-        for (i in 0..(bakedChildren.length()-1)) {
-            if (bakedChildren(i) != null) {
-                r += bakedChildren(i).countCargo();
-            }
-        }
-        return r;
-    }
-    public def iterateCargo(cb:(Primitive)=>void) {
-        for (i in 0..(bakedCargo.length()-1)) cb(bakedCargo(i));
-        for (i in 0..(bakedMeshTriangleCargo.length()-1)) cb(bakedMeshTriangleCargo(i));
-        for (i in 0..(bakedChildren.length()-1)) {
-            if (bakedChildren(i) != null) bakedChildren(i).iterateCargo(cb);
-        }
-    }
-
-    private static def queryOctantHit (s:RayState, t0:Vector3, t1:Vector3) {
-        //Console.OUT.println("\033[1m"+depth+":  is octant:  "+bounds+"\033[0m");
-        //Console.OUT.println("t0="+t0+"  t1="+t1);
-        val t0_ = Vector3.min(t0,t1);
-        val t1_ = Vector3.max(t0,t1);
-        //Console.OUT.println("t0_="+t0_+"  t1_="+t1_);
-        val t0_Bar_ = t0_.maxElement();
-        val t1_Bar_ = t1_.minElement();
-        //Console.OUT.println("in="+t0_Bar_+"  out="+t1_Bar_);
-        return Math.max(t0_Bar_,0.0f) <= Math.min(t1_Bar_, s.l);
-    }
+    public def makeChild (i:Int) = new LooseOctree(depth-1, calcChildAABB(i), size*0.5f);
 
     public def castRay (s:RayState) {
         // in the equation P = o + t.d, the following t0 and t1 are such that...
@@ -165,6 +99,63 @@ public final class LooseOctree {
         
     }
 
+    public def insertLocally (o:Primitive) {
+        if (o instanceof MeshTriangle) {
+            val mt = o as MeshTriangle;
+            if (meshTriangleCargo==null) meshTriangleCargo = new ArrayList[MeshTriangle]();
+            meshTriangleCargo.add(mt);
+        } else {
+            if (cargo==null) cargo = new ArrayList[Primitive]();
+            cargo.add(o);
+        }
+    }
+
+    public def bake () {
+        if (children!=null) bakedChildren = children.raw();
+        if (cargo!=null) bakedCargo = cargo.toIndexedMemoryChunk(); // does a copy
+        if (meshTriangleCargo!=null) bakedMeshTriangleCargo = meshTriangleCargo.toIndexedMemoryChunk(); // does a copy
+        for (i in 0..(bakedChildren.length()-1)) {
+            if (bakedChildren(i) != null) bakedChildren(i).bake();
+        }
+    }
+
+    public def calcChildAABB(i:Int) {
+        // each axis is either 0 or 0.5
+        val min = Vector3((i >> 0) & 1, (i >> 1) & 1, (i >> 2) & 1) * 0.5f;
+        // each axis is either 0.5 or 1
+        val max = min + Vector3(0.5f, 0.5f, 0.5f);
+        return AABB(bounds.lerp(min), bounds.lerp(max));
+    }
+
+    public def ensureChildren () {
+        if (children!=null) return;
+        if (depth==0) return;
+        children = new Array[LooseOctree](8);
+    }
+
+    public def ensureChild (i:Int) {
+        if (depth==0) return;
+        if (children(i) != null) return;
+        children(i) = makeChild(i);
+    }
+
+    public def countCargo() : Int {
+        var r:Int = bakedCargo.length() + bakedMeshTriangleCargo.length();
+        for (i in 0..(bakedChildren.length()-1)) {
+            if (bakedChildren(i) != null) {
+                r += bakedChildren(i).countCargo();
+            }
+        }
+        return r;
+    }
+    public def iterateCargo(cb:(Primitive)=>void) {
+        for (i in 0..(bakedCargo.length()-1)) cb(bakedCargo(i));
+        for (i in 0..(bakedMeshTriangleCargo.length()-1)) cb(bakedMeshTriangleCargo(i));
+        for (i in 0..(bakedChildren.length()-1)) {
+            if (bakedChildren(i) != null) bakedChildren(i).iterateCargo(cb);
+        }
+    }
+
     public def toString() = toString(0);
     private def indent(var depth:Int, spacer:String) {
         val sb = new StringBuilder();
@@ -173,7 +164,7 @@ public final class LooseOctree {
     }
     private def toString(depth:Int) {
         val num_cargo = bakedCargo.length() + bakedMeshTriangleCargo.length();
-        var r : String = indent(depth, "    ") + size+": "+bounds + (num_cargo==0?"":"{"+num_cargo+"}");
+        var r : String = indent(depth, "    ") + bounds + (num_cargo==0?"":"{"+num_cargo+"}");
         if (bakedChildren.length()==0) {
             return r;
         } else {

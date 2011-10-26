@@ -36,6 +36,9 @@ public class SceneLoader {
         var mesh_vert_uv : Vector2 = Vector2(0,0);
         var mesh_mat : Material = white;
 
+        val debug = new DebugMaterial();
+        matTable.put("DEBUG", debug);
+
         val file = new File(fileName);
         for (line_ in file.lines()) {
             val line = line_.trim();
@@ -154,6 +157,20 @@ public class SceneLoader {
 
                     val m = matTable.getOrElse(splits(6),white);
                     prims.add(new WaveyRectangle(Vector3(x,y,z),w,h,m));
+                } else {
+                    Console.ERR.println("Did not understand: "+line_);
+                }
+            } else if (splits(0).equalsIgnoreCase("CUDA_RECT")) {
+                if (splits.size == 7) {
+                    val x = Float.parse(splits(1));
+                    val y = Float.parse(splits(2));
+                    val z = Float.parse(splits(3));
+
+                    val w = Float.parse(splits(4));
+                    val h = Float.parse(splits(5));
+
+                    val m = matTable.getOrElse(splits(6),white);
+                    prims.add(new CUDARectangle(Vector3(x,y,z),w,h,m));
                 } else {
                     Console.ERR.println("Did not understand: "+line_);
                 }

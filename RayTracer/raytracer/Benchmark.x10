@@ -81,14 +81,12 @@ public class Benchmark {
 
             finish for (p in Place.places()) async at (p) {
                 val rt = rts();
-                rt.pos = pos;
-                rt.orientation = orientation;
 
                 for ([iteration] in 1..iters) {
                     Team.WORLD.barrier(here.id);
                     val before = System.nanoTime();
                     val time = (before-before_all)/1.0E9f;
-                    rt.renderFrame(raw_, time);
+                    rt.renderFrame(raw_, pos, orientation, time);
                     Team.WORLD.barrier(here.id);
                     val taken = (System.nanoTime()-before)/1E9;
                     if (!quiet && here == Place.FIRST_PLACE) {

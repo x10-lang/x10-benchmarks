@@ -4,13 +4,15 @@ import x10.compiler.Inline;
 
 public final class RayState {
     public val vertexes:Array[MeshVertex](1);
+    public val engine:Engine;
 
     public val child : RayState;
 
-    public def this (vertexes:Array[MeshVertex](1), time:Float, depth:Int) {
+    public def this (engine:Engine, time:Float, depth:Int) {
         this.time = time;
-        this.vertexes = vertexes;
-        child = depth==0 ? null : new RayState(vertexes, time, depth-1);
+        this.engine = engine;
+        this.vertexes = engine.vertexes;
+        child = depth==0 ? null : new RayState(engine, time, depth-1);
     }
 
     public var o:Vector3; // ray origin
@@ -20,7 +22,7 @@ public final class RayState {
     public var t : Float; // depth value (effectively)
     public var normal : Vector3;
     public var texCoord : Vector2;
-    public var colour : RGB;
+    public var colour : Vector3;
     public var mat : Material;
     public var texSquash : Float;
 
