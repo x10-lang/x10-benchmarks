@@ -11,6 +11,7 @@ RAYTRACER_SRC = \
         raytracer/AABB.x10 \
         raytracer/Benchmark.x10 \
         raytracer/LooseOctree.x10 \
+        raytracer/materials/DebugMaterial.x10 \
         raytracer/materials/SolidColour.x10 \
         raytracer/materials/Textured.x10 \
         raytracer/materials/Reflective.x10 \
