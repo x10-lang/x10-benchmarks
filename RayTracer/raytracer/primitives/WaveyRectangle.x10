@@ -1,7 +1,4 @@
-
 package raytracer.primitives;
-
-import x10.compiler.Native;
 
 import raytracer.*;
 
@@ -29,10 +26,8 @@ public class WaveyRectangle extends Primitive {
     static val dir = Vector2(1,2.6f);
     static val scaledDir = 0.1f * dir.normalised();
 
-    @Native("c++", "::fabsf(#x)")
-    private static def absf(x:Float) : Float = Math.abs(x) as Float;
     private static def waveFunc (x:Float) {
-        val x2 = absf(x);
+        val x2 = Math.abs(x);
         val x3 = x2 % 2.0f;
         return x3>1 ? (1.5f-x3)*(x3-2.36602540378444f)*(x3+0.36602540378444f-1) : (x3-0.5f)*(x3-1.36602540378444f)*(x3+0.36602540378444f);
     }

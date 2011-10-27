@@ -2,8 +2,6 @@ package raytracer.materials;
 
 import raytracer.*;
 
-import x10.compiler.Native;
-
 public class RefractingWater(sub:Material, fresnel:Float, refractiveIndex:Float, refractMask:Vector3, reflectMask:Vector3) extends Material {
     public def reflectRender (rt:Engine, s:RayState, hit_point:Vector3) {
         val s2 = s.child;
@@ -23,12 +21,9 @@ public class RefractingWater(sub:Material, fresnel:Float, refractiveIndex:Float,
         return rt.castRayAndRender(s2);
     }
 
-    @Native("c++", "::powf(#x, #i)")
-    private static def powf(x:Float, i:Float) : Float = Math.pow(x,i) as Float;
-
     public def render (rt:Engine, s:RayState) {
         val hit_point = s.o + s.t*s.d;
-        val perp = powf(1 + s.normal.dot(s.d), fresnel);
+        val perp = Math.powf(1 + s.normal.dot(s.d), fresnel);
         return sub.render(rt,s) + Vector3.lerp(refractMask*refractRender(rt,s,hit_point), reflectMask*reflectRender(rt,s,hit_point), perp);
     }
 }

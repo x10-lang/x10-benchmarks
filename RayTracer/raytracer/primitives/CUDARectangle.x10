@@ -1,7 +1,4 @@
-
 package raytracer.primitives;
-
-import x10.compiler.Native;
 
 import raytracer.*;
 
@@ -26,18 +23,6 @@ public class CUDARectangle extends Primitive {
         return AABB(p1, p1+Vector3(w,h,0));
     }
 
-    static val dir = Vector2(1,2.6f);
-    static val scaledDir = 0.1f * dir.normalised();
-
-    @Native("c++", "::fabsf(#x)")
-    private static def absf(x:Float) : Float = Math.abs(x) as Float;
-    private static def waveFunc (x:Float) {
-        val x2 = absf(x);
-        val x3 = x2 % 2.0f;
-        return x3>1 ? (1.5f-x3)*(x3-2.36602540378444f)*(x3+0.36602540378444f-1) : (x3-0.5f)*(x3-1.36602540378444f)*(x3+0.36602540378444f);
-    }
-
-
     public static def to_col(x:Vector3) = x*0.5f + Vector3(0.5f,0.5f,0.5f);
 
 
@@ -61,7 +46,7 @@ public class CUDARectangle extends Primitive {
         s.mat = mat;
 
         s.normal = s.engine.heightFieldNormal(s.texCoord);
-        s.colour = to_col(s.normal);
+        //s.colour = to_col(s.normal);
 
     }
 }
