@@ -77,8 +77,8 @@ public class UTSBin {
             //@Native("c++", "ProfilerStop();") {}
             time = System.nanoTime() - time;
             Console.OUT.println("Finished.");
-            
-            val allCounters = new Rail[Array[Counter](1){rail}](P,(i:Int) => at(Place(i)) st().counters());
+            val cl = (i:Int) => { val pi = Place(i); return at(pi) st().counters(); };
+            val allCounters = new Rail[Array[Counter](1){rail}](P,cl);
             st().counter.stats(allCounters, time, verbose, false);
             
             Console.OUT.println("--------");
