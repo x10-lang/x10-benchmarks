@@ -109,7 +109,7 @@ final class ParUTSBin {
                 val thief = thieves.pop();
                 val loot = stack.pop(numToSteal);
                 counter.incTxNodes(numToSteal);
-                async at(Place(thief)) st().deal(st, loot, victim);
+                at(Place(thief)) async st().deal(st, loot, victim);
             }
         }
     }
@@ -132,7 +132,7 @@ final class ParUTSBin {
             val q = q_;
             counter.incStealsAttempted();
             waiting = true;
-            @Uncounted async at(Place(q)) st().request(st, p, false);
+            at(Place(q)) @Uncounted async st().request(st, p, false);
             while (waiting) Runtime.probe();
         }
         for (var i:Int=0; (i<lifelines.size) && empty && (0<=lifelines(i)); ++i) {
@@ -140,7 +140,7 @@ final class ParUTSBin {
             if (!lifelinesActivated(lifeline)) {
                 lifelinesActivated(lifeline) = true;
                 waiting = true;
-                @Uncounted async at(Place(lifeline)) st().request(st, p, true);
+                at(Place(lifeline)) @Uncounted async st().request(st, p, true);
                 while (waiting) Runtime.probe();
             }
         }
@@ -158,13 +158,13 @@ final class ParUTSBin {
         val numSteals = k==0 ? (length >= 2 ? length/2 : 0) : (k < length ? k : (k/2 < length ? k/2 : 0));
         if (numSteals==0) {
             if (isLifeLine) thieves.push(thief);
-            @Uncounted async at (Place(thief)) { st().waiting = false; }
+            at (Place(thief)) @Uncounted async { st().waiting = false; }
         } else {
             val loot = stack.pop(numSteals);
             counter.nodesGiven += numSteals;
             ++counter.stealsSuffered;
             val victim = isLifeLine ? Runtime.hereInt() : -1;
-            @Uncounted async at (Place(thief)) { st().deal(st, loot, victim); st().waiting = false; }
+            at (Place(thief)) @Uncounted async { st().deal(st, loot, victim); st().waiting = false; }
         }
     }
     
@@ -207,7 +207,7 @@ final class ParUTSBin {
             for (var pi:Int=1 ; pi<P ; ++pi) {
                 val loot = stack.pop(lootSize);
                 val pi_ = pi;
-                async at(Place(pi_)) {
+                at(Place(pi_)) async {
                     st().deal(st, loot, 0);
                 }
                 counter.incTxNodes(lootSize);
