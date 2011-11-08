@@ -13,7 +13,7 @@ class FRASimpleDistNoAbstraction {
 //  static def barrier() {}
 
     @Native("c++", "__pgasrt_tsp_dupdate_hfi(0, place_id, (__pgasrt_local_addr_t)&(imc->raw()[index]), 0, (__pgasrt_local_addr_t)&update, PGASRT_OP_XOR, NULL, NULL);")
-    static def remote_update(imc: IndexedMemoryChunk[Long], place_id:Int, index:Int, update:Long)
+    static def remote_update(imc: IndexedMemoryChunk[Long], place_id:Int, index:Int, update:Long):void
     { imc.getCongruentSibling(Place(place_id)).remoteXor(index, update); }
 
     static POLY = 0x0000000000000007L;
@@ -49,7 +49,7 @@ class FRASimpleDistNoAbstraction {
                             logLocalTableSize: Int, numUpdates: Long) {
         val mask = (1<<logLocalTableSize)-1;
         val local_updates = numUpdates / Place.MAX_PLACES;
-        finish for (p in Place.places()) async at (p) {
+        finish for (p in Place.places()) at (p) async {
             var ran:Long = HPCC_starts(here.id*(numUpdates/Place.MAX_PLACES));
             val imc = plhimc()();
             val size = logLocalTableSize;
@@ -129,7 +129,7 @@ class FRASimpleDistNoAbstraction {
 
         // create congruent array (same address at each place)
         val plhimc = PlaceLocalHandle.make(Dist.makeUnique(), () => new Box(IndexedMemoryChunk.allocateZeroed[Long](localTableSize, 8, true)) as Box[IndexedMemoryChunk[Long]]{self!=null});
-        finish for (p in Place.places()) async at (p) {
+        finish for (p in Place.places()) at (p) async {
             for ([i] in 0..(localTableSize-1)) plhimc()()(i) = i as Long;
         }
 
@@ -155,7 +155,7 @@ class FRASimpleDistNoAbstraction {
 
         // repeat for testing.
         runBenchmark(plhimc, logLocalTableSize, numUpdates);
-        finish for (p in Place.places()) async at (p) {
+        finish for (p in Place.places()) at (p) async {
             var err:Int = 0;
             for ([i] in 0..(localTableSize-1)) 
                 if (plhimc()()(i) != (i as Long)) err++;

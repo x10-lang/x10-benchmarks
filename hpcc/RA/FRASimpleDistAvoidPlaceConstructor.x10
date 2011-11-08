@@ -45,7 +45,7 @@ class FRASimpleDistAvoidPlaceConstructor {
                             logLocalTableSize: Int, numUpdates: Long) {
         val mask = (1<<logLocalTableSize)-1;
         val local_updates = numUpdates / Place.MAX_PLACES;
-        finish for (p in Place.places()) async at (p) {
+        finish for (p in Place.places()) at (p) async {
             var ran:Long = HPCC_starts(here.id*(numUpdates/Place.MAX_PLACES));
             val imc = plhimc()();
             val size = logLocalTableSize;
@@ -126,7 +126,7 @@ class FRASimpleDistAvoidPlaceConstructor {
 
         // create congruent array (same address at each place)
         val plhimc = PlaceLocalHandle.make(Dist.makeUnique(), () => new Box(IndexedMemoryChunk.allocate[Long](localTableSize, 8, true, true)) as Box[IndexedMemoryChunk[Long]]{self!=null});
-        finish for (p in Place.places()) async at (p) {
+        finish for (p in Place.places()) at (p) async {
             for ([i] in 0..(localTableSize-1)) plhimc()()(i) = i as Long;
         }
 
@@ -148,7 +148,7 @@ class FRASimpleDistAvoidPlaceConstructor {
 
         // repeat for testing.
         runBenchmark(plhimc, logLocalTableSize, numUpdates);
-        finish for (p in Place.places()) async at (p) {
+        finish for (p in Place.places()) at (p) async {
             var err:Int = 0;
             for ([i] in 0..(localTableSize-1)) 
                 if (plhimc()()(i) != i) err++;

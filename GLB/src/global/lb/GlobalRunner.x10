@@ -278,7 +278,7 @@ public final class GlobalRunner[T, Z]  implements Runner[T,Z] {
 					counter.incTxNodes(numToSteal);
 					Event.event("Distributing " + loot.size + " to " + thief);
 					val victim = here.id;
-					async at(Place(thief)) 
+					at(Place(thief)) async
 					   st().launch(st, false, loot, depth+1, victim);
 					numThieves --;
 					if (numThieves == 0) break;
@@ -437,7 +437,7 @@ public final class GlobalRunner[T, Z]  implements Runner[T,Z] {
 					Event.event("Launching at place " + pi+".");
 					// Possible entry point for a thief.
 					val pi_ = pi;
-					async at(Place(pi_)) 
+					at(Place(pi_)) async
 					   st().launch(st, true, loot, 0, 0);
 					counter.incTxNodes(lootSize);
 				}

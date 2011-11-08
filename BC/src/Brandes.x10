@@ -432,7 +432,7 @@ public final class Brandes(N:Int) {
     // Loop over all the places and crunch the numbers.
     finish {
       for ([place] in 0..(numPlaces-1)) 
-        async at(Place(place)) 
+        at(Place(place)) async
           brandesHandles().crunchNumbersLocally (
                        permute, 
                        weighted,

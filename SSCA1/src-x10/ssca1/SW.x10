@@ -187,7 +187,7 @@ public class SW {
 	 finish for ([p] in 0..(segInfo.segmentCount-1)) {
              val mySegment = segmentedInput(p);  // extract the subsegment here to minimize captured state in async body.
 	     val capturedP = p;
-             async at (Place.place(p)) {
+             at (Place.place(p)) async {
 	         val s = new Scorer(parms, shorter, mySegment, segInfo, probing);
                  scorers(capturedP) = s;
                  scores(capturedP) = s.score;
