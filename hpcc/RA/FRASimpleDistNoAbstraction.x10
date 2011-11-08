@@ -5,14 +5,9 @@ import x10.compiler.NativeCPPInclude;
 import x10.util.IndexedMemoryChunk;
 import x10.util.Box;
 
-@NativeCPPInclude("pgas_collectives.h")
-
 class FRASimpleDistNoAbstraction {
 
-//  @Native("c++", "__pgasrt_tsp_barrier()")
-//  static def barrier() {}
-
-    @Native("c++", "__pgasrt_tsp_dupdate_hfi(0, place_id, (__pgasrt_local_addr_t)&(imc->raw()[index]), 0, (__pgasrt_local_addr_t)&update, PGASRT_OP_XOR, NULL, NULL);")
+    @Native("c++", "x10aux::remote_op(#place_id, (x10rt_remote_ptr)&(#imc->raw()[#index]), X10RT_OP_XOR, #update);")
     static def remote_update(imc: IndexedMemoryChunk[Long], place_id:Int, index:Int, update:Long):void
     { imc.getCongruentSibling(Place(place_id)).remoteXor(index, update); }
 
