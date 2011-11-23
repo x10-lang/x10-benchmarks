@@ -9,6 +9,7 @@ public class RefractingWater(sub:Material, fresnel:Float, refractiveIndex:Float,
         s2.o = hit_point;
         s2.d = Vector3.reflect(s.d, s.normal);
         s2.l = 25;
+        s2.hasShadow = false;
         return rt.castRayAndRender(s2);
     }
     public def refractRender (rt:Engine, s:RayState, hit_point:Vector3) {
@@ -18,6 +19,7 @@ public class RefractingWater(sub:Material, fresnel:Float, refractiveIndex:Float,
         s2.d = Vector3.refract(s.d, s.normal, refractiveIndex);
         s2.o += 0.000001f * s2.d; // skip it over the plane, avoids it recursively hitting itself
         s2.l = 25;
+        s2.hasShadow = false;
         return rt.castRayAndRender(s2);
     }
 

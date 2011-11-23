@@ -4,8 +4,6 @@ import x10.util.*;
 
 import x10.io.Console;
 
-import x10.compiler.Inline;
-
 // power of 2 width/height required
 // max of 512 in either direction
 public final class Texture2D {
@@ -19,7 +17,7 @@ public final class Texture2D {
             height = h_==0 ? 1 : h_;
             buffer = IndexedMemoryChunk.allocateUninitialized[RGB](width*height);
         }
-        @Inline public def coordEncode (x:Int, y:Int) {
+        public def coordEncode (x:Int, y:Int) {
             return y * width + x;
             /*
             var r:Int = 0;

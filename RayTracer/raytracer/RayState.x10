@@ -1,8 +1,11 @@
 package raytracer;
 
-import x10.compiler.Inline;
-
 public final class RayState {
+
+    public var primTests:Int;
+
+    public var hasShadow:Boolean;
+
     public val vertexes:Array[MeshVertex](1);
     public val engine:Engine;
 

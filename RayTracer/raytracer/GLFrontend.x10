@@ -304,8 +304,10 @@ public class GLFrontend {
             val opts = new OptionsParser(args, [
                 Option("q","quiet","print out less"),
                 Option("v","verbose","print out more"),
-                Option("o","octree","dump the octree of the scene"),
-                Option("?","help","this information")
+                Option("o","dump","dump the octree of the scene"),
+                Option("?","help","this information"),
+                Option("O","octree","use an octree"),
+                Option("l","loose","use a loose octree")
             ], [
                 Option("W","width","width of rendered output"),
                 Option("H","height","height of rendered output"),
@@ -314,8 +316,7 @@ public class GLFrontend {
                 Option("x","horz-blocks","number of times to split width-ways within a place"),
                 Option("y","vert-blocks","number of times to split height-ways within a place"),
                 Option("b","mipmap-bias","skip this many mipmap levels"),
-                Option("d","octree-depth","bottom out the octree at this depth"),
-                Option("l","loose","use a loose octree")
+                Option("d","octree-depth","bottom out the octree at this depth")
             ]);
             if (opts("-?")) {
                 Console.OUT.println(opts.usage());

@@ -4,8 +4,6 @@ import x10.util.ArrayList;
 import x10.util.StringBuilder;
 import x10.util.IndexedMemoryChunk;
 
-import x10.compiler.Inline;
-
 import raytracer.primitives.MeshTriangle;
 
 public final class LooseOctree extends SpatialDatastructure {
@@ -67,9 +65,11 @@ public final class LooseOctree extends SpatialDatastructure {
 
         // process cargo...
         for (i in 0..(bakedMeshTriangleCargo.length()-1)) {
+            s.primTests++;
             bakedMeshTriangleCargo(i).intersectRay(s);
         }
         for (i in 0..(bakedCargo.length()-1)) {
+            s.primTests++;
             bakedCargo(i).intersectRay(s);
         }
 

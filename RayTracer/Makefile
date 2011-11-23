@@ -10,6 +10,7 @@ ALL_TARGETS = Benchmark.opt Benchmark.dbg GLFrontend.opt GLFrontend.dbg QuatTest
 RAYTRACER_SRC = \
         raytracer/AABB.x10 \
         raytracer/Benchmark.x10 \
+        raytracer/Engine.x10 \
         raytracer/LooseOctree.x10 \
         raytracer/materials/DebugMaterial.x10 \
         raytracer/materials/SolidColour.x10 \
@@ -26,9 +27,9 @@ RAYTRACER_SRC = \
         raytracer/primitives/WaveyRectangle.x10 \
         raytracer/Primitive.x10 \
         raytracer/Quat.x10 \
-        raytracer/Engine.x10 \
         raytracer/RayState.x10 \
         raytracer/RGB.x10 \
+        raytracer/SimpleBVH.x10 \
         raytracer/SceneLoader.x10 \
         raytracer/Texture2D.x10 \
         raytracer/Vector2.x10 \

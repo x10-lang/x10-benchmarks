@@ -11,7 +11,7 @@ public class Textured(amb:Vector3, diff:Vector3, spec:Vector3, gloss:Float, tex:
         //Console.OUT.println(texels_per_pixel+" "+mipmap_level);
 
         val texel = tex(s.texCoord, mipmap_level + rt.mipmapBias);
-        return rt.lightingEquation(s.child, amb as Vector3 * texel, diff as Vector3 * texel, spec as Vector3, gloss, s.normal, s.o + s.t*s.d, -s.d);
+        return rt.lightingEquation(s.hasShadow ? s.child : null, amb as Vector3 * texel, diff as Vector3 * texel, spec as Vector3, gloss, s.normal, s.o + s.t*s.d, -s.d);
     }
 }
 

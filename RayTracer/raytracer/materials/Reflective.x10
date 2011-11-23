@@ -9,6 +9,7 @@ public class Reflective(sub:Material, reflectMask:Vector3) extends Material {
         s2.o = s.o + s.t*s.d;
         s2.d = Vector3.reflect(s.d, s.normal);
         s2.l = 25;
+        s2.hasShadow = true;
         return rt.castRayAndRender(s2);
     }
     public def render (rt:Engine, s:RayState) {

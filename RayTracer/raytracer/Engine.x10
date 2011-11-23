@@ -5,7 +5,6 @@ import x10.util.OptionsParser;
 import x10.util.IndexedMemoryChunk;
 import x10.util.RemoteIndexedMemoryChunk;
 
-import x10.compiler.Inline;
 import x10.compiler.CUDA;
 import x10.compiler.CUDADirectParams;
 
@@ -55,9 +54,9 @@ public class Engine {
 
     var lastTime : Float;
 
-    @Inline private static def lerp (v1:Float, v2:Float, a:Float) = (1-a)*v1 + a*v2;
+    private static def lerp (v1:Float, v2:Float, a:Float) = (1-a)*v1 + a*v2;
 
-    @Inline private final def heightFieldHeight(x:Int, y:Int) = heightFieldHost(y*heightFieldDimX + x);
+    private final def heightFieldHeight(x:Int, y:Int) = heightFieldHost(y*heightFieldDimX + x);
 
     public final def heightFieldPerturb(xm:Int, ym:Int) {
         val x = Math.max(0, xm-1);
@@ -136,13 +135,14 @@ public class Engine {
             Console.OUT.println("vertBlocks: "+vertBlocks);
             Console.OUT.println("localBlockWidth: "+localBlockWidth);
             Console.OUT.println("localBlockHeight: "+localBlockHeight);
+            Console.OUT.println();
         }
 
         localFrame = new Array[RGB](localWidth * localHeight);
 
-        octree = opts("-l")
-               ? new LooseOctree(opts("-d",10), AABB(Vector3(-10,-10,-10),Vector3(10,10,10)), 20.0f)
-               : new      Octree(opts("-d",10), AABB(Vector3(-10,-10,-10),Vector3(10,10,10)));
+        octree = opts("-l") ? new LooseOctree(opts("-d",10), AABB(Vector3(-10,-10,-10),Vector3(10,10,10)), 20.0f)
+               : opts("-O") ? new      Octree(opts("-d",10), AABB(Vector3(-10,-10,-10),Vector3(10,10,10)))
+                            : new   SimpleBVH();
 
         mipmapBias = opts("-b",0);
 
@@ -157,6 +157,9 @@ public class Engine {
 
         if (dumpOctree) Console.OUT.println(octree);
 
+        Console.OUT.println("Primitives: "+octree.countCargo());
+        Console.OUT.println();
+
         heightFieldHost = new Array[Float](heightFieldDimX * heightFieldDimY, 0.0f);
 
         gpu = here.children().size==0 ? here : here.child(0);
@@ -169,9 +172,9 @@ public class Engine {
     public static struct DirectionalLight(dir:Vector3, diff:Vector3, spec:Vector3) {
     };
 
-    val sun = DirectionalLight(Vector3(0.4f,0.6f,1.0f).normalised(), Vector3(1,1,1), Vector3(2,2,2));
+    val sun = DirectionalLight(Vector3(0.4f,0.6f,1.0f).normalised(), Vector3(0.5f,0.5f,0.5f), Vector3(2,2,2));
 
-    val ambLight = 0.3f;
+    val ambLight = 0.5f;
 
     public final def lightingEquation(s:RayState,
                                       surf_amb:Vector3, surf_diff:Vector3, surf_spec:Vector3, surf_gloss:Float, surf_normal:Vector3,
@@ -249,6 +252,8 @@ public class Engine {
 
         if (verbose)
             Console.OUT.println(here+" rendering "+horz_split+","+vert_split+"    "+offset_x+","+offset_y);
+
+        val counter = new Cell[Int](0);
 
         finish {
 
@@ -350,9 +355,11 @@ public class Engine {
                             state.d = ray * 800;
                             state.l = state.d.length();
                             state.d /= state.l;
+                            state.hasShadow = true;
                             localFrame(y*localWidth + x) = castRayAndRender(state) as RGB;
                         }
                     }
+                    atomic { counter() = counter() + state.primTests; }
                 }
                 for (y_ in 0..(localBlockHeight-1)) {
                     val y = y_ + block_off_y;
@@ -361,6 +368,7 @@ public class Engine {
             }
 
         }
+        Console.OUT.println("prim tests: "+counter());
 
         //Console.OUT.println(here+" "+(System.nanoTime() - render_before)/1E9);
         //Console.OUT.println(here+" "+(Runtime.getX10RTStats() - before));
