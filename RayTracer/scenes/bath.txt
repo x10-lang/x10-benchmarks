@@ -4502,7 +4502,7 @@ SPHERE  2  5 2 0.35 mirror
 
 MAT_SOLID waterbasic 0.05 0.05 0.05  0.05 0.05 0.05  0.25 0.25 0.25 20
 #MAT_WATER water waterbasic 1.2 0.45 0.60 0.7  0.6 0.6 0.6
-MAT_REFRACTINGWATER water waterbasic 1.2 0.75  0.45 0.60 0.7  0.6 0.6 0.6
+MAT_REFRACTINGWATER water waterbasic 1.2 0.75  0.55 0.70 0.8  0.4 0.4 0.4
 Wavey_Rect -3.5 -6.5 0  7  13  water
 
 RECT -3.875 -6.875 3.61 0.00 1  -3.875 -6.875 0.3 0.00 0  -3.225 -6.875 0.3 0.25 0  -3.225 -6.875 3.61 0.25 1  ColumnMarble
