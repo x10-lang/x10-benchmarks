@@ -86,7 +86,7 @@ public class Scorer {
     * among processors a lot easier to understand. 
     */
    public def this(parms: Parameters, shorter: Rail[Byte], longer: Rail[Byte], segInfo: SegmentationInfo, probing:Int) {
-      longOffset = segInfo.firstInLonger(here.id);  // where to start if shortfall == 0
+      longOffset = segInfo.firstInLonger(here.id);
       longRail = longer;
       shortRail = shorter;
       val shortSize = shorter.size;
