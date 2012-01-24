@@ -7,23 +7,8 @@ final class ParUTSGeo {
     
     private static val NORMALIZER = 2147483648.0; // does not depend on input parameters
 
-    public static struct TreeNode {
-        val depth:Int;
-        val rng:SHA1Rand;
-        
-        @Inline public def this(seed:Int, depth:Int) {
-            this.depth = depth;
-            this.rng = SHA1Rand(seed);
-        }
-        
-        @Inline public def this(parent:SHA1Rand, spawnNumber:Int, depth:Int) {
-            this.depth = depth;
-            this.rng = SHA1Rand(parent, spawnNumber);
-        }
-    }
-    
     val width:Int;
-    val stack = new MyStack[TreeNode](65536);
+    val stack = new MyStack[SHA1RandX](65536);
     val lifelines:Rail[Int];
     
     // Which of the lifelines have I actually activated?
@@ -37,6 +22,7 @@ final class ParUTSGeo {
     
     val l:Int; 
     val z:Int;
+    val den:double;
     val myRandom = new Random();
     public val counter:Counter;
     var active:Boolean=false;
@@ -68,29 +54,19 @@ final class ParUTSGeo {
         this.counter = new Counter(false);
         thieves = new FixedSizeStack[Int](z);
         lifelinesActivated = new Rail[Boolean](Place.MAX_PLACES);
+        this.den = Math.log(b0/(1.0+b0));
     }
 
-    @Inline final def push(node:TreeNode) {
-        var curNodeBranchingFactor:double;
-        
-        curNodeBranchingFactor = (node.depth < d) ? 
-                b0 : /* true */
-                    0; /* false */
-        
-        /* Now, calculate the number of children */
-        val probForCurNodeBranchingFactor = 1.0 / (1.0 + curNodeBranchingFactor);
-        val randomNumber = node.rng() as double;
-        val normalizedRandomNumber = randomNumber / NORMALIZER;
-        val numChildren = Math.floor ((Math.log (1-normalizedRandomNumber)) /
-                (Math.log 
-                        (1-probForCurNodeBranchingFactor))) as int;
-        
+    @Inline final def push(node:SHA1RandX) {
+        val depth = node.depth();
+        if (depth >= d) return;
+        val numChildren = Math.floor(Math.log(1.0 - node() / NORMALIZER) / den) as int;
         /* Push all the children onto the Deque (stack) */
         for (var i:Int=0; i<numChildren; ++i) 
-            stack.push(TreeNode (node.rng, i, node.depth+1));
+            stack.push(SHA1RandX (node, i));
     }
     
-    @Inline final def processLoot(loot:Rail[TreeNode], lifeline:Boolean) {
+    @Inline final def processLoot(loot:Rail[SHA1RandX], lifeline:Boolean) {
         counter.incRx(lifeline, loot.size);
         for (var i:Int=0; i<loot.size; ++i) {
         	val node = loot(i);
@@ -205,7 +181,7 @@ final class ParUTSGeo {
         }
     }
     
-    def deal(st:PlaceLocalHandle[ParUTSGeo], loot:Rail[TreeNode], source:Int) {
+    def deal(st:PlaceLocalHandle[ParUTSGeo], loot:Rail[SHA1RandX], source:Int) {
         val isLifeLine = source >= 0;
         try {
             if (isLifeLine) lifelinesActivated(source) = false;
@@ -232,18 +208,13 @@ final class ParUTSGeo {
      * evenly amongst all the places. This is the bootstrap mechanism
      * for distributed UTS.
      */
-    def main(st:PlaceLocalHandle[ParUTSGeo], rootNode:SHA1Rand) {
+    def main(st:PlaceLocalHandle[ParUTSGeo], rootNode:SHA1RandX) {
         val P = Place.MAX_PLACES;
         finish {
             active = true;
             counter.startLive();
-            val probForCurNodeBranchingFactor = 1.0 / (1.0 + b0);
-            val randomNumber = rootNode() as double;
-            val normalizedRandomNumber = randomNumber / NORMALIZER;
-            val numChildren = Math.floor ((Math.log (1-normalizedRandomNumber)) /
-                    (Math.log 
-                            (1-probForCurNodeBranchingFactor))) as int;
-            for (var i:Int=0; i<numChildren; ++i) stack.push(TreeNode(rootNode, i, 1));
+            val numChildren = Math.floor((Math.log(1.0 - rootNode() / NORMALIZER)) / den) as int;
+            for (var i:Int=0; i<numChildren; ++i) stack.push(SHA1RandX(rootNode, i));
             ++counter.nodesCounter; // root node is never pushed on the stack.
             
             val lootSize = stack.size()/P;

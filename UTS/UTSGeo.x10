@@ -71,7 +71,7 @@ public class UTSGeo {
             Console.OUT.println("Starting...");
             //@Native("c++", "ProfilerStart(\"UTS.prof\");") {}
             var time:Long = System.nanoTime();
-            st().main(st, SHA1Rand(r));
+            st().main(st, SHA1RandX(r));
             //@Native("c++", "ProfilerStop();") {}
             time = System.nanoTime() - time;
             Console.OUT.println("Finished.");
