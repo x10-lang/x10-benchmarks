@@ -62,8 +62,12 @@ final class ParUTSGeo {
         if (depth >= d) return;
         val numChildren = Math.floor(Math.log(1.0 - node() / NORMALIZER) / den) as int;
         /* Push all the children onto the Deque (stack) */
-        for (var i:Int=0; i<numChildren; ++i) 
-            stack.push(SHA1RandX (node, i));
+        if (depth < d) {
+            for (var i:Int=0; i<numChildren; ++i) 
+                stack.push(SHA1RandX (node, i));
+        } else {
+            counter.nodesCounter += numChildren;
+        }
     }
     
     @Inline final def processLoot(loot:Rail[SHA1RandX], lifeline:Boolean) {
