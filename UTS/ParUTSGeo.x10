@@ -69,20 +69,18 @@ final class ParUTSGeo {
     @Inline final def processLoot(loot:Rail[SHA1RandX], lifeline:Boolean) {
         counter.incRx(lifeline, loot.size);
         for (var i:Int=0; i<loot.size; ++i) {
-        	val node = loot(i);
-        	push(node);
+            push(loot(i));
         }
         counter.nodesCounter += loot.size;
     }
     
     @Inline final def processAtMostN() {
-        val n = min(stack.size(), nu);
-    	for (var i:Int=0; i<n; ++i) {
-        	val node = stack.pop();
-        	push(node);
+        var i:Int=0;
+        for (; (i<nu) && (stack.size()>0); ++i) {
+            push(stack.pop());
         }
-        counter.nodesCounter += n;
-        return n > 0;
+        counter.nodesCounter += i;
+        return stack.size() > 0;
     }
     
     /** A trivial function to calculate minimum of 2 integers */
@@ -213,10 +211,8 @@ final class ParUTSGeo {
         finish {
             active = true;
             counter.startLive();
-            val numChildren = Math.floor((Math.log(1.0 - rootNode() / NORMALIZER)) / den) as int;
-            for (var i:Int=0; i<numChildren; ++i) stack.push(SHA1RandX(rootNode, i));
-            ++counter.nodesCounter; // root node is never pushed on the stack.
-            
+            push(rootNode);
+            ++counter.nodesCounter;
             val lootSize = stack.size()/P;
             for (var pi:Int=1 ; pi<P ; ++pi) {
                 val loot = stack.pop(lootSize);
