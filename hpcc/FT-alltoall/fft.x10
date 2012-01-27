@@ -67,13 +67,11 @@ class fft {
         static def make(I:Int, nRows:Int, localSize:Int, N:Long, SQRTN:Int, verify:Boolean, Cs:PlaceLocalHandle[Array[Double](1){rail}]):Block {
             val block = new Block(I, nRows, localSize, N, SQRTN, verify, Cs);
             block.init(localSize, verify);
-            /* finish */ ateach (p in unique) {} // initialize transport
             return block;
         }
 
         def rowFFTS(fwd:Boolean) {
             execute_plan(fwd?fftwPlan:fftwInversePlan, A, B, SQRTN, 0, nRows);
-            Team.WORLD.barrier(here.id);
         }
 
         def bytwiddle(sign:Int) {
@@ -92,7 +90,6 @@ class fft {
                 }
             }
             twiddle_timer += System.nanoTime();
-            Team.WORLD.barrier(here.id);
         }
 
         def check() {
@@ -101,7 +98,6 @@ class fft {
             for (var q:Int=0; q<A.size; ++q) {
                 if (Math.abs(A(q)-D(q)) > threshold) Console.ERR.println("Error at "+q+" "+A(q).toString()+" "+D(q).toString());
             }
-            Team.WORLD.barrier(here.id);
         }
 
         def transpose() {           
@@ -134,11 +130,21 @@ class fft {
             alltoall_timer -= System.nanoTime();
             Team.WORLD.alltoall(here.id, B, 0, C, 0, chunkSize);
             alltoall_timer += System.nanoTime();
-            //await (nCopy == Place.MAX_PLACES);
-            //nCopy = 0;
-            //x10.io.Console.OUT.println("before barrier" + here.id);                   
-            Team.WORLD.barrier(here.id);
-            //x10.io.Console.OUT.println("after barrier" + here.id);                   
+        }
+
+
+        def warmup() {           
+            val n0 = Place.MAX_PLACES;
+            val n1 = nRows;
+            val chunkSize = 2 * nRows * nRows; 
+            var t:Long = -System.nanoTime();
+            Team.WORLD.alltoall(here.id, B, 0, C, 0, chunkSize);
+            t += System.nanoTime();
+            if (here.id==0) Console.OUT.println("alltoall: " + t/1e9 + " s");
+            t = -System.nanoTime();
+            Team.WORLD.alltoall(here.id, B, 0, C, 0, chunkSize);
+            t += System.nanoTime();
+            if (here.id==0) Console.OUT.println("alltoall: " + t/1e9 + " s");
         }
 
         def scatter() {
@@ -163,7 +169,6 @@ class fft {
                     }                   
                 }
             }
-            Team.WORLD.barrier(here.id);
         }
     }
 
@@ -232,14 +237,12 @@ class fft {
 
         finish ateach (p in unique) {
             // FFT
-        	if (unique(p).id==0) Console.OUT.println("Warmup FFT");
-        	var secs:Double = compute(FFT, true, N);
-        	FFT().alltoall_timer = 0;
-        	FFT().twiddle_timer = 0;
-        	if (unique(p).id==0) Console.OUT.println("Warmup FFT complete");
+        	if (unique(p).id==0) Console.OUT.println("Warmup");
+        	FFT().warmup();
+        	if (unique(p).id==0) Console.OUT.println("Warmup complete");
 
         	if (unique(p).id==0) Console.OUT.println("Start FFT");
-            secs = compute(FFT, true, N);
+            var secs:Double = compute(FFT, true, N);
             if (unique(p).id==0) Console.OUT.println("alltoall: " + FFT().alltoall_timer/1e9 + " s");
             if (unique(p).id==0) Console.OUT.println("twiddle: " + FFT().twiddle_timer/1e9 + " s");
             if (unique(p).id==0) Console.OUT.println("FFT complete");
