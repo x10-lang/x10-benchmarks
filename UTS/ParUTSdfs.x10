@@ -24,7 +24,7 @@ final class ParUTSdfs {
     val counter:Counter;
     public def counters()=[counter as Counter];
     
-    public def this (b:Int, d:Int, k:Int, n:Int, w:Int, l:Int, lifelines:Rail[Int], thieves:FixedSizeStack[Int]) {
+    public def this (b:Int, d:Int, k:Int, n:Int, w:Int, l:Int, lifelines:Rail[Int]) {
         this.den = Math.log(b/(1.0+b));
         this.d = d-1;
         this.k = k;
@@ -34,8 +34,14 @@ final class ParUTSdfs {
         this.lifelines = lifelines;
         this.counter = new Counter(false);
         stack = new MyStack[SHA1RandXX](65536);
-        this.thieves = thieves;
-        lifelinesActivated = new Rail[Boolean](Place.MAX_PLACES, (i:Int)=>(Runtime.hereInt() > 0) && (i == (Runtime.hereInt()-1)/2));
+        thieves = new FixedSizeStack[Int](lifelines.size+2);
+        lifelinesActivated = new Rail[Boolean](Place.MAX_PLACES);
+        
+        // 1st wave
+        val i = Runtime.hereInt();
+        if (2*i+1<Place.MAX_PLACES) thieves.push(2*i+1);
+        if (2*i+2<Place.MAX_PLACES) thieves.push(2*i+2);
+        if (i > 0) lifelinesActivated((i-1)/2) = true;
     }
 
     @Inline final def push(node:SHA1RandXX) {

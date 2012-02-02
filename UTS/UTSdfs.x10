@@ -54,12 +54,7 @@ public class UTSdfs {
                 (2==l) ? NetworkGenerator.generateChunkedGraph (P, z):
                          NetworkGenerator.generateSparseEmbedding (P, z);
             
-            val thieves = new Rail[FixedSizeStack[Int]](P, new FixedSizeStack[Int](lifelines(0).size+2));
-            
-            for (var i:Int=1; i<P; ++i) {
-                thieves((i-1)/2).push(i);
-            }
-            val st = PlaceLocalHandle.make[ParUTSdfs](Dist.makeUnique(), ()=>new ParUTSdfs(b, d, k, n, w, l, lifelines(Runtime.hereInt()), thieves(Runtime.hereInt())));
+            val st = PlaceLocalHandle.make[ParUTSdfs](Dist.makeUnique(), ()=>new ParUTSdfs(b, d, k, n, w, l, lifelines(Runtime.hereInt())));
             
             Console.OUT.println("Starting...");
             //@Native("c++", "ProfilerStart(\"UTS.prof\");") {}
