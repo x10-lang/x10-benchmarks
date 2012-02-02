@@ -25,7 +25,7 @@ public:
         
     sha1_rand FMGL(cxx_sha1_rng);
     x10_int FMGL(depth);
-    x10_int FMGL(index);
+    x10_int FMGL(breadth);
 
     SHA1RandXX* operator->() { return this; }
     
@@ -50,9 +50,20 @@ public:
     void _constructor(x10_int seed) {
         FMGL(cxx_sha1_rng).init((int)seed);
         FMGL(depth) = 0;
-        FMGL(index) = floor(log(1.0 - FMGL(cxx_sha1_rng)() / 2147483648.0) / log(0.8));
+        FMGL(breadth) = floor(log(1.0 - FMGL(cxx_sha1_rng)() / 2147483648.0) / log(0.8));
     }
     
+    inline static SHA1RandXX _make(SHA1RandXX parent) {
+        SHA1RandXX this_;
+        this_->_constructor(parent);
+        return this_;
+    }
+    void _constructor(SHA1RandXX parent) {
+        FMGL(cxx_sha1_rng) = parent->FMGL(cxx_sha1_rng);
+        FMGL(depth) = parent->FMGL(depth);
+        FMGL(breadth) = parent->FMGL(breadth)-1;
+    }
+
     inline static SHA1RandXX _make(SHA1RandXX parent, x10_int spawn_number) {
         SHA1RandXX this_;
         this_->_constructor(parent, spawn_number);
@@ -61,7 +72,7 @@ public:
     void _constructor(SHA1RandXX parent, x10_int spawn_number) {
         FMGL(cxx_sha1_rng).init(parent->FMGL(cxx_sha1_rng), (int)spawn_number);
         FMGL(depth) = parent->FMGL(depth)+1;
-        FMGL(index) = floor(log(1.0 - FMGL(cxx_sha1_rng)() / 2147483648.0) / log(0.8));
+        FMGL(breadth) = floor(log(1.0 - FMGL(cxx_sha1_rng)() / 2147483648.0) / log(0.8));
     }
 
     x10_int __apply() {
@@ -72,12 +83,8 @@ public:
         return FMGL(depth);
     }
 
-    x10_int index() {
-        return FMGL(index);
-    }
-
-    x10_int dec() {
-        return --FMGL(index);
+    x10_int breadth() {
+        return FMGL(breadth);
     }
 
     static void _serialize(SHA1RandXX this_, x10aux::serialization_buffer& buf);

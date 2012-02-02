@@ -30,7 +30,7 @@ x10_boolean SHA1RandXX::_struct_equals(SHA1RandXX that) {
         if (FMGL(cxx_sha1_rng).rng_state[i] != that.FMGL(cxx_sha1_rng).rng_state[i]) return false;
     }
     if (FMGL(depth) != that.FMGL(depth)) return false;
-    if (FMGL(index) != that.FMGL(index)) return false;
+    if (FMGL(breadth) != that.FMGL(breadth)) return false;
 
     return true;
 }
@@ -39,7 +39,7 @@ void SHA1RandXX::_serialize(SHA1RandXX this_, x10aux::serialization_buffer& buf)
         buf.write(this_.FMGL(cxx_sha1_rng).rng_state[i]);
     }
     buf.write(this_.FMGL(depth));
-    buf.write(this_.FMGL(index));
+    buf.write(this_.FMGL(breadth));
 }
 
 void SHA1RandXX::_deserialize_body(x10aux::deserialization_buffer& buf) {
@@ -47,7 +47,7 @@ void SHA1RandXX::_deserialize_body(x10aux::deserialization_buffer& buf) {
         FMGL(cxx_sha1_rng).rng_state[i] = buf.read<unsigned char>();
     }
     FMGL(depth) = buf.read<x10_int>();
-    FMGL(index) = buf.read<x10_int>();
+    FMGL(breadth) = buf.read<x10_int>();
 }
 
 
