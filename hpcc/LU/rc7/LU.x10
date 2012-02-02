@@ -237,7 +237,9 @@ class LU {
                 for (var cj:Int = A_trail.min_y; cj <= A_trail.max_y; cj += py) {
                     val left = A_here.hasCol(J) ? A_L.block(ci, J).raw : rowBuffers(ci/px);
                     val upper = A_here.hasRow(J) ? A_U.block(J, cj).raw : colBuffers(cj/py);
+                    timer.start(12);
                     blockMulSub(A_trail.block(ci, cj).raw, left, upper, B);
+                    timer.stop(12);
                 }
             }
         } 
@@ -402,6 +404,8 @@ class LU {
                   " Time=" + (timer.total(10) as Double)/1e9 + " seconds");
                 Console.OUT.println ("Timer(11) COL-BROADCAST # invocations=" + timer.count(11) +
                   " Time=" + (timer.total(11) as Double)/1e9 + " seconds");
+                Console.OUT.println ("Timer(12) DGEMM # invocations=" + timer.count(12) +
+                		" Time=" + (timer.total(12) as Double)/1e9 + " seconds");
               } 
         }
         t += System.nanoTime();
