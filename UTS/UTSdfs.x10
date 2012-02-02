@@ -54,8 +54,7 @@ public class UTSdfs {
                 (2==l) ? NetworkGenerator.generateChunkedGraph (P, z):
                          NetworkGenerator.generateSparseEmbedding (P, z);
             
-            val size = lifelines(0).size > 2 ? lifelines(0).size : 2;
-            val thieves = new Rail[FixedSizeStack[Int]](P, new FixedSizeStack[Int](size));
+            val thieves = new Rail[FixedSizeStack[Int]](P, new FixedSizeStack[Int](lifelines(0).size+2));
             
             for (var i:Int=1; i<P; ++i) {
                 thieves((i-1)/2).push(i);
