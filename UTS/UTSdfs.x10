@@ -16,7 +16,7 @@ public class UTSdfs {
                     Option("d", "", "Tree depth"),
                     Option("k", "", "Number of items to steal; default 0. If 0, steal half. "),
                     Option("n", "", "Number of nodes to process before probing."),
-                    Option("w", "", "Number of thieves to send out, less 1. (Default 0, so 1 thief will be sent out."),
+                    Option("w", "", "Number of thieves to send out. Default 1."),
                     Option("l", "", "Lifeline method: 0 for linear, 1 for hypercube, 2 for sparse chunked, 3 for sparse embedding -- in which case also enter dimension"),
                     Option("z", "", "Dimension of the sparse hypercube"),
                     Option("v", "", "Verbose, default 0 (no).")
@@ -27,7 +27,7 @@ public class UTSdfs {
             val d = opts("-d", 6);
             val n = opts("-n", 200);
             val k = opts("-k", 0);
-            val w = opts("-w", 0);
+            val w = opts("-w", 1);
             val l = opts("-l", 3);
             val z = opts("-z", 1);
             val verbose = opts("-v", 0) != 0;

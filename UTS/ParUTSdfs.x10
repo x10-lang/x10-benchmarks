@@ -35,7 +35,7 @@ final class ParUTSdfs {
         this.counter = new Counter(false);
         stack = new MyStack[SHA1RandXX](65536);
         this.thieves = thieves;
-        lifelinesActivated = new Rail[Boolean](Place.MAX_PLACES);
+        lifelinesActivated = new Rail[Boolean](Place.MAX_PLACES, (i:Int)=>(Runtime.hereInt() > 0) && (i == (Runtime.hereInt()-1)/2));
     }
 
     @Inline final def push(node:SHA1RandXX) {
