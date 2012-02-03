@@ -112,7 +112,7 @@ final class ParUTSdfs {
                 at (Place(thief)) async st().deal(st, loot, victim);
             }
         }
-        reject();
+        reject(st);
     }
     
     @Inline def reject(st:PlaceLocalHandle[ParUTSdfs]) {
