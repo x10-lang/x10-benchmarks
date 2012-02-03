@@ -93,13 +93,13 @@ final class Queue {
 
     def push(fragment:Fragment) {
         val n = fragment.hash.length();
-        IndexedMemoryChunk.copy(fragment.hash, size, hash, 0, n);
-        IndexedMemoryChunk.copy(fragment.depth, size, depth, 0, n);
-        IndexedMemoryChunk.copy(fragment.lower, size, lower, 0, n);
-        IndexedMemoryChunk.copy(fragment.upper, size, upper, 0, n);
+        while (size + n > hash.length()) grow();
+        IndexedMemoryChunk.copy(fragment.hash, 0, hash, size, n);
+        IndexedMemoryChunk.copy(fragment.depth, 0, depth, size, n);
+        IndexedMemoryChunk.copy(fragment.lower, 0, lower, size, n);
+        IndexedMemoryChunk.copy(fragment.upper, 0, upper, size, n);
         size += n;
     }
-    
 
     private def grow():void {
         val capacity = size * 2;
