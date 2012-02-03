@@ -5,9 +5,11 @@ import x10.compiler.Uncounted;
 final class ParUTSdfs {
     val stack:MyStack[SHA1RandXX];
     val thieves:FixedSizeStack[Int];
+    val temp:FixedSizeStack[Int];
     val lifelines:Rail[Int];
     val lifelinesActivated:Rail[Boolean];
     
+    val b:Int;
     val d:Int;
     val k:Int;
     val n:Int;
@@ -25,6 +27,7 @@ final class ParUTSdfs {
     public def counters()=[counter as Counter];
     
     public def this (b:Int, d:Int, k:Int, n:Int, w:Int, l:Int, lifelines:Rail[Int]) {
+        this.b = b;
         this.den = Math.log(b/(1.0+b));
         this.d = d-1;
         this.k = k;
@@ -35,6 +38,7 @@ final class ParUTSdfs {
         this.counter = new Counter(false);
         stack = new MyStack[SHA1RandXX](65536);
         thieves = new FixedSizeStack[Int](lifelines.size+2);
+        temp = new FixedSizeStack[Int](Place.MAX_PLACES);
         lifelinesActivated = new Rail[Boolean](Place.MAX_PLACES);
         
         // 1st wave
@@ -43,7 +47,9 @@ final class ParUTSdfs {
         if (2*i+2<Place.MAX_PLACES) thieves.push(2*i+2);
         if (i > 0) lifelinesActivated((i-1)/2) = true;
     }
-
+    
+    @Inline def score(node:SHA1RandXX) = (1L << (d - node.depth())) * node.breadth();
+    
     @Inline final def push(node:SHA1RandXX) {
         val depth = node.depth();
         val breadth = node.breadth() - 1;
@@ -87,7 +93,7 @@ final class ParUTSdfs {
     }
     
     @Inline def distribute(st:PlaceLocalHandle[ParUTSdfs]) {
-        var numThieves:Int = thieves.size();
+        var numThieves:Int = thieves.size() + temp.size();
         if (numThieves == 0) return;
         val lootSize = stack.size();
         if (lootSize >= 2) {
@@ -95,12 +101,48 @@ final class ParUTSdfs {
             val numToSteal = lootSize/numThieves;
             val victim = Runtime.hereInt();
             for (var i:Int=1; i < numThieves; ++i) {
-                val thief = thieves.pop();
                 val loot = stack.pop(numToSteal);
-                counter.incTxNodes(numToSteal);
-                at(Place(thief)) async st().deal(st, loot, victim);
+                if (temp.size() > 0) {
+                    val thief = temp.pop();
+                    counter.nodesGiven += numToSteal;
+                    ++counter.stealsSuffered;
+                    if (thief >= 0) {
+                        at (Place(thief)) @Uncounted async { st().deal(st, loot, victim); st().waiting = false; }
+                    } else {
+                        at (Place(-thief-1)) @Uncounted async { st().deal(st, loot, -1); st().waiting = false; }
+                    }
+                } else {
+                    val thief = thieves.pop();
+                    counter.incTxNodes(numToSteal);
+                    at (Place(thief)) async st().deal(st, loot, victim);
+                }
             }
         }
+        while (temp.size() > 0) {
+            val thief = temp.pop();
+            if (thief >= 0) {
+                thieves.push(thief);
+                at (Place(thief)) @Uncounted async { st().waiting = false; }
+            } else {
+                at (Place(-thief-1)) @Uncounted async { st().waiting = false; }
+            }
+        }
+    }
+    
+    def request2(st:PlaceLocalHandle[ParUTSdfs], thief:Int, isLifeLine:Boolean) {
+    	++counter.stealsReceived;
+    	val length = stack.size();
+    	val numSteals = k==0 ? (length >= 2 ? length/2 : 0) : (k < length ? k : (k/2 < length ? k/2 : 0));
+    	if (numSteals == 0) {
+    		if (isLifeLine) thieves.push(thief);
+    		at (Place(thief)) @Uncounted async { st().waiting = false; }
+    	} else {
+    		val loot = stack.pop(numSteals);
+    		counter.nodesGiven += numSteals;
+    		++counter.stealsSuffered;
+    		val victim = isLifeLine ? Runtime.hereInt() : -1;
+    		at (Place(thief)) @Uncounted async { st().deal(st, loot, victim); st().waiting = false; }
+    	}
     }
     
     def steal(st:PlaceLocalHandle[ParUTSdfs]) {
@@ -113,7 +155,7 @@ final class ParUTSdfs {
             while ((q = myRandom.nextInt(P)) == p);
             counter.incStealsAttempted();
             waiting = true;
-            at(Place(q)) @Uncounted async st().request(st, p, false);
+            at (Place(q)) @Uncounted async st().request(st, p, false);
             while (waiting) Runtime.probe();
         }
         for (var i:Int=0; (i<lifelines.size) && empty && (0<=lifelines(i)); ++i) {
@@ -121,7 +163,7 @@ final class ParUTSdfs {
             if (!lifelinesActivated(lifeline)) {
                 lifelinesActivated(lifeline) = true;
                 waiting = true;
-                at(Place(lifeline)) @Uncounted async st().request(st, p, true);
+                at (Place(lifeline)) @Uncounted async st().request(st, p, true);
                 while (waiting) Runtime.probe();
             }
         }
@@ -130,17 +172,11 @@ final class ParUTSdfs {
     
     def request(st:PlaceLocalHandle[ParUTSdfs], thief:Int, isLifeLine:Boolean) {
         ++counter.stealsReceived;
-        val length = stack.size();
-        val numSteals = k==0 ? (length >= 2 ? length/2 : 0) : (k < length ? k : (k/2 < length ? k/2 : 0));
-        if (numSteals == 0) {
+        if (stack.size() == 0) {
             if (isLifeLine) thieves.push(thief);
             at (Place(thief)) @Uncounted async { st().waiting = false; }
         } else {
-            val loot = stack.pop(numSteals);
-            counter.nodesGiven += numSteals;
-            ++counter.stealsSuffered;
-            val victim = isLifeLine ? Runtime.hereInt() : -1;
-            at (Place(thief)) @Uncounted async { st().deal(st, loot, victim); st().waiting = false; }
+            if (isLifeLine) temp.push(thief); else temp.push(-thief-1);
         }
     }
     
