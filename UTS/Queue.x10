@@ -91,6 +91,16 @@ final class Queue {
         return fragment;
     }
 
+    def grab(i:Int, n:Int) {
+        val fragment = new Fragment(1);
+        fragment.hash(0) = hash(i);
+        fragment.depth(0) = depth(i);
+        fragment.upper(0) = upper(i);
+        upper(i) -= n;
+        fragment.lower(0) = upper(i);
+        return fragment;
+    }
+
     def push(fragment:Fragment) {
         val n = fragment.hash.length();
         while (size + n > hash.length()) grow();
@@ -119,6 +129,20 @@ final class Queue {
         IndexedMemoryChunk.copy(upper, 0, u, 0, size);
         upper.deallocate();
         upper = u;
+    }
+
+    @Inline def select() {
+        var max:Double = 0.0;
+        var mem:Int = -1;
+        for (var i:Int=0; i<size; i++) {
+            if (upper(i) <= lower(i) + 1) continue;
+            val s = score(i);
+            if (s > max) {
+                max = s;
+                mem = i;
+            }
+        }
+        return mem;
     }
 
     private static def sub(str:String, start:Int, end:Int) = str.substring(start, Math.min(end, str.length()));

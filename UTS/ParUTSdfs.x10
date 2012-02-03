@@ -44,10 +44,11 @@ final class ParUTSdfs {
     
     @Inline final def processAtMostN() {
         var i:Int=0;
-        do {
+        for (; (i<n) && (queue.size>0); ++i) {
             queue.expand();
-        } while ((++i<n) && (queue.size>0));
+        }
         queue.count += i;
+        return queue.size > 0;
     }
     
     /** A trivial function to calculate minimum of 2 integers */
@@ -55,8 +56,7 @@ final class ParUTSdfs {
     
     final def processStack(st:PlaceLocalHandle[ParUTSdfs]) {
         do {
-            while (queue.size > 0) {
-                processAtMostN();
+            while (processAtMostN()) {
                 Runtime.probe();
                 distribute(st);
             }
@@ -64,15 +64,15 @@ final class ParUTSdfs {
     }
     
     @Inline def distribute(st:PlaceLocalHandle[ParUTSdfs]) {
-        var numThieves:Int = thieves.size() + temp.size();
-        if (numThieves == 0) return;
-        val lootSize = queue.size;
-        if (lootSize >= 2) {
+        var numThieves:Int;
+        var t:Int;
+        while (((numThieves = thieves.size() + temp.size()) > 0) && (t = queue.select()) >= 0) {
+            val lootSize = queue.upper(t) - queue.lower(t);
             numThieves = min(numThieves+1, lootSize);
             val numToSteal = lootSize/numThieves;
             val victim = Runtime.hereInt();
             for (var i:Int=1; i < numThieves; ++i) {
-                val loot = queue.pop(numToSteal);
+                val loot = queue.grab(t, numToSteal);
                 if (temp.size() > 0) {
                     val thief = temp.pop();
                     counter.nodesGiven += numToSteal;
