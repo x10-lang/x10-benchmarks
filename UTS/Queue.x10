@@ -14,7 +14,8 @@ final class Queue {
     val height:Int;
     val den:Double;
 
-    def this(capacity:Int, factor:Int, height:Int) {
+    def this(var capacity:Int, factor:Int, height:Int) {
+        if (capacity < 8) capacity = 8;
         hash = IndexedMemoryChunk.allocateUninitialized[SHA1Rand](capacity);
         depth = IndexedMemoryChunk.allocateUninitialized[Int](capacity);
         lower = IndexedMemoryChunk.allocateUninitialized[Int](capacity);
@@ -37,7 +38,7 @@ final class Queue {
     @Inline def score(i:Int) = Math.pow(factor, height - depth(i)) * (upper(i) - lower(i));
 
     @Inline def push(h:SHA1Rand, d:Int, l:Int, u:Int):void {
-//        if (size+1 > capacity()) grow(size+1);
+        if (size >= hash.length()) grow();
         hash(size) = h;
         depth(size) = d;
         lower(size) = l;
@@ -65,8 +66,6 @@ final class Queue {
             count += u - l;
         }
     }
-
-//    @Inline def capacity():Int = imc.length();
 
     static class Fragment {
         val hash:IndexedMemoryChunk[SHA1Rand];
@@ -101,21 +100,26 @@ final class Queue {
         size += n;
     }
     
-    /*
-    private def grow(var newCapacity:Int):void {
-        var oldCapacity:int = capacity();
-        if (newCapacity < oldCapacity*2) {
-            newCapacity = oldCapacity*2;
-        }
-        if (newCapacity < 8) {
-            newCapacity = 8;
-        }
-        val tmp = IndexedMemoryChunk.allocateUninitialized[Int](newCapacity);
-        IndexedMemoryChunk.copy(imc, 0, tmp, 0, size);
-        imc.deallocate();
-        imc = tmp;
+
+    private def grow():void {
+        val capacity = size * 2;
+        val h = IndexedMemoryChunk.allocateUninitialized[SHA1Rand](capacity);
+        IndexedMemoryChunk.copy(hash, 0, h, 0, size);
+        hash.deallocate();
+        hash = h;
+        val d = IndexedMemoryChunk.allocateUninitialized[Int](capacity);
+        IndexedMemoryChunk.copy(depth, 0, d, 0, size);
+        depth.deallocate();
+        depth = d;
+        val l = IndexedMemoryChunk.allocateUninitialized[Int](capacity);
+        IndexedMemoryChunk.copy(lower, 0, l, 0, size);
+        lower.deallocate();
+        lower = l;
+        val u = IndexedMemoryChunk.allocateUninitialized[Int](capacity);
+        IndexedMemoryChunk.copy(upper, 0, u, 0, size);
+        upper.deallocate();
+        upper = u;
     }
-    */
 
     private static def sub(str:String, start:Int, end:Int) = str.substring(start, Math.min(end, str.length()));
 
