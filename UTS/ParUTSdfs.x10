@@ -60,6 +60,7 @@ final class ParUTSdfs {
                 Runtime.probe();
                 distribute(st);
             }
+            reject(st);
         } while (steal(st));
     }
     
@@ -89,6 +90,32 @@ final class ParUTSdfs {
                 }
             }
         }
+        if (numThieves == 0) return;
+        val lootSize = queue.size;
+        numThieves = min(numThieves+1, lootSize);
+        val numToSteal = lootSize/numThieves;
+        val victim = Runtime.hereInt();
+        for (var i:Int=1; i < numThieves; ++i) {
+            val loot = queue.pop(numToSteal);
+            if (temp.size() > 0) {
+                val thief = temp.pop();
+                counter.nodesGiven += numToSteal;
+                ++counter.stealsSuffered;
+                if (thief >= 0) {
+                    at (Place(thief)) @Uncounted async { st().deal(st, loot, victim); st().waiting = false; }
+                } else {
+                    at (Place(-thief-1)) @Uncounted async { st().deal(st, loot, -1); st().waiting = false; }
+                }
+            } else {
+                val thief = thieves.pop();
+                counter.incTxNodes(numToSteal);
+                at (Place(thief)) async st().deal(st, loot, victim);
+            }
+        }
+        reject();
+    }
+    
+    @Inline def reject(st:PlaceLocalHandle[ParUTSdfs]) {
         while (temp.size() > 0) {
             val thief = temp.pop();
             if (thief >= 0) {
