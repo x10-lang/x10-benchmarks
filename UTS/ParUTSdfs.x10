@@ -21,7 +21,7 @@ final class ParUTSdfs {
     
     val logger:Logger;
     
-    public def this (b:Int, d:Int, n:Int, w:Int, l:Int, lifelines:Rail[Int]) {
+    public def this(b:Int, d:Int, n:Int, w:Int, l:Int, lifelines:Rail[Int]) {
         this.n = n;
         this.w = w;
         this.l = l;
@@ -152,12 +152,16 @@ final class ParUTSdfs {
     }
     
     def request(st:PlaceLocalHandle[ParUTSdfs], thief:Int, lifeline:Boolean) {
-        if (lifeline) ++logger.lifelineStealsReceived; else ++logger.stealsReceived;
-        if (queue.size == 0) {
-            if (lifeline) thieves.push(thief);
-            at (Place(thief)) @Uncounted async { st().waiting = false; }
-        } else {
-            if (lifeline) temp.push(thief); else temp.push(-thief-1);
+        try {
+            if (lifeline) ++logger.lifelineStealsReceived; else ++logger.stealsReceived;
+            if (queue.size == 0) {
+                if (lifeline) thieves.push(thief);
+                at (Place(thief)) @Uncounted async { st().waiting = false; }
+            } else {
+                if (lifeline) temp.push(thief); else temp.push(-thief-1);
+            }
+        } catch (v:Throwable) {
+            error(v);
         }
     }
     
@@ -174,8 +178,8 @@ final class ParUTSdfs {
     }
     
     def deal(st:PlaceLocalHandle[ParUTSdfs], loot:Queue.Fragment, source:Int) {
-        val lifeline = source >= 0;
         try {
+            val lifeline = source >= 0;
             if (lifeline) lifelinesActivated(source) = false;
             if (active) {
                 empty = false;
@@ -191,20 +195,28 @@ final class ParUTSdfs {
                 logger.nodesCount = queue.count;
             }
         } catch (v:Throwable) {
-            Runtime.println("Exception at " + here);
-            v.printStackTrace();
+            error(v);
         }
     }
     
     def main(st:PlaceLocalHandle[ParUTSdfs], seed:Int) {
         finish {
-            active = true;
-            logger.startLive();
-            queue.init(seed);
-            processStack(st);
-            logger.stopLive();
-            active = false;
-            logger.nodesCount = queue.count;
+            try {
+                active = true;
+                logger.startLive();
+                queue.init(seed);
+                processStack(st);
+                logger.stopLive();
+                active = false;
+                logger.nodesCount = queue.count;
+            } catch (v:Throwable) {
+                error(v);
+            }
         } 
+    }
+    
+    static def error(v:Throwable) {
+        Runtime.println("Exception at " + here);
+        v.printStackTrace();
     }
 }
