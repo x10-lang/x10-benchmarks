@@ -1,6 +1,6 @@
-import x10.util.Random;
 import x10.compiler.Inline;
 import x10.compiler.Uncounted;
+import x10.util.Random;
 
 final class ParUTSdfs {
     val queue:Queue;
@@ -13,20 +13,18 @@ final class ParUTSdfs {
     val w:Int;
     val l:Int;
     
-    val myRandom = new Random();
+    val random = new Random();
+    val logger = new Logger();
     
     var active:Boolean = false;
     @x10.compiler.Volatile transient var empty:Boolean;
     @x10.compiler.Volatile transient var waiting:Boolean;
-    
-    val logger:Logger;
     
     public def this(b:Int, d:Int, n:Int, w:Int, l:Int, lifelines:Rail[Int]) {
         this.n = n;
         this.w = w;
         this.l = l;
         this.lifelines = lifelines;
-        this.logger = new Logger();
         queue = new Queue(65536, b, d);
         thieves = new FixedSizeStack[Int](lifelines.size+2);
         temp = new FixedSizeStack[Int](Place.MAX_PLACES);
@@ -34,8 +32,8 @@ final class ParUTSdfs {
         
         // 1st wave
         val i = Runtime.hereInt();
-        if (2*i+1<Place.MAX_PLACES) thieves.push(2*i+1);
-        if (2*i+2<Place.MAX_PLACES) thieves.push(2*i+2);
+        if (2*i+1 < Place.MAX_PLACES) thieves.push(2*i+1);
+        if (2*i+2 < Place.MAX_PLACES) thieves.push(2*i+2);
         if (i > 0) lifelinesActivated((i-1)/2) = true;
     }
     
@@ -48,7 +46,7 @@ final class ParUTSdfs {
         return queue.size > 0;
     }
     
-    @Inline def min(i:Int,j:Int) = i < j ? i : j;
+    @Inline static def min(i:Int,j:Int) = i < j ? i : j;
     
     final def processStack(st:PlaceLocalHandle[ParUTSdfs]) {
         do {
@@ -60,6 +58,25 @@ final class ParUTSdfs {
         } while (steal(st));
     }
     
+    @Inline def give(st:PlaceLocalHandle[ParUTSdfs], loot:Queue.Fragment) {
+        val victim = Runtime.hereInt();
+        logger.nodesGiven += loot.hash.length();
+        if (temp.size() > 0) {
+            val thief = temp.pop();
+            if (thief >= 0) {
+                ++logger.lifelineStealsSuffered;
+                at (Place(thief)) @Uncounted async { st().deal(st, loot, victim); st().waiting = false; }
+            } else {
+                ++logger.stealsSuffered;
+                at (Place(-thief-1)) @Uncounted async { st().deal(st, loot, -1); st().waiting = false; }
+            }
+        } else {
+            ++logger.lifelineStealsSuffered;
+            val thief = thieves.pop();
+            at (Place(thief)) async st().deal(st, loot, victim);
+        }
+    }
+    
     @Inline def distribute(st:PlaceLocalHandle[ParUTSdfs]) {
         var numThieves:Int;
         var t:Int;
@@ -67,48 +84,16 @@ final class ParUTSdfs {
             val lootSize = queue.upper(t) - queue.lower(t);
             numThieves = min(numThieves+1, lootSize);
             val numToSteal = lootSize/numThieves;
-            val victim = Runtime.hereInt();
             for (var i:Int=1; i < numThieves; ++i) {
-                val loot = queue.grab(t, numToSteal);
-                logger.nodesGiven += 1;
-                if (temp.size() > 0) {
-                    val thief = temp.pop();
-                    if (thief >= 0) {
-                        ++logger.lifelineStealsSuffered;
-                        at (Place(thief)) @Uncounted async { st().deal(st, loot, victim); st().waiting = false; }
-                    } else {
-                        ++logger.stealsSuffered;
-                        at (Place(-thief-1)) @Uncounted async { st().deal(st, loot, -1); st().waiting = false; }
-                    }
-                } else {
-                    ++logger.lifelineStealsSuffered;
-                    val thief = thieves.pop();
-                    at (Place(thief)) async st().deal(st, loot, victim);
-                }
+                give(st, queue.grab(t, numToSteal));
             }
         }
         if (numThieves == 0) return;
         val lootSize = queue.size;
         numThieves = min(numThieves+1, lootSize);
         val numToSteal = lootSize/numThieves;
-        val victim = Runtime.hereInt();
         for (var i:Int=1; i < numThieves; ++i) {
-            val loot = queue.pop(numToSteal);
-            logger.nodesGiven += numToSteal;
-            if (temp.size() > 0) {
-                val thief = temp.pop();
-                if (thief >= 0) {
-                    ++logger.lifelineStealsSuffered;
-                    at (Place(thief)) @Uncounted async { st().deal(st, loot, victim); st().waiting = false; }
-                } else {
-                    ++logger.stealsSuffered;
-                    at (Place(-thief-1)) @Uncounted async { st().deal(st, loot, -1); st().waiting = false; }
-                }
-            } else {
-                val thief = thieves.pop();
-                ++logger.lifelineStealsSuffered;
-                at (Place(thief)) async st().deal(st, loot, victim);
-            }
+            give(st, queue.pop(numToSteal));
         }
         reject(st);
     }
@@ -132,7 +117,7 @@ final class ParUTSdfs {
         empty = true;
         for (var i:Int=0; i < w && empty; ++i) {
             var q:Int = 0;
-            while ((q = myRandom.nextInt(P)) == p);
+            while ((q = random.nextInt(P)) == p);
             ++logger.stealsAttempted;
             waiting = true;
             at (Place(q)) @Uncounted async st().request(st, p, false);
