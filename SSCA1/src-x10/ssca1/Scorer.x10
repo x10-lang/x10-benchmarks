@@ -26,7 +26,7 @@ public class Scorer {
 
    // output
    /** how to work our way back through the two sequences to the aligned subsequence starts */
-   val tracebackMoves: Rail[Byte];
+   val tracebackMoves: Rail[Rail[Byte]];
 
    /** 
     * all the info, other than the traceback matrix, that we need to compute the matched
@@ -92,10 +92,10 @@ public class Scorer {
       val shortSize = shorter.size;
       longSize  = longer.size;
       val longSize_ = longSize;
-      tracebackMoves = new Rail[Byte]((shortSize+1)*(longSize_ + 1));
+      tracebackMoves = new Rail[Rail[Byte]](shortSize+1, (Int)=>new Rail[Byte](longSize_ + 1));
       val tracebackMoves_ = tracebackMoves;	
-      for (i in 1..(shortSize-1)) tracebackMoves_(i*(longSize_ + 1)) = STOP;
-      for (j in 0..(longSize_-1))  tracebackMoves_(j) = STOP;
+      for (i in 1..(shortSize-1)) tracebackMoves_(i)(0) = STOP;
+      for (j in 0..(longSize_-1))  tracebackMoves_(0)(j) = STOP;
       val bestScoreUpTo_I_J = new Rail[Int](longSize_ + 1);
       var winningScore : Long = 0;
       var shorterLast: Int = -1;
@@ -122,14 +122,14 @@ public class Scorer {
 	    val scoreOfMatchAtLast = scoringMatrix(alphabetIndex(short_i_minus_1 as Int)*alphabetSize + alphabetIndex(long_j as Int));
 
             val scoreUsingLatestIJ = previousBestScore + scoreOfMatchAtLast;
-            val bestIfGapInsertedInI = bestScoreUpTo_I_J(j) - (tracebackMoves_((i-1)*(longSize_+1)+j)==UP ? extendGapPenalty : openGapPenalty);
-            val bestIfGapInsertedInJ = bestScoreUpTo_I_J(j-1) - (tracebackMoves_(i*(longSize_+1)+j-1) == LEFT ? extendGapPenalty : openGapPenalty);     
+            val bestIfGapInsertedInI = bestScoreUpTo_I_J(j) - (tracebackMoves_(i-1)(j)==UP ? extendGapPenalty : openGapPenalty);
+            val bestIfGapInsertedInJ = bestScoreUpTo_I_J(j-1) - (tracebackMoves_(i)(j-1) == LEFT ? extendGapPenalty : openGapPenalty);     
             previousBestScore = bestScoreUpTo_I_J(j);  // save for the next time around the loop. 
             var winner: Int = bestScoreUpTo_I_J(j) = maxOrZero(scoreUsingLatestIJ, bestIfGapInsertedInI, bestIfGapInsertedInJ);
-            if (winner == 0)                          tracebackMoves_(i*(longSize_ + 1) + j) = STOP;
-            else if (winner == scoreUsingLatestIJ)    tracebackMoves_(i*(longSize_ + 1) + j) = DIAGONAL;
-            else if (winner == bestIfGapInsertedInI)  tracebackMoves_(i*(longSize_ + 1) + j) = UP;
-            else                                      tracebackMoves_(i*(longSize_ + 1) + j) = LEFT;
+            if (winner == 0)                          tracebackMoves_(i)(j) = STOP;
+            else if (winner == scoreUsingLatestIJ)    tracebackMoves_(i)(j) = DIAGONAL;
+            else if (winner == bestIfGapInsertedInI)  tracebackMoves_(i)(j) = UP;
+            else                                      tracebackMoves_(i)(j) = LEFT;
             // Should we set the traceback to start at the current cell? 
             if (winner > winningScore) { //  yes, a new champ!
                winningScore = winner;
@@ -217,7 +217,7 @@ public class Scorer {
     * @param j index into the longer string
     * @return one of the symbolic constants BAD, STOP, LEFT, DIAGONAL, UP
     */
-   private def getTracebackMove(i:Int, j:Int) { return tracebackMoves(i*(longSize + 1) + j); }
+   private def getTracebackMove(i:Int, j:Int) { return tracebackMoves(i)(j); }
    
    /**
     * Assign the value 'direction' to the traceback move that should be executed from
@@ -227,7 +227,7 @@ public class Scorer {
     * @param direction one of the symbolic constants BAD, STOP, LEFT, DIAGONAL, UP
     */
    private def setTracebackMove(i: Int, j: Int, direction: Byte) {
-      tracebackMoves(i*(longSize + 1) + j) = direction;
+      tracebackMoves(i)(j) = direction;
    }
 
    /**
