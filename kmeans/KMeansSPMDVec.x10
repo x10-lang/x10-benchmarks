@@ -65,8 +65,8 @@ public class KMeansSPMDVec {
             val num_file_points = (file.size() / dim / 4) as Int;
             val file_points = new Array[Float](num_file_points*dim, init_points);
 
-            //val team = Team.WORLD;
-            val team = Team(new Array[Place](num_slices * Place.MAX_PLACES, (i:int) => Place.place(i/num_slices)));
+            val team = Team.WORLD;
+            //val team = Team(new Array[Place](num_slices * Place.MAX_PLACES, (i:int) => Place.place(i/num_slices)));
 
             val num_slice_points = num_global_points / num_slices / Place.MAX_PLACES;
 
@@ -169,12 +169,7 @@ public class KMeansSPMDVec {
                             break;
 
                         } // main_loop
-
-                        if (offset==0) {
                             val stop_time = System.currentTimeMillis();
-                            if (!quiet) Console.OUT.print(num_global_points.toString()+" "+num_clusters+" "+dim+" ");
-                            Console.OUT.println((stop_time-start_time)/1E3);
-                        }
                         for (var i:Int=0 ; i<team.size() ; ++i) {
                             if (role == i) {                            
                                 Console.OUT.println(role.toString()+": Computation time: "+compute_time/1E9);
@@ -188,8 +183,12 @@ public class KMeansSPMDVec {
                             }
 
                         }
+                        if (offset==0) {
+                            if (!quiet) Console.OUT.print(num_global_points.toString()+" "+num_clusters+" "+dim+" ");
+                            Console.OUT.println((stop_time-start_time)/1E3);
+                        }
 
-                        team.del(role);    
+//                        team.del(role);    
 
                     } // async
 
