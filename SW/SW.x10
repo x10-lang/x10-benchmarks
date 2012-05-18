@@ -74,6 +74,7 @@ final class Parameters {
 }
 
 struct Result(
+    score:Int,
     shortFirst:Int,
     shortLast:Int,
     longFirst:Int,
@@ -112,6 +113,9 @@ final class SW {
     var winningScore:Int = 0;
     var shortLast:Int = -1;
     var longLast:Int = -1;
+    
+    var bestPlace:Int = -1;
+    var bestScore:int = -1;
 
     def this(params:Parameters, verbose:Boolean) {
         this.params = params;
@@ -134,7 +138,7 @@ final class SW {
         if (verbose) Console.OUT.println("place=" + placeId + " [" + first + ","+ last +"[");
     }
 
-    def run(scores:GlobalRef[Rail[Int]], verbose:Boolean) {
+    def run(plh:PlaceLocalHandle[SW], parentId:Int, verbose:Boolean) {
         val scoringMatrix = params.scoringMatrix;
         val alphabetSize = params.alphabetSize;
         val extendGapPenalty = params.extendGapPenalty;
@@ -173,9 +177,19 @@ final class SW {
             }
         }
         if (verbose) Console.OUT.println("place=" + placeId + " score=" + winningScore + " short=" + shortLast + " long=" + (first+longLast));
-        val p = placeId;
-        val score = winningScore;
-        at (scores) async { scores()(p) = score; }
+        reduce(plh, parentId, placeId, winningScore);
+    }
+
+    @Inline def reduce(plh:PlaceLocalHandle[SW], parentId:Int, placeId:Int, winningScore:Int) {
+        at (Place(parentId)) async {
+            /* atomic */
+            if (plh().bestScore < winningScore) {
+                plh().bestScore = winningScore;
+                plh().bestPlace = placeId;
+            } else if (plh().bestScore == winningScore && plh().bestPlace > placeId) {
+                plh().bestPlace = placeId;
+            }
+        }
     }
 
     @Inline static def maxOrZero(a:Int, b:Int, c:Int) {
@@ -186,7 +200,7 @@ final class SW {
         }
     }
 
-    def result(verify:Boolean) {
+    def trace(verify:Boolean) {
         var nextMove:Byte;
         var i:Int = shortLast;
         var j:Int = longLast;
@@ -210,7 +224,7 @@ final class SW {
         val s = shortBuilder.result();
         val l = longBuilder.result();
         if (verify) check(s, l);
-        return Result(i, shortLast, first+j, first+longLast, s, l);
+        return Result(winningScore, i, shortLast, first+j, first+longLast, s, l);
     }
 
     def check(s:Rail[Byte], l:Rail[Byte]) {
@@ -232,6 +246,22 @@ final class SW {
         }
     }
 
+    def loop(plh:PlaceLocalHandle[SW], stride:Int, verbose:Boolean) {
+        val id = placeId;
+        val m = Math.min(id+stride, params.segmentCount);
+        @Pragma(Pragma.FINISH_HERE) finish for (var i:Int=id; i<m; i++) {
+            at (Place(i)) async plh().run(plh, id, verbose);
+        }
+        reduce(plh, 0, bestPlace, bestScore);
+    }
+
+    def score(plh:PlaceLocalHandle[SW], stride:Int, verbose:Boolean) {
+        @Pragma(Pragma.FINISH_HERE) finish for (var i:Int=0; i<params.segmentCount; i+=stride) {
+            at (Place(i)) async plh().loop(plh, stride, verbose);
+        }
+        return bestPlace;
+    }
+
     static def sub(str:String, start:Int, end:Int) = str.substring(start, Math.min(end, str.length()));
 
     static def printTime(title:String, time:Long) {
@@ -240,7 +270,7 @@ final class SW {
 
     public static def main(args:Array[String](1)){here==Place.FIRST_PLACE} {
         if (args.size < 2) {
-            Console.ERR.println("Usage: sw shortLength longLength [seed] [iterations] [verbose] [verify]");
+            Console.ERR.println("Usage: sw shortLength longLength [seed] [iterations] [stride] [verbose] [verify]");
             System.setExitCode(1);
             return;
         }
@@ -248,35 +278,24 @@ final class SW {
         val longLength = Int.parseInt(args(1));
         val seed = args.size>2 ? Int.parseInt(args(2)) : 1;
         val iterations = args.size>3 ? Int.parseInt(args(3)) : 1;
-        val verbose = args.size>4 ? Boolean.parseBoolean(args(4)) : false;
-        val verify = args.size>5 ? Boolean.parseBoolean(args(5)) : false;
+        val stride = args.size>4 ? Int.parseInt(args(4)) : 4;
+        val verbose = args.size>5 ? Boolean.parseBoolean(args(5)) : false;
+        val verify = args.size>6 ? Boolean.parseBoolean(args(6)) : false;
         val params = new Parameters(shortLength, longLength, seed);
-        val scores = new Rail[Int](params.segmentCount);
-        val ref = GlobalRef[Rail[Int]](scores);
 
         var t:Long = System.nanoTime();
-        val plh = PlaceLocalHandle.makeFlat(new MyPlaceGroup(params.segmentCount), ()=>new SW(params, verbose));
+        val plh = PlaceLocalHandle.makeFlat[SW](new MyPlaceGroup(params.segmentCount), ()=>new SW(params, verbose));
         printTime("Init:  ", System.nanoTime()-t);
 
         for (var k:Int=0; k<iterations; k++) {
             val v = verbose && (k==0);
             t = System.nanoTime();
-            @Pragma(Pragma.FINISH_HERE) finish for (var i:Int=0; i<params.segmentCount; i++) {
-                at (Place(i)) async plh().run(ref, v);
-            }
-            var winningScore:Int = -1;
-            var p:Int = -1;
-            for (var i:Int=0; i<params.segmentCount; i++) {
-                if (scores(i) > winningScore) {
-                    p = i;
-                    winningScore = scores(i);
-                }
-            }
+            val p = plh().score(plh, stride, v);
             printTime("Score: ", System.nanoTime()-t);
             t = System.nanoTime();
-            val r = at (Place(p)) plh().result(verify);
+            val r = at (Place(p)) plh().trace(verify);
             printTime("Trace: ", System.nanoTime()-t);
-            Console.OUT.println("place=" + p + " score=" + scores(p) + " short=[" + r.shortFirst + "," + r.shortLast + "[ long=[" + r.longFirst + "," + r.longLast +"[ length=" + r.short.size);
+            Console.OUT.println("place=" + p + " score=" + r.score + " short=[" + r.shortFirst + "," + r.shortLast + "[ long=[" + r.longFirst + "," + r.longLast +"[ length=" + r.short.size);
             if (v) r.print();
         }
     }
