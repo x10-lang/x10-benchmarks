@@ -3,6 +3,20 @@ import x10.compiler.Native;
 import x10.compiler.Pragma;
 import x10.util.ArrayBuilder;
 
+final class MyPlaceGroup extends PlaceGroup {
+    private val numPlaces:Int;
+    def this(numPlaces:Int) { this.numPlaces = numPlaces; }
+    public operator this(i:int):Place = Place.place(i);
+    public def numPlaces() = numPlaces;
+    public def contains(id:int) = id >= 0 && id < numPlaces;
+    public def indexOf(id:int) = contains(id) ? id : -1;
+    public def iterator() = new Iterator[Place](){
+        private var i:Int = 0;
+        public def hasNext() = i < numPlaces;
+        public def next() = Place(i++);
+    };
+}
+
 final class Random {
     @Native("c++", "srandom(#seed)")
     static native def srandom(seed:Int):void;
@@ -223,9 +237,8 @@ final class SW {
     static def printTime(title:String, time:Long) {
         Console.OUT.println(title + sub("" + (time/1e9), 0, 6) + "s");
     }
-    
+
     public static def main(args:Array[String](1)){here==Place.FIRST_PLACE} {
-        var t:Long = System.nanoTime();
         if (args.size < 2) {
             Console.ERR.println("Usage: sw shortLength longLength [seed] [iterations] [verbose] [verify]");
             System.setExitCode(1);
@@ -238,9 +251,11 @@ final class SW {
         val verbose = args.size>4 ? Boolean.parseBoolean(args(4)) : false;
         val verify = args.size>5 ? Boolean.parseBoolean(args(5)) : false;
         val params = new Parameters(shortLength, longLength, seed);
-        val plh = PlaceLocalHandle.makeFlat(Dist.makeUnique(), ()=>Runtime.hereInt()<params.segmentCount ? new SW(params, verbose) : null);
         val scores = new Rail[Int](params.segmentCount);
         val ref = GlobalRef[Rail[Int]](scores);
+
+        var t:Long = System.nanoTime();
+        val plh = PlaceLocalHandle.makeFlat(new MyPlaceGroup(params.segmentCount), ()=>new SW(params, verbose));
         printTime("Init:  ", System.nanoTime()-t);
 
         for (var k:Int=0; k<iterations; k++) {
