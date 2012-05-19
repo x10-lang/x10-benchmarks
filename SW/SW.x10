@@ -161,19 +161,21 @@ final class SW {
 
         for (var i:Int=1; i<=shortSize; i++) {
             var previousBestScore:Int = 0;
+            val ti = tracebackMoves(i);
+            val ti1 = tracebackMoves(i-1);
             val s = short(i-1)*alphabetSize;
             for (var j:Int=1; j<=localSize; j++) {
                 val scoreOfMatchAtLast = scoringMatrix(s + long(j-1));
                 val scoreUsingLatestIJ = previousBestScore + scoreOfMatchAtLast;
-                val bestIfGapInsertedInI = bestScoreUpTo_I_J(j) - (tracebackMoves(i-1)(j)==UP ? extendGapPenalty : openGapPenalty);
-                val bestIfGapInsertedInJ = bestScoreUpTo_I_J(j-1) - (tracebackMoves(i)(j-1)==LEFT ? extendGapPenalty : openGapPenalty);     
+                val bestIfGapInsertedInI = bestScoreUpTo_I_J(j) - (ti1(j)==UP ? extendGapPenalty : openGapPenalty);
+                val bestIfGapInsertedInJ = bestScoreUpTo_I_J(j-1) - (ti(j-1)==LEFT ? extendGapPenalty : openGapPenalty);     
                 val winner = maxOrZero(scoreUsingLatestIJ, bestIfGapInsertedInI, bestIfGapInsertedInJ);
                 previousBestScore = bestScoreUpTo_I_J(j);
                 bestScoreUpTo_I_J(j) = winner;
-                if (winner == 0)                         tracebackMoves(i)(j) = STOP;
-                else if (winner == scoreUsingLatestIJ)   tracebackMoves(i)(j) = DIAGONAL;
-                else if (winner == bestIfGapInsertedInI) tracebackMoves(i)(j) = UP;
-                else                                     tracebackMoves(i)(j) = LEFT;
+                if (winner == 0)                         ti(j) = STOP;
+                else if (winner == scoreUsingLatestIJ)   ti(j) = DIAGONAL;
+                else if (winner == bestIfGapInsertedInI) ti(j) = UP;
+                else                                     ti(j) = LEFT;
                 if (winner > winningScore) {
                     winningScore = winner;
                     shortLast = i;
@@ -188,7 +190,7 @@ final class SW {
         reduce(plh, parentId, placeId, winningScore);
     }
 
-    @Inline def reduce(plh:PlaceLocalHandle[SW], parentId:Int, placeId:Int, winningScore:Int) {
+    @Inline static def reduce(plh:PlaceLocalHandle[SW], parentId:Int, placeId:Int, winningScore:Int) {
         at (Place(parentId)) async {
             /* atomic */
             if (plh().bestScore < winningScore) {
