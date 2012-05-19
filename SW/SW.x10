@@ -169,13 +169,16 @@ final class SW {
                 val scoreUsingLatestIJ = previousBestScore + scoreOfMatchAtLast;
                 val bestIfGapInsertedInI = bestScoreUpTo_I_J(j) - (ti1(j)==UP ? extendGapPenalty : openGapPenalty);
                 val bestIfGapInsertedInJ = bestScoreUpTo_I_J(j-1) - (ti(j-1)==LEFT ? extendGapPenalty : openGapPenalty);     
-                val winner = maxOrZero(scoreUsingLatestIJ, bestIfGapInsertedInI, bestIfGapInsertedInJ);
+                val direction = maxOrZero(scoreUsingLatestIJ, bestIfGapInsertedInI, bestIfGapInsertedInJ);
+                ti(j) = direction;
+                var winner:Int = 0;
+                switch (direction) {
+                case DIAGONAL: winner = scoreUsingLatestIJ; break;
+                case UP:       winner = bestIfGapInsertedInI; break;
+                case LEFT:     winner = bestIfGapInsertedInJ;
+                }
                 previousBestScore = bestScoreUpTo_I_J(j);
                 bestScoreUpTo_I_J(j) = winner;
-                if (winner == 0)                         ti(j) = STOP;
-                else if (winner == scoreUsingLatestIJ)   ti(j) = DIAGONAL;
-                else if (winner == bestIfGapInsertedInI) ti(j) = UP;
-                else                                     ti(j) = LEFT;
                 if (winner > winningScore) {
                     winningScore = winner;
                     shortLast = i;
@@ -203,10 +206,10 @@ final class SW {
     }
 
     @Inline static def maxOrZero(a:Int, b:Int, c:Int) {
-        if (a > b) {
-            if (a > c) return a > 0 ? a : 0; else return c > 0 ? c : 0;
+        if (a >= b) {
+            if (a >= c) return a > 0 ? DIAGONAL : STOP; else return c > 0 ? LEFT : STOP;
         } else {
-            if (b > c) return b > 0 ? b : 0; else return c > 0 ? c : 0;
+            if (b >= c) return b > 0 ? UP : STOP; else return c > 0 ? LEFT : STOP;
         }
     }
 
