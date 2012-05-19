@@ -98,8 +98,8 @@ struct Result(
 }
 
 final class SW {
-    val STOP = 1y, LEFT = 2y, DIAGONAL = 3y, UP = 4y;
-    val GAP = '-'.ord() as Byte, A = 'A'.ord() as Byte;
+    static STOP = 1y, LEFT = 2y, DIAGONAL = 3y, UP = 4y;
+    static GAP = '-'.ord() as Byte, A = 'A'.ord() as Byte;
 
     val params:Parameters;
     val short:Rail[Byte];
@@ -145,14 +145,19 @@ final class SW {
         val openGapPenalty = params.openGapPenalty;
         val shortSize = params.shortLength;
 
+        val short = short;
+        val long = long;
+        val tracebackMoves = tracebackMoves;
+        val localSize = localSize;
+
         for (var i:Int=0; i<=shortSize; i++) tracebackMoves(i)(0) = STOP;
         for (var j:Int=0; j<=localSize; j++) tracebackMoves(0)(j) = STOP;
 
         val bestScoreUpTo_I_J = new Rail[Int](localSize + 1);
 
-        winningScore = -1;
-        shortLast = -1;
-        longLast = -1;
+        var winningScore:Int = -1;
+        var shortLast:Int = -1;
+        var longLast:Int = -1;
 
         for (var i:Int=1; i<=shortSize; i++) {
             var previousBestScore:Int = 0;
@@ -176,6 +181,9 @@ final class SW {
                 }
             }
         }
+        this.winningScore = winningScore;
+        this.shortLast = shortLast;
+        this.longLast = longLast;
         if (verbose) Console.OUT.println("place=" + placeId + " score=" + winningScore + " short=" + shortLast + " long=" + (first+longLast));
         reduce(plh, parentId, placeId, winningScore);
     }
