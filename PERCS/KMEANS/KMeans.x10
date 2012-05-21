@@ -19,11 +19,13 @@ final class Random {
 }
 
 final class KMeans {
+    static def sub(str:String, start:Int, end:Int) = str.substring(start, Math.min(end, str.length()));
+
     static def printClusters(clusters:Rail[Float], dims:Int) {
         for (var d:Int=0; d<dims; ++d) { 
             for (var k:Int=0; k<clusters.size/dims; ++k) { 
                 if (k>0) Console.OUT.print(" ");
-                Console.OUT.print(clusters(k*dims+d));
+                Console.OUT.print(sub(clusters(k*dims+d).toString(), 0, 6));
             }
             Console.OUT.println();
         }
@@ -51,45 +53,51 @@ final class KMeans {
             val role = Runtime.hereInt();
             val random = new Random(role);
             val host_points = new Rail[Float](num_slice_points*dim, (Int)=>random.next());
-            val host_nearest = new Rail[Float](num_slice_points);
 
-            val host_clusters  = new Rail[Float](num_clusters*dim);
-            for (var k:Int=0; k<num_clusters; ++k) {
-                for (var d:Int=0; d<dim; ++d) {
-                    host_clusters(k*dim+d) = host_points(k+d*num_slice_points);
+            val host_clusters = new Rail[Float](num_clusters*dim);
+            val host_cluster_counts = new Rail[Int](num_clusters);
+
+            val team = Team.WORLD;
+
+            if (role == 0) {
+                for (var k:Int=0; k<num_clusters; ++k) {
+                    for (var d:Int=0; d<dim; ++d) {
+                        host_clusters(k*dim+d) = host_points(k+d*num_slice_points);
+                    }
                 }
             }
-            val host_cluster_counts = new Rail[Int](num_clusters);
 
             val old_clusters = new Rail[Float](num_clusters*dim);
 
             var compute_time:Long = 0;
             var comm_time:Long = 0;
 
-            val team = Team.WORLD;
-            team.barrier(role);
+            team.allreduce(role, host_clusters, 0, host_clusters, 0, host_clusters.size, Team.ADD);
 
             val start_time = System.nanoTime();
 
             for (var iter:Int=0; iter<iterations; ++iter) {
 
-                Array.copy(host_clusters, 0, old_clusters, 0, host_clusters.size);
-                host_clusters.fill(0);
-                host_cluster_counts.fill(0);
+                Array.copy(host_clusters, old_clusters);
+                host_clusters.clear();
+                host_cluster_counts.clear();
 
                 val compute_start = System.nanoTime();
                 for (var p:Int=0; p<num_slice_points; p+=8) {
                     val closest = Vec.make[Int](8);
                     val closest_dist = Vec.make[Float](8);
                     for (var w:Int=0; w<8; ++w) closest(w) = -1;
-                    for (var w:Int=0; w<8; ++w) closest_dist(w) = Float.MAX_VALUE;
+                    for (var w:Int=0; w<8; ++w) closest_dist(w) = 1e37f;
                     for (var k:Int=0; k<num_clusters; ++k) {
                         val dist = Vec.make[Float](8);
                         for (var w:Int=0; w<8; ++w) dist(w) = 0.0f;
                         for (var d:Int=0; d<dim; ++d) {
+                            val tmp = Vec.make[Float](8);
                             for (var w:Int=0; w<8; ++w) {
-                                val tmp = host_points(p+w+d*num_slice_points) - old_clusters(k*dim+d);
-                                dist(w) = dist(w) + tmp * tmp;
+                                tmp(w) = host_points(p+w+d*num_slice_points) - old_clusters(k*dim+d);
+                            }
+                            for (var w:Int=0; w<8; ++w) {
+                                dist(w) = dist(w) + tmp(w) * tmp(w);
                             }
                         }
                         for (var w:Int=0; w<8; ++w) {
@@ -126,7 +134,7 @@ final class KMeans {
 
             val stop_time = System.nanoTime();
 
-            Console.OUT.println("Place: " + role + " computation time: "+compute_time/1E9 +
+            if (role == 0) Console.OUT.println("Place: " + role + " computation time: "+compute_time/1E9 +
                     " communication time: " + comm_time/1E9);
 
             team.barrier(role);
