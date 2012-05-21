@@ -42,16 +42,18 @@ final class Parameters {
     val shortLength:Int;
     val longLength:Int;
     val seed:Int;
+    val stride:Int;
 
     val overlap:Int;
     val segmentCount:Int;
     val baseSegmentLength:Int;
     val shortfall:Int;
 
-    def this(shortLength:Int, longLength:Int, seed:Int) {
+    def this(shortLength:Int, longLength:Int, seed:Int, stride:Int) {
         this.shortLength = shortLength;
         this.longLength = longLength;
         this.seed = seed;
+        this.stride = stride;
 
         for (var i:Int=0; i<alphabetSize;i++) {
             for (var j:Int=0; j<alphabetSize;j++) {
@@ -69,7 +71,7 @@ final class Parameters {
         baseSegmentLength = overlap + (longLength-overlap)/segmentCount;
         shortfall = (longLength-overlap) % segmentCount;
 
-        Console.OUT.println("places: " + segmentCount + "/" + Place.MAX_PLACES + " short: " + shortLength + " long: " + longLength + " seed: " + seed);
+        Console.OUT.println("places: " + segmentCount + "/" + Place.MAX_PLACES + " short: " + shortLength + " long: " + longLength + " seed: " + seed + " stride: " + stride + " overlap: " + overlap);
     }
 }
 
@@ -259,18 +261,18 @@ final class SW {
         }
     }
 
-    def loop(plh:PlaceLocalHandle[SW], stride:Int, verbose:Boolean) {
+    def loop(plh:PlaceLocalHandle[SW], verbose:Boolean) {
         val id = placeId;
-        val m = Math.min(id+stride, params.segmentCount);
+        val m = Math.min(id+params.stride, params.segmentCount);
         @Pragma(Pragma.FINISH_HERE) finish for (var i:Int=id; i<m; i++) {
             at (Place(i)) async plh().run(plh, id, verbose);
         }
         reduce(plh, 0, bestPlace, bestScore);
     }
 
-    def score(plh:PlaceLocalHandle[SW], stride:Int, verbose:Boolean) {
-        @Pragma(Pragma.FINISH_HERE) finish for (var i:Int=0; i<params.segmentCount; i+=stride) {
-            at (Place(i)) async plh().loop(plh, stride, verbose);
+    def score(plh:PlaceLocalHandle[SW], verbose:Boolean) {
+        @Pragma(Pragma.FINISH_HERE) finish for (var i:Int=0; i<params.segmentCount; i+=params.stride) {
+            at (Place(i)) async plh().loop(plh, verbose);
         }
         return bestPlace;
     }
@@ -279,6 +281,12 @@ final class SW {
 
     static def printTime(title:String, time:Long) {
         Console.OUT.println(title + sub("" + (time/1e9), 0, 6) + "s");
+    }
+
+    public static def sqrt(var p:Int) {
+        var r:Int = p;
+        while (p > 1) { p = p>>2; r = r>>1; }
+        return r;
     }
 
     public static def main(args:Array[String](1)){here==Place.FIRST_PLACE} {
@@ -290,11 +298,12 @@ final class SW {
         val shortLength = Int.parseInt(args(0));
         val longLength = Int.parseInt(args(1));
         val seed = args.size>2 ? Int.parseInt(args(2)) : 1;
-        val iterations = args.size>3 ? Int.parseInt(args(3)) : 1;
-        val stride = args.size>4 ? Int.parseInt(args(4)) : 4;
+        val iterations = args.size>3 ? Int.parseInt(args(3)) : 5;
+        val s = args.size>4 ? Int.parseInt(args(4)) : 0;
+        val stride = s==0 ? sqrt(Place.MAX_PLACES) : s;
         val verbose = args.size>5 ? Boolean.parseBoolean(args(5)) : false;
         val verify = args.size>6 ? Boolean.parseBoolean(args(6)) : false;
-        val params = new Parameters(shortLength, longLength, seed);
+        val params = new Parameters(shortLength, longLength, seed, stride);
 
         var t:Long = System.nanoTime();
         val plh = PlaceLocalHandle.makeFlat[SW](new MyPlaceGroup(params.segmentCount), ()=>new SW(params, verbose));
@@ -303,7 +312,7 @@ final class SW {
         for (var k:Int=0; k<iterations; k++) {
             val v = verbose && (k==0);
             t = System.nanoTime();
-            val p = plh().score(plh, stride, v);
+            val p = plh().score(plh, v);
             printTime("Score: ", System.nanoTime()-t);
             t = System.nanoTime();
             val r = at (Place(p)) plh().trace(verify);
