@@ -1,0 +1,6 @@
+XLSMPOPTS=startproc=0:stride=128 OMP_NUM_THREADS=1  ./stream-native
+XLSMPOPTS=startproc=0:stride=64  OMP_NUM_THREADS=2  ./stream-native
+XLSMPOPTS=startproc=0:stride=32  OMP_NUM_THREADS=4  ./stream-native
+XLSMPOPTS=startproc=0:stride=16  OMP_NUM_THREADS=8  ./stream-native
+XLSMPOPTS=startproc=0:stride=8   OMP_NUM_THREADS=16 ./stream-native
+XLSMPOPTS=startproc=0:stride=4   OMP_NUM_THREADS=32 ./stream-native
