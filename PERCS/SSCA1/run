@@ -1,0 +1,13 @@
+./ssca1 4000 163840000 -procs 4096
+./ssca1 4000  81920000 -procs 2048
+./ssca1 4000  40960000 -procs 1024
+./ssca1 4000  20480000 -procs 512
+./ssca1 4000  10240000 -procs 256
+./ssca1 4000   5120000 -procs 128
+./ssca1 4000   2560000 -procs 64
+./ssca1 4000   1280000 -procs 32
+./ssca1 4000    640000 -procs 16
+./ssca1 4000    320000 -procs 8
+./ssca1 4000    160000 -procs 4
+./ssca1 4000     80000 -procs 2
+./ssca1 4000     40000 -procs 1

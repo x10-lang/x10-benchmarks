@@ -1,0 +1,2 @@
+x10c++ -x10rt pami -O -NO_CHECKS -STATIC_CHECKS KMeans.x10 -o kmeans
+mpCC -qinline -qhot -O3 -q64 -qarch=auto -qtune=auto KMeansNative.cc -o KMeansNative
