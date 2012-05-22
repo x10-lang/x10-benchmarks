@@ -44,7 +44,7 @@ final class KMeans {
         val dim = opts("-d", 3);
         val verbose = opts("-v");
 
-        Console.OUT.println("points: " + num_global_points + " clusters: " + num_clusters +
+        Console.OUT.println("places: " + Place.MAX_PLACES + " points: " + num_global_points + " clusters: " + num_clusters +
                 " dimensions: " + dim + " iterations: " + iterations);
 
         val num_slice_points = num_global_points / Place.MAX_PLACES;
@@ -134,7 +134,7 @@ final class KMeans {
 
             val stop_time = System.nanoTime();
 
-            if (role == 0) Console.OUT.println("Place: " + role + " computation time: "+compute_time/1E9 +
+            if (role == 0) Console.OUT.println("place: " + role + " computation time: "+compute_time/1E9 +
                     " communication time: " + comm_time/1E9);
 
             team.barrier(role);

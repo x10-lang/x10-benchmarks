@@ -1,7 +1,6 @@
-import x10.util.Timer;
 import x10.util.Team;
 
-public class FSSimpleDist {
+public class Stream {
 
     static MEG = 1024*1024;
     static alpha = 3.0D;
@@ -68,7 +67,7 @@ public class FSSimpleDist {
         printStats(N, min, verified());
     }
 
-    static def now():double = Timer.nanoTime() * 1e-9;
+    static def now():double = System.nanoTime() * 1e-9;
 
     static def printStats(N:long, time:double, verified:boolean) {
         val size = (3*8*N/MEG);
