@@ -73,7 +73,6 @@ class FT {
     }
 
     def bytwiddle(sign:Int) {
-        twiddle_timer -= System.nanoTime();
         val W_N = 2.0 * Math.PI / N;
         for (var i:Int=0; i<nRows; ++i) {
             for (var j:Int=0; j<SQRTN; ++j) {
@@ -87,7 +86,6 @@ class FT {
                 A(idx+1) = ai*c-ar*s;
             }
         }
-        twiddle_timer += System.nanoTime();
     }
 
     def check() {
@@ -113,8 +111,6 @@ class FT {
         val n0 = Place.MAX_PLACES;
         val n1 = nRows;
         val n2 = SQRTN;
-        val chunkSize = 2 * nRows * nRows; 
-        val dstIndex = I * chunkSize;
         val FFTE_NBLK = 16;
 
         for (var k:Int = 0; k < n0; ++k) {
@@ -131,9 +127,10 @@ class FT {
                 }
             }
         }
-        alltoall_timer -= System.nanoTime();
-        Team.WORLD.alltoall(I, B, 0, C, 0, chunkSize);
-        alltoall_timer += System.nanoTime();
+    }
+
+    def alltoall() {
+        Team.WORLD.alltoall(I, B, 0, C, 0, 2 * nRows * nRows);
     }
 
     def scatter() {
@@ -160,20 +157,28 @@ class FT {
     static def format(t:Long) = (t as Double) * 1.0e-9;
 
     def compute(fwd:Boolean, N:Long) {
-        val timers = new Rail[Long](7);
-        timers(0)=System.nanoTime(); transpose(); scatter();
-        timers(1)=System.nanoTime(); rowFFTS(fwd);
-        timers(2)=System.nanoTime(); transpose(); scatter();
-        timers(3)=System.nanoTime(); bytwiddle(fwd ? 1 : -1);
-        timers(4)=System.nanoTime(); rowFFTS(fwd);
-        timers(5)=System.nanoTime(); transpose(); scatter();
-        timers(6)=System.nanoTime(); 
+        val timers = new Rail[Long](12);
+        timers(0)=System.nanoTime(); transpose();
+        timers(1)=System.nanoTime(); alltoall();
+        timers(2)=System.nanoTime(); scatter();
+        timers(3)=System.nanoTime(); rowFFTS(fwd);
+        timers(4)=System.nanoTime(); transpose();
+        timers(5)=System.nanoTime(); alltoall();
+        timers(6)=System.nanoTime(); scatter();
+        timers(7)=System.nanoTime(); bytwiddle(fwd ? 1 : -1);
+        timers(8)=System.nanoTime(); rowFFTS(fwd);
+        timers(9)=System.nanoTime(); transpose();
+        timers(10)=System.nanoTime(); alltoall();
+        timers(11)=System.nanoTime(); scatter();
+        timers(12)=System.nanoTime(); 
 
         // Output
-        val secs = format(timers(6) - timers(0));
+        val secs = format(timers(12) - timers(0));
         val Gigaflops = 1.0e-9*N*5*Math.log(N as double)/Math.log(2.0)/secs;
         if (I == 0) Console.OUT.println("execution time=" + secs + " secs" + " Gigaflops=" + Gigaflops);
-        val steps = ["transpose1", "row_ffts1", "transpose2", "twiddle", "row_ffts2", "transpose3"];
+        val steps = ["transpose1", "alltoall1 ", "scatter1  ", "row_ffts1 ",
+                "transpose2", "alltoall2 ", "scatter2  ", "twiddle   ", "row_ffts2 ",
+                "transpose3", "alltoall3 ", "scatter3  "];
         if (I == 0) for (var i:Int = 0; i < steps.size; ++i) {
             Console.OUT.println("Step " + steps(i) + " took " + format(timers(i+1) - timers(i)) + " s");
         }
@@ -190,8 +195,6 @@ class FT {
         // FFT
         if (I == 0) Console.OUT.println("Start FFT");
         var secs:Double = compute(true, N);
-        if (I == 0) Console.OUT.println("alltoall: " + format(alltoall_timer) + " s");
-        if (I == 0) Console.OUT.println("twiddle: " + format(twiddle_timer) + " s");
         if (I == 0) Console.OUT.println("FFT complete");
 
         // Reverse FFT
