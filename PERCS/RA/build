@@ -1,0 +1,1 @@
+x10c++ -x10rt pami -O -NO_CHECKS -STATIC_CHECKS RandomAccess.x10 -o ra
