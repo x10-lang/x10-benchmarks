@@ -44,8 +44,6 @@ class FT {
     val verify:Boolean;
     val fftwPlan:Long;
     val fftwInversePlan:Long;
-    var alltoall_timer:Long = 0;
-    var twiddle_timer:Long = 0;
 
     def this(nRows:Int, localSize:Int, N:Long, SQRTN:Int, verify:Boolean) {
         I = Runtime.hereInt();
