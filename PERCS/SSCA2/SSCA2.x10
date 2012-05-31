@@ -18,11 +18,11 @@ public final class SSCA2(N:Int) {
         this.verbose = verbose;
     }
 
-    static def make(rmat:Rmat, verbose:Int) {
+    static def make(rmat:Rmat, permute:Int, verbose:Int) {
         val graph = rmat.generate();
         graph.compress();
         val s = new SSCA2(graph, verbose);
-        s.permuteVertices();
+        if (permute > 0) s.permuteVertices();
         return s;
     }
 
@@ -129,11 +129,11 @@ public final class SSCA2(N:Int) {
         } // All vertices from(startVertex, endVertex)
 
         if(verbose > 0) {
-            Console.OUT.println("[" + here.id + ":" + Runtime.workerId() + "] "
-                + " Alloc= " + allocTime/1e9
-                + " Reset= " + resetTime/1e9
-                + " Proc= " + processingTime/1e9
-                + " Count= " + count);
+            Console.OUT.println("[" + here.id + "]"
+                + " Alloc = " + allocTime/1e9
+                + " Reset = " + resetTime/1e9
+                + " Proc = " + processingTime/1e9
+                + " Count = " + count);
         }
     }
 
@@ -169,8 +169,8 @@ public final class SSCA2(N:Int) {
             Team.ADD); // Operation to be performed.
 
         if(verbose > 0) {
-            Console.OUT.println("[" + here.id +  "] " 
-                + " Global merge time= " +((globalMergeTime+System.nanoTime())/1e9));
+            Console.OUT.println("[" + here.id +  "]"
+                + " Global merge time = " +((globalMergeTime+System.nanoTime())/1e9));
         }
     }
 
@@ -180,7 +180,7 @@ public final class SSCA2(N:Int) {
     private def printBetweennessMap() {
         for(var i:Int=0; i<N; ++i) {
             if(betweennessMap(i) != 0.0) {
-                Console.OUT.println("(" + i + ") ->" + betweennessMap(i));
+                Console.OUT.println("(" + i + ") -> " + betweennessMap(i));
             }
         }
     }
@@ -188,10 +188,10 @@ public final class SSCA2(N:Int) {
     /**
      * Calls betweeness, prints out the statistics and what not.
      */
-    private static def crunchNumbers(rmat:Rmat, verbose:Int) {
+    private static def crunchNumbers(rmat:Rmat, permute:Int, verbose:Int) {
         var time:Long = System.nanoTime();
 
-        val plh = PlaceLocalHandle.makeFlat[SSCA2](Dist.makeUnique(), ()=>SSCA2.make(rmat, verbose));
+        val plh = PlaceLocalHandle.makeFlat[SSCA2](Dist.makeUnique(), ()=>SSCA2.make(rmat, permute, verbose));
 
         val distTime = (System.nanoTime()-time)/1e9;
         time = System.nanoTime();
@@ -233,6 +233,7 @@ public final class SSCA2(N:Int) {
             Option("b", "", "Probability b"),
             Option("c", "", "Probability c"),
             Option("d", "", "Probability d"),
+            Option("p", "", "Permutation"),
             Option("v", "", "Verbose")]);
 
         val seed:Long = cmdLineParams("-s", 2);
@@ -241,6 +242,7 @@ public final class SSCA2(N:Int) {
         val b:Double = cmdLineParams("-b", 0.1);
         val c:Double = cmdLineParams("-c", 0.1);
         val d:Double = cmdLineParams("-d", 0.25);
+        val permute:Int = cmdLineParams("-p", 1); // on by default
         val verbose:Int = cmdLineParams("-v", 0); // off by default
 
         Console.OUT.println("Running SSCA2 with the following parameters:");
@@ -252,6 +254,6 @@ public final class SSCA2(N:Int) {
         Console.OUT.println("d = " + d);
         Console.OUT.println("places = " + Place.MAX_PLACES);
 
-        crunchNumbers(Rmat(seed, n, a, b, c, d), verbose);
+        crunchNumbers(Rmat(seed, n, a, b, c, d), permute, verbose);
     }
 }
