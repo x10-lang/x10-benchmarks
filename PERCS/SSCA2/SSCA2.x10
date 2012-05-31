@@ -168,7 +168,7 @@ public final class SSCA2(N:Int) {
             N, // Number of elements.
             Team.ADD); // Operation to be performed.
 
-        if(verbose > 0) {
+        if(verbose > 1) {
             Console.OUT.println("[" + here.id +  "]"
                 + " Global merge time = " +((globalMergeTime+System.nanoTime())/1e9));
         }
@@ -217,9 +217,10 @@ public final class SSCA2(N:Int) {
         val procTime = time/1E9;
         val totalTime = distTime + procTime;
         val procPct = procTime*100.0/totalTime;
-        Console.OUT.println("Betweenness calculation took time=" + totalTime + " s(proc: " + procPct  +  "%).");
 
-        if(verbose > 1) plh().printBetweennessMap();
+        if(verbose > 2) plh().printBetweennessMap();
+
+        Console.OUT.println("Places: " + max + "  N: " + N + "  Setup: " + distTime + "s  Processing: " + procTime + "s  Total: " + totalTime + "s  (proc: " + procPct  +  "%).");
     }
 
     /**
