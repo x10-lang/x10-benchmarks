@@ -33,13 +33,13 @@ public final class SSCA2(N:Int) {
      * betweenness for all the vertices based on this calculation.
      */
     public def bfsShortestPaths(val startVertex:Int, val endVertex:Int) {
-        var allocTime:Long= System.nanoTime();
+        var allocTime:Long = System.nanoTime();
         // Per-thread structure --- initialize once.
         val myBetweennessMap = new Rail[Double](N, 0.0 as Double);
 
         // These are the per-vertex data structures.
         val vertexStack = new FixedRailStack[Int](N);
-        val predecessorMap= new Rail[FixedRailStack[Int]](N, (i:Int)=>new FixedRailStack[Int](graph.getInDegree(i)));
+        val predecessorMap = new Rail[FixedRailStack[Int]](N, (i:Int)=>new FixedRailStack[Int](graph.getInDegree(i)));
         val distanceMap = new Rail[Long](N, Long.MAX_VALUE);
         val sigmaMap = new Rail[Long](N, 0L);
         val regularQueue = new FixedRailQueue[Int](N);
@@ -47,114 +47,113 @@ public final class SSCA2(N:Int) {
         val processedVerticesStack = new FixedRailStack[Int](N);
         var count:Int = 0;
 
-        allocTime =(System.nanoTime() - allocTime);
+        allocTime = System.nanoTime() - allocTime;
 
         var processingTime:Long = 0;
         var resetTime:Long = 0;
+
         // Iterate over each of the vertices in my portion.
-    for(var vertexIndex:Int=startVertex; vertexIndex<endVertex; ++vertexIndex) { 
-      val s:Int = this.verticesToWorkOn(vertexIndex);
-      
-      // Reset the values of those vertices that were touched in the previous
-      // iteration. This might save some computation.
+        for(var vertexIndex:Int=startVertex; vertexIndex<endVertex; ++vertexIndex) { 
+            val s:Int = this.verticesToWorkOn(vertexIndex);
 
-      // 1. Clear the vertexStack and the priorityQueue --- O(1) operation.
-      val resetCounter:Long = System.nanoTime();
-      vertexStack.clear();
-      regularQueue.clear();
+            // Reset the values of those vertices that were touched in the previous
+            // iteration. This might save some computation.
 
-      // 2. Pop off the processedVerticesStack and reset their values.
-      while(!(processedVerticesStack.isEmpty())) {
-        val processedVertex = processedVerticesStack.pop();
-        predecessorMap(processedVertex).clear();
-        distanceMap(processedVertex) = Long.MAX_VALUE;
-        sigmaMap(processedVertex) = 0 as Long;
-        deltaMap(processedVertex) = 0.0 as Double;
-      }
+            // 1. Clear the vertexStack and the priorityQueue --- O(1) operation.
+            val resetCounter:Long = System.nanoTime();
+            vertexStack.clear();
+            regularQueue.clear();
 
-      resetTime +=(System.nanoTime() - resetCounter);
-      
-      val processingCounter:Long = System.nanoTime();
-      // Put the values for source vertex
-      distanceMap(s)=0 as Long;
-      sigmaMap(s)=1 as Long;
-      regularQueue.push(s);
-     
-     
-      // Loop until there are no elements left in the priority queue
-      while(!regularQueue.isEmpty()) {
-        count++;
-        // Pop the node with the least distance
-        val v = regularQueue.pop();
-        vertexStack.push(v);
-        processedVerticesStack.push(v);
+            // 2. Pop off the processedVerticesStack and reset their values.
+            while(!(processedVerticesStack.isEmpty())) {
+                val processedVertex = processedVerticesStack.pop();
+                predecessorMap(processedVertex).clear();
+                distanceMap(processedVertex) = Long.MAX_VALUE;
+                sigmaMap(processedVertex) = 0L;
+                deltaMap(processedVertex) = 0.0;
+            }
 
-        // Get the start and the end points for the edge list for "v"
-        val edgeStart:Int = graph.begin(v);
-        val edgeEnd:Int = graph.end(v);
-        
-        // Iterate over all its neighbors
-        for(var wIndex:Int=edgeStart; wIndex<edgeEnd; ++wIndex) {
-          // Get the target of the current edge and its weight.
-          val w:Int = graph.getAdjacentVertexFromIndex(wIndex);
-          val distanceThroughV:Long = distanceMap(v) + 1 as Long;
+            resetTime += System.nanoTime() - resetCounter;
 
-          // In BFS, the minimum distance will only be found once --- the 
-          // first time that a node is discovered. So, add it to the queue.
-          if(distanceMap(w)==Long.MAX_VALUE) {
-            regularQueue.push(w);
-            distanceMap(w) = distanceThroughV;
-          }
+            val processingCounter:Long = System.nanoTime();
 
-          // If the distance through "v" for "w" from "s" was the same as its 
-          // current distance, we found another shortest path. So, add 
-          // "v" to predecessorMap of "w" and update other maps.
-          if(distanceThroughV == distanceMap(w)) {
-            sigmaMap(w) = sigmaMap(w) + sigmaMap(v);// XTENLANG-2027
-            predecessorMap(w).push(v);
-          }
+            // Put the values for source vertex
+            distanceMap(s) = 0L;
+            sigmaMap(s) = 1L;
+            regularQueue.push(s);
+
+            // Loop until there are no elements left in the priority queue
+            while(!regularQueue.isEmpty()) {
+                count++;
+                // Pop the node with the least distance
+                val v = regularQueue.pop();
+                vertexStack.push(v);
+                processedVerticesStack.push(v);
+
+                // Get the start and the end points for the edge list for "v"
+                val edgeStart:Int = graph.begin(v);
+                val edgeEnd:Int = graph.end(v);
+
+                // Iterate over all its neighbors
+                for(var wIndex:Int=edgeStart; wIndex<edgeEnd; ++wIndex) {
+                    // Get the target of the current edge.
+                    val w:Int = graph.getAdjacentVertexFromIndex(wIndex);
+                    val distanceThroughV:Long = distanceMap(v) + 1L;
+ 
+                    // In BFS, the minimum distance will only be found once --- the 
+                    // first time that a node is discovered. So, add it to the queue.
+                    if(distanceMap(w) == Long.MAX_VALUE) {
+                        regularQueue.push(w);
+                        distanceMap(w) = distanceThroughV;
+                    }
+
+                    // If the distance through "v" for "w" from "s" was the same as its 
+                    // current distance, we found another shortest path. So, add 
+                    // "v" to predecessorMap of "w" and update other maps.
+                    if(distanceThroughV == distanceMap(w)) {
+                        sigmaMap(w) = sigmaMap(w) + sigmaMap(v);// XTENLANG-2027
+                        predecessorMap(w).push(v);
+                    }
+                }
+            } // while priorityQueue not empty
+
+            // Return vertices in order of non-increasing distances from "s"
+            while(!vertexStack.isEmpty()) {
+                val w = vertexStack.pop();
+                while(!(predecessorMap(w).isEmpty())) {
+                    val v = predecessorMap(w).pop();
+                    deltaMap(v) += (sigmaMap(v) as Double/sigmaMap(w) as Double)*(1.0 + deltaMap(w));
+                }
+
+                // Accumulate updates locally 
+                if(w != s) myBetweennessMap(w) += deltaMap(w); 
+
+            } // vertexStack not empty
+            processingTime += System.nanoTime() - processingCounter;
+        } // All vertices from(startVertex, endVertex)
+
+        // update shared state at the place once, atomically.
+        var localMergeTime:Long = System.nanoTime();
+        for(var i:Int=0; i<N; i++) {
+            val result = myBetweennessMap(i);
+            if(result != 0.0) {
+                val lock = betweennessMapLocks(i);
+                lock.lock();
+                betweennessMap(i) += result;
+                lock.unlock();
+            }
         }
-      } // while priorityQueue not empty
-      
-      // Return vertices in order of non-increasing distances from "s"
-      while(!vertexStack.isEmpty()) {
-        val w = vertexStack.pop();
-        while(!(predecessorMap(w).isEmpty())) {
-          val v = predecessorMap(w).pop();
-          deltaMap(v) +=(sigmaMap(v) as Double/sigmaMap(w) as Double)*
-         (1 + deltaMap(w));
-        }
-     
-        // Accumulate updates locally 
-        if(w != s) myBetweennessMap(w) += deltaMap(w); 
-       
-      } // vertexStack not empty
-      processingTime  +=(System.nanoTime() - processingCounter);
-    } // All vertices from(startVertex, endVertex)
+        localMergeTime = System.nanoTime() - localMergeTime;
 
-    // update shared state at the place once, atomically.
-    var localMergeTime:Long = System.nanoTime();
-    for(var i:Int=0; i < N; i++) {
-      val result = myBetweennessMap(i);
-      if(result != 0.0D) {
-        val lock = betweennessMapLocks(i);
-        lock.lock();
-        betweennessMap(i) += result;
-        lock.unlock();
-      }
-    } 
-    localMergeTime =(System.nanoTime() - localMergeTime);
-    
-    if(verbose > 0) {
-      Console.OUT.println("[" + here.id + ":" + Runtime.workerId() + "] "
-          + " Alloc= " + allocTime/1e9
-          + " Reset= " + resetTime/1e9
-          + " Proc= " + processingTime/1e9
-          + " Merge= " + localMergeTime/1e9
-          + " Count= " + count
-      );
+        if(verbose > 0) {
+            Console.OUT.println("[" + here.id + ":" + Runtime.workerId() + "] "
+                + " Alloc= " + allocTime/1e9
+                + " Reset= " + resetTime/1e9
+                + " Proc= " + processingTime/1e9
+                + " Merge= " + localMergeTime/1e9
+                + " Count= " + count);
+        }
     }
-  }
 
     /**
      * A function to shuffle the vertices randomly to give better work dist.
@@ -177,7 +176,7 @@ public final class SSCA2(N:Int) {
         val num = last - first as Long;
         val max = Runtime.NTHREADS;
 
-        finish {
+        @Pragma(Pragma.FINISH_LOCAL) finish {
             for(var i:Int=0; i<max; ++i) {
                 val ii = i;
                 async {
