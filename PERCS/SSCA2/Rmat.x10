@@ -1,14 +1,11 @@
 import x10.util.Random;
-import x10.util.HashMap;
-import x10.util.ArrayList;
 
 /**
  * A class that emulates the recursive-matrix graph from the paper:
- * "R-MAT: A Recursive Model for Graph Mining" by Chakrabarti et al..
+ * "R-MAT: A Recursive Model for Graph Mining" by Chakrabarti et al.
  * 
  * This code is based on the MATLAB sample code that was given along 
- * with the SSCA2 benchmarks. For working MATLAB code, please refer to
- * "rmat.m" file in the current directory.
+ * with the SSCA2 benchmarks.
  * 
  * The R-MAT generator takes in 6 parameters as input (via the constructor).
  * The values passed to these arguments ultimately decide the shape and the 
@@ -23,7 +20,7 @@ public struct Rmat {
 	private val b:Double; // the graph. A detailed description of the 
 	private val c:Double; // parameters is out of scope here. Briefly,
 	private val d:Double; // (a+b+c+d == 1) and typically a>=b, a>= c, a>=d.
-	
+
 	public def this (seed:Long,
 			n:Int,
 			a:Double,
@@ -38,14 +35,14 @@ public struct Rmat {
 		this.c = c;
 		this.d = d;
 	}
-	
+
 	/**
 	 *  A function that mimics the MATLAB function rand (M,1). It generates a 
 	 *  vector of M random numbers. Here, numElements is M!
 	 */
 	private def rand(rng:Random, numElements:Int) =
 		new Rail[Double](numElements, (Int)=>rng.nextDouble());
-	
+
 	/**
 	 * A function that mimics the use of > operator in MATLAB when the LHS is 
 	 * a vector and the RHS either a scalar value or a vector. Basically, the 
@@ -54,7 +51,7 @@ public struct Rmat {
 	 */
 	private def greaterThan(lhs:Rail[Double], rhs:Double) =
 		new Rail[Int](lhs.size, (i:Int)=>(lhs(i) > rhs) ? 1 : 0);
-	
+
 	/**
 	 * The same function as above, only with a element-wise comparison in the RHS
 	 * instead of a comparison with a scalar value. So, there is a 1 in the 
@@ -62,7 +59,7 @@ public struct Rmat {
 	 */
 	private def greaterThan(lhs:Rail[Double], rhs:Rail[Double]) =
 		new Rail[Int](lhs.size, (i:Int)=>(lhs(i) > rhs(i)) ? 1 : 0);
-	
+
 	/**
 	 * Multiple a vector with a scalar. There is, however, one catch. When the 
 	 * flip bit is turned on, the vector (LHS) is manipulated such that its either 
@@ -71,33 +68,27 @@ public struct Rmat {
 	 */
 	private def multiply(lhs:Rail[Int], multiplier:Double, flip:Boolean) =
 		new Rail[Double](lhs.size, (i:Int)=>multiplier*(flip ? ((lhs(i) > 0) ? 0 : 1) : lhs(i)));
-	
+
 	/**
 	 * A straightforward vector-scalar multiplication
 	 */
 	private def multiply(lhs:Rail[Int], multiplier:Int) =
 		new Rail[Int](lhs.size, (i:Int)=>lhs(i)*multiplier);
-	
+
 	/**
 	 * A straightforward addition of two vectors.
 	 */
 	private def add(lhs:Rail[Double], rhs:Rail[Double]) = 
 		new Rail[Double](lhs.size, (i:Int)=>lhs(i)+rhs(i));
-	
+
 	/**
 	 * Same as above, but with a different type
 	 */
 	private def add(lhs:Rail[Int], rhs:Rail[Int]) =
 		new Rail[Int](lhs.size, (i:Int)=>lhs(i)+rhs(i));
-	
-	
+
 	/**
 	 * This function mimics the behavior of the MATLAB function sparse(i,j,s).
-	 * Basically, we are given two vectors. The LHS vector stands for the row 
-	 * indices, and is hence called "row". Similarly, the RHS vector contains 
-	 * the column indices. By default, the edge weight of an edge is considered
-	 * to be 1. However, if the (row,col) values repeat, you add 1 to the edge 
-	 * weight --- this is a way to deal with duplicate edges.
 	 */
 	private def sparse(row:Rail[Int], col:Rail[Int]):Graph {
 		val adjacencyGraph:Graph = new Graph(N);
