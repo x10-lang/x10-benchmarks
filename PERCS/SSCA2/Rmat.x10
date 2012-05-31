@@ -90,7 +90,7 @@ public struct Rmat {
 	/**
 	 * This function mimics the behavior of the MATLAB function sparse(i,j,s).
 	 */
-	private def sparse(row:Rail[Int], col:Rail[Int]):Graph {
+	private def sparse(row:Rail[Int], col:Rail[Int]) {
 		val adjacencyGraph:Graph = new Graph(N);
 		for (var i:Int=0; i<row.size; ++i) adjacencyGraph.addEdge(row(i), col(i));
 		return adjacencyGraph;

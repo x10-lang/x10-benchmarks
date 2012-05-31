@@ -69,7 +69,7 @@ public final class Graph {
      * iterating over all the edges over all the vertices and populating the 
      * offsetMap and the adjacencyMap.
      */
-    public def compressGraph() { 
+    public def compress() { 
         // The graph may be compressed already --- don't do anything in this case.
         if(adjacencyMap != null) return;
 
