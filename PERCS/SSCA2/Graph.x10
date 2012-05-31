@@ -27,7 +27,7 @@ public final class Graph {
     }
 
     /** Get the adjacent node from index */
-    public def getAdjacentVertexFromIndex(wIndex:Int) {
+    @x10.compiler.Inline public def getAdjacentVertexFromIndex(wIndex:Int) {
         assert(adjacencyMap != null);
         return adjacencyMap(wIndex);
     }
@@ -37,7 +37,7 @@ public final class Graph {
      * notation of the graph. This means that the compression must represent
      * the graph in the CSR format.
      */
-    public def begin(v:Int) {
+    @x10.compiler.Inline public def begin(v:Int) {
         assert(adjacencyMap != null);
         assert(v < N);
         return offsetMap(v);
@@ -48,7 +48,7 @@ public final class Graph {
      * vertex's neighbor list end. The iteration space is therefore
      * [begin, end).
      */
-    public def end(v:Int) {
+    @x10.compiler.Inline public def end(v:Int) {
         assert(adjacencyMap != null);
         assert(v < N);
         return offsetMap(v+1);

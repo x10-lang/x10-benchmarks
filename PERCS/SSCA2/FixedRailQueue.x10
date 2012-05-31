@@ -6,7 +6,7 @@ import x10.util.IndexedMemoryChunk;
  * of an ArrayList --- so it should be considerably faster. We only work 
  * with sizes that are a power of two.
  */
-public class FixedRailQueue[T] {
+public final class FixedRailQueue[T] {
   private val internalStorage:IndexedMemoryChunk[T];
   private var N:Int;
   private var head:Int;
@@ -33,10 +33,10 @@ public class FixedRailQueue[T] {
   public def size() = this.size;
 
   /** Check if the stack is empty */
-  public def isEmpty() = this.size==0;
+  @x10.compiler.Inline public def isEmpty() = this.size==0;
     
   /** Add the element to the front of the queue. */
-  public def push(v:T) {
+  @x10.compiler.Inline public def push(v:T) {
     // check that we are not going to overflow.
     assert ((this.size+1) < this.N);
 
@@ -51,7 +51,7 @@ public class FixedRailQueue[T] {
   }
   
   /** Remove and return the top element of the stack. */
-  public def pop():T {
+  @x10.compiler.Inline public def pop():T {
     // check that we have something in the stack
     assert ((this.size) > 0); 
 

@@ -5,7 +5,7 @@ import x10.util.IndexedMemoryChunk;
  * of the stack and that holds all the time. This also uses a IMC instead
  * of an ArrayList --- so it should be considerably faster.
  */
-public class FixedRailStack[T] {
+public final class FixedRailStack[T] {
   private val internalStorage:IndexedMemoryChunk[T];
   private var size:Int;
 
@@ -19,10 +19,10 @@ public class FixedRailStack[T] {
   public def size() = this.size;
 
   /** Check if the stack is empty */
-  public def isEmpty() = this.size==0;
+  @x10.compiler.Inline public def isEmpty() = this.size==0;
     
   /** Add the element to the top of the stack. */
-  public def push(v:T) {
+  @x10.compiler.Inline public def push(v:T) {
     // check that we are not going to blow the stack.
     assert (this.size < this.internalStorage.length());
 
@@ -32,7 +32,7 @@ public class FixedRailStack[T] {
   }
   
   /** Remove and return the top element of the stack. */
-  public def pop():T {
+  @x10.compiler.Inline public def pop():T {
     // check that we have something in the stack
     assert (this.size > 0); 
 
