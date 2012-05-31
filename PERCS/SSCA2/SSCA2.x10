@@ -63,7 +63,7 @@ public final class SSCA2(N:Int) {
             // 2. Pop off the processedVerticesStack and reset their values.
             while(!(processedVerticesStack.isEmpty())) {
                 val processedVertex = processedVerticesStack.pop();
-                predecessorMap(processedVertex).clear();
+//                predecessorMap(processedVertex).clear();
                 distanceMap(processedVertex) = Long.MAX_VALUE;
                 sigmaMap(processedVertex) = 0L;
                 deltaMap(processedVertex) = 0.0;
