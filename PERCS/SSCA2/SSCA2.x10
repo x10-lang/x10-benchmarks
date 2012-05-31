@@ -49,14 +49,7 @@ public final class SSCA2(N:Int) {
 
         // Iterate over each of the vertices in my portion.
         for(var vertexIndex:Int=startVertex; vertexIndex<endVertex; ++vertexIndex) { 
-            val s:Int = this.verticesToWorkOn(vertexIndex);
-
-            // Reset the values of those vertices that were touched in the previous
-            // iteration. This might save some computation.
-
-            // 1. Clear the vertexStack and the priorityQueue --- O(1) operation.
-            vertexStack.clear();
-            regularQueue.clear();
+            val s:Int = verticesToWorkOn(vertexIndex);
 
             val processingCounter:Long = System.nanoTime();
 
@@ -134,7 +127,7 @@ public final class SSCA2(N:Int) {
         for(var i:Int=0; i<N; i++) {
             val indexToPick = prng.nextInt(N-i);
             val v = verticesToWorkOn(i);
-            verticesToWorkOn(i) = this.verticesToWorkOn(i+indexToPick);
+            verticesToWorkOn(i) = verticesToWorkOn(i+indexToPick);
             verticesToWorkOn(i+indexToPick) = v;
         }
     }
