@@ -40,7 +40,6 @@ public final class SSCA2(N:Int) {
         val sigmaMap = new Rail[Long](N);
         val regularQueue = new FixedRailQueue[Int](N);
         val deltaMap = new Rail[Double](N);
-        val processedVerticesStack = new FixedRailStack[Int](N);
         var count:Int = 0;
 
         allocTime = System.nanoTime() - allocTime;
@@ -56,20 +55,8 @@ public final class SSCA2(N:Int) {
             // iteration. This might save some computation.
 
             // 1. Clear the vertexStack and the priorityQueue --- O(1) operation.
-            val resetCounter:Long = System.nanoTime();
             vertexStack.clear();
             regularQueue.clear();
-
-            // 2. Pop off the processedVerticesStack and reset their values.
-            while(!(processedVerticesStack.isEmpty())) {
-                val processedVertex = processedVerticesStack.pop();
-//                predecessorMap(processedVertex).clear();
-                distanceMap(processedVertex) = Long.MAX_VALUE;
-                sigmaMap(processedVertex) = 0L;
-                deltaMap(processedVertex) = 0.0;
-            }
-
-            resetTime += System.nanoTime() - resetCounter;
 
             val processingCounter:Long = System.nanoTime();
 
@@ -84,7 +71,6 @@ public final class SSCA2(N:Int) {
                 // Pop the node with the least distance
                 val v = regularQueue.pop();
                 vertexStack.push(v);
-                processedVerticesStack.push(v);
 
                 // Get the start and the end points for the edge list for "v"
                 val edgeStart:Int = graph.begin(v);
@@ -123,6 +109,9 @@ public final class SSCA2(N:Int) {
 
                 // Accumulate updates locally 
                 if(w != s) betweennessMap(w) += deltaMap(w); 
+                distanceMap(w) = Long.MAX_VALUE;
+                sigmaMap(w) = 0L;
+                deltaMap(w) = 0.0;
 
             } // vertexStack not empty
             processingTime += System.nanoTime() - processingCounter;
@@ -131,7 +120,6 @@ public final class SSCA2(N:Int) {
         if(verbose > 0) {
             Console.OUT.println("[" + here.id + "]"
                 + " Alloc = " + allocTime/1e9
-                + " Reset = " + resetTime/1e9
                 + " Proc = " + processingTime/1e9
                 + " Count = " + count);
         }
