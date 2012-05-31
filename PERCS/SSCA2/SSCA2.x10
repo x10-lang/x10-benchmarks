@@ -9,8 +9,7 @@ public final class SSCA2(N:Int) {
     val graph:Graph;
     val verbose:Int;
     val verticesToWorkOn = new Rail[Int](N, (i:Int)=>i);
-    val betweennessMap = new Rail[Double](N, 0.0);
-    val betweennessMapLocks = new Rail[Lock](N, (Int)=>new Lock());
+    val betweennessMap = new Rail[Double](N);
 
     // Constructor
     public def this(graph:Graph, verbose:Int) {
@@ -34,16 +33,13 @@ public final class SSCA2(N:Int) {
      */
     public def bfsShortestPaths(val startVertex:Int, val endVertex:Int) {
         var allocTime:Long = System.nanoTime();
-        // Per-thread structure --- initialize once.
-        val myBetweennessMap = new Rail[Double](N, 0.0 as Double);
-
         // These are the per-vertex data structures.
         val vertexStack = new FixedRailStack[Int](N);
         val predecessorMap = new Rail[FixedRailStack[Int]](N, (i:Int)=>new FixedRailStack[Int](graph.getInDegree(i)));
         val distanceMap = new Rail[Long](N, Long.MAX_VALUE);
-        val sigmaMap = new Rail[Long](N, 0L);
+        val sigmaMap = new Rail[Long](N);
         val regularQueue = new FixedRailQueue[Int](N);
-        val deltaMap = new Rail[Double](N, 0.0 as Double);
+        val deltaMap = new Rail[Double](N);
         val processedVerticesStack = new FixedRailStack[Int](N);
         var count:Int = 0;
 
@@ -126,31 +122,17 @@ public final class SSCA2(N:Int) {
                 }
 
                 // Accumulate updates locally 
-                if(w != s) myBetweennessMap(w) += deltaMap(w); 
+                if(w != s) betweennessMap(w) += deltaMap(w); 
 
             } // vertexStack not empty
             processingTime += System.nanoTime() - processingCounter;
         } // All vertices from(startVertex, endVertex)
-
-        // update shared state at the place once, atomically.
-        var localMergeTime:Long = System.nanoTime();
-        for(var i:Int=0; i<N; i++) {
-            val result = myBetweennessMap(i);
-            if(result != 0.0) {
-                val lock = betweennessMapLocks(i);
-                lock.lock();
-                betweennessMap(i) += result;
-                lock.unlock();
-            }
-        }
-        localMergeTime = System.nanoTime() - localMergeTime;
 
         if(verbose > 0) {
             Console.OUT.println("[" + here.id + ":" + Runtime.workerId() + "] "
                 + " Alloc= " + allocTime/1e9
                 + " Reset= " + resetTime/1e9
                 + " Proc= " + processingTime/1e9
-                + " Merge= " + localMergeTime/1e9
                 + " Count= " + count);
         }
     }
@@ -173,17 +155,7 @@ public final class SSCA2(N:Int) {
      * Place local version of crunchNumbers.
      */
     private def crunchNumbersLocally(first:Int, last:Int) {
-        val num = last - first as Long;
-        val max = Runtime.NTHREADS;
-
-        @Pragma(Pragma.FINISH_LOCAL) finish {
-            for(var i:Int=0; i<max; ++i) {
-                val ii = i;
-                async {
-                    bfsShortestPaths(first + (num*ii/max) as Int, first + (num*(ii+1)/max) as Int);
-                }
-            }
-        }
+        bfsShortestPaths(first, last);
 
         // Merge the results in this place with the results in other places.
         val globalMergeTime:Long = -System.nanoTime();
@@ -278,10 +250,7 @@ public final class SSCA2(N:Int) {
         Console.OUT.println("b = " + b);
         Console.OUT.println("c = " + c);
         Console.OUT.println("d = " + d);
-        Console.OUT.println("" + Place.MAX_PLACES + " place" 
-            + (Place.MAX_PLACES > 1 ? "s" : "")
-            + " and " + Runtime.NTHREADS + " worker" 
-            + (Runtime.NTHREADS > 1 ? "s" : "") + "/place");
+        Console.OUT.println("places = " + Place.MAX_PLACES);
 
         crunchNumbers(Rmat(seed, n, a, b, c, d), verbose);
     }
