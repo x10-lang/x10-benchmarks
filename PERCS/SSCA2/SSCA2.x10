@@ -7,12 +7,10 @@ import x10.util.Team;
 import x10.util.concurrent.Lock;
 
 public final class SSCA2(N:Int) {
-  static val Meg = (1000*1000);
-
   val graph:Graph;
   val debug:Int;
   val verticesToWorkOn=new Rail[Int] (N, (i:Int)=>i);
-  val betweennessMap=new Rail[Double] (N, (Int)=> 0.0D);
+  val betweennessMap=new Rail[Double] (N, 0.0);
   val betweennessMapLocks = new Rail[Lock](N, (Int)=> new Lock());
   
   // Constructor
@@ -21,8 +19,6 @@ public final class SSCA2(N:Int) {
     this.graph=g;
     this.debug=debug;
   }
-
-  private def graph()=graph;
 
   // A comparator which orders the vertices by their distances.
   private static val makeNonIncreasingComparator = 
@@ -254,7 +250,7 @@ public final class SSCA2(N:Int) {
     val distTime = (System.nanoTime()-time)/1e9;
     time = System.nanoTime();
     
-    val myGraph = brandesHandles().graph();
+    val myGraph = brandesHandles().graph;
     val N= myGraph.numVertices();
     val M= myGraph.numEdges();
     Console.OUT.println ("Graph details: N=" + N + ", M=" + M);
