@@ -1,94 +1,52 @@
 import x10.util.IndexedMemoryChunk;
 
 /**
- * An implementation of the stack that allows us to set the initial size 
- * of the stack and that holds all the time. This also uses a Rail instead
- * of an ArrayList --- so it should be considerably faster. We only work 
- * with sizes that are a power of two.
+ * An implementation of a queue.
  */
 public final class FixedRailQueue[T] {
   private val internalStorage:IndexedMemoryChunk[T];
   private var N:Int;
   private var head:Int;
   private var tail:Int;
-  private var size:Int;
 
-  /** return the power of 2 that is greater than N by the least */
-  private def getNearestPowerOf2 (N:Int) {
-    var newN:Int = 0x1;
-    while (newN < N) newN = newN << 1;
-    return newN;
-  }
-
-  /** Construct a fixed size stack */
+  /** Construct a fixed size queue */
   public def this(N:Int) { 
-    this.N = this.getNearestPowerOf2 (N);
-    this.internalStorage = IndexedMemoryChunk.allocateZeroed[T] (this.N);
+    this.N = N;
+    this.internalStorage = IndexedMemoryChunk.allocateZeroed[T] (N);
     this.head=0;
     this.tail=0;
-    this.size=0;
   }
 
-  /** Return the size of the stack */
-  public def size() = this.size;
-
-  /** Check if the stack is empty */
-  @x10.compiler.Inline public def isEmpty() = this.size==0;
+  /** Check if the queue is empty */
+  @x10.compiler.Inline public def isEmpty() = this.head==this.tail;
     
   /** Add the element to the front of the queue. */
   @x10.compiler.Inline public def push(v:T) {
-    // check that we are not going to overflow.
-    assert ((this.size+1) < this.N);
-
     // Add the element and increase the size
-    this.internalStorage(this.tail) = v;
-
-    // Increment the size
-    ++this.size;
-    
-    // addition modulo N.
-    this.tail = (this.tail+1) & (this.N-1); 
+    this.internalStorage(this.tail++) = v;
   }
   
-  /** Remove and return the top element of the stack. */
+  /** Remove and return one element of the queue if FIFO order. */
   @x10.compiler.Inline public def pop():T {
-    // check that we have something in the stack
-    assert ((this.size) > 0); 
-
     // Remove the first element from the queue.
-    val poppedElement = this.internalStorage(this.head);
-
-    // Decrement the size
-    --this.size;
-    
-    // addition modulo N.
-    this.head = (this.head+1) & (this.N-1); 
-
-    return poppedElement;
+    return this.internalStorage(this.head++);
   }
   
-  /** Return, but do not remove, the top element of the stack. */
-  public def peek() {
-    // check that we have something in the stack
-    assert ((this.size) > 0); 
-
-    // Return the position at head.
-    return this.internalStorage(this.head);
+  /** Remove and return one element of the queue in LIFO order. */
+  @x10.compiler.Inline public def top():T {
+    return this.internalStorage(--this.tail);
   }
 
-  /** Clear everything, but retain the size  */
-  public def clear() { 
-    this.size=0;
+  /** Rewind. */
+  @x10.compiler.Inline public def rewind() {
     this.head=0;
-    this.tail=0;
   }
 
   /** Output the contents of the queue in the order they are stored */
   public def print () {
     Console.OUT.print ("[");
-    for (var i:Int=0; i<this.size; ++i) {
-      val index:Int = (i+this.head) & (this.N-1);
-      Console.OUT.print (((i==0)?"":",") + this.internalStorage(index));
+    for (var i:Int=this.head; i<this.tail; ++i) {
+      Console.OUT.print (((i==this.head)?"":",") + this.internalStorage(i));
     }
     Console.OUT.println ("]");
   }

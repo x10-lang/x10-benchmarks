@@ -34,7 +34,6 @@ public final class SSCA2(N:Int) {
     public def bfsShortestPaths(val startVertex:Int, val endVertex:Int) {
         var allocTime:Long = System.nanoTime();
         // These are the per-vertex data structures.
-        val vertexStack = new FixedRailStack[Int](N);
         val predecessorMap = new Rail[FixedRailStack[Int]](N, (i:Int)=>new FixedRailStack[Int](graph.getInDegree(i)));
         val distanceMap = new Rail[Long](N, Long.MAX_VALUE);
         val sigmaMap = new Rail[Long](N);
@@ -63,7 +62,6 @@ public final class SSCA2(N:Int) {
                 count++;
                 // Pop the node with the least distance
                 val v = regularQueue.pop();
-                vertexStack.push(v);
 
                 // Get the start and the end points for the edge list for "v"
                 val edgeStart:Int = graph.begin(v);
@@ -92,9 +90,11 @@ public final class SSCA2(N:Int) {
                 }
             } // while priorityQueue not empty
 
+            regularQueue.rewind();
+
             // Return vertices in order of non-increasing distances from "s"
-            while(!vertexStack.isEmpty()) {
-                val w = vertexStack.pop();
+            while(!regularQueue.isEmpty()) {
+                val w = regularQueue.top();
                 while(!(predecessorMap(w).isEmpty())) {
                     val v = predecessorMap(w).pop();
                     deltaMap(v) += (sigmaMap(v) as Double/sigmaMap(w) as Double)*(1.0 + deltaMap(w));
