@@ -34,7 +34,8 @@ public final class SSCA2(N:Int) {
     public def bfsShortestPaths(val startVertex:Int, val endVertex:Int) {
         var allocTime:Long = System.nanoTime();
         // These are the per-vertex data structures.
-        val predecessorMap = new Rail[FixedRailStack[Int]](N, (i:Int)=>new FixedRailStack[Int](graph.getInDegree(i)));
+        val predecessorMap = new Rail[Int](graph.numEdges());
+        val predecessorCount = new Rail[Int](N);
         val distanceMap = new Rail[Long](N, Long.MAX_VALUE);
         val sigmaMap = new Rail[Long](N);
         val regularQueue = new FixedRailQueue[Int](N);
@@ -85,7 +86,7 @@ public final class SSCA2(N:Int) {
                     // "v" to predecessorMap of "w" and update other maps.
                     if(distanceThroughV == distanceMap(w)) {
                         sigmaMap(w) = sigmaMap(w) + sigmaMap(v);// XTENLANG-2027
-                        predecessorMap(w).push(v);
+                        predecessorMap(graph.rev(w)+predecessorCount(w)++) = v;
                     }
                 }
             } // while priorityQueue not empty
@@ -95,8 +96,9 @@ public final class SSCA2(N:Int) {
             // Return vertices in order of non-increasing distances from "s"
             while(!regularQueue.isEmpty()) {
                 val w = regularQueue.top();
-                while(!(predecessorMap(w).isEmpty())) {
-                    val v = predecessorMap(w).pop();
+                val rev = graph.rev(w);
+                while(predecessorCount(w) > 0) {
+                    val v = predecessorMap(rev+--predecessorCount(w));
                     deltaMap(v) += (sigmaMap(v) as Double/sigmaMap(w) as Double)*(1.0 + deltaMap(w));
                 }
 

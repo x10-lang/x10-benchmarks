@@ -11,6 +11,8 @@ public final class Graph {
     /** The edgelist of a vertex is stored as offsetMap[i] to offsetmap[i+1] */
     private val offsetMap:Rail[Int];
 
+    private val reverseOffsetMap:Rail[Int];
+
     /** This just contains a series of edges that are indexed by offsetMap */
     private var adjacencyMap:Rail[Int];
 
@@ -22,6 +24,7 @@ public final class Graph {
         this.M = 0;
         this.inDegreeMap = new Rail[Int](N);
         this.offsetMap = new Rail[Int](N+1);
+        this.reverseOffsetMap = new Rail[Int](N);
         this.adjacencyList = new Rail[ArrayList[Int]](N, (Int)=>new ArrayList[Int]());
         this.adjacencyMap = null;
     }
@@ -52,6 +55,12 @@ public final class Graph {
         assert(adjacencyMap != null);
         assert(v < N);
         return offsetMap(v+1);
+    }
+
+    @x10.compiler.Inline public def rev(v:Int) {
+        assert(adjacencyMap != null);
+        assert(v < N);
+        return reverseOffsetMap(v);
     }
 
     /** Return the number of vertices in the graph */
@@ -88,8 +97,15 @@ public final class Graph {
             }
         }
 
+        var offset:Int = 0;
+        for(var v:Int=0; v<N; ++v) {
+            reverseOffsetMap(v) = offset;
+            offset += inDegreeMap(v);
+        }
+
         // assert that we have included every edge.
         assert(currentOffset == M);
+        assert(offset == M);
 
         // set the offset of the sentinel
         offsetMap(N) = currentOffset;
