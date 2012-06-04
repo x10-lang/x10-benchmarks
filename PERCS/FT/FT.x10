@@ -155,7 +155,7 @@ class FT {
     static def format(t:Long) = (t as Double) * 1.0e-9;
 
     def compute(fwd:Boolean, N:Long) {
-        val timers = new Rail[Long](12);
+        val timers = new Rail[Long](13);
         timers(0)=System.nanoTime(); transpose();
         timers(1)=System.nanoTime(); alltoall();
         timers(2)=System.nanoTime(); scatter();
