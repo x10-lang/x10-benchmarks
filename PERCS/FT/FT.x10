@@ -33,8 +33,8 @@ class FT {
     @Native("c++", "create_plan(#1, #2, #3)")
     native static def create_plan(SQRTN:Int, direction:Int, flags:Int):Long;
 
-    val A:Rail[Double];
-    val B:Rail[Double];
+    var A:Rail[Double];
+    var B:Rail[Double];
     val D:Rail[Double];
     val I:Int;
     val nRows:Int;
@@ -65,7 +65,7 @@ class FT {
     }
 
     def rowFFTS(fwd:Boolean) {
-        execute_plan(fwd?fftwPlan:fftwInversePlan, B, A, SQRTN, 0, nRows);
+        execute_plan(fwd?fftwPlan:fftwInversePlan, A, B, SQRTN, 0, nRows);
     }
 
     def bytwiddle(sign:Int) {
@@ -78,8 +78,8 @@ class FT {
                 val ij = (I*nRows+i)*j;
                 val c = Math.cos(W_N*ij);
                 val s = Math.sin(W_N*ij)*sign;
-                B(idx) = ar*c+ai*s;
-                B(idx+1) = ai*c-ar*s;
+                A(idx) = ar*c+ai*s;
+                A(idx+1) = ai*c-ar*s;
             }
         }
     }
@@ -125,34 +125,11 @@ class FT {
         }
     }
 
-    def transposeB() {
-    	val n0 = Place.MAX_PLACES;
-    	val n1 = nRows;
-    	val n2 = SQRTN;
-    	val FFTE_NBLK = 16;
-
-    	for (var k:Int = 0; k < n0; ++k) {
-    		for (var ii:Int = 0; ii < n1; ii += FFTE_NBLK) {
-    			for (var jj:Int = k * nRows; jj < (k+1) * nRows; jj += FFTE_NBLK) {
-    				val tmin1 = ii + FFTE_NBLK < n1 ? ii + FFTE_NBLK : n1;
-    				for (var i:Int = ii; i < tmin1; ++i) {
-    					val tmin2 = jj + FFTE_NBLK < n2 ? jj + FFTE_NBLK : n2;
-    					for (var j:Int = jj; j < tmin2; ++j) {
-    						A(2*(n1 * j + i)) = B(2*(n2 * i + j));
-    						A(2*(n1 * j + i)+1) = B(2*(n2 * i + j)+1);
-    					}
-    				}
-    			}
-    		}
-    	}
-    }
-
     def alltoall() {
-        Team.WORLD.alltoall(I, A, 0, B, 0, 2 * nRows * nRows);
-    }
-
-    def alltoallB() {
-    	Team.WORLD.alltoall(I, B, 0, A, 0, 2 * nRows * nRows);
+        Team.WORLD.alltoall(I, B, 0, A, 0, 2 * nRows * nRows);
+        val C = B;
+        B = A;
+        A = C;
     }
 
     def scatter() {
@@ -167,52 +144,31 @@ class FT {
                     for (var i:Int = ii; i < tmin1; ++i) {
                         val tmin2 = jj + FFTE_NBLK < n2 ? jj + FFTE_NBLK : n2;
                         for (var j:Int = jj; j < tmin2; ++j) {
-                            B(2*(k * n2 * n1 + j + i * n2)) = A(2*(i * n2 * n2 + k * n2 + j));
-                            B(2*(k * n2 * n1 + j + i * n2)+1) = A(2*(i * n2 * n2 + k * n2 + j)+1);
+                            A(2*(k * n2 * n1 + j + i * n2)) = B(2*(i * n2 * n2 + k * n2 + j));
+                            A(2*(k * n2 * n1 + j + i * n2)+1) = B(2*(i * n2 * n2 + k * n2 + j)+1);
                         }
                     }
                 }
             }
         }
-   }
-
-    def scatterB() {
-    	val n1 = Place.MAX_PLACES;
-    	val n2 = nRows;
-    	val FFTE_NBLK = 16;
-
-    	for (var k:Int = 0; k < n2; ++k) {
-    		for (var ii:Int = 0; ii < n1; ii += FFTE_NBLK) {
-    			for (var jj:Int = 0; jj < n2; jj += FFTE_NBLK) {
-    				val tmin1 = ii + FFTE_NBLK < n1 ? ii + FFTE_NBLK : n1;
-    				for (var i:Int = ii; i < tmin1; ++i) {
-    					val tmin2 = jj + FFTE_NBLK < n2 ? jj + FFTE_NBLK : n2;
-    					for (var j:Int = jj; j < tmin2; ++j) {
-    						A(2*(k * n2 * n1 + j + i * n2)) = B(2*(i * n2 * n2 + k * n2 + j));
-    						A(2*(k * n2 * n1 + j + i * n2)+1) = B(2*(i * n2 * n2 + k * n2 + j)+1);
-    					}
-    				}
-    			}
-    		}
-    	}
     }
 
     static def format(t:Long) = (t as Double) * 1.0e-9;
 
     def compute(fwd:Boolean, N:Long) {
         val timers = new Rail[Long](13);
-        timers(0)=System.nanoTime(); transpose(); // A->B
-        timers(1)=System.nanoTime(); alltoallB(); // B->A
-        timers(2)=System.nanoTime(); scatter(); // A->B
-        timers(3)=System.nanoTime(); rowFFTS(fwd); // B->B
-        timers(4)=System.nanoTime(); transposeB(); // B->A
-        timers(5)=System.nanoTime(); alltoall(); // A->B
-        timers(6)=System.nanoTime(); scatterB(); // B->A
-        timers(7)=System.nanoTime(); bytwiddle(fwd ? 1 : -1); // A->B
-        timers(8)=System.nanoTime(); rowFFTS(fwd); // B->B
-        timers(9)=System.nanoTime(); transposeB(); // B->A
-        timers(10)=System.nanoTime(); alltoall(); // A->B
-        timers(11)=System.nanoTime(); scatterB(); // B->A
+        timers(0)=System.nanoTime(); transpose();
+        timers(1)=System.nanoTime(); alltoall();
+        timers(2)=System.nanoTime(); scatter();
+        timers(3)=System.nanoTime(); rowFFTS(fwd);
+        timers(4)=System.nanoTime(); transpose();
+        timers(5)=System.nanoTime(); alltoall();
+        timers(6)=System.nanoTime(); scatter();
+        timers(7)=System.nanoTime(); bytwiddle(fwd ? 1 : -1);
+        timers(8)=System.nanoTime(); rowFFTS(fwd);
+        timers(9)=System.nanoTime(); transpose();
+        timers(10)=System.nanoTime(); alltoall();
+        timers(11)=System.nanoTime(); scatter();
         timers(12)=System.nanoTime(); 
 
         // Output
