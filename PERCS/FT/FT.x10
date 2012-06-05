@@ -35,7 +35,6 @@ class FT {
 
     var A:Rail[Double];
     var B:Rail[Double];
-    val D:Rail[Double];
     val I:Int;
     val nRows:Int;
     val N:Long;
@@ -60,8 +59,6 @@ class FT {
 
         val random = new Random(I);
         for (var i:Int=0; i<localSize; ++i) A(i) = random.next() - 0.5;
-
-        if (verify) D = new Rail[Double](A); else D = null;
     }
 
     def rowFFTS(fwd:Boolean) {
@@ -85,9 +82,11 @@ class FT {
     }
 
     def check() {
+        val random = new Random(I);
         val threshold = 1.0e-15*Math.log(N as double)/Math.log(2.0)*16;
         for (var q:Int=0; q<A.size; ++q) {
-            if (Math.abs(A(q)-D(q)) > threshold) Console.ERR.println("Error at "+q+" "+A(q).toString()+" "+D(q).toString());
+            val expected = random.next() - 0.5;
+            if (Math.abs(A(q)-expected) > threshold) Console.ERR.println("Error at "+q+" "+A(q)+" "+expected);
         }
     }
 
