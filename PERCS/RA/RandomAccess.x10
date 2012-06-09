@@ -1,5 +1,6 @@
-import x10.util.IndexedMemoryChunk;
+import x10.compiler.Pragma;
 import x10.util.Box;
+import x10.util.IndexedMemoryChunk;
 
 class RandomAccess {
 
@@ -32,30 +33,52 @@ class RandomAccess {
         return ran;
     }
 
+    public static def sqrt(var p:Int) {
+        var r:Int = p;
+        while (p > 1) { p = p>>2; r = r>>1; }
+        return r;
+    }
+
     static def runBenchmark(plhimc: PlaceLocalHandle[Box[IndexedMemoryChunk[Long]]{self!=null}],
                             logLocalTableSize: Int, numUpdates: Long) {
         val mask = (1<<logLocalTableSize)-1;
         val local_updates = numUpdates / Place.MAX_PLACES;
-        finish for (p in Place.places()) at (p) async {
-            var ran:Long = HPCC_starts(here.id*(numUpdates/Place.MAX_PLACES));
+
+        val max = Place.MAX_PLACES;
+        val stride = sqrt(max);
+
+        @Pragma(Pragma.FINISH_SPMD) finish {
+            for(var i:Int=0; i<max; i+=stride) {
+                val ii = i;
+                at(Place(ii)) async {
+                    @Pragma(Pragma.FINISH_SPMD) finish {
+                        val m = (max < ii+stride) ? max : (ii+stride);
+                        for(var j:Int=ii; j<m; ++j) {
+                            val jj = j;
+                            at(Place(jj)) async {
+                                val t = System.nanoTime();
+            var ran:Long = HPCC_starts(jj*(numUpdates/Place.MAX_PLACES));
             val imc = plhimc()();
             val size = logLocalTableSize;
             val mask1 = mask;
             val mask2 = Place.MAX_PLACES - 1;
             val poly = POLY;
-            val here_id = here.id;
             val lu = local_updates;
-            for (var i:Long=0 ; i<lu ; i+=1L) {
+            for (var k:Long=0 ; k<lu ; k+=1L) {
                 val place_id = ((ran>>size) as Int) & mask2;
                 val index = (ran as Int) & mask1;
                 val update = ran;
-                if (place_id==here_id) {
+                if (place_id==jj) {
                     imc(index) ^= update;
                 } else {
                     imc.getCongruentSibling(Place(place_id)).remoteXor(index, update);
                 }
                 ran = (ran << 1) ^ (ran<0L ? poly : 0L);
             }
+            
+            val u = System.nanoTime() - t;
+//            Runtime.println("" + jj + " -> " + (u/1e9));
+                            }}}}}
         }
     }
 
@@ -113,8 +136,8 @@ class RandomAccess {
         val numUpdates = updates_*tableSize;
 
         // create congruent array (same address at each place)
-        val plhimc = PlaceLocalHandle.make(Dist.makeUnique(), () => new Box(IndexedMemoryChunk.allocateZeroed[Long](localTableSize, 8, true)) as Box[IndexedMemoryChunk[Long]]{self!=null});
-        finish for (p in Place.places()) at (p) async {
+        val plhimc = PlaceLocalHandle.makeFlat(Dist.makeUnique(), () => new Box(IndexedMemoryChunk.allocateZeroed[Long](localTableSize, 8, true)) as Box[IndexedMemoryChunk[Long]]{self!=null});
+        @Pragma(Pragma.FINISH_SPMD) finish for (p in Place.places()) at (p) async {
             for ([i] in 0..(localTableSize-1)) plhimc()()(i) = i as Long;
         }
 
@@ -140,7 +163,7 @@ class RandomAccess {
 
         // repeat for testing.
         runBenchmark(plhimc, logLocalTableSize, numUpdates);
-        finish for (p in Place.places()) at (p) async {
+        @Pragma(Pragma.FINISH_SPMD) finish for (p in Place.places()) at (p) async {
             var err:Int = 0;
             for ([i] in 0..(localTableSize-1)) 
                 if (plhimc()()(i) != (i as Long)) err++;
