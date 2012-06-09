@@ -118,6 +118,25 @@ public final class SSCA2(N:Int) {
                 + " Proc = " + processingTime/1e9
                 + " Count = " + count);
         }
+
+        // Merge the results in this place with the results in other places.
+        var globalMergeTime:Long = -System.nanoTime();
+
+        Team.WORLD.allreduce(here.id, // My ID.
+                betweennessMap, // Source buffer.
+                0, // Offset into the source buffer.
+                betweennessMap, // Destination buffer.
+                0, // Offset into the destination buffer.
+                N, // Number of elements.
+                Team.ADD); // Operation to be performed.
+
+        globalMergeTime += System.nanoTime();
+
+        if(verbose > 1) {
+            Console.OUT.println("[" + here.id +  "]"
+                + " Merge = " + globalMergeTime/1e9
+                + " Pr/Mr = " + (processingTime+globalMergeTime)/1e9);
+        }
     }
 
     /**
@@ -135,29 +154,6 @@ public final class SSCA2(N:Int) {
     }
 
     /**
-     * Place local version of crunchNumbers.
-     */
-    private def crunchNumbersLocally(first:Int, last:Int) {
-        bfsShortestPaths(first, last);
-
-        // Merge the results in this place with the results in other places.
-        val globalMergeTime:Long = -System.nanoTime();
-
-        Team.WORLD.allreduce(here.id, // My ID.
-            betweennessMap, // Source buffer.
-            0, // Offset into the source buffer.
-            betweennessMap, // Destination buffer.
-            0, // Offset into the destination buffer.
-            N, // Number of elements.
-            Team.ADD); // Operation to be performed.
-
-        if(verbose > 1) {
-            Console.OUT.println("[" + here.id +  "]"
-                + " Global merge time = " +((globalMergeTime+System.nanoTime())/1e9));
-        }
-    }
-
-    /**
      * Dump the betweenness map.
      */
     private def printBetweennessMap() {
@@ -166,6 +162,12 @@ public final class SSCA2(N:Int) {
                 Console.OUT.println("(" + i + ") -> " + betweennessMap(i));
             }
         }
+    }
+
+    public static def sqrt(var p:Int) {
+        var r:Int = p;
+        while (p > 1) { p = p>>2; r = r>>1; }
+        return r;
     }
 
     /**
@@ -185,13 +187,22 @@ public final class SSCA2(N:Int) {
         Console.OUT.println("Graph details: N=" + N + ", M=" + M);
 
         val max = Place.MAX_PLACES;
+        val stride = sqrt(max);
 
         // Loop over all the places and crunch the numbers.
         @Pragma(Pragma.FINISH_SPMD) finish {
-            for(var i:Int=0; i<max; ++i) {
+            for(var i:Int=0; i<max; i+=stride) {
                 val ii = i;
                 at(Place(ii)) async {
-                    plh().crunchNumbersLocally((N as Long*ii/max) as Int, (N as Long*(ii+1)/max) as Int);
+                     @Pragma(Pragma.FINISH_SPMD) finish {
+                        val m = (max < ii+stride) ? max : (ii+stride);
+                        for(var j:Int=ii; j<m; ++j) {
+                            val jj = j;
+                            at(Place(jj)) async {
+                                plh().bfsShortestPaths((N as Long*jj/max) as Int, (N as Long*(jj+1)/max) as Int);
+                            }
+                        }
+                    }
                 }
             }
         }
