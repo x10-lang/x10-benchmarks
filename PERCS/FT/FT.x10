@@ -177,8 +177,13 @@ class FT {
         val steps = ["transpose1", "alltoall1 ", "scatter1  ", "row_ffts1 ",
                 "transpose2", "alltoall2 ", "scatter2  ", "twiddle   ", "row_ffts2 ",
                 "transpose3", "alltoall3 ", "scatter3  "];
-        if (I == 0) for (var i:Int = 0; i < steps.size; ++i) {
-            Console.OUT.println("Step " + steps(i) + " took " + format(timers(i+1) - timers(i)) + " s");
+        if (I == 0) {
+            for (var i:Int = 0; i < steps.size; ++i) {
+                Console.OUT.println("Step " + steps(i) + " took " + format(timers(i+1) - timers(i)) + " s");
+            }
+            val v = timers(12)-timers(11) + timers(10)-timers(6) + timers(5)-timers(2) + timers(1)-timers(0);
+            Console.OUT.println("Computation time: " + format(v) + "s of total time: "
+                    + secs + "s (" + (100*format(v)/secs) + "%)");
         }
 
         return secs;
