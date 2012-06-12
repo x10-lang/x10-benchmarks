@@ -16,15 +16,6 @@ class LU {
 
     @NativeCPPExtern
         native static def blockMulSubRow(me:Rail[Double], diag:Rail[Double], B:Int, j:Int, cond:boolean):void;
-    
-    /*
-    static def runAt(id:Int, c:()=>void) {
-         x10.lang.Runtime.runClosureAt(id, c);
-         x10.lang.Runtime.dealloc(c);
-    }
-    */
-
-    static unique = Dist.makeUnique();
 
     val M:Int;
     val N:Int;
@@ -209,7 +200,9 @@ class LU {
             for (var cj:Int = A_U.min_y; cj <= A_U.max_y; cj += py) {
                 val block = A_here.hasBlock(J, cj) ? A_U.block(J, cj).raw : colBuffers(cj/py);
                 timer.start(11);
+                timer.start(15);
                 col.bcast(colRole, J%px, block, 0, block, 0, block.size);
+                timer.stop(15);
                 timer.stop(11);
             }
         }
@@ -221,7 +214,9 @@ class LU {
             for (var ci:Int = A_L.min_x; ci <= A_L.max_x; ci += px) {
                 val block = A_here.hasBlock(ci, J) ? A_L.block(ci, J).raw : rowBuffers(ci/px);
                 timer.start(10);
+                timer.start(14);
                 row.bcast(rowRole, J%py, block, 0, block, 0, block.size);
+                timer.stop(14);
                 timer.stop(10);
             }
         }
@@ -244,26 +239,21 @@ class LU {
     }
 
     def solve(timer:Timer) {
-        progressInc:Int = 2;
-        var nextJ:Int = progressInc;
-
-        computeRowSum(); Team.WORLD.barrier(here.id);
+        timer.start(13); computeRowSum(); Team.WORLD.barrier(here.id); timer.stop(13);
 
         timer.start(9);
 
         for (var J:Int = 0; J < NB; J++){
-            timer.start(1); panel(J, timer);            Team.WORLD.barrier(here.id); timer.stop(1);
-            timer.start(2); swapRows(J, timer);         Team.WORLD.barrier(here.id); timer.stop(2);
-            timer.start(3); triSolve(J, timer);         Team.WORLD.barrier(here.id); timer.stop(3);
+            timer.start(1); panel(J, timer);                   Team.WORLD.barrier(here.id); timer.stop(1);
+            timer.start(2); swapRows(J, timer);                Team.WORLD.barrier(here.id); timer.stop(2);
+            timer.start(3); triSolve(J, timer);                Team.WORLD.barrier(here.id); timer.stop(3);
             timer.start(4); if (J != NB - 1) update(J, timer); Team.WORLD.barrier(here.id); timer.stop(4);
 
             /* Progress meter */
-            if(0 == here.id && J > nextJ) {
+            if(0 == here.id) {
                 timer.stop(9);
-                Console.OUT.println("" + J + " of " + NB + " complete " + 
-                        "last " + progressInc + " iterations took " + 
+                Console.OUT.println("Completed iteration " + J + " of " + NB + " in " + 
                         (timer.total(9) as Double)/1e9 + " seconds");
-                nextJ += progressInc;
                 timer.clear(9);
                 timer.start(9);
             }
@@ -365,9 +355,9 @@ class LU {
 
         var t:Long = -System.nanoTime();
 
-        @Pragma(Pragma.FINISH_ATEACH_UNIQUE) finish ateach (p in unique) {
+        @Pragma(Pragma.FINISH_ATEACH_UNIQUE) finish ateach (p in Dist.makeUnique()) {
             val lu = lus();
-            val timer = new Timer(15);
+            val timer = new Timer(16);
 
             timer.start(0);
 
@@ -380,32 +370,39 @@ class LU {
             if (here.id == 0) {
                 Console.OUT.println ("difference " + r);
                 Console.OUT.println(((r < 0.01?" ok)":" fail ") + " diff=" + r));
-                Console.OUT.println ("Timer(0) TOTAL #invocations=" + timer.count(0) +
-                  " Time=" + (timer.total(0) as Double) / 1e9 + " seconds");
-                Console.OUT.println ("Timer(1) PANEL #invocations=" + timer.count(1) +
+                Console.OUT.println ("Timer(0)  TOTAL         #invocations=" + timer.count(0) +
+                  " Time=" + (timer.total(0) / 1e9) + " seconds");
+                Console.OUT.println ("Timer(1)  PANEL         #invocations=" + timer.count(1) +
                   " Time=" + (timer.total(1) as Double)/1e9 + " seconds");
-                Console.OUT.println ("Timer(2) SWAPROWS #invocations=" + timer.count(2) +
+                Console.OUT.println ("Timer(2)  SWAPROWS      #invocations=" + timer.count(2) +
                   " Time=" + (timer.total(2) as Double)/1e9 + " seconds");
-                Console.OUT.println ("Timer(3) TRISOLVE #invocations=" + timer.count(3) +
+                Console.OUT.println ("Timer(3)  TRISOLVE      #invocations=" + timer.count(3) +
                   " Time=" + (timer.total(3) as Double)/1e9 + " seconds");
-                Console.OUT.println ("Timer(4) UPDATE #invocations=" + timer.count(4) +
+                Console.OUT.println ("Timer(4)  UPDATE        #invocations=" + timer.count(4) +
                   " Time=" + (timer.total(4) as Double)/1e9 + " seconds");
-                Console.OUT.println ("Timer(5) PANEL-PIVOT #invocations=" + timer.count(5) +
+                Console.OUT.println ("Timer(5)  PANEL-PIVOT   #invocations=" + timer.count(5) +
                   " Time=" + (timer.total(5) as Double)/1e9 + " seconds");
-                Console.OUT.println ("Timer(6) PANEL-SWAP #invocations=" + timer.count(6) +
+                Console.OUT.println ("Timer(6)  PANEL-SWAP    #invocations=" + timer.count(6) +
                   " Time=" + (timer.total(6) as Double)/1e9 + " seconds");
-                Console.OUT.println ("Timer(7) PANEL-BCAST #invocations=" + timer.count(7) +
+                Console.OUT.println ("Timer(7)  PANEL-BCAST   #invocations=" + timer.count(7) +
                   " Time=" + (timer.total(7) as Double)/1e9 + " seconds");
-                Console.OUT.println ("Timer(8) PANEL-UPDATE #invocations=" + timer.count(8) +
+                Console.OUT.println ("Timer(8)  PANEL-UPDATE  #invocations=" + timer.count(8) +
                   " Time=" + (timer.total(8) as Double)/1e9 + " seconds");
-                Console.OUT.println ("Timer(10) ROW-BROADCAST # invocations=" + timer.count(10) +
+                Console.OUT.println ("Timer(10) ROW-BROADCAST #invocations=" + timer.count(10) +
                   " Time=" + (timer.total(10) as Double)/1e9 + " seconds");
-                Console.OUT.println ("Timer(11) COL-BROADCAST # invocations=" + timer.count(11) +
+                Console.OUT.println ("Timer(11) COL-BROADCAST #invocations=" + timer.count(11) +
                   " Time=" + (timer.total(11) as Double)/1e9 + " seconds");
-                Console.OUT.println ("Timer(12) DGEMM # invocations=" + timer.count(12) +
+                Console.OUT.println ("Timer(12) DGEMM         #invocations=" + timer.count(12) +
                 		" Time=" + (timer.total(12) as Double)/1e9 + " seconds");
-              } 
+                Console.OUT.println ("Timer(13) ROW-SUM       #invocations=" + timer.count(13) +
+                        " Time=" + (timer.total(13) as Double)/1e9 + " seconds");
+                Console.OUT.println ("Timer(14) UPD-ROW-BCAST #invocations=" + timer.count(14) +
+                        " Time=" + (timer.total(14) as Double)/1e9 + " seconds");
+                Console.OUT.println ("Timer(15) UPD-COL-BCAST #invocations=" + timer.count(15) +
+                        " Time=" + (timer.total(15) as Double)/1e9 + " seconds");
+              }
         }
+
         t += System.nanoTime();
 
         Console.OUT.println();
