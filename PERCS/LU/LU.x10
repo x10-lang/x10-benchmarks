@@ -74,20 +74,22 @@ class LU {
     }
 
     def computeLocalMax(J:Int, LUCol:Int) {
-        var max:Double = 0;
+        var max:Double = -1.0;
         var id:Int = -1;
+        val A_panel_j = A_here.blocks(J, MB, J, J);
+        val c = LUCol - J*B;
 
-        for (var I:Int = J; I <= MB; ++I) if (A_here.hasRow(I)) {
-            val IB = I * B;
-            val b = A_here.block(I, LUCol / B);
-            for (var i:Int = Math.max(IB, LUCol); i < IB + B; i++) {
-                if (Math.abs(b(i, LUCol)) >= Math.abs(max) || id == -1) {
-                    max = b(i, LUCol);
-                    id = i;
+        for (var I:Int = A_panel_j.min_x; I <= A_panel_j.max_x; I += px) {
+            val b = A_here.block(I, J).raw;
+            for (var i:Int = I==J ? c : 0; i < B; i++) {
+                val a = Math.abs(b(i*B+c));
+                if (a > max) {
+                    max = a;
+                    id = I*B+i;
                 }
             }
         }
-        return col.indexOfMax(colRole, Math.abs(max), id);
+        return col.indexOfMax(colRole, max, id);
     }
 
     def exchange(row1:Int, row2:Int, min:Int, max:Int, dest:Int) {
@@ -331,7 +333,7 @@ class LU {
 				at(Place(A_here.placeOfBlock(I, J))) async {
 					Array.asyncCopy(_A().block(I, J).raw, 0, remoteRowBuffer, 0, _B * _B);
 				}
-	    	}
+	    	} 
             return rowBuffer;
         }
     }
