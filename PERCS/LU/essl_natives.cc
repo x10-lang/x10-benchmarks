@@ -28,6 +28,18 @@ void blockTriSolve (double* me,
   
 }
 
+void blockTriSolveDiag (double* diag,
+			      signed int min,
+			      signed int max,
+			      signed int B)
+{
+  double alpha = 1.0;
+  int n = B - max;
+  int p = max - min;
+  dtrsm_("R", "U", "N", "U", &n, &p, &alpha, diag+min*B+min, &B, diag+min*B+max, &B);
+
+}
+
 void blockBackSolve (double* me, 
 			       double* diag, 
 			       signed int B)
@@ -47,6 +59,30 @@ void blockMulSub (double* me,
   dgemm_ ("N", "N", &B, &B, &B, &alpha, upper, &B, left, &B, &beta, me, &B);  
 }
 
+void blockMulSubDiag (double* diag,
+			    signed int min,
+			    signed int max,
+			    signed int B)
+{
+  double alpha = -1.0;
+  double beta = 1.0;
+  int n = B - max;
+  int p = max - min;
+  dgemm_ ("N", "N", &n, &n, &p, &alpha, diag+min*B+max, &B, diag+max*B+min, &B, &beta, diag+max*B+max, &B);
+}
+
+void blockMulSubPanel (double* me,
+			    double* diag,
+			    signed int min,
+			    signed int max,
+			    signed int B)
+{
+  double alpha = -1.0;
+  double beta = 1.0;
+  int n = B - max;
+  int p = max - min;
+  dgemm_ ("N", "N", &n, &B, &p, &alpha, diag+min*B+max, &B, me+min, &B, &beta, me+max, &B);
+}
 
 void blockMulSubRow (double     * me,
 				       double     * diag,

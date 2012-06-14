@@ -9,10 +9,19 @@ class LU {
         native static def blockTriSolve(me:Rail[Double], diag:Rail[Double], B:Int):void;
 
     @NativeCPPExtern
+        native static def blockTriSolveDiag(diag:Rail[Double], min:Int, max:Int, B:Int):void;
+
+    @NativeCPPExtern
         native static def blockBackSolve(me:Rail[Double], diag:Rail[Double], B:Int):void;
 
     @NativeCPPExtern
         native static def blockMulSub(me:Rail[Double], left:Rail[Double], upper:Rail[Double], B:Int):void;
+
+    @NativeCPPExtern
+        native static def blockMulSubDiag(diag:Rail[Double], min:Int, max:Int, B:Int):void;
+
+    @NativeCPPExtern
+        native static def blockMulSubPanel(me:Rail[Double], diag:Rail[Double], min:Int, max:Int, B:Int):void;
 
     @NativeCPPExtern
         native static def blockMulSubRow(me:Rail[Double], diag:Rail[Double], B:Int, j:Int, cond:boolean):void;
@@ -24,6 +33,7 @@ class LU {
     val NB:Int;
     val px:Int;
     val py:Int;
+    val bk:Int;
     val A:PlaceLocalHandle[BlockedArray];
     val A_here:BlockedArray;
     val colRole:Int;
@@ -100,20 +110,25 @@ class LU {
         A_here.setRow(row1, min, max, buffer);
     }
 
+    static def sub(str:String, start:Int, end:Int) = str.substring(start, Math.min(end, str.length()));
+
     def panel(J:Int, timer:Timer) {
         val A_panel_j = A_here.blocks(J, MB, J, J);
         val A_ext_panel_j = A_here.blocks(0, MB, J, J);
         if (!A_ext_panel_j.empty()) {
-            var n:Int = 0;
-            val LUColStart:Int = J * B;
-            for (var LUCol:Int = LUColStart; LUCol<LUColStart + B; LUCol++) {
+          val LUColStart:Int = J * B;
+          val nb = B/bk;
+          for (var K:Int=0; K<nb; K++) {
+            val min = K*bk;
+            val max = min + bk;
+            for (var LUCol:Int = LUColStart + min; LUCol<LUColStart + max; LUCol++) {
                 timer.start(5);
                 val row2:Int = computeLocalMax(J, LUCol);
                 timer.stop(5);
                 timer.start(6);
                 if (A_here.hasBlock(J, J)) {
                     val row1 = LUCol;
-                    pivot(n) = row2;
+                    pivot(LUCol -J*B) = row2;
                     if (row2 != row1) {
                         val dest = A_here.placeOf(row2, LUCol);
                         if (dest == here.id) {
@@ -140,12 +155,55 @@ class LU {
                 if(!A_panel_j.empty()) {
                     timer.start(8);
                     for (var I:Int = A_panel_j.min_x; I <= A_panel_j.max_x; I += px) {
-                        blockMulSubRow(A_here.block(I, J).raw, rowForBroadcast, B, LUCol - J * B, I == J);
+//                        blockMulSubRow(A_here.block(I, J).raw, rowForBroadcast, B, LUCol - J * B, I == J);
+                        val b = A_here.block(I, J).raw;
+                        val j = LUCol - J * B;
+                        if (I == J) {
+                            val div0 = 1.0 / b(j*B+j);
+                            for (var i:int=j+1; i < B; i++)
+                            {
+                                b(i*B+j) *= div0;
+                                for (var k:Int=j+1; k<max; k++) b(i*B+k) -= b(i*B+j)*b(j*B+k);
+                            }
+                        } else {
+                            val div0 = 1.0 / rowForBroadcast(j);
+                            for (var i:Int=0; i < B; i++)
+                            {
+                                b(i*B+j) *= div0;
+                                for (var k:Int=j+1; k<max; k++) b(i*B+k) -= b(i*B+j)*rowForBroadcast(k);
+                            }
+                        }
                     }
                     timer.stop(8);
                 }
-                n++;
             }
+
+            if (A_here.hasBlock(J, J)) {
+                timer.start(8);
+                val diag = A_here.block(J, J).raw;
+                blockTriSolveDiag(diag, min, max, B);
+                timer.stop(8);
+            }
+
+            val block = A_here.hasBlock(J, J) ? A_here.block(J, J).raw : colBuffer;
+            timer.start(7);
+            timer.start(11);
+            col.bcast(colRole, J%px, block, min*B, block, min*B, B*(max-min));
+            timer.stop(11);
+            timer.stop(7);
+            if(!A_panel_j.empty()) {
+                timer.start(8);
+                for (var I:Int = A_panel_j.min_x; I <= A_panel_j.max_x; I += px) {
+                    val diag = A_here.block(I, J).raw;
+                    if (I == J) {
+                        blockMulSubDiag(diag, min, max, B);
+                    } else {
+                        blockMulSubPanel(diag, block, min, max, B);
+                    }
+                }
+                timer.stop(8);
+            }
+          }
         }
     }
     
@@ -278,7 +336,7 @@ class LU {
         }
     }
 
-    def backsolve() {
+    def backsolve(timer:Timer) {
         val A_last_panel = A_here.blocks(0, MB, NB, NB);
         if (!A_last_panel.empty()) {
             for (var I:Int = MB; I >= 0; --I) {
@@ -288,7 +346,9 @@ class LU {
                 var tmp:Rail[Double];
                 if (A_here.hasRow(I)) tmp = A_here.block(I, NB).raw; else tmp = colBuffer;
                 val bufferY = tmp;
+                timer.start(11);
                 col.bcast(colRole, I%px, bufferY, 0, bufferY, 0, bufferY.size);
+                timer.stop(11);
                 for (var ci:Int = 0; ci < I; ++ci) if (A_here.hasRow(ci)) {
                     blockMulSub(A_here.block(ci, NB).raw, memget(ci, I), bufferY, B);
                 }
@@ -300,22 +360,27 @@ class LU {
 
     def check() {
         var max:Double = 0.0;
-        for (var i:Int = 0; i < M; ++i) {
-            if (A_here.placeOf(i, M) == here.id) {
-                val v = 1.0 - A_here(i, M);
-                max = Math.max(max, v * v);
+        val A_last_panel = A_here.blocks(0, MB, NB, NB);
+        if (!A_last_panel.empty()) {
+            for (var I:Int = A_last_panel.min_x; I <= A_last_panel.max_x; I += px) {
+                for (var i:int=0; i < B; i++) {
+                    val v = 1.0 - A_here.block(I, NB)(I*B+i, M);
+                    max = Math.max(max, v * v);
+                }
             }
+            Console.OUT.println("Place " + here.id + " has difference " + max);
+            max = col.allreduce(colRole, max, Team.MAX);
         }
-        Console.OUT.println("diff " + max + " " + here.id);
-        return col.allreduce(colRole,max,Team.MAX);
+        return max;
     }
 
     public static def main(args:Rail[String]) {
         if (args.size < 4) {
-            Console.OUT.println("Usage: LU M B (px py)");
+            Console.OUT.println("Usage: LU M B px py bk");
             Console.OUT.println("M = Matrix size,");
             Console.OUT.println("B = Block size, where B should perfectly divide M");
             Console.OUT.println("px py = Processor grid, where px*py = nplaces");
+            Console.OUT.println("bk = block size for panel, where bk should divide B");
             return;
         }
         val M = Int.parse(args(0));
@@ -323,15 +388,16 @@ class LU {
         val N = M + B;
         val px = Int.parse(args(2));
         val py = Int.parse(args(3));
+        val bk = Int.parse(args(4));
         val A = BlockedArray.make(M, N, B, B, px, py);
         val buffers = PlaceLocalHandle.makeFlat[Rail[Double]{self!=null}](Dist.makeUnique(), ()=>new Rail[Double](N));        
-        val lus = PlaceLocalHandle.makeFlat[LU](Dist.makeUnique(), ()=>new LU(M, N, B, px, py, A, buffers));
-        Console.OUT.println ("LU Starting: M " + M + " B " + B + " px " + px + " py " + py);
+        val lus = PlaceLocalHandle.makeFlat[LU](Dist.makeUnique(), ()=>new LU(M, N, B, px, py, bk, A, buffers));
+        Console.OUT.println ("LU: M " + M + " B " + B + " px " + px + " py " + py);
         start(lus);
     }
 
-    def this(M:Int, N:Int, B:Int, px:Int, py:Int, A:PlaceLocalHandle[BlockedArray], buffers:PlaceLocalHandle[Rail[Double]{self!=null}]) { 
-        this.M = M; this.N = N; this.B = B; this.px = px; this.py = py;
+    def this(M:Int, N:Int, B:Int, px:Int, py:Int, bk:Int, A:PlaceLocalHandle[BlockedArray], buffers:PlaceLocalHandle[Rail[Double]{self!=null}]) { 
+        this.M = M; this.N = N; this.B = B; this.px = px; this.py = py; this.bk = bk;
         this.A = A; A_here = A();
         this.buffers = buffers; buffer = buffers();
         MB = M / B - 1;
@@ -357,20 +423,18 @@ class LU {
 
         @Pragma(Pragma.FINISH_ATEACH_UNIQUE) finish ateach (p in Dist.makeUnique()) {
             val lu = lus();
-            val timer = new Timer(16);
+            val timer = new Timer(17);
 
             timer.start(0);
-
             lu.solve(timer);
-            lu.backsolve();
-            val r = lu.check();
-
             timer.stop(0);
 
+            timer.start(16);
+            lu.backsolve(timer);
+            timer.stop(16);
+
             if (here.id == 0) {
-                Console.OUT.println ("difference " + r);
-                Console.OUT.println(((r < 0.01?" ok)":" fail ") + " diff=" + r));
-                Console.OUT.println ("Timer(0)  TOTAL         #invocations=" + timer.count(0) +
+                Console.OUT.println ("Timer(0)  SOLVE         #invocations=" + timer.count(0) +
                   " Time=" + (timer.total(0) / 1e9) + " seconds");
                 Console.OUT.println ("Timer(1)  PANEL         #invocations=" + timer.count(1) +
                   " Time=" + (timer.total(1) as Double)/1e9 + " seconds");
@@ -392,21 +456,29 @@ class LU {
                   " Time=" + (timer.total(10) as Double)/1e9 + " seconds");
                 Console.OUT.println ("Timer(11) COL-BROADCAST #invocations=" + timer.count(11) +
                   " Time=" + (timer.total(11) as Double)/1e9 + " seconds");
-                Console.OUT.println ("Timer(12) DGEMM         #invocations=" + timer.count(12) +
-                		" Time=" + (timer.total(12) as Double)/1e9 + " seconds");
+                Console.OUT.println ("Timer(12) UPD-DGEMM     #invocations=" + timer.count(12) +
+                  " Time=" + (timer.total(12) as Double)/1e9 + " seconds");
                 Console.OUT.println ("Timer(13) ROW-SUM       #invocations=" + timer.count(13) +
-                        " Time=" + (timer.total(13) as Double)/1e9 + " seconds");
+                  " Time=" + (timer.total(13) as Double)/1e9 + " seconds");
                 Console.OUT.println ("Timer(14) UPD-ROW-BCAST #invocations=" + timer.count(14) +
-                        " Time=" + (timer.total(14) as Double)/1e9 + " seconds");
+                  " Time=" + (timer.total(14) as Double)/1e9 + " seconds");
                 Console.OUT.println ("Timer(15) UPD-COL-BCAST #invocations=" + timer.count(15) +
-                        " Time=" + (timer.total(15) as Double)/1e9 + " seconds");
-              }
+                  " Time=" + (timer.total(15) as Double)/1e9 + " seconds");
+                Console.OUT.println ("Timer(16) BACKSOLVE     #invocations=" + timer.count(16) +
+                  " Time=" + (timer.total(16) as Double)/1e9 + " seconds");
+            }
         }
 
         t += System.nanoTime();
 
-        Console.OUT.println();
-        Console.OUT.println(" Time= "+ t/1e9 + " seconds" + " Rate= " + flops(lus().N)/t + " GFlops");
+        @Pragma(Pragma.FINISH_ATEACH_UNIQUE) finish ateach (p in Dist.makeUnique()) {
+            val r = lus().check();
+            if (here.id == 0) {
+                Console.OUT.println("Worst difference of " + r + " is " + (r < 0.01? "" : "not ") + "ok");
+            }
+        }
+
+        Console.OUT.println("Total time="+ t/1e9 + " seconds" + " Rate= " + flops(lus().N)/t + " GFlops");
     }
 
     static def flops(n:Int) = ((4.0*n-3.0)*n-1.0)*n/6.0;
