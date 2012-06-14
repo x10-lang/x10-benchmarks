@@ -49,26 +49,26 @@ class LU {
     val rowBuffers:Rail[Rail[Double]{self!=null}]{self!=null};
     val buffer:Rail[Double]{rail,self!=null};
     val buffers:PlaceLocalHandle[Rail[Double]{self!=null}];
+    val remoteBuffer:RemoteArray[Double];
+    val remoteRowBuffer:RemoteArray[Double];
 
     def computeRowSum() {
-        val sum = new Rail[Double](B);
-
         for (var I:Int = 0; I <= MB; ++I) if (A_here.hasRow(I)) {
             val IB = I * B;
-            for (var k:Int = 0; k < B; ++k) sum(k) = 0.0;
+            for (var k:Int = 0; k < B; ++k) rowForBroadcast(k) = 0.0;
             for (var J:Int = 0; J <= MB; ++J) if (A_here.hasCol(J)) {
                 val JB = J * B;
                 val b = A_here.block(I, J);
                 for (var i:Int = 0; i < B; ++i) {
                     for (var j:Int = 0; j < B; ++j) {
-                        sum(i) += b(IB + i, JB + j);
+                        rowForBroadcast(i) += b(IB + i, JB + j);
                     }
                 }
             }
             for (var k:Int = 0; k < B; ++k) { 
                 // [DC] This probably ought to be optimised to sum the whole array, instead of each element with its own collective op
-                sum(k) = row.allreduce(rowRole,sum(k),Team.ADD);
-                if (A_here.hasCol(NB)) A_here(IB + k, M) = sum(k);
+                rowForBroadcast(k) = row.allreduce(rowRole,rowForBroadcast(k),Team.ADD);
+                if (A_here.hasCol(NB)) A_here(IB + k, M) = rowForBroadcast(k);
             }
         }
     }
@@ -96,17 +96,17 @@ class LU {
         val source = here; 
         ready = false;
         val size = A_here.getRow(row1, min, max, buffer);        
-        val remoteBuffer = new RemoteArray(buffer);
         val _buffers = buffers; // this is done so that we don't serialize the object that contains buffers
         val _A = A;
+        val _remoteBuffer = remoteBuffer;
         
         @Pragma(Pragma.FINISH_ASYNC_AND_BACK) finish{
         	at (Place(dest)) async {
         	    @Pragma(Pragma.FINISH_ASYNC) finish{
-        			Array.asyncCopy[Double](remoteBuffer, 0, _buffers(), 0, size);
+        			Array.asyncCopy[Double](_remoteBuffer, 0, _buffers(), 0, size);
         		}
         		val size2 = _A().swapRow(row2, min, max, _buffers());
-       			Array.asyncCopy[Double](_buffers(), 0, remoteBuffer, 0, size2);
+       			Array.asyncCopy[Double](_buffers(), 0, _remoteBuffer, 0, size2);
         	}        	
         }
         A_here.setRow(row1, min, max, buffer);
@@ -327,11 +327,11 @@ class LU {
             val source = here;
             ready = false;
             val _A = A;
-            val remoteRowBuffer = new RemoteArray(rowBuffer);
             val _B = B;
+            val _remoteRowBuffer = remoteRowBuffer;
             @Pragma(Pragma.FINISH_ASYNC_AND_BACK) finish{
 				at(Place(A_here.placeOfBlock(I, J))) async {
-					Array.asyncCopy(_A().block(I, J).raw, 0, remoteRowBuffer, 0, _B * _B);
+					Array.asyncCopy(_A().block(I, J).raw, 0, _remoteRowBuffer, 0, _B * _B);
 				}
 	    	} 
             return rowBuffer;
@@ -402,6 +402,7 @@ class LU {
         this.M = M; this.N = N; this.B = B; this.px = px; this.py = py; this.bk = bk;
         this.A = A; A_here = A();
         this.buffers = buffers; buffer = buffers();
+        remoteBuffer = new RemoteArray(buffer);
         MB = M / B - 1;
         NB = N / B - 1;
         colRole = here.id / py;
@@ -415,6 +416,7 @@ class LU {
         this.rowBuffers = rowBuffers;
         this.colBuffers = colBuffers;
         rowBuffer = rowBuffers(0);
+        remoteRowBuffer = new RemoteArray(rowBuffer);
         colBuffer = colBuffers(0);
     }
 
