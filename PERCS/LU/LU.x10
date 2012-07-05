@@ -425,7 +425,7 @@ class LU {
 
         var t:Long = -System.nanoTime();
 
-        @Pragma(Pragma.FINISH_ATEACH_UNIQUE) finish ateach (p in Dist.makeUnique()) {
+        PlaceGroup.WORLD.broadcastFlat(()=>{
             val lu = lus();
             val timer = new Timer(17);
 
@@ -471,16 +471,16 @@ class LU {
                 Console.OUT.println ("Timer(16) BACKSOLVE     #invocations=" + timer.count(16) +
                   " Time=" + (timer.total(16) as Double)/1e9 + " seconds");
             }
-        }
+        });
 
         t += System.nanoTime();
 
-        @Pragma(Pragma.FINISH_ATEACH_UNIQUE) finish ateach (p in Dist.makeUnique()) {
+        PlaceGroup.WORLD.broadcastFlat(()=>{
             val r = lus().check();
             if (here.id == 0) {
                 Console.OUT.println("Worst difference of " + r + " is " + (r < 0.01? "" : "not ") + "ok");
             }
-        }
+        });
 
         Console.OUT.println("Total time="+ t/1e9 + " seconds" + " Rate= " + flops(lus().N)/t + " GFlops");
     }

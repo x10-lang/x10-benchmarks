@@ -17,20 +17,6 @@ final class Random {
     def next() = (rand() & 3L) as Byte; // 0..alphabetSize-1
 }
 
-final class MyPlaceGroup extends PlaceGroup {
-    private val numPlaces:Int;
-    def this(numPlaces:Int) { this.numPlaces = numPlaces; }
-    public operator this(i:int):Place = Place.place(i);
-    public def numPlaces() = numPlaces;
-    public def contains(id:int) = id >= 0 && id < numPlaces;
-    public def indexOf(id:int) = contains(id) ? id : -1;
-    public def iterator() = new Iterator[Place](){
-        private var i:Int = 0;
-        public def hasNext() = i < numPlaces;
-        public def next() = Place(i++);
-    };
-}
-
 final class Parameters {
     val openGapPenalty = 2;
     val extendGapPenalty = 1;
@@ -306,7 +292,7 @@ final class SSCA1 {
         val params = new Parameters(shortLength, longLength, seed, stride);
 
         var t:Long = System.nanoTime();
-        val plh = PlaceLocalHandle.makeFlat[SSCA1](new MyPlaceGroup(params.segmentCount), ()=>new SSCA1(params, verbose));
+        val plh = PlaceLocalHandle.makeFlat[SSCA1](PlaceGroup.make(params.segmentCount), ()=>new SSCA1(params, verbose));
         printTime("Init:  ", System.nanoTime()-t);
 
         for (var k:Int=0; k<iterations; k++) {

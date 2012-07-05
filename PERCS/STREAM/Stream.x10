@@ -1,3 +1,5 @@
+import x10.array.PlaceGroup;
+import x10.compiler.Pragma;
 import x10.util.Team;
 
 public class Stream {
@@ -20,45 +22,38 @@ public class Stream {
 
         Console.OUT.println("localSize=" + localSize);
 
-        finish {
-
-            for (var pp:int=0; pp<NUM_PLACES; pp++) {
-
-                val p = pp;
+        PlaceGroup.WORLD.broadcastFlat(()=>{
+                val p = here.id;
+                val a = new Array[double](localSize);
+                val b = new Array[double](localSize);
+                val c = new Array[double](localSize);
                 
-                at(Place.place(p)) async {
-                    val a = new Array[double](localSize);
-                    val b = new Array[double](localSize);
-                    val c = new Array[double](localSize);
-                    
-                    for (var i:int=0; i<localSize; i++) {
-                        b(i) = 1.5 * (p*localSize+i);
-                        c(i) = 2.5 * (p*localSize+i);
-                    }
-                    
-                    val beta = alpha;
-                    
-                    for (var j:int=0; j<NUM_TIMES; j++) {
-                        if (p==0) {
-                            val t = times as GlobalRef[Array[Double](1)]{self.home==here};
-                            t()(j) = -now();
-                        }
-                        for (var i:int=0; i<localSize; i++)
-                            a(i) = b(i) + beta*c(i);
-                        Team.WORLD.barrier(here.id);
-                        if (p==0) {
-                            val t = times as GlobalRef[Array[Double](1)]{self.home==here};
-                            t()(j) += now();
-                        }
-                    }
-                    
-                    // verification
-                    for (var i:int=0; i<localSize; i++)
-                        if (a(i) != b(i) + alpha*c(i)) 
-                            verified.set(false);
+                for (var i:int=0; i<localSize; i++) {
+                    b(i) = 1.5 * (p*localSize+i);
+                    c(i) = 2.5 * (p*localSize+i);
                 }
-            }
-        }
+                
+                val beta = alpha;
+                
+                for (var j:int=0; j<NUM_TIMES; j++) {
+                    if (p==0) {
+                        val t = times as GlobalRef[Array[Double](1)]{self.home==here};
+                        t()(j) = -now();
+                    }
+                    for (var i:int=0; i<localSize; i++)
+                        a(i) = b(i) + beta*c(i);
+                    Team.WORLD.barrier(here.id);
+                    if (p==0) {
+                        val t = times as GlobalRef[Array[Double](1)]{self.home==here};
+                        t()(j) += now();
+                    }
+                }
+                
+                // verification
+                for (var i:int=0; i<localSize; i++)
+                    if (a(i) != b(i) + alpha*c(i)) 
+                        verified.set(false);
+            });
 
         var min:double = 1000000;
         for (var j:int=1; j<NUM_TIMES; j++)

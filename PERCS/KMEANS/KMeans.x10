@@ -1,3 +1,4 @@
+import x10.array.PlaceGroup;
 import x10.compiler.Native;
 import x10.util.Option;
 import x10.util.OptionsParser;
@@ -49,7 +50,7 @@ final class KMeans {
 
         val num_slice_points = num_global_points / Place.MAX_PLACES;
 
-        finish for (var h:Int=0; h<Place.MAX_PLACES; ++h) at (Place(h)) async {
+        PlaceGroup.WORLD.broadcastFlat(()=>{
             val role = Runtime.hereInt();
             val random = new Random(role);
             val host_points = new Rail[Float](num_slice_points*dim, (Int)=>random.next());
@@ -142,6 +143,6 @@ final class KMeans {
             if (role == 0) {
                 Console.OUT.println("Total time: " + (stop_time-start_time)/1E9);
             }
-        }
+        });
     }
 }

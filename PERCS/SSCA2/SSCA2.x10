@@ -1,3 +1,4 @@
+import x10.array.PlaceGroup;
 import x10.compiler.Pragma;
 import x10.util.Random;
 import x10.util.OptionsParser;
@@ -164,12 +165,6 @@ public final class SSCA2(N:Int) {
         }
     }
 
-    public static def sqrt(var p:Int) {
-        var r:Int = p;
-        while (p > 1) { p = p>>2; r = r>>1; }
-        return r;
-    }
-
     /**
      * Calls betweeness, prints out the statistics and what not.
      */
@@ -187,25 +182,12 @@ public final class SSCA2(N:Int) {
         Console.OUT.println("Graph details: N=" + N + ", M=" + M);
 
         val max = Place.MAX_PLACES;
-        val stride = sqrt(max);
 
         // Loop over all the places and crunch the numbers.
-        @Pragma(Pragma.FINISH_SPMD) finish {
-            for(var i:Int=0; i<max; i+=stride) {
-                val ii = i;
-                at(Place(ii)) async {
-                     @Pragma(Pragma.FINISH_SPMD) finish {
-                        val m = (max < ii+stride) ? max : (ii+stride);
-                        for(var j:Int=ii; j<m; ++j) {
-                            val jj = j;
-                            at(Place(jj)) async {
-                                plh().bfsShortestPaths((N as Long*jj/max) as Int, (N as Long*(jj+1)/max) as Int);
-                            }
-                        }
-                    }
-                }
-            }
-        }
+        PlaceGroup.WORLD.broadcastFlat(()=>{
+                val h = Runtime.hereInt();
+                plh().bfsShortestPaths((N as Long*h/max) as Int, (N as Long*(h+1)/max) as Int);
+            });
 
         time = System.nanoTime() - time;
         val procTime = time/1E9;

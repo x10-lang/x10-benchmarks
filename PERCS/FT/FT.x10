@@ -1,3 +1,4 @@
+import x10.array.PlaceGroup;
 import x10.compiler.Native;
 import x10.compiler.NativeCPPInclude;
 import x10.compiler.NativeCPPOutputFile;
@@ -243,6 +244,6 @@ class FT {
         val plh = PlaceLocalHandle.make[FT](Dist.makeUnique(), ()=>new FT(nRows, localSize, N, SQRTN, verify));
 
         // Benchmark
-        for (var p:Int=0; p<Place.MAX_PLACES; ++p) at (Place(p)) async plh().run();
+        PlaceGroup.WORLD.broadcastFlat(()=>{plh().run();});
     }
 }
