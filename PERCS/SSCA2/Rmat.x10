@@ -40,8 +40,11 @@ public struct Rmat {
 	 *  A function that mimics the MATLAB function rand (M,1). It generates a 
 	 *  vector of M random numbers. Here, numElements is M!
 	 */
-	private def rand(rng:Random, numElements:Int) =
-		new Rail[Double](numElements, (Int)=>rng.nextDouble());
+	private def rand(dest:Rail[Double], rng:Random) {
+	    for(var i:Int=0;i<dest.size;++i) {
+	        dest(i) = rng.nextDouble();
+	    }
+	}
 
 	/**
 	 * A function that mimics the use of > operator in MATLAB when the LHS is 
@@ -49,16 +52,22 @@ public struct Rmat {
 	 * result of "V > a", where "V" is a vector and "a" is a scalar is an 
 	 * integer-valued vector where there is a 1 if "V[i] > a" and 0 otherwise.
 	 */
-	private def greaterThan(lhs:Rail[Double], rhs:Double) =
-		new Rail[Int](lhs.size, (i:Int)=>(lhs(i) > rhs) ? 1 : 0);
+	private def greaterThan(dest:Rail[Int], lhs:Rail[Double], rhs:Double) {
+	    for(var i:Int=0;i<dest.size;++i) {
+	        dest(i) = (lhs(i) > rhs) ? 1 : 0;
+	    }
+	}
 
 	/**
 	 * The same function as above, only with a element-wise comparison in the RHS
 	 * instead of a comparison with a scalar value. So, there is a 1 in the 
 	 * resultant vector if "LHS[i] > RHS[i]", and 0 otherwise.
 	 */
-	private def greaterThan(lhs:Rail[Double], rhs:Rail[Double]) =
-		new Rail[Int](lhs.size, (i:Int)=>(lhs(i) > rhs(i)) ? 1 : 0);
+	private def greaterThan(dest:Rail[Int], lhs:Rail[Double], rhs:Rail[Double]) {
+	    for(var i:Int=0;i<dest.size;++i) {
+	        dest(i) = (lhs(i) > rhs(i)) ? 1 : 0;
+	    }
+	}
 
 	/**
 	 * Multiple a vector with a scalar. There is, however, one catch. When the 
@@ -66,26 +75,38 @@ public struct Rmat {
 	 * always 0 or 1. If V[i] > 0 and flip==true, then LHS(i) == 0, and 1 otherwise.
 	 * In other words, we flip V[i].
 	 */
-	private def multiply(lhs:Rail[Int], multiplier:Double, flip:Boolean) =
-		new Rail[Double](lhs.size, (i:Int)=>multiplier*(flip ? ((lhs(i) > 0) ? 0 : 1) : lhs(i)));
+	private def multiply(dest:Rail[Double], lhs:Rail[Int], multiplier:Double, flip:Boolean) {
+	    for(var i:Int=0;i<dest.size;++i) {
+	        dest(i) = multiplier*(flip ? ((lhs(i) > 0) ? 0 : 1) : lhs(i));
+	    }
+	}
 
 	/**
 	 * A straightforward vector-scalar multiplication
 	 */
-	private def multiply(lhs:Rail[Int], multiplier:Int) =
-		new Rail[Int](lhs.size, (i:Int)=>lhs(i)*multiplier);
+	private def multiply(lhs:Rail[Int], multiplier:Int)  {
+	    for(var i:Int=0;i<lhs.size;++i) {
+	        lhs(i) *= multiplier;
+	    }
+	}
 
 	/**
 	 * A straightforward addition of two vectors.
 	 */
-	private def add(lhs:Rail[Double], rhs:Rail[Double]) = 
-		new Rail[Double](lhs.size, (i:Int)=>lhs(i)+rhs(i));
+	private def add(lhs:Rail[Double], rhs:Rail[Double]) {
+	    for(var i:Int=0;i<lhs.size;++i) {
+	        lhs(i) += rhs(i);
+	    }
+	}
 
 	/**
 	 * Same as above, but with a different type
 	 */
-	private def add(lhs:Rail[Int], rhs:Rail[Int]) =
-		new Rail[Int](lhs.size, (i:Int)=>lhs(i)+rhs(i));
+	private def add(lhs:Rail[Int], rhs:Rail[Int]) {
+	    for(var i:Int=0;i<lhs.size;++i) {
+	        lhs(i) += rhs(i);
+	    }
+	}
 
 	/**
 	 * This function mimics the behavior of the MATLAB function sparse(i,j,s).
@@ -102,8 +123,13 @@ public struct Rmat {
 		val rng = new Random(seed);
 
 		// Create index arrays
-		var ii:Rail[Int] = new Rail[Int](M);
-		var jj:Rail[Int] = new Rail[Int](M);
+		val ii = new Rail[Int](M);
+		val jj = new Rail[Int](M);
+		val iiBit = new Rail[Int](M);
+		val iiBit2 = new Rail[Double](M);
+		val jjBit = new Rail[Int](M);
+		val jjBitComparator = new Rail[Double](M);
+		val r:Rail[Double] = new Rail[Double](M);
 
 		// Loop over each order of bit
 		val ab = a+b;
@@ -111,12 +137,18 @@ public struct Rmat {
 		val aNorm = a/(a+b);
 
 		for (var ib:Int=0; ib<n; ++ib) {
-			val iiBit = greaterThan(rand(rng, M), ab);
-			val jjBitComparator = add(multiply(iiBit, cNorm, false), multiply(iiBit, aNorm, true));
-			val jjBit = greaterThan(rand(rng, M), jjBitComparator);
+		    rand(r, rng);
+			greaterThan(iiBit, r, ab);
+			multiply(jjBitComparator, iiBit, cNorm, false);
+			multiply(iiBit2, iiBit, aNorm, true);
+			add(jjBitComparator, iiBit2);
+			rand(r, rng);
+			greaterThan(jjBit, r, jjBitComparator);
 			val exponent = 1<<ib;
-			ii = add(ii, multiply(iiBit, exponent));
-			jj = add(jj, multiply(jjBit, exponent));
+			multiply(iiBit, exponent);
+			add(ii, iiBit);
+			multiply(jjBit, exponent);
+			add(jj, jjBit);
 		}
 
 		return sparse(ii, jj);
