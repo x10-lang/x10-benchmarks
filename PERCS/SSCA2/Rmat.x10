@@ -126,10 +126,8 @@ public struct Rmat {
 		val ii = new Rail[Int](M);
 		val jj = new Rail[Int](M);
 		val iiBit = new Rail[Int](M);
-		val iiBit2 = new Rail[Double](M);
-		val jjBit = new Rail[Int](M);
 		val jjBitComparator = new Rail[Double](M);
-		val r:Rail[Double] = new Rail[Double](M);
+		val r = new Rail[Double](M);
 
 		// Loop over each order of bit
 		val ab = a+b;
@@ -137,18 +135,18 @@ public struct Rmat {
 		val aNorm = a/(a+b);
 
 		for (var ib:Int=0; ib<n; ++ib) {
+		    val exponent = 1<<ib;
 		    rand(r, rng);
 			greaterThan(iiBit, r, ab);
 			multiply(jjBitComparator, iiBit, cNorm, false);
-			multiply(iiBit2, iiBit, aNorm, true);
-			add(jjBitComparator, iiBit2);
-			rand(r, rng);
-			greaterThan(jjBit, r, jjBitComparator);
-			val exponent = 1<<ib;
+			multiply(r, iiBit, aNorm, true);
 			multiply(iiBit, exponent);
 			add(ii, iiBit);
-			multiply(jjBit, exponent);
-			add(jj, jjBit);
+			add(jjBitComparator, r);
+			rand(r, rng);
+			greaterThan(iiBit, r, jjBitComparator);
+			multiply(iiBit, exponent);
+			add(jj, iiBit);
 		}
 
 		return sparse(ii, jj);
