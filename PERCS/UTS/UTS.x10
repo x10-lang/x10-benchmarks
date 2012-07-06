@@ -55,7 +55,19 @@ public class UTS {
         //@Native("c++", "ProfilerStop();") {}
         Console.OUT.println("Finished.");
         
-        val logs = new Rail[Logger](P, (i:Int)=>at (Place(i)) st().logger);
+        val logs:Rail[Logger];
+        if (Place.MAX_PLACES >= 1024) {
+            logs = new Rail[Logger](Place.MAX_PLACES/32, (i:Int)=>at (Place(i*32)) {
+                val h = Runtime.hereInt();
+                val n = Math.min(32, Place.MAX_PLACES-h);
+                val logs = new Rail[Logger](n, (i:Int)=>at (Place(h+i)) st().logger);
+                val log = new Logger();
+                log.collect(logs);
+                return log;
+            });
+        } else {
+            logs = new Rail[Logger](P, (i:Int)=>at (Place(i)) st().logger);
+        }
         val log = new Logger();
         log.collect(logs);
         log.stats(time, verbose);
