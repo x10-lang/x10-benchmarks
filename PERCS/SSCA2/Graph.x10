@@ -92,8 +92,9 @@ public final class Graph {
             offsetMap(v) = currentOffset;
 
             // Iterate over all the edges.
-            for(w in adjacencyList(v)) {
-                adjacencyMap(currentOffset++) = w;
+            val list = adjacencyList(v);
+            for(var i:Int=0; i<list.size(); ++i) {
+                adjacencyMap(currentOffset++) = list(i);
             }
         }
 
