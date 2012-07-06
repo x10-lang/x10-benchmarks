@@ -32,15 +32,17 @@ public class Logger {
         lastStartStopLiveTimeStamp = time;
     }
 
-    def stats(logs:Rail[Logger], time:Long, verbose:Boolean) {
+    def collect(logs:Rail[Logger]) {
         for (l in logs.values()) add(l);
+    }
 
+    def stats(time:Long, verbose:Boolean) {
         Console.OUT.println(nodesGiven + " nodes stolen = " + nodesReceived + " (direct) + " +
-                lifelineNodesReceived + " (lifeline)."); 
+            lifelineNodesReceived + " (lifeline)."); 
         Console.OUT.println(stealsPerpetrated + " successful direct steals."); 
         Console.OUT.println(lifelineStealsPerpetrated + " successful lifeline steals.");
         Console.OUT.println("Performance: " + nodesCount + "/" + sub("" + (time/1E9), 0, 6) +
-                " = " + sub("" + (nodesCount/(time/1E3)), 0, 6) + "M nodes/s");
+            " = " + sub("" + (nodesCount/(time/1E3)), 0, 6) + "M nodes/s");
     }
 
     private static def sub(str:String, start:Int, end:Int) = str.substring(start, Math.min(end, str.length()));

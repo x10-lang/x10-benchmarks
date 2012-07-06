@@ -43,7 +43,7 @@ public class UTS {
             (2==l) ? NetworkGenerator.generateChunkedGraph(P, z):
                      NetworkGenerator.generateSparseEmbedding(P, z);
         
-        val st = PlaceLocalHandle.make[ParUTS,Rail[Int]](Dist.makeUnique(),
+        val st = PlaceLocalHandle.makeFlat[ParUTS,Rail[Int]](Dist.makeUnique(),
                 (p:Place)=>lifelines(p.id),
                 (lifelines:Rail[Int])=>new ParUTS(b, d, n, w, l, lifelines));
         
@@ -56,7 +56,9 @@ public class UTS {
         Console.OUT.println("Finished.");
         
         val logs = new Rail[Logger](P, (i:Int)=>at (Place(i)) st().logger);
-        new Logger().stats(logs, time, verbose);
+        val log = new Logger();
+        log.collect(logs);
+        log.stats(time, verbose);
     }
 }
 
