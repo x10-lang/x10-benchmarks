@@ -1,0 +1,1 @@
+mpCC -qinline -qhot -O3 -q64 -qarch=auto -qtune=auto KMeansNative.cc -o kmeans-native

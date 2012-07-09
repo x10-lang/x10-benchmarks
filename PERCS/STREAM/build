@@ -1,2 +1,1 @@
-mpCC -q64 -O5 -qsmp -qthreaded -DN=100000000 stream.c -o stream-native
-x10c++ -x10rt pami -O -NO_CHECKS -STATIC_CHECKS Stream.x10 -o stream
+x10c++ $X10RTTRANSPORT -O -NO_CHECKS -STATIC_CHECKS Stream.x10 -o stream
