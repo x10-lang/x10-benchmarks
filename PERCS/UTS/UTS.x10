@@ -11,8 +11,8 @@ public class UTS {
                 Option("d", "", "Tree depth"),
                 Option("n", "", "Number of nodes to process before probing. Default 200."),
                 Option("w", "", "Number of thieves to send out. Default 1."),
-                Option("l", "", "Lifeline method: 0 for linear, 1 for hypercube, 2 for sparse chunked, 3 for sparse embedding -- in which case also enter dimension"),
-                Option("z", "", "Dimension of the sparse hypercube"),
+                Option("l", "", "Base of the lifeline"),
+                Option("z", "", "Depth of the lifeline"),
                 Option("v", "", "Verbose. Default 0 (no).")]);
         
         val b = opts("-b", 4);
@@ -20,7 +20,7 @@ public class UTS {
         val d = opts("-d", 6);
         val n = opts("-n", 200);
         val w = opts("-w", 1);
-        val l = opts("-l", 3);
+        val l = opts("-l", 32);
         val z = opts("-z", 1);
         val verbose = opts("-v", 0) != 0;
         
@@ -33,19 +33,9 @@ public class UTS {
                 "   w=" + w +
                 "   n=" + n +
                 "   l=" + l + 
-                "   z=" + z +
-                (l==3 ? "   base=" + (z==0 ? 0 : NetworkGenerator.findW(P, z)) : ""));
+                "   z=" + z);
         
-        // Generate the lifelines
-        val lifelines:Rail[Rail[Int]] =
-            (0==l) ? NetworkGenerator.generateRing(P):
-            (1==l) ? NetworkGenerator.generateHyperCube(P):
-            (2==l) ? NetworkGenerator.generateChunkedGraph(P, z):
-                     NetworkGenerator.generateSparseEmbedding(P, z);
-        
-        val st = PlaceLocalHandle.makeFlat[ParUTS,Rail[Int]](Dist.makeUnique(),
-                (p:Place)=>lifelines(p.id),
-                (lifelines:Rail[Int])=>new ParUTS(b, d, n, w, l, lifelines));
+        val st = PlaceLocalHandle.makeFlat[ParUTS](PlaceGroup.WORLD, ()=>new ParUTS(b, d, n, w, l, z));
         
         Console.OUT.println("Starting...");
         //@Native("c++", "ProfilerStart(\"UTS.prof\");") {}

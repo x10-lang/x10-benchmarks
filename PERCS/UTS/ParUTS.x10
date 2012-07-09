@@ -11,7 +11,6 @@ final class ParUTS {
     
     val n:Int;
     val w:Int;
-    val l:Int;
     
     val random = new Random();
     val logger = new Logger();
@@ -20,20 +19,43 @@ final class ParUTS {
     @x10.compiler.Volatile transient var empty:Boolean;
     @x10.compiler.Volatile transient var waiting:Boolean;
     
-    public def this(b:Int, d:Int, n:Int, w:Int, l:Int, lifelines:Rail[Int]) {
+    val P = Place.MAX_PLACES;
+    
+    public def this(b:Int, d:Int, n:Int, w:Int, l:Int, z:Int) {
         this.n = n;
         this.w = w;
-        this.l = l;
-        this.lifelines = lifelines;
+        this.lifelines = new Rail[Int](z, -1);
+        var x:Int = 1;
+        val i = Runtime.hereInt();
+        
+        // lifelines
+        var t:Int = 0;
+        for (var j:Int=0; j<z; j++) {
+            var v:Int = i;
+            for (var k:Int=1; k<l; k++) {
+                v = v - v%(x*l) + (v+x)%(x*l);
+                if (v<P) {
+                    lifelines(t++) = v;
+                    break;
+                }
+            }
+            x *= l;
+        }
+        
+        /*
+        Console.OUT.print("" + i + " =>");
+        for (var j:Int=0; j<z; j++) Console.OUT.print(" " + lifelines(j));
+        Console.OUT.println();
+        */
+        
         queue = new Queue(65536, b, d);
         thieves = new FixedSizeStack[Int](lifelines.size+2);
-        temp = new FixedSizeStack[Int](Place.MAX_PLACES);
-        lifelinesActivated = new Rail[Boolean](Place.MAX_PLACES);
+        temp = new FixedSizeStack[Int](P);
+        lifelinesActivated = new Rail[Boolean](P);
         
         // 1st wave
-        val i = Runtime.hereInt();
-        if (2*i+1 < Place.MAX_PLACES) thieves.push(2*i+1);
-        if (2*i+2 < Place.MAX_PLACES) thieves.push(2*i+2);
+        if (2*i+1 < P) thieves.push(2*i+1);
+        if (2*i+2 < P) thieves.push(2*i+2);
         if (i > 0) lifelinesActivated((i-1)/2) = true;
     }
     
@@ -111,7 +133,6 @@ final class ParUTS {
     }
     
     def steal(st:PlaceLocalHandle[ParUTS]) {
-        val P = Place.MAX_PLACES;
         if (P == 1) return false;
         val p = Runtime.hereInt();
         empty = true;
