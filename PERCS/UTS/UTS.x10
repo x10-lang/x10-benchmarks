@@ -8,8 +8,8 @@ import x10.util.Random;
 
 public final class UTS {
     val queue:Queue;
+    val lifelineThieves:FixedSizeStack[Int];
     val thieves:FixedSizeStack[Int];
-    val temp:FixedSizeStack[Int];
     val lifelines:Rail[Int];
     val lifelinesActivated:Rail[Boolean];
     
@@ -53,14 +53,14 @@ public final class UTS {
          * Console.OUT.println();
          */
         
-        queue = new Queue(65536, b, d);
-        thieves = new FixedSizeStack[Int](lifelines.size+2);
-        temp = new FixedSizeStack[Int](P);
+        queue = new Queue(1024, b, d);
+        lifelineThieves = new FixedSizeStack[Int](lifelines.size+2);
+        thieves = new FixedSizeStack[Int](P);
         lifelinesActivated = new Rail[Boolean](P);
         
         // 1st wave
-        if (2*h+1 < P) thieves.push(2*h+1);
-        if (2*h+2 < P) thieves.push(2*h+2);
+        if (2*h+1 < P) lifelineThieves.push(2*h+1);
+        if (2*h+2 < P) lifelineThieves.push(2*h+2);
         if (h > 0) lifelinesActivated((h-1)/2) = true;
     }
     
@@ -88,8 +88,8 @@ public final class UTS {
     @Inline def give(st:PlaceLocalHandle[UTS], loot:Queue.Fragment) {
         val victim = Runtime.hereInt();
         logger.nodesGiven += loot.hash.length();
-        if (temp.size() > 0) {
-            val thief = temp.pop();
+        if (thieves.size() > 0) {
+            val thief = thieves.pop();
             if (thief >= 0) {
                 ++logger.lifelineStealsSuffered;
                 at (Place(thief)) @Uncounted async { st().deal(st, loot, victim); st().waiting = false; }
@@ -99,7 +99,7 @@ public final class UTS {
             }
         } else {
             ++logger.lifelineStealsSuffered;
-            val thief = thieves.pop();
+            val thief = lifelineThieves.pop();
             at (Place(thief)) async st().deal(st, loot, victim);
         }
     }
@@ -107,7 +107,7 @@ public final class UTS {
     @Inline def distribute(st:PlaceLocalHandle[UTS]) {
         var numThieves:Int;
         var t:Int;
-        while (((numThieves = thieves.size() + temp.size()) > 0) && (t = queue.select()) >= 0) {
+        while (((numThieves = lifelineThieves.size() + thieves.size()) > 0) && (t = queue.select()) >= 0) {
             val lootSize = queue.upper(t) - queue.lower(t);
             numThieves = min(numThieves+1, lootSize);
             val numToSteal = lootSize/numThieves;
@@ -126,10 +126,10 @@ public final class UTS {
     }
     
     @Inline def reject(st:PlaceLocalHandle[UTS]) {
-        while (temp.size() > 0) {
-            val thief = temp.pop();
+        while (thieves.size() > 0) {
+            val thief = thieves.pop();
             if (thief >= 0) {
-                thieves.push(thief);
+                lifelineThieves.push(thief);
                 at (Place(thief)) @Uncounted async { st().waiting = false; }
             } else {
                 at (Place(-thief-1)) @Uncounted async { st().waiting = false; }
@@ -166,10 +166,10 @@ public final class UTS {
         try {
             if (lifeline) ++logger.lifelineStealsReceived; else ++logger.stealsReceived;
             if (queue.size == 0) {
-                if (lifeline) thieves.push(thief);
+                if (lifeline) lifelineThieves.push(thief);
                 at (Place(thief)) @Uncounted async { st().waiting = false; }
             } else {
-                if (lifeline) temp.push(thief); else temp.push(-thief-1);
+                if (lifeline) thieves.push(thief); else thieves.push(-thief-1);
             }
         } catch (v:Throwable) {
             error(v);
