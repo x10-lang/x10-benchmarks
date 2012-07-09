@@ -29,13 +29,14 @@ public final class UTS {
         this.n = n;
         this.w = w;
         this.lifelines = new Rail[Int](z, -1);
-        var x:Int = 1;
-        val i = Runtime.hereInt();
+        
+        val h = Runtime.hereInt();
         
         // lifelines
+        var x:Int = 1;
         var t:Int = 0;
         for (var j:Int=0; j<z; j++) {
-            var v:Int = i;
+            var v:Int = h;
             for (var k:Int=1; k<l; k++) {
                 v = v - v%(x*l) + (v+x)%(x*l);
                 if (v<P) {
@@ -58,9 +59,9 @@ public final class UTS {
         lifelinesActivated = new Rail[Boolean](P);
         
         // 1st wave
-        if (2*i+1 < P) thieves.push(2*i+1);
-        if (2*i+2 < P) thieves.push(2*i+2);
-        if (i > 0) lifelinesActivated((i-1)/2) = true;
+        if (2*h+1 < P) thieves.push(2*h+1);
+        if (2*h+2 < P) thieves.push(2*h+2);
+        if (h > 0) lifelinesActivated((h-1)/2) = true;
     }
     
     @Inline final def processAtMostN() {
@@ -275,7 +276,7 @@ public final class UTS {
         if (P >= 1024) {
             logs = new Rail[Logger](P/32, (i:Int)=>at (Place(i*32)) {
                 val h = Runtime.hereInt();
-                val n = Math.min(32, P-h);
+                val n = min(32, P-h);
                 val logs = new Rail[Logger](n, (i:Int)=>at (Place(h+i)) st().logger);
                 val log = new Logger();
                 log.collect(logs);
