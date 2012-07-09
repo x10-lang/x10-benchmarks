@@ -1,4 +1,3 @@
-import x10.array.PlaceGroup;
 import x10.compiler.Native;
 import x10.compiler.NativeCPPInclude;
 import x10.compiler.NativeCPPOutputFile;

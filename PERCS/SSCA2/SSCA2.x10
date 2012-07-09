@@ -1,4 +1,3 @@
-import x10.array.PlaceGroup;
 import x10.compiler.Pragma;
 import x10.util.Random;
 import x10.util.OptionsParser;

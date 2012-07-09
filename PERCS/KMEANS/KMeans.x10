@@ -1,4 +1,3 @@
-import x10.array.PlaceGroup;
 import x10.compiler.Native;
 import x10.util.Option;
 import x10.util.OptionsParser;
