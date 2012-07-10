@@ -17,7 +17,7 @@ public final class UTS {
     val w:Int;
     
     val random = new Random();
-    val logger = new Logger();
+    val logger:Logger;
     
     var active:Boolean = false;
     @x10.compiler.Volatile transient var empty:Boolean;
@@ -38,7 +38,7 @@ public final class UTS {
         for (var j:Int=0; j<z; j++) {
             var v:Int = h;
             for (var k:Int=1; k<l; k++) {
-                v = v - v%(x*l) + (v+x)%(x*l);
+                v = v - v%(x*l) + (v+x*l-x)%(x*l);
                 if (v<P) {
                     lifelines(t++) = v;
                     break;
@@ -59,9 +59,12 @@ public final class UTS {
         lifelinesActivated = new Rail[Boolean](P);
         
         // 1st wave
-        if (2*h+1 < P) lifelineThieves.push(2*h+1);
-        if (2*h+2 < P) lifelineThieves.push(2*h+2);
-        if (h > 0) lifelinesActivated((h-1)/2) = true;
+        if (3*h+1 < P) lifelineThieves.push(3*h+1);
+        if (3*h+2 < P) lifelineThieves.push(3*h+2);
+        if (3*h+3 < P) lifelineThieves.push(3*h+3);
+        if (h > 0) lifelinesActivated((h-1)/3) = true;
+        
+        logger = new Logger(true);
     }
     
     @Inline final def processAtMostN() {
@@ -146,8 +149,10 @@ public final class UTS {
             while ((q = random.nextInt(P)) == p);
             ++logger.stealsAttempted;
             waiting = true;
+            logger.stopLive();
             at (Place(q)) @Uncounted async st().request(st, p, false);
             while (waiting) Runtime.probe();
+            logger.startLive();
         }
         for (var i:Int=0; (i<lifelines.size) && empty && (0<=lifelines(i)); ++i) {
             val lifeline = lifelines(i);
@@ -155,8 +160,10 @@ public final class UTS {
                 ++logger.lifelineStealsAttempted;
                 lifelinesActivated(lifeline) = true;
                 waiting = true;
+                logger.stopLive();
                 at (Place(lifeline)) @Uncounted async st().request(st, p, true);
                 while (waiting) Runtime.probe();
+                logger.startLive();
             }
         }
         return !empty;
@@ -239,20 +246,27 @@ public final class UTS {
                 Option("n", "", "Number of nodes to process before probing. Default 200."),
                 Option("w", "", "Number of thieves to send out. Default 1."),
                 Option("l", "", "Base of the lifeline"),
-                Option("z", "", "Depth of the lifeline"),
                 Option("v", "", "Verbose. Default 0 (no).")]);
         
         val b = opts("-b", 4);
-        val r = opts("-r", 0);
-        val d = opts("-d", 6);
-        val n = opts("-n", 200);
-        val w = opts("-w", 1);
+        val r = opts("-r", 19);
+        val d = opts("-d", 13);
+        val n = opts("-n", 1000);
         val l = opts("-l", 32);
-        val z = opts("-z", 1);
         val verbose = opts("-v", 0) != 0;
         
         val P = Place.MAX_PLACES;
         
+        var z0:Int = 1;
+        var zz:Int = l;
+        while (zz < P) {
+            z0++;
+            zz *= l;
+        }
+        val z = z0;
+
+        val w = opts("-w", z);
+
         Console.OUT.println("places=" + P +
                 "   b=" + b +
                 "   r=" + r +
@@ -277,17 +291,17 @@ public final class UTS {
             logs = new Rail[Logger](P/32, (i:Int)=>at (Place(i*32)) {
                 val h = Runtime.hereInt();
                 val n = min(32, P-h);
-                val logs = new Rail[Logger](n, (i:Int)=>at (Place(h+i)) st().logger);
-                val log = new Logger();
+                val logs = new Rail[Logger](n, (i:Int)=>at (Place(h+i)) st().logger.get(verbose));
+                val log = new Logger(false);
                 log.collect(logs);
                 return log;
             });
         } else {
             logs = new Rail[Logger](P, (i:Int)=>at (Place(i)) st().logger);
         }
-        val log = new Logger();
+        val log = new Logger(false);
         log.collect(logs);
-        log.stats(time, verbose);
+        log.stats(time);
     }
 }
 

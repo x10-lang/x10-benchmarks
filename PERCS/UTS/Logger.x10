@@ -17,9 +17,18 @@ public class Logger {
     var lastStartStopLiveTimeStamp:Long = -1L;
     var timeAlive:Long = 0L;
     var timeDead:Long = 0L;
+    var startTime:Long = 0L;
+    val timeReference:Long;
+    
+    def this(b:Boolean) {
+        if (b) x10.util.Team.WORLD.barrier(here.id);
+        timeReference = System.nanoTime();
+    }
+    
 
     def startLive() {
         val time = System.nanoTime();
+        if (startTime == 0L) startTime = time;
         if (lastStartStopLiveTimeStamp >= 0) {
             timeDead += time - lastStartStopLiveTimeStamp;
         }
@@ -36,7 +45,7 @@ public class Logger {
         for (l in logs.values()) add(l);
     }
 
-    def stats(time:Long, verbose:Boolean) {
+    def stats(time:Long) {
         Console.OUT.println(nodesGiven + " nodes stolen = " + nodesReceived + " (direct) + " +
             lifelineNodesReceived + " (lifeline)."); 
         Console.OUT.println(stealsPerpetrated + " successful direct steals."); 
@@ -54,5 +63,21 @@ public class Logger {
         stealsPerpetrated += other.stealsPerpetrated;
         lifelineNodesReceived += other.lifelineNodesReceived;
         lifelineStealsPerpetrated += other.lifelineStealsPerpetrated;
+    }
+
+    def get(verbose:Boolean) {
+        if (verbose) {
+            Console.OUT.println("" + Runtime.hereInt() + " -> " +
+                sub("" + (timeAlive/1E9), 0, 6) + " : " +
+                sub("" + (timeDead/1E9), 0, 6) + " : " + 
+                sub("" + ((timeAlive + timeDead)/1E9), 0, 6) + " : " + 
+                sub("" + (100.0*timeAlive/(timeAlive+timeDead)), 0, 6) + "%" + " :: " +
+                sub("" + ((startTime-timeReference)/1E9), 0, 6) + " : " +
+                sub("" + ((lastStartStopLiveTimeStamp-timeReference)/1E9), 0, 6) + " :: " +
+                stealsAttempted + " : " +
+                lifelineStealsAttempted + " : " +
+                (lifelineStealsAttempted - lifelineStealsPerpetrated));
+        }
+        return this;
     }
 }
