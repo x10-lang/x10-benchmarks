@@ -54,7 +54,7 @@ public final class UTS {
          */
         
         queue = new Queue(1024, b, d);
-        lifelineThieves = new FixedSizeStack[Int](lifelines.size+2);
+        lifelineThieves = new FixedSizeStack[Int](lifelines.size+3);
         thieves = new FixedSizeStack[Int](P);
         lifelinesActivated = new Rail[Boolean](P);
         
