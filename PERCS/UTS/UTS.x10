@@ -140,13 +140,18 @@ public final class UTS {
         }
     }
     
+    @Inline def rand(p:Int, P:Int) {
+        val v = random.nextInt(P);
+        return (P<1024) ? v : (((v/11)*11+(p%19))%P);
+    }
+    
     def steal(st:PlaceLocalHandle[UTS]) {
         if (P == 1) return false;
         val p = Runtime.hereInt();
         empty = true;
         for (var i:Int=0; i < w && empty; ++i) {
             var q:Int = 0;
-            while ((q = random.nextInt(P)) == p);
+            while ((q = rand(p, P)) == p);
             ++logger.stealsAttempted;
             waiting = true;
             logger.stopLive();
