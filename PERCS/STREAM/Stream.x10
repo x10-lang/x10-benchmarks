@@ -1,4 +1,5 @@
 import x10.compiler.Pragma;
+import x10.util.IndexedMemoryChunk;
 import x10.util.Team;
 
 public class Stream {
@@ -8,7 +9,7 @@ public class Stream {
 
     static NUM_TIMES = 10;
 
-    static DEFAULT_SIZE = 20 * MEG;
+    static DEFAULT_SIZE = 16 * MEG;
 
     static NUM_PLACES = Place.MAX_PLACES;
 
@@ -23,9 +24,9 @@ public class Stream {
 
         PlaceGroup.WORLD.broadcastFlat(()=>{
                 val p = here.id;
-                val a = new Array[double](localSize);
-                val b = new Array[double](localSize);
-                val c = new Array[double](localSize);
+                val a = new Array[double](IndexedMemoryChunk.allocateZeroed[double](localSize, 8, true));
+                val b = new Array[double](IndexedMemoryChunk.allocateZeroed[double](localSize, 8, true));
+                val c = new Array[double](IndexedMemoryChunk.allocateZeroed[double](localSize, 8, true));
                 
                 for (var i:int=0; i<localSize; i++) {
                     b(i) = 1.5 * (p*localSize+i);
