@@ -392,7 +392,7 @@ class LU {
         val py = Int.parse(args(3));
         val bk = Int.parse(args(4));
         val A = BlockedArray.make(M, N, B, B, px, py);
-        val buffers = PlaceLocalHandle.makeFlat[Rail[Double]{self!=null}](Dist.makeUnique(), ()=>new Rail[Double](N));        
+        val buffers = PlaceLocalHandle.makeFlat[Rail[Double]{self!=null}](Dist.makeUnique(), ()=>new Rail[Double](x10.util.IndexedMemoryChunk.allocateZeroed[Double](N, 8, true)));        
         val lus = PlaceLocalHandle.makeFlat[LU](Dist.makeUnique(), ()=>new LU(M, N, B, px, py, bk, A, buffers));
         Console.OUT.println ("LU: M " + M + " B " + B + " px " + px + " py " + py);
         start(lus);
@@ -411,8 +411,8 @@ class LU {
         row = Team.WORLD.split(here.id, colRole, rowRole);
         pivot = new Rail[Int](B);
         rowForBroadcast = new Rail[Double](B);
-        val rowBuffers = new Rail[Rail[Double]{self!=null}](M / B / px + 1, (Int)=>new Rail[Double](B * B));
-        val colBuffers = new Rail[Rail[Double]{self!=null}](N / B / py + 1, (Int)=>new Rail[Double](B * B));
+        val rowBuffers = new Rail[Rail[Double]{self!=null}](M / B / px + 1, (Int)=>new Rail[Double](x10.util.IndexedMemoryChunk.allocateZeroed[Double](B*B, 8, true)));
+        val colBuffers = new Rail[Rail[Double]{self!=null}](N / B / py + 1, (Int)=>new Rail[Double](x10.util.IndexedMemoryChunk.allocateZeroed[Double](B*B, 8, true)));
         this.rowBuffers = rowBuffers;
         this.colBuffers = colBuffers;
         rowBuffer = rowBuffers(0);
