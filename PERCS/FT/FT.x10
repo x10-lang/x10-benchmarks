@@ -2,6 +2,7 @@ import x10.compiler.Native;
 import x10.compiler.NativeCPPInclude;
 import x10.compiler.NativeCPPOutputFile;
 import x10.compiler.NativeCPPCompilationUnit;
+import x10.util.IndexedMemoryChunk;
 import x10.util.Team;
 
 @NativeCPPInclude("ft_natives.h")
@@ -54,8 +55,8 @@ class FT {
         fftwPlan = create_plan(SQRTN, -1, 0);
         fftwInversePlan = create_plan(SQRTN, 1, 0);
 
-        A = new Rail[Double](localSize);
-        B = new Rail[Double](localSize);
+        A = new Rail[Double](IndexedMemoryChunk.allocateZeroed[Double](localSize, 8, true));
+        B = new Rail[Double](IndexedMemoryChunk.allocateZeroed[Double](localSize, 8, true));
 
         val random = new Random(I);
         for (var i:Int=0; i<localSize; ++i) A(i) = random.next() - 0.5;
