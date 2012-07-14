@@ -15,22 +15,30 @@ public final class UTS {
     
     val n:Int;
     val w:Int;
+    val m:Int;
     
     val random = new Random();
+    val victims:Rail[Int];
     val logger:Logger;
     
-    var active:Boolean = false;
+    @x10.compiler.Volatile transient var active:Boolean = false;
     @x10.compiler.Volatile transient var empty:Boolean;
     @x10.compiler.Volatile transient var waiting:Boolean;
     
     val P = Place.MAX_PLACES;
     
-    public def this(b:Int, d:Int, n:Int, w:Int, l:Int, z:Int) {
+    public def this(b:Int, d:Int, n:Int, w:Int, l:Int, z:Int, m:Int) {
         this.n = n;
         this.w = w;
+        this.m = m;
         this.lifelines = new Rail[Int](z, -1);
         
         val h = Runtime.hereInt();
+        
+        victims = new Rail[Int](m);
+        if (P>1) for (var i:Int=0; i<m; i++) {
+            while ((victims(i) = random.nextInt(P)) == h);
+        }
         
         // lifelines
         var x:Int = 1;
@@ -53,7 +61,7 @@ public final class UTS {
          * Console.OUT.println();
          */
         
-        queue = new Queue(1024, b, d);
+        queue = new Queue(4096, b, d);
         lifelineThieves = new FixedSizeStack[Int](lifelines.size+3);
         thieves = new FixedSizeStack[Int](P);
         lifelinesActivated = new Rail[Boolean](P);
@@ -140,22 +148,15 @@ public final class UTS {
         }
     }
     
-    @Inline def rand(p:Int, P:Int) {
-        val v = random.nextInt(P);
-        return (P<1024) ? v : (((v/11)*11+(p%19))%P);
-    }
-    
     def steal(st:PlaceLocalHandle[UTS]) {
         if (P == 1) return false;
         val p = Runtime.hereInt();
         empty = true;
         for (var i:Int=0; i < w && empty; ++i) {
-            var q:Int = 0;
-            while ((q = rand(p, P)) == p);
             ++logger.stealsAttempted;
             waiting = true;
             logger.stopLive();
-            at (Place(q)) @Uncounted async st().request(st, p, false);
+            at (Place(victims(random.nextInt(m)))) @Uncounted async st().request(st, p, false);
             while (waiting) Runtime.probe();
             logger.startLive();
         }
@@ -251,13 +252,15 @@ public final class UTS {
                 Option("n", "", "Number of nodes to process before probing. Default 200."),
                 Option("w", "", "Number of thieves to send out. Default 1."),
                 Option("l", "", "Base of the lifeline"),
+                Option("m", "", "Max potential victims"),
                 Option("v", "", "Verbose. Default 0 (no).")]);
         
         val b = opts("-b", 4);
         val r = opts("-r", 19);
         val d = opts("-d", 13);
-        val n = opts("-n", 1000);
+        val n = opts("-n", 511);
         val l = opts("-l", 32);
+        val m = opts("-m", 1024);
         val verbose = opts("-v", 0) != 0;
         
         val P = Place.MAX_PLACES;
@@ -279,9 +282,10 @@ public final class UTS {
                 "   w=" + w +
                 "   n=" + n +
                 "   l=" + l + 
+                "   m=" + m + 
                 "   z=" + z);
         
-        val st = PlaceLocalHandle.makeFlat[UTS](PlaceGroup.WORLD, ()=>new UTS(b, d, n, w, l, z));
+        val st = PlaceLocalHandle.makeFlat[UTS](PlaceGroup.WORLD, ()=>new UTS(b, d, n, w, l, z, m));
         
         Console.OUT.println("Starting...");
         //@Native("c++", "ProfilerStart(\"UTS.prof\");") {}
