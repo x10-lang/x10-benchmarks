@@ -154,5 +154,9 @@ class RandomAccess {
                 if (plhimc()()(i) != (i as Long)) err++;
             Console.OUT.println(here+": Found " + err + " errors.");
         });
+
+        // print statistics again
+        Console.OUT.println("CPU time used: "+cpuTime+" seconds");
+        Console.OUT.println(GUPs+" Billion(10^9) Updates per second (GUP/s)");
     }
 }
