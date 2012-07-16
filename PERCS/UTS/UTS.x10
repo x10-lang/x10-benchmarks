@@ -1,4 +1,5 @@
 import x10.compiler.Inline;
+import x10.compiler.Pragma;
 import x10.compiler.Uncounted;
 import x10.util.Option;
 import x10.util.OptionsParser;
@@ -224,7 +225,7 @@ public final class UTS {
     }
     
     def main(st:PlaceLocalHandle[UTS], seed:Int) {
-        finish {
+        @Pragma(Pragma.FINISH_DENSE) finish {
             try {
                 active = true;
                 logger.startLive();
