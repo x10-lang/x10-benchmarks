@@ -24,9 +24,9 @@ public class Stream {
 
         PlaceGroup.WORLD.broadcastFlat(()=>{
                 val p = here.id;
-                val a = new Array[double](IndexedMemoryChunk.allocateZeroed[double](localSize, 8, true));
-                val b = new Array[double](IndexedMemoryChunk.allocateZeroed[double](localSize, 8, true));
-                val c = new Array[double](IndexedMemoryChunk.allocateZeroed[double](localSize, 8, true));
+                val a = new Array[double](IndexedMemoryChunk.allocateZeroed[double](localSize, 8, IndexedMemoryChunk.hugePages()));
+                val b = new Array[double](IndexedMemoryChunk.allocateZeroed[double](localSize, 8, IndexedMemoryChunk.hugePages()));
+                val c = new Array[double](IndexedMemoryChunk.allocateZeroed[double](localSize, 8, IndexedMemoryChunk.hugePages()));
                 
                 for (var i:int=0; i<localSize; i++) {
                     b(i) = 1.5 * (p*localSize+i);
