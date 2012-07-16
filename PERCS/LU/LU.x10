@@ -405,8 +405,8 @@ class LU {
         remoteBuffer = new RemoteArray(buffer);
         MB = M / B - 1;
         NB = N / B - 1;
-        colRole = here.id / py;
-        rowRole = here.id % py;
+        colRole = here.id % px;
+        rowRole = here.id / px;
         col = Team.WORLD.split(here.id, rowRole, colRole);
         row = Team.WORLD.split(here.id, colRole, rowRole);
         pivot = new Rail[Int](B);

@@ -67,8 +67,8 @@ public final class BlockedArray implements (Int,Int)=>Double {
         this.by = by;
         this.px = px;
         this.py = py;
-        val min_x = here.id/py;
-        val min_y = here.id%py;
+        val min_x = here.id%px;
+        val min_y = here.id/px;
         val nx = M/(bx*px);
         val ny = (N-by)/(by*py)+(min_y==0 ? 1 : 0);
         this.min_x = min_x;
@@ -87,9 +87,9 @@ public final class BlockedArray implements (Int,Int)=>Double {
     public def blockOf(i:Int, j:Int) = block(i/bx, j/by);
     public def placeOf(i:Int, j:Int) = placeOfBlock(i/bx, j/by);
     public def hasBlock(I:Int, J:Int) = placeOfBlock(I, J) == here.id;
-    public def hasCol(J:Int) = (J-here.id)%py == 0;
-    public def hasRow(I:Int) = here.id/py == I%px;
-    public def placeOfBlock(I:Int, J:Int) = I%px*py+J%py;
+    public def hasCol(J:Int) = here.id/px == J%py;
+    public def hasRow(I:Int) = here.id%px == I%px;
+    public def placeOfBlock(I:Int, J:Int) = I%px+J%py*px;
 
     public def blocks(min_x:Int, max_x:Int, min_y:Int, max_y:Int) {
         val view_min_x = min_x+(px+this.min_x-(min_x%px))%px;
