@@ -241,7 +241,7 @@ class FT {
         }
 
         // Initialization
-        val plh = PlaceLocalHandle.make[FT](Dist.makeUnique(), ()=>new FT(nRows, localSize, N, SQRTN, verify));
+        val plh = PlaceLocalHandle.makeFlat[FT](PlaceGroup.WORLD, ()=>new FT(nRows, localSize, N, SQRTN, verify));
 
         // Benchmark
         PlaceGroup.WORLD.broadcastFlat(()=>{plh().run();});
