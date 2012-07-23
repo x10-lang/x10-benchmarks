@@ -1,0 +1,21 @@
+# HugePages_Total:    5120
+
+./lu   17280 360   1   1 20 -procs 1     2>&1 | tee -a log.lu.00001
+
+./lu   97920 360   8   4 20 -procs 32    2>&1 | tee -a log.lu.00032
+
+./lu 3133440 360 256 128 20 -procs 32768 2>&1 | tee -a log.lu.32768
+./lu 1566720 360 128  64 20 -procs 8192  2>&1 | tee -a log.lu.08192
+./lu  783360 360  64  32 20 -procs 2048  2>&1 | tee -a log.lu.02048
+./lu  391680 360  32  16 20 -procs 512   2>&1 | tee -a log.lu.00512
+./lu  195840 360  16   8 20 -procs 128   2>&1 | tee -a log.lu.00128
+./lu   48960 360   4   2 20 -procs 8     2>&1 | tee -a log.lu.00008
+./lu   24480 360   2   1 20 -procs 2     2>&1 | tee -a log.lu.00002
+
+./lu 2211840 360 128 128 20 -procs 16384 2>&1 | tee -a log.lu.16384
+./lu 1105920 360  64  64 20 -procs 4096  2>&1 | tee -a log.lu.04096
+./lu  552960 360  32  32 20 -procs 1024  2>&1 | tee -a log.lu.01024
+./lu  276480 360  16  16 20 -procs 256   2>&1 | tee -a log.lu.00256
+./lu  138240 360   8   8 20 -procs 64    2>&1 | tee -a log.lu.00064
+./lu   69120 360   4   4 20 -procs 16    2>&1 | tee -a log.lu.00016
+./lu   34560 360   2   2 20 -procs 4     2>&1 | tee -a log.lu.00004

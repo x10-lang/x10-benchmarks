@@ -1,0 +1,19 @@
+# HugePages_Total:       0
+
+./uts -d 22 -procs 47040 2>&1 | tee -a log.uts.47040
+./uts -d 22 -procs 32768 2>&1 | tee -a log.uts.32768
+./uts -d 21 -procs 16384 2>&1 | tee -a log.uts.16384
+./uts -d 21 -procs 8192  2>&1 | tee -a log.uts.08192
+./uts -d 20 -procs 4096  2>&1 | tee -a log.uts.04096
+./uts -d 20 -procs 2048  2>&1 | tee -a log.uts.02048
+./uts -d 19 -procs 1024  2>&1 | tee -a log.uts.01024
+./uts -d 19 -procs 512   2>&1 | tee -a log.uts.00512
+./uts -d 18 -procs 256   2>&1 | tee -a log.uts.00256
+./uts -d 18 -procs 128   2>&1 | tee -a log.uts.00128
+./uts -d 17 -procs 64    2>&1 | tee -a log.uts.00064
+./uts -d 17 -procs 32    2>&1 | tee -a log.uts.00032
+./uts -d 16 -procs 16    2>&1 | tee -a log.uts.00016
+./uts -d 16 -procs 8     2>&1 | tee -a log.uts.00008
+./uts -d 15 -procs 4     2>&1 | tee -a log.uts.00004
+./uts -d 15 -procs 2     2>&1 | tee -a log.uts.00002
+./uts -d 14 -procs 1     2>&1 | tee -a log.uts.00001
