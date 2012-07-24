@@ -1,13 +1,19 @@
-./stream -procs 4096
-./stream -procs 2048
-./stream -procs 1024
-./stream -procs 512
-./stream -procs 256
-./stream -procs 128
-./stream -procs 64
-./stream -procs 32
-./stream -procs 16
-./stream -procs 8
-./stream -procs 4
-./stream -procs 2
-./stream -procs 1
+# HugePages_Total:     768
+
+./stream -procs 47040 2>&1 | tee -a log.stream.47040
+./stream -procs 32768 2>&1 | tee -a log.stream.32768
+./stream -procs 16384 2>&1 | tee -a log.stream.16384
+./stream -procs 8192  2>&1 | tee -a log.stream.08192
+./stream -procs 4096  2>&1 | tee -a log.stream.04096
+./stream -procs 2048  2>&1 | tee -a log.stream.02048
+./stream -procs 1024  2>&1 | tee -a log.stream.01024
+./stream -procs 512   2>&1 | tee -a log.stream.00512
+./stream -procs 256   2>&1 | tee -a log.stream.00256
+./stream -procs 128   2>&1 | tee -a log.stream.00128
+./stream -procs 64    2>&1 | tee -a log.stream.00064
+./stream -procs 32    2>&1 | tee -a log.stream.00032
+./stream -procs 16    2>&1 | tee -a log.stream.00016
+./stream -procs 8     2>&1 | tee -a log.stream.00008
+./stream -procs 4     2>&1 | tee -a log.stream.00004
+./stream -procs 2     2>&1 | tee -a log.stream.00002
+./stream -procs 1     2>&1 | tee -a log.stream.00001
