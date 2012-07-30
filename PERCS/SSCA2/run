@@ -17,7 +17,6 @@
 
 ./ssca2 -n 16 -procs 32    2>&1 | tee -a log.ssca2.n16.00032
 ./ssca2 -n 16 -procs 16    2>&1 | tee -a log.ssca2.n16.00016
-./ssca2 -n 16 -procs 16    2>&1 | tee -a log.ssca2.n16.00016
 ./ssca2 -n 16 -procs 8     2>&1 | tee -a log.ssca2.n16.00008
 ./ssca2 -n 16 -procs 4     2>&1 | tee -a log.ssca2.n16.00004
 ./ssca2 -n 16 -procs 2     2>&1 | tee -a log.ssca2.n16.00002
