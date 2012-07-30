@@ -295,6 +295,8 @@ final class SSCA1 {
         val plh = PlaceLocalHandle.makeFlat[SSCA1](PlaceGroup.make(params.segmentCount), ()=>new SSCA1(params, verbose));
         printTime("Init:  ", System.nanoTime()-t);
 
+        val start_time = System.nanoTime();
+
         for (var k:Int=0; k<iterations; k++) {
             val v = verbose && (k==0);
             t = System.nanoTime();
@@ -306,5 +308,8 @@ final class SSCA1 {
             Console.OUT.println("place=" + p + " score=" + r.score + " short=[" + r.shortFirst + "," + r.shortLast + "[ long=[" + r.longFirst + "," + r.longLast +"[ length=" + r.short.size);
             if (v) r.print();
         }
+        val stop_time = System.nanoTime();
+
+        Console.OUT.println("Total time: " + (stop_time-start_time)/1E9);
     }
 }
