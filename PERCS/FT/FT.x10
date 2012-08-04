@@ -55,8 +55,8 @@ class FT {
         fftwPlan = create_plan(SQRTN, -1, 0);
         fftwInversePlan = create_plan(SQRTN, 1, 0);
 
-        A = new Rail[Double](IndexedMemoryChunk.allocateZeroed[Double](localSize, 8, IndexedMemoryChunk.hugePages()));
-        B = new Rail[Double](IndexedMemoryChunk.allocateZeroed[Double](localSize, 8, IndexedMemoryChunk.hugePages()));
+        A = new Rail[Double](IndexedMemoryChunk.allocateZeroed[Double](localSize, 8, true));
+        B = new Rail[Double](IndexedMemoryChunk.allocateZeroed[Double](localSize, 8, true));
 
         val random = new Random(I);
         for (var i:Int=0; i<localSize; ++i) A(i) = random.next() - 0.5;
