@@ -6,8 +6,8 @@ export X10CXX?=x10c++
 
 #leave blank by default, X10 automatically chooses a transport for you. To
 #force a particular implementation, please uncheck one of the other options.
-#export X10RTTRANSPORT	?= 
-export X10RTTRANSPORT	?= -x10rt pami
+export X10RTTRANSPORT	?= 
+#export X10RTTRANSPORT	?= -x10rt pami
 #export X10RTTRANSPORT	?= -x10rt mpi
 #export X10RTTRANSPORT ?= -x10rt standalone
 #export X10RTTRANSPORT ?= -x10rt pgas_lapi

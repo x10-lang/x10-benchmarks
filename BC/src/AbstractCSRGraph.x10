@@ -10,6 +10,7 @@ public abstract class AbstractCSRGraph {
   protected val N:Int; // number of vertices
   protected var M:Int; // number of edges
   protected val inDegreeMap:Rail[Int]; // in-degree for each vertex
+  protected val outDegreeMap:Rail[Int]; // out-degree for each vertex
   protected var compressed:Boolean; // indicates compression
 
   /** 
@@ -28,7 +29,7 @@ public abstract class AbstractCSRGraph {
    * the CSR format.
    * 
    * The graph is written out as follows in Binary:
-   * [N][M][offsetMap][AdjacencyMap]
+   * [N][M][inDegreeMap][outDegreeMap][offsetMap][AdjacencyMap]
    */
   public def this (fileName:String) {
     val inputFile:File = new File(fileName);
@@ -40,6 +41,9 @@ public abstract class AbstractCSRGraph {
 
     // Second, create the datastructures that we need.
     this.inDegreeMap = new Rail[Int] 
+                        (this.N, (i:Int) => inputFileReader.readInt());
+
+    this.outDegreeMap = new Rail[Int] 
                         (this.N, (i:Int) => inputFileReader.readInt());
 
     // Third, create the offset map --- which has (N+1) entries. BEWARE!
@@ -59,6 +63,7 @@ public abstract class AbstractCSRGraph {
     this.N = N;
     this.M = 0;
     this.inDegreeMap = new Rail[Int] (this.N, (Int) => 0);
+    this.outDegreeMap = new Rail[Int] (this.N, (Int) => 0);
     this.offsetMap = new Rail[Int] ((this.N)+1);
     this.compressed = false;
   }
@@ -70,6 +75,26 @@ public abstract class AbstractCSRGraph {
   public final def getAdjacentVertexFromIndex(wIndex:Int) {
     assert (this.compressed);
     return this.adjacencyMap(wIndex);
+  }
+
+  /** Get the maximum indegree */
+  public final def getMaxInDegree() {
+    var maxInDegree:Int = 0;    
+    for ([i] in 0..this.N) {
+      if (this.inDegreeMap(i) > maxInDegree) {
+        maxInDegree = this.inDegreeMap(i);
+      }
+    }
+  }
+
+  /** Get the maximum outdegree */
+  public final def getMaxOutDegree() {
+    var maxOutDegree:Int = 0;    
+    for ([i] in 0..this.N) {
+      if (this.outDegreeMap(i) > maxOutDegree) {
+        maxOutDegree = this.outDegreeMap(i);
+      }
+    }
   }
 
   /** 
@@ -114,8 +139,16 @@ public abstract class AbstractCSRGraph {
     this.M+=1;
   }
 
+  /** Add to the outDegree of a vertex */
+  public final def incrementOutDegree (v:Int) {
+    this.outDegreeMap(v)+=1;
+  }
+
   /** Get a vertex's inDegree */
   public final def getInDegree (v:Int) = this.inDegreeMap(v);
+
+  /** Get a vertex's inDegree */
+  public final def getOutDegree (v:Int) = this.outDegreeMap(v);
 
   /**
    * Write the graph out to file so that its easy to read the next time 
@@ -134,8 +167,9 @@ public abstract class AbstractCSRGraph {
     outputFileWriter.writeInt (this.N);
     outputFileWriter.writeInt (this.M);
 
-    // Second, write the in-degree map.
+    // Second, write the in- and out-degree map.
     for ([i] in 0..(this.N-1)) outputFileWriter.writeInt(this.inDegreeMap(i));
+    for ([i] in 0..(this.N-1)) outputFileWriter.writeInt(this.outDegreeMap(i));
 
     // Third, write the offset map --- which has (N+1) entries. BEWARE!
     for ([i] in 0..(this.N)) outputFileWriter.writeInt(this.offsetMap(i));

@@ -169,6 +169,53 @@ public final class Brandes(N:Int) {
       );
     }
   }
+  
+  /**
+  * Helper function that computes the single source shortest path for a 
+  * list of vertices, one vertex at a time. The algorithm is based on the
+  * delta-stepping algorithm by Meyer and Sanders. In this version, all 
+  * the threads work on computing a single source shortest path rather than
+  * in the Dijkstra's version where there is one thread computing an 
+  * individual single source shortest path. Although this will result in a
+  * slowdown, the key idea here is to conserve space.
+  *
+  * Algorithm:
+  *
+  * PREPARATION:
+  * (I)   Compute DELTA, the width that we are willing to accomodate as one 
+  *       bucket. DELTA is usually chosen to be THETA(1/d), where 'd' is the 
+  *       diameter of the graph.
+  * (II)  Figure out the number of buckets that are needed. Each bucket holds
+  *       values ranging form (i*DELTA) to (i*DELTA+DELTA).
+  * (III) Classify each edge as either HEAVY or LIGHT based on the distances.
+  *       LIGHT edges are those that are less than or equal to DELTA and HEAVY
+  *       edges are those which are otherwise.
+  *
+  * INITIALIZATION:
+  * (I)  Relax source "s" with distance 0. 
+  * (II) Set iteration index to "i" to 0.
+  *
+  * OUTER LOOP:
+  * (I)  While (there exists a non-empty bucket); do
+  * (II) S = NULL-SET.
+  * 
+  * INNER LOOP:
+  *     (I)   While the ith bucket is NOT-NULL.
+  *     (II)  Req += All light edges belonging to vertices in current bucket.
+  *     (III) S = S U B[i]
+  *     (IV)  B[i] = NULL-SET
+  *     (V)   Relax all edges in Req.
+  * (VI)  Relax all the heavy edges in set S.
+  * (VI)  Go to the next bucket (i++)
+  * 
+  */
+  public def deltaSteppingShortestPaths (val startVertex:Int,
+                                         val endVertex:Int,
+                                         debug:Int) {
+    val delta:Int = this.graph.getMaxOutDegree ();
+    var buckets:ArrayList[ArrayList[Int]] = new ArrayList[ArrayList[Int]];
+
+  }
 
   /**
   * Helper function that processes one single vertex --- i.e, calculates 
