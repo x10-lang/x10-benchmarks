@@ -1,4 +1,4 @@
-# HugePages_Total:     768
+# HugePages_Total:    3072
 
 ./stream -procs 47040 2>&1 | tee -a log.stream.47040
 ./stream -procs 32768 2>&1 | tee -a log.stream.32768
