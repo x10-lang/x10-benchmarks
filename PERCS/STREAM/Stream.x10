@@ -9,7 +9,7 @@ public class Stream {
 
     static NUM_TIMES = 10;
 
-    static DEFAULT_SIZE = 16 * MEG;
+    static DEFAULT_SIZE = 64 * MEG;
 
     static NUM_PLACES = Place.MAX_PLACES;
 
