@@ -284,7 +284,7 @@ final class SSCA1 {
         val shortLength = Int.parseInt(args(0));
         val longLength = Int.parseInt(args(1));
         val seed = args.size>2 ? Int.parseInt(args(2)) : 1;
-        val iterations = args.size>3 ? Int.parseInt(args(3)) : 5;
+        val iterations = args.size>3 ? Int.parseInt(args(3)) : 6;
         val s = args.size>4 ? Int.parseInt(args(4)) : 0;
         val stride = s==0 ? sqrt(Place.MAX_PLACES) : s;
         val verbose = args.size>5 ? Boolean.parseBoolean(args(5)) : false;
@@ -295,10 +295,15 @@ final class SSCA1 {
         val plh = PlaceLocalHandle.makeFlat[SSCA1](PlaceGroup.make(params.segmentCount), ()=>new SSCA1(params, verbose));
         printTime("Init:  ", System.nanoTime()-t);
 
-        val start_time = System.nanoTime();
+        var start_time:Long = 0;
+        Console.OUT.println("Warmup");
 
         for (var k:Int=0; k<iterations; k++) {
             val v = verbose && (k==0);
+            if (k == 1) {
+                Console.OUT.println("Start Timer");
+                start_time = System.nanoTime();
+            }
             t = System.nanoTime();
             val p = plh().score(plh, v);
             printTime("Score: ", System.nanoTime()-t);
@@ -306,9 +311,10 @@ final class SSCA1 {
             val r = at (Place(p)) plh().trace(verify);
             printTime("Trace: ", System.nanoTime()-t);
             Console.OUT.println("place=" + p + " score=" + r.score + " short=[" + r.shortFirst + "," + r.shortLast + "[ long=[" + r.longFirst + "," + r.longLast +"[ length=" + r.short.size);
-            if (v) r.print();
+            if (k == 0) r.print();
         }
         val stop_time = System.nanoTime();
+        Console.OUT.println("Stop Timer");
 
         Console.OUT.println("Total time: " + (stop_time-start_time)/1E9);
     }
