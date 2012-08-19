@@ -117,22 +117,9 @@ public final class UTS {
     }
     
     @Inline def distribute(st:PlaceLocalHandle[UTS]) {
-        var numThieves:Int;
-        var t:Int;
-        while (((numThieves = lifelineThieves.size() + thieves.size()) > 0) && (t = queue.select()) >= 0) {
-            val lootSize = queue.upper(t) - queue.lower(t);
-            numThieves = min(numThieves+1, lootSize);
-            val numToSteal = lootSize/numThieves;
-            for (var i:Int=1; i < numThieves; ++i) {
-                give(st, queue.grab(t, numToSteal));
-            }
-        }
-        if (numThieves == 0) return;
-        val lootSize = queue.size;
-        numThieves = min(numThieves+1, lootSize);
-        val numToSteal = lootSize/numThieves;
-        for (var i:Int=1; i < numThieves; ++i) {
-            give(st, queue.pop(numToSteal));
+        var loot:Queue.Fragment;
+        while ((lifelineThieves.size() + thieves.size() > 0) && (loot = queue.grab()) != null) {
+            give(st, loot);
         }
         reject(st);
     }
