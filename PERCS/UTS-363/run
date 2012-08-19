@@ -1,0 +1,4 @@
+# HugePages_Total:       0
+
+./uts -d 21 -procs 11904 2>&1 | tee -a log.uts.11904
+./uts -d 14 -procs 1     2>&1 | tee -a log.uts.00001
