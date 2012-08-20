@@ -35,18 +35,12 @@ final class Queue {
 
     @Inline def children(h:SHA1Rand) = Math.floor(Math.log(1.0 - h() / 2147483648.0) / den) as Int;
 
-    @Inline def score(i:Int) = Math.pow(factor, height - depth(i)) * (upper(i) - lower(i));
-
     @Inline def push(h:SHA1Rand, d:Int, l:Int, u:Int):void {
         if (size >= hash.length()) grow();
         hash(size) = h;
         depth(size) = d;
         lower(size) = l;
         upper(size++) = u;
-    }
-
-    @Inline def pop():Int {
-        return --size;
     }
 
     @Inline def expand() {
@@ -81,23 +75,24 @@ final class Queue {
         }
     }
 
-    def pop(n:Int) {
-        val fragment = new Fragment(n);
-        size -= n;
-        IndexedMemoryChunk.copy(hash, size, fragment.hash, 0, n);
-        IndexedMemoryChunk.copy(depth, size, fragment.depth, 0, n);
-        IndexedMemoryChunk.copy(lower, size, fragment.lower, 0, n);
-        IndexedMemoryChunk.copy(upper, size, fragment.upper, 0, n);
-        return fragment;
-    }
-
-    def grab(i:Int, n:Int) {
-        val fragment = new Fragment(1);
-        fragment.hash(0) = hash(i);
-        fragment.depth(0) = depth(i);
-        fragment.upper(0) = upper(i);
-        upper(i) -= n;
-        fragment.lower(0) = upper(i);
+    def grab() {
+        var s:Int = 0;
+        for (var i:Int=0; i<size; ++i) {
+            if ((upper(i) - lower(i)) >= 2) ++s;
+        }
+        if (s == 0) return null;
+        val fragment = new Fragment(s);
+        s = 0;
+        for (var i:Int=0; i<size; ++i) {
+            val p = upper(i) - lower(i);
+            if (p >= 2) {
+               fragment.hash(s) = hash(i);
+               fragment.depth(s) = depth(i);
+               fragment.upper(s) = upper(i);
+               upper(i) -= p/2;
+               fragment.lower(s++) = upper(i);
+            }
+        }
         return fragment;
     }
 
@@ -131,26 +126,12 @@ final class Queue {
         upper = u;
     }
 
-    @Inline def select() {
-        var max:Double = 0.0;
-        var mem:Int = -1;
-        for (var i:Int=0; i<size; i++) {
-            if (upper(i) <= lower(i) + 1) continue;
-            val s = score(i);
-            if (s > max) {
-                max = s;
-                mem = i;
-            }
-        }
-        return mem;
-    }
-
     private static def sub(str:String, start:Int, end:Int) = str.substring(start, Math.min(end, str.length()));
 
     public static def main(Array[String]) {
-        val queue = new Queue(256, 4, 13);
+        val queue = new Queue(4096, 4, 14);
         var time:Long = System.nanoTime();
-        queue.init(29);
+        queue.init(19);
         while (queue.size > 0) {
             queue.expand();
             queue.count++;
