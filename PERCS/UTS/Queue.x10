@@ -75,7 +75,7 @@ final class Queue {
         }
     }
 
-    def grab() {
+    @Inline def grab() {
         var s:Int = 0;
         for (var i:Int=0; i<size; ++i) {
             if ((upper(i) - lower(i)) >= 2) ++s;

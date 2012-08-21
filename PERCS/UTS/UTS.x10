@@ -92,6 +92,7 @@ public final class UTS {
             while (processAtMostN()) {
                 Runtime.probe();
                 distribute(st);
+                reject(st);
             }
             reject(st);
         } while (steal(st));
@@ -118,10 +119,9 @@ public final class UTS {
     
     @Inline def distribute(st:PlaceLocalHandle[UTS]) {
         var loot:Queue.Fragment;
-        while ((lifelineThieves.size() + thieves.size() > 0) && (loot = queue.grab()) != null) {
+        while (((thieves.size() > 0) || (lifelineThieves.size() > 0)) && (loot = queue.grab()) != null) {
             give(st, loot);
         }
-        reject(st);
     }
     
     @Inline def reject(st:PlaceLocalHandle[UTS]) {
