@@ -185,7 +185,7 @@ public final class UTS {
             } else {
                 if (lifeline) thieves.push(thief); else thieves.push(-thief-1);
             }
-        } catch (v:Throwable) {
+        } catch (v:CheckedThrowable) {
             error(v);
         }
     }
@@ -219,7 +219,7 @@ public final class UTS {
                 active = false;
                 logger.nodesCount = queue.count;
             }
-        } catch (v:Throwable) {
+        } catch (v:CheckedThrowable) {
             error(v);
         }
     }
@@ -234,13 +234,13 @@ public final class UTS {
                 logger.stopLive();
                 active = false;
                 logger.nodesCount = queue.count;
-            } catch (v:Throwable) {
+            } catch (v:CheckedThrowable) {
                 error(v);
             }
         } 
     }
     
-    static def error(v:Throwable) {
+    static def error(v:CheckedThrowable) {
         Runtime.println("Exception at " + here);
         v.printStackTrace();
     }

@@ -6,16 +6,16 @@
 class SHA1Rand_ibox0 : public x10::lang::IBox<SHA1Rand> {
 public:
     static x10::lang::Any::itable<SHA1Rand_ibox0 > itable;
-    x10_boolean equals(x10aux::ref<x10::lang::Any> arg0) {
+    x10_boolean equals(x10::lang::Any* arg0) {
         return this->value->equals(arg0);
     }
     x10_int hashCode() {
         return this->value->hashCode();
     }
-    x10aux::ref<x10::lang::String> toString() {
+    x10::lang::String* toString() {
         return this->value->toString();
     }
-    x10aux::ref<x10::lang::String> typeName() {
+    x10::lang::String* typeName() {
         return x10aux::type_name(this->value);
     }
     
@@ -45,10 +45,10 @@ void SHA1Rand::_deserialize_body(x10aux::deserialization_buffer& buf) {
 }
 
 
-x10_boolean SHA1Rand::equals(x10aux::ref<x10::lang::Any> that) {
-    x10aux::ref<x10::lang::Reference> thatAsRef(that);
+x10_boolean SHA1Rand::equals(x10::lang::Any* that) {
+    x10::lang::Reference* thatAsRef = reinterpret_cast<x10::lang::Reference*>(that);
     if (thatAsRef->_type()->equals(x10aux::getRTT<SHA1Rand >())) {
-        x10aux::ref<x10::lang::IBox<SHA1Rand > > thatAsIBox(that);
+        x10::lang::IBox<SHA1Rand>* thatAsIBox = reinterpret_cast<x10::lang::IBox<SHA1Rand>*>(that);
         return _struct_equals(thatAsIBox->value);
     }
     return false;
@@ -58,7 +58,7 @@ x10_boolean SHA1Rand::equals(SHA1Rand that) {
     return _struct_equals(that);
 }
 
-x10aux::ref<x10::lang::String> SHA1Rand::toString() {
+x10::lang::String* SHA1Rand::toString() {
     return x10::lang::String::Lit("SHA1Rand: detailed toString not defined.");
 }
 
@@ -67,7 +67,7 @@ x10_int SHA1Rand::hashCode() {
     return *((x10_int*)tmp);
 }
 
-x10aux::ref<x10::lang::String> SHA1Rand::typeName() {
+x10::lang::String* SHA1Rand::typeName() {
     return x10aux::type_name(*this);
 }
 
