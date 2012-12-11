@@ -42,7 +42,7 @@ public class Ones extends TaskFrame[Int, Int] {
 				public def zero()=0;
 				public operator this(a:Int, b:Int)=a+b;
 			};
-			val counts = new Rail(Place.MAX_PLACES, 
+			val counts = new Rail[GlobalRef[TaskFrame[Int,Int]]](Place.MAX_PLACES, 
 					(i:Int)=> at(Place(i)) GlobalRef[TaskFrame[Int,Int]](new Ones()));
 			val runner = seq ? new SeqRunner[Int,Int](new Counts()) as Runner[Int,Int]
 			                 : new GlobalRunner[Int, Int](args, ()=> counts(here.id));
@@ -53,11 +53,11 @@ public class Ones extends TaskFrame[Int, Int] {
 			Console.OUT.println("Finished with result " + result + ".");
 			runner.stats(time, true);
 			Console.OUT.println("--------");
-			for (count in counts) {
+			for (count in counts.values()) {
 				at (count) 
 				Console.OUT.println("Ones(" + here.id +")=" + (count() as Ones).c);
 			}
-		} catch (e:Throwable) {
+		} catch (e:CheckedThrowable) {
 			e.printStackTrace(Console.ERR);
 		}
 	}

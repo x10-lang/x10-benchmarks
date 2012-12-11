@@ -15,7 +15,6 @@ namespace x10 {
 
 #include "sha1_rand.hpp"
 #include <x10aux/config.h>
-#include <x10aux/ref.h>
 #include <x10aux/RTT.h>
 #include <x10aux/serialization.h>
 
@@ -77,15 +76,15 @@ namespace examples {
 
             x10_boolean _struct_equals(UTS__SHA1Rand that);
     
-            x10_boolean equals(x10aux::ref<x10::lang::Any> that);
+            x10_boolean equals(x10::lang::Any* that);
     
             x10_boolean equals(UTS__SHA1Rand that);
     
-            x10aux::ref<x10::lang::String> toString();
+            x10::lang::String* toString();
     
             x10_int hashCode();
     
-            x10aux::ref<x10::lang::String> typeName();
+            x10::lang::String* typeName();
         };
 
     }

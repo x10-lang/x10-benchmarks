@@ -8,16 +8,16 @@ namespace examples {
         class UTS__SHA1Rand_ibox0 : public x10::lang::IBox<UTS__SHA1Rand> {
         public:
             static x10::lang::Any::itable<UTS__SHA1Rand_ibox0 > itable;
-            x10_boolean equals(x10aux::ref<x10::lang::Any> arg0) {
+            x10_boolean equals(x10::lang::Any* arg0) {
                 return this->value->equals(arg0);
             }
             x10_int hashCode() {
                 return this->value->hashCode();
             }
-            x10aux::ref<x10::lang::String> toString() {
+            x10::lang::String* toString() {
                 return this->value->toString();
             }
-            x10aux::ref<x10::lang::String> typeName() {
+            x10::lang::String* typeName() {
                 return x10aux::type_name(this->value);
             }
     
@@ -50,10 +50,10 @@ namespace examples {
         }
 
 
-        x10_boolean UTS__SHA1Rand::equals(x10aux::ref<x10::lang::Any> that) {
-            x10aux::ref<x10::lang::Reference> thatAsRef(that);
+        x10_boolean UTS__SHA1Rand::equals(x10::lang::Any* that) {
+            x10::lang::Reference* thatAsRef = reinterpret_cast<x10::lang::Reference*>(that);
             if (thatAsRef->_type()->equals(x10aux::getRTT<UTS__SHA1Rand >())) {
-                x10aux::ref<x10::lang::IBox<UTS__SHA1Rand > > thatAsIBox(that);
+                x10::lang::IBox<UTS__SHA1Rand>* thatAsIBox = reinterpret_cast<x10::lang::IBox<UTS__SHA1Rand>*>(that);
                 return _struct_equals(thatAsIBox->value);
             }
             return false;
@@ -63,7 +63,7 @@ namespace examples {
             return _struct_equals(that);
         }
 
-        x10aux::ref<x10::lang::String> UTS__SHA1Rand::toString() {
+        x10::lang::String* UTS__SHA1Rand::toString() {
             return x10::lang::String::Lit("UTS$SHA1Rand: detailed toString not defined.");
         }
 
@@ -72,7 +72,7 @@ namespace examples {
             return *((x10_int*)tmp);
         }
 
-        x10aux::ref<x10::lang::String> UTS__SHA1Rand::typeName() {
+        x10::lang::String* UTS__SHA1Rand::typeName() {
             return x10aux::type_name(*this);
         }
 

@@ -57,7 +57,7 @@ public class Fib {
 	        Console.OUT.println("Finished with result " + result + "( expected " + fib(x) + ").");
 	        runner.stats(time, false);
             Console.OUT.println("--------");
-        } catch (e:Throwable) {
+        } catch (e:CheckedThrowable) {
             e.printStackTrace(Console.ERR);
         }
     }
