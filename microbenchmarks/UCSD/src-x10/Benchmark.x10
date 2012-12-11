@@ -41,6 +41,7 @@ import x10.io.File;
 import x10.io.FileWriter;
 import x10.io.Printer;
 import x10.util.Random;
+import x10.compiler.NonEscaping;
 
 class Timer {
     private var base_time: Long;
@@ -56,7 +57,7 @@ class Timer {
         base_time = System.nanoTime();
     }
 
-    def clear(): void {
+    @NonEscaping final def clear(): void {
         elapsed_time = 0;
     }
 
@@ -86,34 +87,34 @@ class GCTest {
     @NativeRep("java", "java.lang.Runtime", null, null)
     static class NativeRuntime {
 	@Native("java", "java.lang.Runtime.getRuntime()")
-        public static def getRuntime() = new NativeRuntime();
+        public static def getRuntime():NativeRuntime = new NativeRuntime();
         
 	@Native("java", "#0.gc()")
-	public def gc() { }
+	public def gc():void { }
         
 	@Native("java", "#0.totalMemory()")
-	public def totalMemory() = 0L;
+	public def totalMemory():long = 0L;
         
 	@Native("java", "#0.freeMemory()")
-	public def freeMemory() = 0L;
+	public def freeMemory():long = 0L;
         
 	@Native("java", "#0.runFinalization()")
-	public def runFinalization() { }
+	public def runFinalization():void { }
     }
 
     // WGG - pick these sizes carefully: will kill some systems
     static val GC_POINTERS = 200;
     static val GC_OBJECTS = 2000;
     static val MAX_OBJ_SIZE = 4000;
-    val objects = Rail.make[GCTestElem](GC_POINTERS);
-    val counter: Counter! = new Counter();
+    val objects = new Rail[GCTestElem](GC_POINTERS);
+    val counter = new Counter();
     var seed1: Long  = 121393;  // WGG - no, I didn't look these up in Knuth
     var seed2: Long  = 196418;
     var total_size: Long  = 0;
     var freememory: Long, totalmemory: Long;
     var newfreememory: Long, newtotalmemory: Long, recoveredmemory: Long;
-    var fullGCtimer: Timer!;
-    var incrGCtimer: Timer!;
+    var fullGCtimer: Timer;
+    var incrGCtimer: Timer;
     
     public def this() {}
     
@@ -167,11 +168,11 @@ class GCTest {
 
 class GCTestElem {
     val collect: Rail[Byte];
-    val counter: GCTest.Counter!;
+    val counter: GCTest.Counter;
 
-    public def this(counter: GCTest.Counter!, size: Int) {
+    public def this(counter: GCTest.Counter, size: Int) {
         this.counter = counter;
-        collect = Rail.make[Byte](size);
+        collect = new Rail[Byte](size);
     }
 
     protected def finalize() {
@@ -181,7 +182,7 @@ class GCTestElem {
 
 class LoopTest {
     static val ITERATIONS = 1000000;
-    var t: Timer!;
+    var t: Timer;
 
     public def start(): void {
         t = new Timer();
@@ -198,8 +199,8 @@ class LoopTest {
 
 class ArrayTest {
     static val ARRAY_INTS = 1000000;
-    val arr = Rail.make[Int](ARRAY_INTS);
-    var t: Timer!;
+    val arr = new Rail[Int](ARRAY_INTS);
+    var t: Timer;
 
     public def start(): void {
         t = new Timer();
@@ -218,8 +219,8 @@ class ArrayTest {
 
 class FieldTest {
     static val FIELD_ACCESSES = 1000000;
-    val fte: FieldTestElem! = new FieldTestElem();
-    var t: Timer!;
+    val fte: FieldTestElem = new FieldTestElem();
+    var t: Timer;
 
     public def start(): void {
         var temp: Int;
@@ -247,8 +248,8 @@ class ArithmeticTest {
     static val MULTS = 1000000;
     static val FADDS = 1000000;
     static val FMULTS = 1000000;
-    var intaddtimer: Timer!, intmulttimer: Timer!;
-    var doubleaddtimer: Timer!, doublemulttimer: Timer!;
+    var intaddtimer: Timer, intmulttimer: Timer;
+    var doubleaddtimer: Timer, doublemulttimer: Timer;
     var sum: Int = 0, prod: Int = 1;
     var fsum: Double = 0.0, fprod: Double = 1.0;
     val realnumber = new Random().nextDouble() * 43213.5752 + 1; // WGG - don't use int i
@@ -295,8 +296,8 @@ class ArithmeticTest {
 
 class MethodTest {
     static val METHOD_CALLS = 1000000;
-    var sametimer: Timer!, othertimer: Timer!;
-    var mt: MethodTest!;
+    var sametimer: Timer, othertimer: Timer;
+    var mt: MethodTest;
 
     public def start(): void {
         sametimer = new Timer();
@@ -327,7 +328,7 @@ class MethodTest {
 
 class ExceptionTest {
     static val THROWS = 1000000;
-    var t: Timer!;
+    var t: Timer;
     var exc: MyException;
 
     public def start(): void {
@@ -363,7 +364,7 @@ class ThreadTest {
     
     static val THREADCNT = 3;
     static val SWITCHES = 10000;
-    var t: Timer!;
+    var t: Timer;
     var i: Int;
 
     public def start(): void {
@@ -391,9 +392,9 @@ class ThreadTest {
 }
 
 class IOTest {
-    var bytetimer: Timer!, blocktimer: Timer!;
+    var bytetimer: Timer, blocktimer: Timer;
     static val BUFSIZE = 100000;
-    var buffer: Rail[Byte]!;
+    var buffer: Rail[Byte];
     var out: FileWriter;
 
     public def start(pstream: Printer): void {
@@ -416,7 +417,7 @@ class IOTest {
         }
         bytetimer.record();
 
-        buffer = Rail.make[Byte](BUFSIZE);
+        buffer = new Rail[Byte](BUFSIZE);
         blocktimer.mark();
         try {
             out.write(buffer);
@@ -466,7 +467,7 @@ class StringHelper {
 class Benchmark {
     var next: Int;
     var pstream: Printer;
-    var cumtimer: Timer!;
+    var cumtimer: Timer;
     var skipgc: Boolean;
     var mode: String;
     var optflags: String;
@@ -482,13 +483,13 @@ class Benchmark {
         optflags = (OptFlags != null) ? OptFlags : "unspecified";
     }
 
-    public static def main(args: Rail[String]!): void {
+    public static def main(args: Rail[String]): void {
         val bm = new Benchmark(x10.io.Console.OUT, false, "unspecified");
 
-        if (args.length == 0)
+        if (args.size == 0)
             bm.runbenchmarks();
         else {
-            for (var i: Int = 0; i < args.length; i++)
+            for (var i: Int = 0; i < args.size; i++)
                 bm.runTest(args(i));
         }
     }
@@ -513,11 +514,11 @@ class Benchmark {
         }
 
         // run the test or the cum
-        if (next < test.length) {
+        if (next < test.size) {
             runTest(test(next));
             pstream.println(" ");
             return true;
-        } else if (next == test.length) {
+        } else if (next == test.size) {
             cumtimer.record();
             StringHelper.bmfill(pstream, "Cumulative runtime: ", cumtimer.elapsed());
             pstream.println();
