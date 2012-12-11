@@ -36,7 +36,7 @@ public class Geometric(b0:Int, a:Int, d:Int) extends TaskFrame[TreeNode, Int]{
 				(l==3 ?" base=" + NetworkGenerator.findW(Place.MAX_PLACES, z) : ""));
 	}
 	
-	public def runRootTask(s:TreeNode, stack:Stack[TreeNode]):void offers Int {
+	public def runRootTask(s:TreeNode, stack:Stack[TreeNode]) offers Int :void {
 		runTask(s, stack);
 	}
 	public def runTask  (

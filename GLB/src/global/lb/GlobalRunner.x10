@@ -184,7 +184,7 @@ public final class GlobalRunner[T, Z]  implements Runner[T,Z] {
 		
 		/** Process the current task.
 		 */
-		final def processSubtree (task:T):void offers Z {
+		final def processSubtree (task:T) offers Z :void {
 			++counter.nodesCounter;
 			frame.runTask(task, stack);
 		}
@@ -193,7 +193,7 @@ public final class GlobalRunner[T, Z]  implements Runner[T,Z] {
 		 * Process the loot - the Rail[T] of tasks received from the environment.
 		 * 
 		 */
-		final def processLoot(loot: Rail[T], lifeline:Boolean):void offers Z {
+		final def processLoot(loot: Rail[T], lifeline:Boolean) offers Z :void {
 			Event.event("Processing loot of size " + loot.size + " with stack "+ stack.size());
 			counter.incRx(lifeline, loot.size);
 			val time = System.nanoTime();
@@ -205,7 +205,7 @@ public final class GlobalRunner[T, Z]  implements Runner[T,Z] {
 		
 		/** Process at most n tasks from the stack.
 		 */
-		final def processAtMostN(n:Int):void offers Z{
+		final def processAtMostN(n:Int) offers Z :void{
 			val time = System.nanoTime();
 			Event.event("Processing " + n + " with size "+ stack.size());
 			for (var count:Int=0; count < n; count++) {
@@ -225,7 +225,7 @@ public final class GlobalRunner[T, Z]  implements Runner[T,Z] {
 		 * <p> Exit loop when stack is empty, and terminate. 
 		 * 
 		 */
-		final def processStack(st:PLH[T, Z]):void offers Z {
+		final def processStack(st:PLH[T, Z]) offers Z :void {
 			while (true) {
 				var n:Int = Math.min(stack.size(), nu);
 				while (n > 0) {
@@ -260,7 +260,7 @@ public final class GlobalRunner[T, Z]  implements Runner[T,Z] {
 		
 		/** Distribute loot to activated incoming lifelines.
 		 */
-		def distribute(st:PLH[T, Z], depth:Int):void offers Z {
+		def distribute(st:PLH[T, Z], depth:Int) offers Z :void {
 			val time = System.nanoTime();
 			val numThieves = thieves.size();
 			if (numThieves > 0)
@@ -378,7 +378,7 @@ public final class GlobalRunner[T, Z]  implements Runner[T,Z] {
 				init:Boolean, 
 				loot:Rail[T], 
 				depth:Int, 
-				source:Int):void offers Z {
+				source:Int) offers Z :void {
 			// assert loot != null;
 			try {
 				Event.event("Place (" + source + ") launches " 
@@ -405,7 +405,7 @@ public final class GlobalRunner[T, Z]  implements Runner[T,Z] {
 				counter.stopLive();
 				active=false;
 				Event.event("Async terminates.");
-			} catch (v:Throwable) {
+			} catch (v:CheckedThrowable) {
 				Console.OUT.println("Exception at " + here);
 				v.printStackTrace();
 			}

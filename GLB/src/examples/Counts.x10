@@ -20,11 +20,11 @@ import global.lb.*;
 
 public class Counts extends TaskFrame[Int, Int] {
     var c:Int=0;
-    public def runTask(t:Int, s:Stack[Int]):void offers Int {
+    public def runTask(t:Int, s:Stack[Int]) offers Int :void {
 	   offer t;
 	   c += t;
     }
-    public def runRootTask(t:Int, s:Stack[Int]):void offers Int {
+    public def runRootTask(t:Int, s:Stack[Int])offers Int :void {
 	   for (var i:Int=0; i < t; i++) 
 	   s.push(2);
     }

@@ -47,11 +47,11 @@ public abstract class  TaskFrame[A, B] {
 	 * Implementations of this method will use 
 	 * the stack to create additional tasks, if necessary.
 	 */
-	abstract public def runTask(t:A, stack:Stack[A]):void offers B;
+	abstract public def runTask(t:A, stack:Stack[A]) offers B :void;
 	
 	/**
 	 * Run this task as a root task. Implementations of this method
 	 * will use the stack to create additional tasks, if necessary.
 	 */
-	abstract public def runRootTask(t:A, stack:Stack[A]):void offers B;
+	abstract public def runRootTask(t:A, stack:Stack[A]) offers B :void;
 }

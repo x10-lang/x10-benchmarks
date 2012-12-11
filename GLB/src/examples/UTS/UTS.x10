@@ -135,7 +135,7 @@ public class UTS {
 	    Console.OUT.println("Finished with result " + result + ".");
 	    runner.stats(time, verbose); 
 	    Console.OUT.println("--------");
-	} catch (e:Throwable) {
+	} catch (e:CheckedThrowable) {
 	    e.printStackTrace(Console.ERR);
 	}
     }
