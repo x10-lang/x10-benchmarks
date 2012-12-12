@@ -1,20 +1,25 @@
 import x10.compiler.Inline;
 import x10.compiler.Native;
+import x10.compiler.NativeRep;
 import x10.compiler.Pragma;
 import x10.util.ArrayBuilder;
 
+@NativeRep("java", "java.util.Random", null, null)
 final class Random {
     @Native("c++", "srandom(#seed)")
-    static native def srandom(seed:Int):void;
+    private static def srandom(seed:Int):void {}
 
     @Native("c++", "random()")
+    @Native("java", "#this.nextLong()")
     native def rand():Long;
 
+    @Native("java", "new java.util.Random(#seed)")
     def this(seed:Int) {
         srandom(seed);
     }
 
-    def next() = (rand() & 3L) as Byte; // 0..alphabetSize-1
+    @Native("java", "((byte) (#this.nextLong() & 3L))")
+    def next():Byte = (rand() & 3L) as Byte; // 0..alphabetSize-1
 }
 
 final class Parameters {
@@ -67,19 +72,19 @@ struct Result(
     shortLast:Int,
     longFirst:Int,
     longLast:Int,
-    short:Rail[Byte],
-    long:Rail[Byte]) {
+    short_:Rail[Byte],
+    long_:Rail[Byte]) {
 
     def print(first:Int, length:Int) {
-        Console.OUT.println(new String(short, first, length));
-        Console.OUT.println(new String(long, first, length));
+        Console.OUT.println(new String(short_, first, length));
+        Console.OUT.println(new String(long_, first, length));
         Console.OUT.println();
     }
 
     def print() {
         val line = 72;
-        val quo = short.size/line;
-        val mod = short.size-quo*line;
+        val quo = short_.size/line;
+        val mod = short_.size-quo*line;
         for (var i:Int=0; i<quo; i++) print(i*line, line);
         if (mod > 0) print(quo*line, mod);
     }
@@ -90,8 +95,8 @@ final class SSCA1 {
     static GAP = '-'.ord() as Byte, A = 'A'.ord() as Byte;
 
     val params:Parameters;
-    val short:Rail[Byte];
-    val long:Rail[Byte];
+    val short_:Rail[Byte];
+    val long_:Rail[Byte];
     val tracebackMoves:Rail[Rail[Byte]];
     val first:Int;
     val last:Int;
@@ -113,14 +118,14 @@ final class SSCA1 {
         localSize = size;
         last = first + size;
         val r = new Random(params.seed);
-        short = new Rail[Byte](params.shortLength);
-        long = new Rail[Byte](size);
+        short_ = new Rail[Byte](params.shortLength);
+        long_ = new Rail[Byte](size);
         for (var i:Int=0; i<params.shortLength; i++) {
-            short(i) = r.next();
+            short_(i) = r.next();
         }
         for (var i:Int=0; i<last; i++) {
             val v = r.next();
-            if (i>=first) long(i-first) = v;
+            if (i>=first) long_(i-first) = v;
         }
         tracebackMoves = new Rail[Rail[Byte]](params.shortLength+1, (Int)=>new Rail[Byte](size+1));
         if (verbose) Console.OUT.println("place=" + placeId + " [" + first + ","+ last +"[");
@@ -133,10 +138,10 @@ final class SSCA1 {
         val openGapPenalty = params.openGapPenalty;
         val shortSize = params.shortLength;
 
-        val short = short;
-        val long = long;
-        val tracebackMoves = tracebackMoves;
-        val localSize = localSize;
+        val short_ = this.short_;
+        val long_ = this.long_;
+        val tracebackMoves = this.tracebackMoves;
+        val localSize = this.localSize;
 
         for (var i:Int=0; i<=shortSize; i++) tracebackMoves(i)(0) = STOP;
         for (var j:Int=0; j<=localSize; j++) tracebackMoves(0)(j) = STOP;
@@ -151,9 +156,9 @@ final class SSCA1 {
             var previousBestScore:Int = 0;
             val ti = tracebackMoves(i);
             val ti1 = tracebackMoves(i-1);
-            val s = short(i-1)*alphabetSize;
+            val s = short_(i-1)*alphabetSize;
             for (var j:Int=1; j<=localSize; j++) {
-                val scoreOfMatchAtLast = scoringMatrix(s + long(j-1));
+                val scoreOfMatchAtLast = scoringMatrix(s + long_(j-1));
                 val scoreUsingLatestIJ = previousBestScore + scoreOfMatchAtLast;
                 val bestIfGapInsertedInI = bestScoreUpTo_I_J(j) - (ti1(j)==UP ? extendGapPenalty : openGapPenalty);
                 val bestIfGapInsertedInJ = bestScoreUpTo_I_J(j-1) - (ti(j-1)==LEFT ? extendGapPenalty : openGapPenalty);     
@@ -210,16 +215,16 @@ final class SSCA1 {
         while ((nextMove = tracebackMoves(i)(j)) != STOP) {
             switch (nextMove) {
             case UP:
-                shortBuilder.add(short(--i) + A);
+                shortBuilder.add(short_(--i) + A);
                 longBuilder.add(GAP);
                 break;
             case DIAGONAL:
-                shortBuilder.add(short(--i) + A);
-                longBuilder.add(long(--j) + A);
+                shortBuilder.add(short_(--i) + A);
+                longBuilder.add(long_(--j) + A);
                 break;
             case LEFT:
                 shortBuilder.add(GAP);
-                longBuilder.add(long(--j) + A);
+                longBuilder.add(long_(--j) + A);
             }
         }
         val s = shortBuilder.result();
@@ -310,7 +315,7 @@ final class SSCA1 {
             t = System.nanoTime();
             val r = at (Place(p)) plh().trace(verify);
             printTime("Trace: ", System.nanoTime()-t);
-            Console.OUT.println("place=" + p + " score=" + r.score + " short=[" + r.shortFirst + "," + r.shortLast + "[ long=[" + r.longFirst + "," + r.longLast +"[ length=" + r.short.size);
+            Console.OUT.println("place=" + p + " score=" + r.score + " short=[" + r.shortFirst + "," + r.shortLast + "[ long=[" + r.longFirst + "," + r.longLast +"[ length=" + r.short_.size);
             if (k == 0) r.print();
         }
         val stop_time = System.nanoTime();

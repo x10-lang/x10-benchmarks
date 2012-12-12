@@ -1,21 +1,26 @@
 import x10.compiler.Native;
+import x10.compiler.NativeRep;
 import x10.util.Option;
 import x10.util.OptionsParser;
 import x10.util.Team;
 import x10.util.Vec;
 
+@NativeRep("java", "java.util.Random", null, null)
 final class Random {
     @Native("c++", "srandom(#seed)")
-    static native def srandom(seed:Int):void;
+    private static def srandom(seed:Int):void {}
 
     @Native("c++", "random()")
+    @Native("java", "#this.nextLong()")
     native def rand():Long;
 
+    @Native("java", "new java.util.Random(#seed)")
     def this(seed:Int) {
         srandom(seed);
     }
 
-    def next() = (rand() as Float)/2147483648f;
+    @Native("java", "(((float) #this.nextLong()) / 2147483648f)")
+    def next():Float = (rand() as Float)/2147483648f;
 }
 
 final class KMeans {
