@@ -1,0 +1,8 @@
+# HugePages_Total:       0
+
+X10_NPLACES=1     ./uts -d 14 2>&1 | tee -a log.uts.00001
+
+exit 0
+
+X10_NPLACES=11904 ./uts -d 21 2>&1 | tee -a log.uts.11904
+X10_NPLACES=1     ./uts -d 14 2>&1 | tee -a log.uts.00001

@@ -1,0 +1,26 @@
+# HugePages_Total:    4096
+
+#M=28
+M=20
+
+X10_NPLACES=1     ./ra -m $M -u 1 2>&1 | tee -a log.ra.00001
+X10_NPLACES=8     ./ra -m $M -u 1 2>&1 | tee -a log.ra.00008
+
+exit 0
+
+X10_NPLACES=32768 ./ra -m $M -u 1 2>&1 | tee -a log.ra.32768
+X10_NPLACES=16384 ./ra -m $M -u 1 2>&1 | tee -a log.ra.16384
+X10_NPLACES=8192  ./ra -m $M -u 1 2>&1 | tee -a log.ra.08192
+X10_NPLACES=4096  ./ra -m $M -u 1 2>&1 | tee -a log.ra.04096
+X10_NPLACES=2048  ./ra -m $M -u 1 2>&1 | tee -a log.ra.02048
+X10_NPLACES=1024  ./ra -m $M -u 1 2>&1 | tee -a log.ra.01024
+X10_NPLACES=512   ./ra -m $M -u 1 2>&1 | tee -a log.ra.00512
+X10_NPLACES=256   ./ra -m $M -u 1 2>&1 | tee -a log.ra.00256
+X10_NPLACES=128   ./ra -m $M -u 1 2>&1 | tee -a log.ra.00128
+X10_NPLACES=64    ./ra -m $M -u 1 2>&1 | tee -a log.ra.00064
+X10_NPLACES=32    ./ra -m $M -u 1 2>&1 | tee -a log.ra.00032
+X10_NPLACES=16    ./ra -m $M -u 1 2>&1 | tee -a log.ra.00016
+X10_NPLACES=8     ./ra -m $M -u 1 2>&1 | tee -a log.ra.00008
+X10_NPLACES=4     ./ra -m $M -u 1 2>&1 | tee -a log.ra.00004
+X10_NPLACES=2     ./ra -m $M -u 1 2>&1 | tee -a log.ra.00002
+X10_NPLACES=1     ./ra -m $M -u 1 2>&1 | tee -a log.ra.00001

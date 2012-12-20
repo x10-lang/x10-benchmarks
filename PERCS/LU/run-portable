@@ -1,0 +1,23 @@
+# HugePages_Total:    5120
+
+X10_NPLACES=1     ./lu   17280 360   1   1 20  2>&1 | tee -a log.lu.00001
+
+exit 0
+
+X10_NPLACES=32    ./lu   97920 360   8   4 20  2>&1 | tee -a log.lu.00032
+
+X10_NPLACES=32768 ./lu 3133440 360 256 128 20  2>&1 | tee -a log.lu.32768
+X10_NPLACES=8192  ./lu 1566720 360 128  64 20  2>&1 | tee -a log.lu.08192
+X10_NPLACES=2048  ./lu  783360 360  64  32 20  2>&1 | tee -a log.lu.02048
+X10_NPLACES=512   ./lu  391680 360  32  16 20  2>&1 | tee -a log.lu.00512
+X10_NPLACES=128   ./lu  195840 360  16   8 20  2>&1 | tee -a log.lu.00128
+X10_NPLACES=8     ./lu   48960 360   4   2 20  2>&1 | tee -a log.lu.00008
+X10_NPLACES=2     ./lu   24480 360   2   1 20  2>&1 | tee -a log.lu.00002
+
+X10_NPLACES=16384 ./lu 2211840 360 128 128 20  2>&1 | tee -a log.lu.16384
+X10_NPLACES=4096  ./lu 1105920 360  64  64 20  2>&1 | tee -a log.lu.04096
+X10_NPLACES=1024  ./lu  552960 360  32  32 20  2>&1 | tee -a log.lu.01024
+X10_NPLACES=256   ./lu  276480 360  16  16 20  2>&1 | tee -a log.lu.00256
+X10_NPLACES=64    ./lu  138240 360   8   8 20  2>&1 | tee -a log.lu.00064
+X10_NPLACES=16    ./lu   69120 360   4   4 20  2>&1 | tee -a log.lu.00016
+X10_NPLACES=4     ./lu   34560 360   2   2 20  2>&1 | tee -a log.lu.00004

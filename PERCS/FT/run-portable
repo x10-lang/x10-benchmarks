@@ -1,0 +1,23 @@
+# HugePages_Total:    4096
+
+X10_NPLACES=1     ./ft 3 true 2>&1 | tee -a log.ft.00001
+X10_NPLACES=8     ./ft 3 true 2>&1 | tee -a log.ft.00008
+
+exit 0
+
+X10_NPLACES=32768 ./ft 20 true 2>&1 | tee -a log.ft.32768
+X10_NPLACES=16384 ./ft 20 true 2>&1 | tee -a log.ft.16384
+X10_NPLACES=8192  ./ft 19 true 2>&1 | tee -a log.ft.08192
+X10_NPLACES=4096  ./ft 19 true 2>&1 | tee -a log.ft.04096
+X10_NPLACES=2048  ./ft 18 true 2>&1 | tee -a log.ft.02048
+X10_NPLACES=1024  ./ft 18 true 2>&1 | tee -a log.ft.01024
+X10_NPLACES=512   ./ft 17 true 2>&1 | tee -a log.ft.00512
+X10_NPLACES=256   ./ft 17 true 2>&1 | tee -a log.ft.00256
+X10_NPLACES=128   ./ft 16 true 2>&1 | tee -a log.ft.00128
+X10_NPLACES=64    ./ft 16 true 2>&1 | tee -a log.ft.00064
+X10_NPLACES=32    ./ft 15 true 2>&1 | tee -a log.ft.00032
+X10_NPLACES=16    ./ft 15 true 2>&1 | tee -a log.ft.00016
+X10_NPLACES=8     ./ft 14 true 2>&1 | tee -a log.ft.00008
+X10_NPLACES=4     ./ft 14 true 2>&1 | tee -a log.ft.00004
+X10_NPLACES=2     ./ft 13 true 2>&1 | tee -a log.ft.00002
+X10_NPLACES=1     ./ft 13 true 2>&1 | tee -a log.ft.00001

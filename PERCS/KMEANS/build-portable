@@ -1,0 +1,1 @@
+x10c++ $X10RTTRANSPORT -O -NO_CHECKS -STATIC_CHECKS KMeans.x10 -d tmp -cxx-prearg '-I..' -o kmeans

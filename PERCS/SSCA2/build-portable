@@ -1,0 +1,1 @@
+x10c++ $X10RTTRANSPORT -O -NO_CHECKS -STATIC_CHECKS SSCA2.x10 -d tmp -cxx-prearg '-I..' -o ssca2

@@ -1,0 +1,1 @@
+x10c++ $X10RTTRANSPORT -O -NO_CHECKS -STATIC_CHECKS Stream.x10 -d tmp -cxx-prearg '-I..' -o stream
