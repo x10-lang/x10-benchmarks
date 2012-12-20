@@ -1,28 +1,28 @@
 # HugePages_Total:       0
 
-X10_NPLACES=1     x10 -cp ssca2.jar SSCA2 -n 12 2>&1 | tee -a log.ssca2.n12.00001
-X10_NPLACES=8     x10 -cp ssca2.jar SSCA2 -n 12 2>&1 | tee -a log.ssca2.n12.00008
+X10_NPLACES=1     x10 -cp ssca2.jar SSCA2 -n 12 2>&1 | tee -a log.ssca2.managed.n12.00001
+X10_NPLACES=8     x10 -cp ssca2.jar SSCA2 -n 12 2>&1 | tee -a log.ssca2.managed.n12.00008
 
 exit 0
 
-X10_NPLACES=47040 x10 -cp ssca2.jar SSCA2 -n 20 2>&1 | tee -a log.ssca2.n20.47040
-X10_NPLACES=32768 x10 -cp ssca2.jar SSCA2 -n 20 2>&1 | tee -a log.ssca2.n20.32768
-X10_NPLACES=16384 x10 -cp ssca2.jar SSCA2 -n 20 2>&1 | tee -a log.ssca2.n20.16384
-X10_NPLACES=8192  x10 -cp ssca2.jar SSCA2 -n 20 2>&1 | tee -a log.ssca2.n20.08192
-X10_NPLACES=4096  x10 -cp ssca2.jar SSCA2 -n 20 2>&1 | tee -a log.ssca2.n20.04096
-X10_NPLACES=2048  x10 -cp ssca2.jar SSCA2 -n 20 2>&1 | tee -a log.ssca2.n20.02048
+X10_NPLACES=47040 x10 -cp ssca2.jar SSCA2 -n 20 2>&1 | tee -a log.ssca2.managed.n20.47040
+X10_NPLACES=32768 x10 -cp ssca2.jar SSCA2 -n 20 2>&1 | tee -a log.ssca2.managed.n20.32768
+X10_NPLACES=16384 x10 -cp ssca2.jar SSCA2 -n 20 2>&1 | tee -a log.ssca2.managed.n20.16384
+X10_NPLACES=8192  x10 -cp ssca2.jar SSCA2 -n 20 2>&1 | tee -a log.ssca2.managed.n20.08192
+X10_NPLACES=4096  x10 -cp ssca2.jar SSCA2 -n 20 2>&1 | tee -a log.ssca2.managed.n20.04096
+X10_NPLACES=2048  x10 -cp ssca2.jar SSCA2 -n 20 2>&1 | tee -a log.ssca2.managed.n20.02048
 
-X10_NPLACES=2048  x10 -cp ssca2.jar SSCA2 -n 18 2>&1 | tee -a log.ssca2.n18.02048
-X10_NPLACES=1024  x10 -cp ssca2.jar SSCA2 -n 18 2>&1 | tee -a log.ssca2.n18.01024
-X10_NPLACES=512   x10 -cp ssca2.jar SSCA2 -n 18 2>&1 | tee -a log.ssca2.n18.00512
-X10_NPLACES=256   x10 -cp ssca2.jar SSCA2 -n 18 2>&1 | tee -a log.ssca2.n18.00256
-X10_NPLACES=128   x10 -cp ssca2.jar SSCA2 -n 18 2>&1 | tee -a log.ssca2.n18.00128
-X10_NPLACES=64    x10 -cp ssca2.jar SSCA2 -n 18 2>&1 | tee -a log.ssca2.n18.00064
-X10_NPLACES=32    x10 -cp ssca2.jar SSCA2 -n 18 2>&1 | tee -a log.ssca2.n18.00032
+X10_NPLACES=2048  x10 -cp ssca2.jar SSCA2 -n 18 2>&1 | tee -a log.ssca2.managed.n18.02048
+X10_NPLACES=1024  x10 -cp ssca2.jar SSCA2 -n 18 2>&1 | tee -a log.ssca2.managed.n18.01024
+X10_NPLACES=512   x10 -cp ssca2.jar SSCA2 -n 18 2>&1 | tee -a log.ssca2.managed.n18.00512
+X10_NPLACES=256   x10 -cp ssca2.jar SSCA2 -n 18 2>&1 | tee -a log.ssca2.managed.n18.00256
+X10_NPLACES=128   x10 -cp ssca2.jar SSCA2 -n 18 2>&1 | tee -a log.ssca2.managed.n18.00128
+X10_NPLACES=64    x10 -cp ssca2.jar SSCA2 -n 18 2>&1 | tee -a log.ssca2.managed.n18.00064
+X10_NPLACES=32    x10 -cp ssca2.jar SSCA2 -n 18 2>&1 | tee -a log.ssca2.managed.n18.00032
 
-X10_NPLACES=32    x10 -cp ssca2.jar SSCA2 -n 16 2>&1 | tee -a log.ssca2.n16.00032
-X10_NPLACES=16    x10 -cp ssca2.jar SSCA2 -n 16 2>&1 | tee -a log.ssca2.n16.00016
-X10_NPLACES=8     x10 -cp ssca2.jar SSCA2 -n 16 2>&1 | tee -a log.ssca2.n16.00008
-X10_NPLACES=4     x10 -cp ssca2.jar SSCA2 -n 16 2>&1 | tee -a log.ssca2.n16.00004
-X10_NPLACES=2     x10 -cp ssca2.jar SSCA2 -n 16 2>&1 | tee -a log.ssca2.n16.00002
-X10_NPLACES=1     x10 -cp ssca2.jar SSCA2 -n 16 2>&1 | tee -a log.ssca2.n16.00001
+X10_NPLACES=32    x10 -cp ssca2.jar SSCA2 -n 16 2>&1 | tee -a log.ssca2.managed.n16.00032
+X10_NPLACES=16    x10 -cp ssca2.jar SSCA2 -n 16 2>&1 | tee -a log.ssca2.managed.n16.00016
+X10_NPLACES=8     x10 -cp ssca2.jar SSCA2 -n 16 2>&1 | tee -a log.ssca2.managed.n16.00008
+X10_NPLACES=4     x10 -cp ssca2.jar SSCA2 -n 16 2>&1 | tee -a log.ssca2.managed.n16.00004
+X10_NPLACES=2     x10 -cp ssca2.jar SSCA2 -n 16 2>&1 | tee -a log.ssca2.managed.n16.00002
+X10_NPLACES=1     x10 -cp ssca2.jar SSCA2 -n 16 2>&1 | tee -a log.ssca2.managed.n16.00001

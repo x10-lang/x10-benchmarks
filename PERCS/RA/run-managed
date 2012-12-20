@@ -1,27 +1,26 @@
 # HugePages_Total:    4096
 
-#SIZE=28
-SIZE=20
-UPDATES=1
+#M=28
+M=20
 
 # Note: Team APIs are not fully implemented in Managed X10 2.3, thus this program runs only with single place.
-X10_NPLACES=1     x10 -cp ra.jar RandomAccess -m $SIZE -u $UPDATES 2>&1 | tee -a log.ra-managed.00001
+X10_NPLACES=1     x10 -cp ra.jar RandomAccess -m $M -u 1 2>&1 | tee -a log.ra.managed.00001
 
 exit 0
 
-X10_NPLACES=32768 x10 -cp ra.jar RandomAccess -m $SIZE -u $UPDATES 2>&1 | tee -a log.ra-managed.32768
-X10_NPLACES=16384 x10 -cp ra.jar RandomAccess -m $SIZE -u $UPDATES 2>&1 | tee -a log.ra-managed.16384
-X10_NPLACES=8192  x10 -cp ra.jar RandomAccess -m $SIZE -u $UPDATES 2>&1 | tee -a log.ra-managed.08192
-X10_NPLACES=4096  x10 -cp ra.jar RandomAccess -m $SIZE -u $UPDATES 2>&1 | tee -a log.ra-managed.04096
-X10_NPLACES=2048  x10 -cp ra.jar RandomAccess -m $SIZE -u $UPDATES 2>&1 | tee -a log.ra-managed.02048
-X10_NPLACES=1024  x10 -cp ra.jar RandomAccess -m $SIZE -u $UPDATES 2>&1 | tee -a log.ra-managed.01024
-X10_NPLACES=512   x10 -cp ra.jar RandomAccess -m $SIZE -u $UPDATES 2>&1 | tee -a log.ra-managed.00512
-X10_NPLACES=256   x10 -cp ra.jar RandomAccess -m $SIZE -u $UPDATES 2>&1 | tee -a log.ra-managed.00256
-X10_NPLACES=128   x10 -cp ra.jar RandomAccess -m $SIZE -u $UPDATES 2>&1 | tee -a log.ra-managed.00128
-X10_NPLACES=64    x10 -cp ra.jar RandomAccess -m $SIZE -u $UPDATES 2>&1 | tee -a log.ra-managed.00064
-X10_NPLACES=32    x10 -cp ra.jar RandomAccess -m $SIZE -u $UPDATES 2>&1 | tee -a log.ra-managed.00032
-X10_NPLACES=16    x10 -cp ra.jar RandomAccess -m $SIZE -u $UPDATES 2>&1 | tee -a log.ra-managed.00016
-X10_NPLACES=8     x10 -cp ra.jar RandomAccess -m $SIZE -u $UPDATES 2>&1 | tee -a log.ra-managed.00008
-X10_NPLACES=4     x10 -cp ra.jar RandomAccess -m $SIZE -u $UPDATES 2>&1 | tee -a log.ra-managed.00004
-X10_NPLACES=2     x10 -cp ra.jar RandomAccess -m $SIZE -u $UPDATES 2>&1 | tee -a log.ra-managed.00002
-X10_NPLACES=1     x10 -cp ra.jar RandomAccess -m $SIZE -u $UPDATES 2>&1 | tee -a log.ra-managed.00001
+X10_NPLACES=32768 x10 -cp ra.jar RandomAccess -m $M -u 1 2>&1 | tee -a log.ra.managed.32768
+X10_NPLACES=16384 x10 -cp ra.jar RandomAccess -m $M -u 1 2>&1 | tee -a log.ra.managed.16384
+X10_NPLACES=8192  x10 -cp ra.jar RandomAccess -m $M -u 1 2>&1 | tee -a log.ra.managed.08192
+X10_NPLACES=4096  x10 -cp ra.jar RandomAccess -m $M -u 1 2>&1 | tee -a log.ra.managed.04096
+X10_NPLACES=2048  x10 -cp ra.jar RandomAccess -m $M -u 1 2>&1 | tee -a log.ra.managed.02048
+X10_NPLACES=1024  x10 -cp ra.jar RandomAccess -m $M -u 1 2>&1 | tee -a log.ra.managed.01024
+X10_NPLACES=512   x10 -cp ra.jar RandomAccess -m $M -u 1 2>&1 | tee -a log.ra.managed.00512
+X10_NPLACES=256   x10 -cp ra.jar RandomAccess -m $M -u 1 2>&1 | tee -a log.ra.managed.00256
+X10_NPLACES=128   x10 -cp ra.jar RandomAccess -m $M -u 1 2>&1 | tee -a log.ra.managed.00128
+X10_NPLACES=64    x10 -cp ra.jar RandomAccess -m $M -u 1 2>&1 | tee -a log.ra.managed.00064
+X10_NPLACES=32    x10 -cp ra.jar RandomAccess -m $M -u 1 2>&1 | tee -a log.ra.managed.00032
+X10_NPLACES=16    x10 -cp ra.jar RandomAccess -m $M -u 1 2>&1 | tee -a log.ra.managed.00016
+X10_NPLACES=8     x10 -cp ra.jar RandomAccess -m $M -u 1 2>&1 | tee -a log.ra.managed.00008
+X10_NPLACES=4     x10 -cp ra.jar RandomAccess -m $M -u 1 2>&1 | tee -a log.ra.managed.00004
+X10_NPLACES=2     x10 -cp ra.jar RandomAccess -m $M -u 1 2>&1 | tee -a log.ra.managed.00002
+X10_NPLACES=1     x10 -cp ra.jar RandomAccess -m $M -u 1 2>&1 | tee -a log.ra.managed.00001
