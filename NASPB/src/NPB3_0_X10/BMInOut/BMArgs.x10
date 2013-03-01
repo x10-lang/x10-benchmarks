@@ -64,8 +64,8 @@ public class BMArgs {
 		serial() = true;
 	}
 
-	public static def ParseCmdLineArgs(argv: Array[String](1){rail}, BMName: String): void  {
-		for (var i: Int = 0; i<argv.size(); i++) {
+	public static def ParseCmdLineArgs(argv: Rail[String], BMName: String): void  {
+		for (var i: Int = 0; i<argv.size; i++) {
 			if (argv(i).equals("SERIAL")
 					|| argv(i).equals("serial")
 					|| argv(i).equals("-serial")

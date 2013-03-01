@@ -70,12 +70,12 @@ public class Rprj extends MGWorker {
 		 r: Array[Double](1){rail} = mg.r;
 		rprj3(r, roff, m1k, m2k, m3k, zoff, m1j, m2j, m3j, x1, y1, start, end);
 
-		for ([j3,j2] in (start-1..(end-1))*(1..(m2j-1))) {
+		for ([j3,j2] in ((start-1)..(end-1))*(1..(m2j-1))) {
 			r(zoff+m1j*(j2+m2j*j3)) = r(zoff+m1j-2+m1j*(j2+m2j*j3));
 			r(zoff+m1j-1+m1j*(j2+m2j*j3)) = r(zoff+1+m1j*(j2+m2j*j3));
 		}
 
-		for ([j3,j1] in (start-1..(end-1))*(0..m1j)) {
+		for ([j3,j1] in ((start-1)..(end-1))*(0..m1j)) {
 			r(zoff+j1+m1j*m2j*j3) = r(zoff+j1+m1j*(m2j-2+m2j*j3));
 			r(zoff+j1+m1j*(m2j-1+m2j*j3)) = r(zoff+j1+m1j*(1+m2j*j3));
 		}

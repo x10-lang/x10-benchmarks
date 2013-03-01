@@ -145,7 +145,7 @@ public class BMResults  {
 
 		outbuf = new StringBuilder().add("                          "
 				+"                         *");
-		outline = new String("* Time in seconds   = "+String.format(fmt, new Array[Any][time]));
+		outline = new String("* Time in seconds   = "+String.format(fmt, [time as Any]));
 		outbuf.insert(0, outline);
 		
 		outbuf.insert(len-1,"*");
@@ -153,7 +153,7 @@ public class BMResults  {
 
 		outbuf = new StringBuilder().add("                          "
 				+"                         *");
-		outline = new String("* ACCTime           = "+String.format(fmt, new Array[Any][acctime]));
+		outline = new String("* ACCTime           = "+String.format(fmt, [acctime as Any]));
 		outbuf.insert(0, outline);
 		
 		outbuf.insert(len-1,"*");
@@ -161,7 +161,7 @@ public class BMResults  {
 
 		outbuf = new StringBuilder().add("                          "
 				+"                         *");
-		outline = new String("* Mops total        = "+String.format(fmt, new Array[Any][mops]));
+		outline = new String("* Mops total        = "+String.format(fmt, [mops as Any]));
 		outbuf.insert(0, outline);
 		
 		outbuf.insert(len-1,"*");
@@ -253,13 +253,13 @@ public class BMResults  {
 				outline = "Iterations      = "+String.valueOf(niter);
 				out.println(outline);
 				
-				outline = "Time in seconds = "+String.format(fmt, new Array[Any][time]);
+				outline = "Time in seconds = "+String.format(fmt, [time as Any]);
 				out.println(outline);
 			
-				outline = "ACCTime         = "+String.format(fmt, new Array[Any][acctime]);
+				outline = "ACCTime         = "+String.format(fmt, [acctime as Any]);
 				out.println(outline);
 			
-				outline = "Mops total      = "+String.format(fmt, new Array[Any][mops]);
+				outline = "Mops total      = "+String.format(fmt, [mops as Any]);
 				out.println(outline);
 			
 				outline = "Operation type  = "+String.valueOf(optype);
@@ -340,15 +340,16 @@ public class BMResults  {
 		}
 	}
 
-	public static def printComparisonStatus(var clss: char, var verified: int, var epsilon: double, var xcr: Rail[double], var xcrref: Rail[double], var xcrdif: Rail[double]): int = {
-		for (var m: int = 0; m < xcr.length; m++) {
+	public static def printComparisonStatus(clss: char, verified: int, epsilon: double, 
+			xcr: Rail[Double], xcrref: Rail[Double], xcrdif: Rail[Double]): int  {
+		for (var m: int = 0; m < xcr.size; m++) {
 			if (clss == 'U') {
 				x10.io.Console.OUT.println(m+". "+xcr(m));
 			} else {
 				if (xcrdif(m) <= epsilon) {
-					if (verified ==-1) verified = 1;
+					//if (verified ==-1) verified = 1;
 				} else {
-					verified = 0;
+					//verified = 0;
 					x10.io.Console.OUT.print("FAILURE: ");
 				}
 				x10.io.Console.OUT.println(m+". "+xcr(m)+" "+xcrref(m)+" "+xcrdif(m));
@@ -357,7 +358,8 @@ public class BMResults  {
 		return verified;
 	}
 
-	public static def printComparisonStatus(clss: char, var verified: int, epsilon: double, xcr: double, xcrref: double, xcrdif: double): int = {
+	public static def printComparisonStatus(clss: char, var verified: int, epsilon: double, xcr: double, 
+			xcrref: double, xcrdif: double): int {
 		if (clss == 'U') {
 			x10.io.Console.OUT.println(" "+xcr);
 		} else {

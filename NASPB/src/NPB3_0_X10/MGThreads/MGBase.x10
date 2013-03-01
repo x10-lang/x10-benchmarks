@@ -72,13 +72,13 @@ public class MGBase {
 	protected val nr: int;
 	protected val nm2: int;
 	protected val timer: Timer = new Timer();
-	protected val nx: Rail[int] = Rail.make[int](maxlevel);
-	protected val ny: Rail[int] = Rail.make[int](maxlevel);
-	protected val nz: Rail[int] = Rail.make[int](maxlevel);
-	protected val ir: Rail[int] = Rail.make[int](maxlevel);
-	protected val m1: Rail[int] = Rail.make[int](maxlevel);
-	protected val m2: Rail[int] = Rail.make[int](maxlevel);
-	protected val m3: Rail[int] = Rail.make[int](maxlevel);
+	protected val nx: Rail[int] = new Rail[int](maxlevel);
+	protected val ny: Rail[int] = new Rail[int](maxlevel);
+	protected val nz: Rail[int] = new Rail[int](maxlevel);
+	protected val ir: Rail[int] = new Rail[int](maxlevel);
+	protected val m1: Rail[int] = new Rail[int](maxlevel);
+	protected val m2: Rail[int] = new Rail[int](maxlevel);
+	protected val m3: Rail[int] = new Rail[int](maxlevel);
 	
 	public var lt: int;
 	public var lb: int;
@@ -172,27 +172,26 @@ public class MGBase {
 	}
 	
 	public var num_threads: int = 0;
-	public static def checksum(arr: Rail[int],  name: String,stop: boolean): void = {
+	public static def checksum(arr:Rail[int],name:String,stop:boolean): void  {
 		var csum: double = 0;
-		for (var i: int = 0; i<arr.length; i++) csum += arr(i);
+		for (var i: int = 0; i<arr.size; i++) csum += arr(i);
 		x10.io.Console.OUT.println(name + " checksum MG " + csum);
 		if (stop) throw new IllegalOperationException();
 	}
-	public static def dmax1( a: double,  b: double): double = (a < b) ? b : a; 
+	public static def dmax1(a:Double,b:Double):Double = (a<b)?b:a; 
 	
-	public static def comm3( u: Array[Double](1){rail}, 
-			 off: int,  n1: int,  n2: int,  n3: int) {
+	public static def comm3(u:Rail[Double],off:Int,n1:Int,n2:Int,n3:Int) {
 		//		c---------------------------------------------------------------------
 		//		c     comm3 organizes the communication on all borders
 		//		c---------------------------------------------------------------------
 		//		double precision u(n1,n2,n3)
 		
-		for ([i3,i2] in (1..(n3-2))*(1..n2-2)) {
+		for ([i3,i2] in (1..(n3-2))*(1..(n2-2))) {
 			u(off+n1*(i2+n2*i3)) = u(off+n1-2+n1*(i2+n2*i3));
 			u(off+n1-1+n1*(i2+n2*i3)) = u(off+1+n1*(i2+n2*i3));
 		}
 		
-		for ([i3,i1] in (1..n3-2)*(0..n1-1)) {
+		for ([i3,i1] in (1..(n3-2))*(0..(n1-1))) {
 			u(off+i1+n1*n2*i3) = u(off+i1+n1*(n2-2+n2*i3));
 			u(off+i1+n1*(n2-1+n2*i3)) = u(off+i1+n1*(1+n2*i3));
 		}

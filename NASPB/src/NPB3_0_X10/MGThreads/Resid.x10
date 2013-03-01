@@ -52,23 +52,23 @@ package NPB3_0_X10.MGThreads;
 import NPB3_0_X10.MG;
 
 public class Resid extends MGWorker {
-	private var visr: boolean;
-	private var n1: int;
-	private var n2: int;
-	private var n3: int;
-	private var off: int;
-	var uoff: int = 0;
-	var u1: Array[double](1){rail};
-	var u2: Array[double](1){rail};
+	//private var visr: boolean;
+	//private var n1:Int;
+	//private var n2: int;
+	//private var n3: int;
+	//private var off: int;
+	//var uoff: int = 0;
+	val u1: Rail[Double];
+	val u2: Rail[Double];
 
-	public def this(mg: MG, i: int): Resid = {
+	public def this(mg:MG,i:Int) {
 		super(mg, i);
-		u1 = new Array[double](nm+1);
-		u2 = new Array[double](nm+1);
+		u1 = new Rail[Double](nm+1);
+		u2 = new Rail[Double](nm+1);
 	}
 
-	public def step( done: boolean,  visr: boolean,  wstart: int,  wend: int,  
-			n1: int,  n2: int,  n3: int,  off: int): void  {
+	public def step(done:Boolean,visr:Boolean,wstart:Int,wend:Int,  
+			n1:Int,n2:Int,n3:Int,off:Int): void  {
 		getWork(wstart, wend);
 		if (work == 0) return;
 		resid(u, (visr) ? r : v, r, off, n1, n2, n3, u1, u2, a, start, end);
@@ -76,7 +76,7 @@ public class Resid extends MGWorker {
 //		c---------------------------------------------------------------------
 //		c     exchange boundary data
 //		c---------------------------------------------------------------------
-		for ([i3,i2] in (start..end)*(1..n2-2)) {
+		for ([i3,i2] in (start..end)*(1..(n2-2))) {
 			r(off+n1*(i2+n2*i3)) = r(off+n1-2+n1*(i2+n2*i3));
 			r(off+n1-1+n1*(i2+n2*i3)) = r(off+1+n1*(i2+n2*i3));
 		}
@@ -86,12 +86,12 @@ public class Resid extends MGWorker {
 			r(off+i1+n1*(n2-1+n2*i3)) = r(off+i1+n1*(1+n2*i3));
 		}
 	}
-	public static def resid( u: Array[double](1){rail},  v: Array[double](1){rail}, 
-			 r: Array[double](1){rail},  off: int,  n1: int,  n2: int, 
-			 n3: int,  u1: Array[double](1){rail},  u2: Array[double](1){rail}, 
-			 a: Array[double](1),  start: int,  end: int): void {
-		for ([i3,i2] in (start..end)*(1..n2-2)) {
-			for ([i1] in 0..(n1-1)) {
+	public static def resid(u:Rail[Double], v:Rail[Double], 
+			 r:Rail[Double], off:Int, n1:Int, n2: Int, 
+			 n3:Int, u1:Rail[Double], u2:Rail[Double], 
+			 a: Array[Double](1), start:Int, end:Int): void {
+		for ([i3,i2] in (start..end)*(1..(n2-2))) {
+			for (i1 in 0..(n1-1)) {
 				u1(i1) = u(off+i1+n1*(i2-1+n3*i3))
 					+ u(off+i1+n1*(i2+1+n3*i3))
 					+ u(off+i1+n1*(i2+n3*(i3-1)))
@@ -101,7 +101,7 @@ public class Resid extends MGWorker {
 					+ u(off+i1+n1*(i2-1+n3*(i3+1)))
 					+ u(off+i1+n1*(i2+1+n3*(i3+1)));
 			}
-			for ([i1] in 1..(n1-2)) {
+			for (i1 in 1..(n1-2)) {
 				r(off+i1+n1*(i2+n3*i3)) = v(off+i1+n1*(i2+n3*i3))
 					- a(0) * u(off+i1+n1*(i2+n3*i3))
 //					c---------------------------------------------------------------------

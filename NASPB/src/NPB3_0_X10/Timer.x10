@@ -50,11 +50,11 @@ package NPB3_0_X10;
 
 public class Timer {
 	public static val max_counters: int = 64;
-	var start_time: Rail[double] =  Rail.make[double](max_counters);
-	var elapsed_time: Rail[double] =   Rail.make[double](max_counters);
-	var total_time: Rail[double] =   Rail.make[double](max_counters);
+	val start_time=new Rail[Double](max_counters);
+	val elapsed_time=new Rail[Double](max_counters);
+	val total_time=new Rail[Double](max_counters);
 
-	public def Timer(): void = {
+	public def Timer(): void {
 		for (var i: int = 0; i < max_counters; i++) {
 			start_time(i) = 0;
 			elapsed_time(i) = 0;
@@ -66,21 +66,19 @@ public class Timer {
 		start_time(n) = System.currentTimeMillis();
 	}
 
-	public def stop(n: int): void = {
+	public def stop(n: int): void {
 		elapsed_time(n) = System.currentTimeMillis()-start_time(n);
 		elapsed_time(n) /= 1000;
 		total_time(n) += elapsed_time(n);
 	}
 
-	public def readTimer( n: int): double = {
-		return total_time(n);
-	}
+	public def readTimer( n: int)=total_time(n);
 
-	public def resetTimer(var n: int): void = {
+	public def resetTimer(var n: int): void  {
 		elapsed_time(n) = start_time(n) = total_time(n) = 0;
 	}
 
-	public def resetAllTimers(): void = {
+	public def resetAllTimers(): void  {
 		for (var i: int = 0; i < max_counters; i++) resetTimer(i);
 	}
 }
