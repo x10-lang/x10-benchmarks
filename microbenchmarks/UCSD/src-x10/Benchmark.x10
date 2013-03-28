@@ -411,7 +411,7 @@ class IOTest {
         bytetimer.mark();
         for (var i: Int = 0; i < BUFSIZE; i++) {
             try {
-                out.write(0);
+                out.write(0y);
             } catch (e: Exception) {
             }
         }
@@ -486,7 +486,7 @@ class Benchmark {
     public static def main(args: Rail[String]): void {
         val bm = new Benchmark(x10.io.Console.OUT, false, "unspecified");
 
-        if (args.size == 0)
+        if (args.size == 0L)
             bm.runbenchmarks();
         else {
             for (var i: Int = 0; i < args.size; i++)
@@ -518,7 +518,7 @@ class Benchmark {
             runTest(test(next));
             pstream.println(" ");
             return true;
-        } else if (next == test.size) {
+        } else if (next == (test.size as Int)) {
             cumtimer.record();
             StringHelper.bmfill(pstream, "Cumulative runtime: ", cumtimer.elapsed());
             pstream.println();
