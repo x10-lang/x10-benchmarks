@@ -2,7 +2,7 @@ import x10.compiler.Inline;
 import x10.compiler.Native;
 import x10.compiler.NativeRep;
 import x10.compiler.Pragma;
-import x10.util.ArrayBuilder;
+import x10.util.RailBuilder;
 
 @NativeRep("java", "java.util.Random", null, null)
 final class Random {
@@ -83,8 +83,8 @@ struct Result(
 
     def print() {
         val line = 72;
-        val quo = short_.size/line;
-        val mod = short_.size-quo*line;
+        val quo = (short_.size as Int)/line;
+        val mod = (short_.size as Int)-quo*line;
         for (var i:Int=0; i<quo; i++) print(i*line, line);
         if (mod > 0) print(quo*line, mod);
     }
@@ -127,7 +127,7 @@ final class SSCA1 {
             val v = r.next();
             if (i>=first) long_(i-first) = v;
         }
-        tracebackMoves = new Rail[Rail[Byte]](params.shortLength+1, (Int)=>new Rail[Byte](size+1));
+        tracebackMoves = new Rail[Rail[Byte]](params.shortLength+1, (Long)=>new Rail[Byte](size+1));
         if (verbose) Console.OUT.println("place=" + placeId + " [" + first + ","+ last +"[");
     }
 
@@ -210,8 +210,8 @@ final class SSCA1 {
         var nextMove:Byte;
         var i:Int = shortLast;
         var j:Int = longLast;
-        val shortBuilder = new ArrayBuilder[Byte]();
-        val longBuilder = new ArrayBuilder[Byte]();
+        val shortBuilder = new RailBuilder[Byte]();
+        val longBuilder = new RailBuilder[Byte]();
         while ((nextMove = tracebackMoves(i)(j)) != STOP) {
             switch (nextMove) {
             case UP:
