@@ -1,9 +1,9 @@
 import x10.compiler.Native;
 import x10.compiler.NativeRep;
+import x10.compiler.StackAllocate;
 import x10.util.Option;
 import x10.util.OptionsParser;
 import x10.util.Team;
-import x10.util.Vec;
 
 @NativeRep("java", "java.util.Random", null, null)
 final class Random {
@@ -57,7 +57,7 @@ final class KMeans {
         PlaceGroup.WORLD.broadcastFlat(()=>{
             val role = Runtime.hereInt();
             val random = new Random(role);
-            val host_points = new Rail[Float](num_slice_points*dim, (Int)=>random.next());
+            val host_points = new Rail[Float](num_slice_points*dim, (Long)=>random.next());
 
             val host_clusters = new Rail[Float](num_clusters*dim);
             val host_cluster_counts = new Rail[Int](num_clusters);
@@ -72,32 +72,32 @@ final class KMeans {
                 }
             }
 
-            val old_clusters = new Rail[Float](num_clusters*dim);
+            val old_clusters = new Rail[Float](host_clusters.size);
 
             var compute_time:Long = 0;
             var comm_time:Long = 0;
 
-            team.allreduce(role, host_clusters, 0, host_clusters, 0, host_clusters.size, Team.ADD);
+            team.allreduce(role, host_clusters, 0, host_clusters, 0, host_clusters.size as Int, Team.ADD);
 
             val start_time = System.nanoTime();
 
             for (var iter:Int=0; iter<iterations; ++iter) {
 
-                Array.copy(host_clusters, old_clusters);
+                Rail.copy(host_clusters, old_clusters);
                 host_clusters.clear();
                 host_cluster_counts.clear();
 
                 val compute_start = System.nanoTime();
                 for (var p:Int=0; p<num_slice_points; p+=8) {
-                    val closest = Vec.make[Int](8);
-                    val closest_dist = Vec.make[Float](8);
+                    @StackAllocate val closest = @StackAllocate new Rail[Int](8L);
+                    @StackAllocate val closest_dist = @StackAllocate new Rail[Float](8L);
                     for (var w:Int=0; w<8; ++w) closest(w) = -1;
                     for (var w:Int=0; w<8; ++w) closest_dist(w) = 1e37f;
                     for (var k:Int=0; k<num_clusters; ++k) {
-                        val dist = Vec.make[Float](8);
+                        @StackAllocate val dist = @StackAllocate new Rail[Float](8L);
                         for (var w:Int=0; w<8; ++w) dist(w) = 0.0f;
                         for (var d:Int=0; d<dim; ++d) {
-                            val tmp = Vec.make[Float](8);
+                            @StackAllocate val tmp = @StackAllocate new Rail[Float](8L);
                             for (var w:Int=0; w<8; ++w) {
                                 tmp(w) = host_points(p+w+d*num_slice_points) - old_clusters(k*dim+d);
                             }
@@ -123,8 +123,8 @@ final class KMeans {
                 compute_time += System.nanoTime() - compute_start;
 
                 val comm_start = System.nanoTime();
-                team.allreduce(role, host_clusters, 0, host_clusters, 0, host_clusters.size, Team.ADD);
-                team.allreduce(role, host_cluster_counts, 0, host_cluster_counts, 0, host_cluster_counts.size, Team.ADD);
+                team.allreduce(role, host_clusters, 0, host_clusters, 0, host_clusters.size as Int, Team.ADD);
+                team.allreduce(role, host_cluster_counts, 0, host_cluster_counts, 0, host_cluster_counts.size as Int, Team.ADD);
                 comm_time += System.nanoTime() - comm_start;
 
                 for (var k:Int=0; k<num_clusters; ++k) {
