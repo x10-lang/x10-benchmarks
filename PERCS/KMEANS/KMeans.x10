@@ -4,6 +4,7 @@ import x10.compiler.StackAllocate;
 import x10.util.Option;
 import x10.util.OptionsParser;
 import x10.util.Team;
+import x10.util.Vec;
 
 @NativeRep("java", "java.util.Random", null, null)
 final class Random {
@@ -89,15 +90,15 @@ final class KMeans {
 
                 val compute_start = System.nanoTime();
                 for (var p:Int=0; p<num_slice_points; p+=8) {
-                    @StackAllocate val closest = @StackAllocate new Rail[Int](8L);
-                    @StackAllocate val closest_dist = @StackAllocate new Rail[Float](8L);
+                    val closest = Vec.make[Int](8);
+                    val closest_dist = Vec.make[Float](8);
                     for (var w:Int=0; w<8; ++w) closest(w) = -1;
                     for (var w:Int=0; w<8; ++w) closest_dist(w) = 1e37f;
                     for (var k:Int=0; k<num_clusters; ++k) {
-                        @StackAllocate val dist = @StackAllocate new Rail[Float](8L);
+                        val dist = Vec.make[Float](8);
                         for (var w:Int=0; w<8; ++w) dist(w) = 0.0f;
                         for (var d:Int=0; d<dim; ++d) {
-                            @StackAllocate val tmp = @StackAllocate new Rail[Float](8L);
+                            val tmp = Vec.make[Float](8);
                             for (var w:Int=0; w<8; ++w) {
                                 tmp(w) = host_points(p+w+d*num_slice_points) - old_clusters(k*dim+d);
                             }
