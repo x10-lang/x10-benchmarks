@@ -51,7 +51,7 @@ public final class FixedRailQueue[T] {
     Console.OUT.println ("]");
   }
 
-  public static def main (args:Array[String](1)) {
+  public static def main (args:Rail[String]) {
     val myQueue = new FixedRailQueue[Int] (4);
     
     myQueue.push (1);

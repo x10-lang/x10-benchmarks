@@ -25,7 +25,7 @@ public final class Graph {
         this.inDegreeMap = new Rail[Int](N);
         this.offsetMap = new Rail[Int](N+1);
         this.reverseOffsetMap = new Rail[Int](N);
-        this.adjacencyList = new Rail[ArrayList[Int]](N, (Int)=>new ArrayList[Int]());
+        this.adjacencyList = new Rail[ArrayList[Int]](N, (Long)=>new ArrayList[Int]());
         this.adjacencyMap = null;
     }
 

@@ -10,7 +10,7 @@ class RandomAccess {
     // Utility routine to start random number generator at Nth step
     static def HPCC_starts(var n:Long): Long {
         var i:Int, j:Int;
-        val m2 = new Array[Long](64);
+        val m2 = new Rail[Long](64);
         while (n < 0) n += PERIOD;
         while (n > PERIOD) n -= PERIOD;
         if (n == 0L) return 0x1L;
@@ -76,7 +76,7 @@ class RandomAccess {
         out.println("   <updates> is the number of updates per element (default 4)");
     }
 
-    public static def main (args:Array[String]{rank==1}) {
+    public static def main (args:Rail[String]) {
 
         if ((Place.MAX_PLACES & (Place.MAX_PLACES-1)) > 0) {
             Console.ERR.println("The number of places must be a power of 2.");
@@ -123,7 +123,7 @@ class RandomAccess {
         // create congruent array (same address at each place)
         val plhimc = PlaceLocalHandle.makeFlat(PlaceGroup.WORLD, () => new Box(IndexedMemoryChunk.allocateZeroed[Long](localTableSize, 8, true)) as Box[IndexedMemoryChunk[Long]]{self!=null});
         PlaceGroup.WORLD.broadcastFlat(()=>{
-            for ([i] in 0..(localTableSize-1)) plhimc()()(i) = i as Long;
+            for (i in 0..(localTableSize-1)) plhimc()()(i) = i as Long;
         });
 
         // print some info
@@ -150,7 +150,7 @@ class RandomAccess {
         runBenchmark(plhimc, logLocalTableSize, numUpdates);
         PlaceGroup.WORLD.broadcastFlat(()=>{
             var err:Int = 0;
-            for ([i] in 0..(localTableSize-1)) 
+            for (i in 0..(localTableSize-1)) 
                 if (plhimc()()(i) != (i as Long)) err++;
             Console.OUT.println(here+": Found " + err + " errors.");
         });

@@ -1,6 +1,6 @@
 #!/bin/bash
 
-SIZE=$((16*1024*1024))
+SIZE=$((1024*1024))
 
 X10_NPLACES=1     x10 -cp stream.jar Stream $SIZE 2>&1 | tee -a log.stream.managed.00001
 X10_NPLACES=8     x10 -cp stream.jar Stream $SIZE 2>&1 | tee -a log.stream.managed.00008

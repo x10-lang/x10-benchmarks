@@ -8,7 +8,7 @@ import x10.util.concurrent.Lock;
 public final class SSCA2(N:Int) {
     val graph:Graph;
     val verbose:Int;
-    val verticesToWorkOn = new Rail[Int](N, (i:Int)=>i);
+    val verticesToWorkOn = new Rail[Int](N, (i:Long)=>i as Int);
     val betweennessMap = new Rail[Double](N);
 
     // Constructor
@@ -170,7 +170,7 @@ public final class SSCA2(N:Int) {
     private static def crunchNumbers(rmat:Rmat, permute:Int, verbose:Int) {
         var time:Long = System.nanoTime();
 
-        val plh = PlaceLocalHandle.makeFlat[SSCA2](Dist.makeUnique(), ()=>SSCA2.make(rmat, permute, verbose));
+        val plh = PlaceLocalHandle.makeFlat[SSCA2](Place.places(), ()=>SSCA2.make(rmat, permute, verbose));
 
         val distTime = (System.nanoTime()-time)/1e9;
         time = System.nanoTime();
@@ -202,7 +202,7 @@ public final class SSCA2(N:Int) {
      * Reads in all the options and calculate betweenness.
      */
     public static def main(args:Rail[String]):void {
-        val cmdLineParams = new OptionsParser(args, null, [
+        val cmdLineParams = new OptionsParser(args, new Rail[Option](0L), [
             Option("s", "", "Seed for the random number"),
             Option("n", "", "Number of vertices = 2^n"),
             Option("a", "", "Probability a"),

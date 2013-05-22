@@ -13,9 +13,9 @@ public class Stream {
 
     static NUM_PLACES = Place.MAX_PLACES;
 
-    public static def main(args:Array[String](1)){here == Place.FIRST_PLACE} {
+    public static def main(args:Rail[String]){here == Place.FIRST_PLACE} {
         val verified = new Cell[Boolean](true);
-        val times = GlobalRef[Array[double](1)](new Array[double](NUM_TIMES));
+        val times = GlobalRef[Rail[double]](new Rail[double](NUM_TIMES));
         val N0 = args.size>0? int.parse(args(0)) : DEFAULT_SIZE;
         val N = (N0 as long) * NUM_PLACES;
         val localSize =  N0;
@@ -24,9 +24,9 @@ public class Stream {
 
         PlaceGroup.WORLD.broadcastFlat(()=>{
                 val p = here.id;
-                val a = new Array[double](IndexedMemoryChunk.allocateZeroed[double](localSize, 8, IndexedMemoryChunk.hugePages()));
-                val b = new Array[double](IndexedMemoryChunk.allocateZeroed[double](localSize, 8, IndexedMemoryChunk.hugePages()));
-                val c = new Array[double](IndexedMemoryChunk.allocateZeroed[double](localSize, 8, IndexedMemoryChunk.hugePages()));
+                val a = new Rail[double](IndexedMemoryChunk.allocateZeroed[double](localSize, 8, IndexedMemoryChunk.hugePages()));
+                val b = new Rail[double](IndexedMemoryChunk.allocateZeroed[double](localSize, 8, IndexedMemoryChunk.hugePages()));
+                val c = new Rail[double](IndexedMemoryChunk.allocateZeroed[double](localSize, 8, IndexedMemoryChunk.hugePages()));
                 
                 for (var i:int=0; i<localSize; i++) {
                     b(i) = 1.5 * (p*localSize+i);
@@ -37,14 +37,14 @@ public class Stream {
                 
                 for (var j:int=0; j<NUM_TIMES; j++) {
                     if (p==0) {
-                        val t = times as GlobalRef[Array[Double](1)]{self.home==here};
+                        val t = times as GlobalRef[Rail[Double]]{self.home==here};
                         t()(j) = -now();
                     }
                     for (var i:int=0; i<localSize; i++)
                         a(i) = b(i) + beta*c(i);
                     Team.WORLD.barrier(here.id);
                     if (p==0) {
-                        val t = times as GlobalRef[Array[Double](1)]{self.home==here};
+                        val t = times as GlobalRef[Rail[Double]]{self.home==here};
                         t()(j) += now();
                     }
                 }
