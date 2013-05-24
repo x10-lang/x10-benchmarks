@@ -78,7 +78,7 @@ final class KMeans {
             var compute_time:Long = 0;
             var comm_time:Long = 0;
 
-            team.allreduce(role, host_clusters, 0, host_clusters, 0, host_clusters.size as Int, Team.ADD);
+            team.allreduce(host_clusters, 0L, host_clusters, 0L, host_clusters.size, Team.ADD);
 
             val start_time = System.nanoTime();
 
@@ -124,8 +124,8 @@ final class KMeans {
                 compute_time += System.nanoTime() - compute_start;
 
                 val comm_start = System.nanoTime();
-                team.allreduce(role, host_clusters, 0, host_clusters, 0, host_clusters.size as Int, Team.ADD);
-                team.allreduce(role, host_cluster_counts, 0, host_cluster_counts, 0, host_cluster_counts.size as Int, Team.ADD);
+                team.allreduce(host_clusters, 0L, host_clusters, 0L, host_clusters.size, Team.ADD);
+                team.allreduce(host_cluster_counts, 0L, host_cluster_counts, 0L, host_cluster_counts.size, Team.ADD);
                 comm_time += System.nanoTime() - comm_start;
 
                 for (var k:Int=0; k<num_clusters; ++k) {
@@ -143,7 +143,7 @@ final class KMeans {
             if (role == 0) Console.OUT.println("place: " + role + " computation time: "+compute_time/1E9 +
                     " communication time: " + comm_time/1E9);
 
-            team.barrier(role);
+            team.barrier();
 
             if (role == 0) {
                 Console.OUT.println("Total time: " + (stop_time-start_time)/1E9);
