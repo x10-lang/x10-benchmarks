@@ -40,13 +40,18 @@ import x10.util.Team;
     public operator this(i:Int) = (v:T) : T = backing(i) = v;
 
     @Native("c++", "(#this)->toString()")
-    public native def toString():String;
+    public def toString():String = backing.toString();
 
     @Native("c++", "(#this)->equals(#that)")
-    public native def equals(that:Any):Boolean;
+    public def equals(that:Any):Boolean {
+        if (that instanceof Vec[T]) {
+            return this.backing.equals((that as Vec[T]).backing);
+        }
+        return false;
+    }
 
     @Native("c++", "(#this)->hashCode()")
-    public native def hashCode():Int;
+    public def hashCode():Int = size;
 }
 
 
