@@ -36,13 +36,7 @@ template <class T, x10_int SZ> struct NativeVec : public NativeVec_rtt<T> {
     inline x10_int size() const { return SZ; }
     T arr[SZ];
     NativeVec(void) { };
-    NativeVec(size_t sz) {
-        (void) sz;
-        // COMMENT OUT rest of code in this function to avoid initialisation assignments
-        for (size_t i=0 ; i<SZ ; ++i) {
-            arr[i] = x10aux::zeroValue<T>();
-        }
-    }
+    NativeVec(size_t sz) { (void) sz; }
     const T &get (int i) const { return arr[i]; }
     const T &set (const T &v, int i) { arr[i] = v; return v; }
     NativeVec(const NativeVec<T,SZ> &src)
