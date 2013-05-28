@@ -1,0 +1,1 @@
+mpCC -q64 -O5 -qsmp -qthreaded -DN=100000000 stream.c -o stream-native

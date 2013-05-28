@@ -1,0 +1,23 @@
+# HugePages_Total:       0
+
+./ssca2 -n 20 -procs 47040 2>&1 | tee -a log.ssca2.n20.47040
+./ssca2 -n 20 -procs 32768 2>&1 | tee -a log.ssca2.n20.32768
+./ssca2 -n 20 -procs 16384 2>&1 | tee -a log.ssca2.n20.16384
+./ssca2 -n 20 -procs 8192  2>&1 | tee -a log.ssca2.n20.08192
+./ssca2 -n 20 -procs 4096  2>&1 | tee -a log.ssca2.n20.04096
+./ssca2 -n 20 -procs 2048  2>&1 | tee -a log.ssca2.n20.02048
+
+./ssca2 -n 18 -procs 2048  2>&1 | tee -a log.ssca2.n18.02048
+./ssca2 -n 18 -procs 1024  2>&1 | tee -a log.ssca2.n18.01024
+./ssca2 -n 18 -procs 512   2>&1 | tee -a log.ssca2.n18.00512
+./ssca2 -n 18 -procs 256   2>&1 | tee -a log.ssca2.n18.00256
+./ssca2 -n 18 -procs 128   2>&1 | tee -a log.ssca2.n18.00128
+./ssca2 -n 18 -procs 64    2>&1 | tee -a log.ssca2.n18.00064
+./ssca2 -n 18 -procs 32    2>&1 | tee -a log.ssca2.n18.00032
+
+./ssca2 -n 16 -procs 32    2>&1 | tee -a log.ssca2.n16.00032
+./ssca2 -n 16 -procs 16    2>&1 | tee -a log.ssca2.n16.00016
+./ssca2 -n 16 -procs 8     2>&1 | tee -a log.ssca2.n16.00008
+./ssca2 -n 16 -procs 4     2>&1 | tee -a log.ssca2.n16.00004
+./ssca2 -n 16 -procs 2     2>&1 | tee -a log.ssca2.n16.00002
+./ssca2 -n 16 -procs 1     2>&1 | tee -a log.ssca2.n16.00001

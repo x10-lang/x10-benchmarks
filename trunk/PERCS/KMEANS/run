@@ -1,0 +1,19 @@
+# HugePages_Total:       0
+
+./kmeans -n 1881600000 -c 4096 -d 12 -i 5 -procs 47040 2>&1 | tee -a log.kmeans.47040
+./kmeans -n 1310720000 -c 4096 -d 12 -i 5 -procs 32768 2>&1 | tee -a log.kmeans.32768
+./kmeans -n  655360000 -c 4096 -d 12 -i 5 -procs 16384 2>&1 | tee -a log.kmeans.16384
+./kmeans -n  327680000 -c 4096 -d 12 -i 5 -procs 8192  2>&1 | tee -a log.kmeans.08192
+./kmeans -n  163840000 -c 4096 -d 12 -i 5 -procs 4096  2>&1 | tee -a log.kmeans.04096
+./kmeans -n   81920000 -c 4096 -d 12 -i 5 -procs 2048  2>&1 | tee -a log.kmeans.02048
+./kmeans -n   40960000 -c 4096 -d 12 -i 5 -procs 1024  2>&1 | tee -a log.kmeans.01024
+./kmeans -n   20480000 -c 4096 -d 12 -i 5 -procs 512   2>&1 | tee -a log.kmeans.00512
+./kmeans -n   10240000 -c 4096 -d 12 -i 5 -procs 256   2>&1 | tee -a log.kmeans.00256
+./kmeans -n    5120000 -c 4096 -d 12 -i 5 -procs 128   2>&1 | tee -a log.kmeans.00128
+./kmeans -n    2560000 -c 4096 -d 12 -i 5 -procs 64    2>&1 | tee -a log.kmeans.00064
+./kmeans -n    1280000 -c 4096 -d 12 -i 5 -procs 32    2>&1 | tee -a log.kmeans.00032
+./kmeans -n     640000 -c 4096 -d 12 -i 5 -procs 16    2>&1 | tee -a log.kmeans.00016
+./kmeans -n     320000 -c 4096 -d 12 -i 5 -procs 8     2>&1 | tee -a log.kmeans.00008
+./kmeans -n     160000 -c 4096 -d 12 -i 5 -procs 4     2>&1 | tee -a log.kmeans.00004
+./kmeans -n      80000 -c 4096 -d 12 -i 5 -procs 2     2>&1 | tee -a log.kmeans.00002
+./kmeans -n      40000 -c 4096 -d 12 -i 5 -procs 1     2>&1 | tee -a log.kmeans.00001

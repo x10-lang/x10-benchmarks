@@ -1,0 +1,19 @@
+# HugePages_Total:    4096
+
+
+./ra -m 28 -u 1 -procs 32768 2>&1 | tee -a log.ra.32768
+./ra -m 28 -u 1 -procs 16384 2>&1 | tee -a log.ra.16384
+./ra -m 28 -u 1 -procs 8192  2>&1 | tee -a log.ra.08192
+./ra -m 28 -u 1 -procs 4096  2>&1 | tee -a log.ra.04096
+./ra -m 28 -u 1 -procs 2048  2>&1 | tee -a log.ra.02048
+./ra -m 28 -u 1 -procs 1024  2>&1 | tee -a log.ra.01024
+./ra -m 28 -u 1 -procs 512   2>&1 | tee -a log.ra.00512
+./ra -m 28 -u 1 -procs 256   2>&1 | tee -a log.ra.00256
+./ra -m 28 -u 1 -procs 128   2>&1 | tee -a log.ra.00128
+./ra -m 28 -u 1 -procs 64    2>&1 | tee -a log.ra.00064
+./ra -m 28 -u 1 -procs 32    2>&1 | tee -a log.ra.00032
+./ra -m 28 -u 1 -procs 16    2>&1 | tee -a log.ra.00016
+./ra -m 28 -u 1 -procs 8     2>&1 | tee -a log.ra.00008
+./ra -m 28 -u 1 -procs 4     2>&1 | tee -a log.ra.00004
+./ra -m 28 -u 1 -procs 2     2>&1 | tee -a log.ra.00002
+./ra -m 28 -u 1 -procs 1     2>&1 | tee -a log.ra.00001

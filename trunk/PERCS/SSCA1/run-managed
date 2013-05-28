@@ -1,0 +1,24 @@
+# HugePages_Total:       0
+
+X10_NPLACES=1     x10 -cp ssca1.jar SSCA1 4000      40000 2>&1 | tee -a log.ssca1.managed.00001
+X10_NPLACES=8     x10 -cp ssca1.jar SSCA1 4000     320000 2>&1 | tee -a log.ssca1.managed.00008
+
+exit 0
+
+X10_NPLACES=47040 x10 -cp ssca1.jar SSCA1 4000 1881600000 2>&1 | tee -a log.ssca1.managed.47040
+X10_NPLACES=32768 x10 -cp ssca1.jar SSCA1 4000 1310720000 2>&1 | tee -a log.ssca1.managed.32768
+X10_NPLACES=16384 x10 -cp ssca1.jar SSCA1 4000  655360000 2>&1 | tee -a log.ssca1.managed.16384
+X10_NPLACES=8192  x10 -cp ssca1.jar SSCA1 4000  327680000 2>&1 | tee -a log.ssca1.managed.08192
+X10_NPLACES=4096  x10 -cp ssca1.jar SSCA1 4000  163840000 2>&1 | tee -a log.ssca1.managed.04096
+X10_NPLACES=2048  x10 -cp ssca1.jar SSCA1 4000   81920000 2>&1 | tee -a log.ssca1.managed.02048
+X10_NPLACES=1024  x10 -cp ssca1.jar SSCA1 4000   40960000 2>&1 | tee -a log.ssca1.managed.01024
+X10_NPLACES=512   x10 -cp ssca1.jar SSCA1 4000   20480000 2>&1 | tee -a log.ssca1.managed.00512
+X10_NPLACES=256   x10 -cp ssca1.jar SSCA1 4000   10240000 2>&1 | tee -a log.ssca1.managed.00256
+X10_NPLACES=128   x10 -cp ssca1.jar SSCA1 4000    5120000 2>&1 | tee -a log.ssca1.managed.00128
+X10_NPLACES=64    x10 -cp ssca1.jar SSCA1 4000    2560000 2>&1 | tee -a log.ssca1.managed.00064
+X10_NPLACES=32    x10 -cp ssca1.jar SSCA1 4000    1280000 2>&1 | tee -a log.ssca1.managed.00032
+X10_NPLACES=16    x10 -cp ssca1.jar SSCA1 4000     640000 2>&1 | tee -a log.ssca1.managed.00016
+X10_NPLACES=8     x10 -cp ssca1.jar SSCA1 4000     320000 2>&1 | tee -a log.ssca1.managed.00008
+X10_NPLACES=4     x10 -cp ssca1.jar SSCA1 4000     160000 2>&1 | tee -a log.ssca1.managed.00004
+X10_NPLACES=2     x10 -cp ssca1.jar SSCA1 4000      80000 2>&1 | tee -a log.ssca1.managed.00002
+X10_NPLACES=1     x10 -cp ssca1.jar SSCA1 4000      40000 2>&1 | tee -a log.ssca1.managed.00001

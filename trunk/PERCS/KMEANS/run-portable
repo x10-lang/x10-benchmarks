@@ -1,0 +1,24 @@
+# HugePages_Total:       0
+
+X10_NPLACES=1     ./kmeans -n      40000 -c 4096 -d 12 -i 5 2>&1 | tee -a log.kmeans.00001
+X10_NPLACES=8     ./kmeans -n     320000 -c 4096 -d 12 -i 5 2>&1 | tee -a log.kmeans.00008
+
+exit 0
+
+X10_NPLACES=47040 ./kmeans -n 1881600000 -c 4096 -d 12 -i 5 2>&1 | tee -a log.kmeans.47040
+X10_NPLACES=32768 ./kmeans -n 1310720000 -c 4096 -d 12 -i 5 2>&1 | tee -a log.kmeans.32768
+X10_NPLACES=16384 ./kmeans -n  655360000 -c 4096 -d 12 -i 5 2>&1 | tee -a log.kmeans.16384
+X10_NPLACES=8192  ./kmeans -n  327680000 -c 4096 -d 12 -i 5 2>&1 | tee -a log.kmeans.08192
+X10_NPLACES=4096  ./kmeans -n  163840000 -c 4096 -d 12 -i 5 2>&1 | tee -a log.kmeans.04096
+X10_NPLACES=2048  ./kmeans -n   81920000 -c 4096 -d 12 -i 5 2>&1 | tee -a log.kmeans.02048
+X10_NPLACES=1024  ./kmeans -n   40960000 -c 4096 -d 12 -i 5 2>&1 | tee -a log.kmeans.01024
+X10_NPLACES=512   ./kmeans -n   20480000 -c 4096 -d 12 -i 5 2>&1 | tee -a log.kmeans.00512
+X10_NPLACES=256   ./kmeans -n   10240000 -c 4096 -d 12 -i 5 2>&1 | tee -a log.kmeans.00256
+X10_NPLACES=128   ./kmeans -n    5120000 -c 4096 -d 12 -i 5 2>&1 | tee -a log.kmeans.00128
+X10_NPLACES=64    ./kmeans -n    2560000 -c 4096 -d 12 -i 5 2>&1 | tee -a log.kmeans.00064
+X10_NPLACES=32    ./kmeans -n    1280000 -c 4096 -d 12 -i 5 2>&1 | tee -a log.kmeans.00032
+X10_NPLACES=16    ./kmeans -n     640000 -c 4096 -d 12 -i 5 2>&1 | tee -a log.kmeans.00016
+X10_NPLACES=8     ./kmeans -n     320000 -c 4096 -d 12 -i 5 2>&1 | tee -a log.kmeans.00008
+X10_NPLACES=4     ./kmeans -n     160000 -c 4096 -d 12 -i 5 2>&1 | tee -a log.kmeans.00004
+X10_NPLACES=2     ./kmeans -n      80000 -c 4096 -d 12 -i 5 2>&1 | tee -a log.kmeans.00002
+X10_NPLACES=1     ./kmeans -n      40000 -c 4096 -d 12 -i 5 2>&1 | tee -a log.kmeans.00001

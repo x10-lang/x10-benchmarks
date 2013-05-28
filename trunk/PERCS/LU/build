@@ -1,0 +1,1 @@
+x10c++ $X10RTTRANSPORT -O -NO_CHECKS LU.x10 -post '# # #  -L/opt/ibmcmp/xlsmp/2.1/lib64 -L/opt/ibmcmp/xlf/13.1/lib64 -R/opt/ibmcmp/lib64li4 -lessl -lm -lxlf90_r -lxl -lxlomp_ser -lxlfmath' -o lu

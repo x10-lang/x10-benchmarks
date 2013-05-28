@@ -1,0 +1,50 @@
+MAT_SOLID White 1 1 1  1 1 1  1 1 1  10
+MAT_SOLID Black 0 0 0  .1 .1 .1  1 1 1  10
+MAT_SOLID Grey 0.5 0.5 0.5  0.5 0.5 0.5  1 1 1  10
+MAT_SOLID DarkGrey 0.25 0.25 0.25  0.25 0.25 0.25  1 1 1  10
+MAT_SOLID LightGrey 0.75 0.75 0.75  0.75 0.75 0.75  1 1 1  10
+
+MAT_SOLID LightRed 1 0.5 0.5  1 0.5 0.5  1 1 1  10
+MAT_SOLID LightGreen 0.5 1 0.5  0.5 1 0.5  1 1 1  10
+MAT_SOLID LightBlue 0.5 0.5 1  0.5 0.5 1  1 1 1  10
+MAT_SOLID Red 1 0 0  1 0 0  1 1 1  10
+MAT_SOLID Green 0 1 0  0 1 0  1 1 1  10
+MAT_SOLID Blue 0 0 1  0 0 1  1 1 1  10
+MAT_SOLID DarkRed 0.5 0 0  0.5 0 0  1 1 1  10
+MAT_SOLID DarkGreen 0 0.5 0   0 0.5 0  1 1 1  10
+MAT_SOLID DarkBlue 0 0 0.5   0 0 0.5  1 1 1  10
+
+MAT_SOLID LightYellow 1 1 0.5   1 1 0.5  1 1 1  10
+MAT_SOLID LightCyan 0.5 1 1   0.5 1 1  1 1 1  10
+MAT_SOLID LightMagenta 1 0.5 1   1 0.5 1  1 1 1  10
+MAT_SOLID Yellow 1 1 0   1 1 0  1 1 1  10
+MAT_SOLID Cyan 0 1 1   0 1 1  1 1 1  10
+MAT_SOLID Magenta 1 0 1   1 0 1  1 1 1  10
+MAT_SOLID DarkYellow 0.5 0.5 0  0.5 0.5 0  1 1 1  10
+MAT_SOLID DarkCyan 0 0.5 0.5   0 0.5 0.5  1 1 1  10
+MAT_SOLID DarkMagenta 0.5 0 0.5   0.5 0 0.5  1 1 1  10
+
+MAT_SOLID MetallicGrey 0.5 0.5 0.5  0.5 0.5 0.5  0.5 0.5 0.5  20
+MAT_REFLECTIVE Mirror MetallicGrey 0.5 0.5 0.5
+MAT_REFLECTIVE DarkMirror Black 0.10 0.10 0.10
+MAT_REFLECTIVE RedMirror DarkRed 0.5 0.0 0.0
+MAT_REFLECTIVE BlueMirror DarkBlue 0.0 0.0 0.4
+MAT_REFLECTIVE CyanMirror DarkCyan 0.0 0.4 0.4
+
+MAT_TEX Logo 512 512 scenes/logo.raw  1 1 1  1 1 1  0.3 0.3 0.3  30
+RECT -30 30 0 0 0  -30 -30 0 0 10  30 -30 0 10 10  30 30 0 10 0  Logo
+
+RECT -5 -7 4 0.00 1  -5 -7 0 0.00 0  -4 -7 0 0.25 0  -4 -7 4 0.25 1  DarkMirror
+RECT -4 -7 4 0.25 1  -4 -7 0 0.25 0  -4 -6 0 0.50 0  -4 -6 4 0.50 1  DarkMirror
+RECT -4 -6 4 0.50 1  -4 -6 0 0.50 0  -5 -6 0 0.75 0  -5 -6 4 0.75 1  DarkMirror
+RECT -5 -6 4 0.25 1  -5 -6 0 0.25 0  -5 -7 0 0.50 0  -5 -7 4 0.50 1  DarkMirror
+RECT -5 -6 4 0.25 1  -5 -7 4 0.25 0  -4 -7 4 0.50 0  -4 -6 4 0.50 1  DarkMirror
+
+SPHERE 5 2 1 1 Mirror
+SPHERE 2 5 3 3 DarkMirror
+SPHERE -3 7 1 1 RedMirror
+SPHERE 2 -2 2 2 BlueMirror
+SPHERE -3 -2 1.5 1.5 CyanMirror
+SPECKLEDSPHERE -5 3 1 1 DarkMirror
+
+SKYBOX 512 scenes/skybox_FR.raw scenes/skybox_BK.raw scenes/skybox_LF.raw scenes/skybox_RT.raw scenes/skybox_UP.raw scenes/skybox_DN.raw 
