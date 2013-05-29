@@ -41,7 +41,7 @@ class RandomAccess {
         val max = Place.MAX_PLACES;
 
         PlaceGroup.WORLD.broadcastFlat(()=>{
-            val jj = Runtime.hereInt();
+            val jj = Runtime.hereLong();
             val t = System.nanoTime();
             var ran:Long = HPCC_starts(jj*(numUpdates/Place.MAX_PLACES));
             val imc = plhimc()();
@@ -68,7 +68,7 @@ class RandomAccess {
     }
 
     private static def help (err:Boolean) {
-        if (here.id!=0) return;
+        if (here.id!=0L) return;
         val out = err ? Console.ERR : Console.OUT;
         out.println("Usage: ra [-m <mem>] [-u <updates>]");
         out.println("where");
@@ -91,7 +91,7 @@ class RandomAccess {
             if (args(i).equals("-m")) {
                 i++;
                 if (i >= args.size) {
-                    if (here.id==0)
+                    if (here.id==0L)
                         Console.ERR.println("Too few cmdline params.");
                     help(true);
                     return;
@@ -100,14 +100,14 @@ class RandomAccess {
             } else if (args(i).equals("-u")) {
                 i++;
                 if (i >= args.size) {
-                    if (here.id==0)
+                    if (here.id==0L)
                         Console.ERR.println("Too few cmdline params.");
                     help(true);
                     return;
                 }
                 updates_ = Int.parseInt(args(i++));
             } else {
-                if (here.id==0)
+                if (here.id==0L)
                     Console.ERR.println("Unrecognised cmdline param: \""+args(i)+"\"");
                 help(true);
                 return;
