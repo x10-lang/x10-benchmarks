@@ -5,8 +5,6 @@ import x10.util.Option;
 import x10.util.OptionsParser;
 import x10.util.Random;
 
-//@x10.compiler.NativeCPPInclude("google/profiler.h")
-
 public final class UTS {
     val queue:Queue;
     val lifelineThieves:FixedSizeStack[Int];
@@ -38,7 +36,7 @@ public final class UTS {
         
         victims = new Rail[Int](m);
         if (P>1) for (var i:Int=0; i<m; i++) {
-            while ((victims(i) = random.nextInt(P)) == h);
+            while ((victims(i) = random.nextInt(P as Int)) == h);
         }
         
         // lifelines
@@ -56,13 +54,7 @@ public final class UTS {
             x *= l;
         }
         
-        /*
-         * Console.OUT.print("" + i + " =>");
-         * for (var j:Int=0; j<z; j++) Console.OUT.print(" " + lifelines(j));
-         * Console.OUT.println();
-         */
-        
-        queue = new Queue(4096, b, d);
+        queue = new Queue(b);
         lifelineThieves = new FixedSizeStack[Int](lifelines.size+3);
         thieves = new FixedSizeStack[Int](P);
         lifelinesActivated = new Rail[Boolean](P);
@@ -85,7 +77,7 @@ public final class UTS {
         return queue.size > 0;
     }
     
-    @Inline static def min(i:Int,j:Int) = i < j ? i : j;
+    @Inline static def min(i:Long, j:Long) = i < j ? i : j;
     
     final def processStack(st:PlaceLocalHandle[UTS]) {
         do {
@@ -98,9 +90,9 @@ public final class UTS {
         } while (steal(st));
     }
     
-    @Inline def give(st:PlaceLocalHandle[UTS], loot:Queue.Fragment) {
+    @Inline def give(st:PlaceLocalHandle[UTS], loot:Fragment) {
         val victim = Runtime.hereInt();
-        logger.nodesGiven += loot.hash.length();
+        logger.nodesGiven += loot.hash.size;
         if (thieves.size() > 0) {
             val thief = thieves.pop();
             if (thief >= 0) {
@@ -118,8 +110,8 @@ public final class UTS {
     }
     
     @Inline def distribute(st:PlaceLocalHandle[UTS]) {
-        var loot:Queue.Fragment;
-        while (((thieves.size() > 0) || (lifelineThieves.size() > 0)) && (loot = queue.grab()) != null) {
+        var loot:Fragment;
+        while (((thieves.size() > 0) || (lifelineThieves.size() > 0)) && (loot = Fragment.make(queue)) != null) {
             give(st, loot);
         }
     }
@@ -137,7 +129,7 @@ public final class UTS {
     }
     
     def steal(st:PlaceLocalHandle[UTS]) {
-        if (P == 1) return false;
+        if (P == 1L) return false;
         val p = Runtime.hereInt();
         empty = true;
         for (var i:Int=0; i < w && empty; ++i) {
@@ -166,7 +158,7 @@ public final class UTS {
     def request(st:PlaceLocalHandle[UTS], thief:Int, lifeline:Boolean) {
         try {
             if (lifeline) ++logger.lifelineStealsReceived; else ++logger.stealsReceived;
-            if (queue.size == 0) {
+            if (queue.size == 0L) {
                 if (lifeline) lifelineThieves.push(thief);
                 at (Place(thief)) @Uncounted async { st().waiting = false; }
             } else {
@@ -177,8 +169,8 @@ public final class UTS {
         }
     }
     
-    @Inline final def processLoot(loot:Queue.Fragment, lifeline:Boolean) {
-        val n = loot.hash.length();
+    @Inline final def processLoot(loot:Fragment, lifeline:Boolean) {
+        val n = loot.hash.size;
         if (lifeline) {
             ++logger.lifelineStealsPerpetrated;
             logger.lifelineNodesReceived += n;
@@ -186,10 +178,10 @@ public final class UTS {
             ++logger.stealsPerpetrated;
             logger.nodesReceived += n;
         }
-        queue.push(loot);
+        loot.push(queue);
     }
     
-    def deal(st:PlaceLocalHandle[UTS], loot:Queue.Fragment, source:Int) {
+    def deal(st:PlaceLocalHandle[UTS], loot:Fragment, source:Int) {
         try {
             val lifeline = source >= 0;
             if (lifeline) lifelinesActivated(source) = false;
@@ -211,12 +203,12 @@ public final class UTS {
         }
     }
     
-    def main(st:PlaceLocalHandle[UTS], seed:Int) {
+    def main(st:PlaceLocalHandle[UTS], seed:Int, d:Int) {
         @Pragma(Pragma.FINISH_DENSE) finish {
             try {
                 active = true;
                 logger.startLive();
-                queue.init(seed);
+                queue.init(seed, d);
                 processStack(st);
                 logger.stopLive();
                 active = false;
@@ -232,17 +224,17 @@ public final class UTS {
         v.printStackTrace();
     }
     
-    public static def main(args:Array[String](1)) {
-        val opts = new OptionsParser(args, null, [
-                Option("b", "", "Branching factor"),
-                Option("r", "", "Seed (0 <= r < 2^31"),
-                Option("d", "", "Tree depth"),
-                Option("n", "", "Number of nodes to process before probing. Default 200."),
-                Option("w", "", "Number of thieves to send out. Default 1."),
-                Option("l", "", "Base of the lifeline"),
-                Option("m", "", "Max potential victims"),
-                Option("v", "", "Verbose. Default 0 (no).")]);
-        
+    public static def main(args:Rail[String]) {
+        val opts = new OptionsParser(args, new Rail[Option](), [
+                                                                Option("b", "", "Branching factor"),
+                                                                Option("r", "", "Seed (0 <= r < 2^31"),
+                                                                Option("d", "", "Tree depth"),
+                                                                Option("n", "", "Number of nodes to process before probing. Default 200."),
+                                                                Option("w", "", "Number of thieves to send out. Default 1."),
+                                                                Option("l", "", "Base of the lifeline"),
+                                                                Option("m", "", "Max potential victims"),
+                                                                Option("v", "", "Verbose. Default 0 (no).")]);
+
         val b = opts("-b", 4);
         val r = opts("-r", 19);
         val d = opts("-d", 13);
@@ -250,9 +242,9 @@ public final class UTS {
         val l = opts("-l", 32);
         val m = opts("-m", 1024);
         val verbose = opts("-v", 0) != 0;
-        
+
         val P = Place.MAX_PLACES;
-        
+
         var z0:Int = 1;
         var zz:Int = l;
         while (zz < P) {
@@ -265,41 +257,37 @@ public final class UTS {
 
         Console.OUT.println("places=" + P +
                 "   b=" + b +
-                "   r=" + r +
-                "   d=" + d +
-                "   w=" + w +
-                "   n=" + n +
-                "   l=" + l + 
-                "   m=" + m + 
-                "   z=" + z);
+                        "   r=" + r +
+                                "   d=" + d +
+                                        "   w=" + w +
+                                                "   n=" + n +
+                                                        "   l=" + l + 
+                                                                "   m=" + m + 
+                                                                        "   z=" + z);
         
         val st = PlaceLocalHandle.makeFlat[UTS](PlaceGroup.WORLD, ()=>new UTS(b, d, n, w, l, z, m));
         
         Console.OUT.println("Starting...");
-        //@Native("c++", "ProfilerStart(\"UTS.prof\");") {}
         var time:Long = System.nanoTime();
-        st().main(st, r);
+        st().main(st, r, d);
         time = System.nanoTime() - time;
-        //@Native("c++", "ProfilerStop();") {}
         Console.OUT.println("Finished.");
         
         val logs:Rail[Logger];
         if (P >= 1024) {
-            logs = new Rail[Logger](P/32, (i:Int)=>at (Place(i*32)) {
+            logs = new Rail[Logger](P/32, (i:Long)=>at (Place(i*32)) {
                 val h = Runtime.hereInt();
                 val n = min(32, P-h);
-                val logs = new Rail[Logger](n, (i:Int)=>at (Place(h+i)) st().logger.get(verbose));
+                val logs = new Rail[Logger](n, (i:Long)=>at (Place(h+i)) st().logger.get(verbose));
                 val log = new Logger(false);
                 log.collect(logs);
                 return log;
             });
         } else {
-            logs = new Rail[Logger](P, (i:Int)=>at (Place(i)) st().logger);
+            logs = new Rail[Logger](P, (i:Long)=>at (Place(i)) st().logger);
         }
         val log = new Logger(false);
         log.collect(logs);
         log.stats(time);
     }
 }
-
-// vim: ts=2:sw=2:et

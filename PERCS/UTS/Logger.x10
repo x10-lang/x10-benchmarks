@@ -21,7 +21,7 @@ public class Logger {
     val timeReference:Long;
     
     def this(b:Boolean) {
-        if (b) x10.util.Team.WORLD.barrier(here.id);
+        if (b) x10.util.Team.WORLD.barrier();
         timeReference = System.nanoTime();
     }
     
@@ -42,7 +42,7 @@ public class Logger {
     }
 
     def collect(logs:Rail[Logger]) {
-        for (l in logs.values()) add(l);
+        for (l in logs) add(l);
     }
 
     def stats(time:Long) {

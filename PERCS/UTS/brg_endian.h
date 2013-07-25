@@ -43,7 +43,7 @@
       defined( __CYGWIN32__ ) || defined( __DJGPP__ ) || defined( __osf__ )
 #  include <machine/endian.h>
 #elif defined( __linux__ ) || defined( __GNUC__ ) || defined( __GNU_LIBRARY__ )
-#  if !defined( __MINGW32__ )
+#  if !defined( __MINGW32__ ) && !defined( __sun__ )
 #    include <endian.h>
 #    if !defined( __BEOS__ )
 #      include <byteswap.h>
@@ -111,7 +111,8 @@
       defined( __i386__ )  || defined( _M_I86 )  || defined( _M_IX86 )    || \
       defined( __OS2__ )   || defined( sun386 )  || defined( __TURBOC__ ) || \
       defined( vax )       || defined( vms )     || defined( VMS )        || \
-      defined( __VMS )     || defined( _M_X64 )
+      defined( __VMS )     || defined( _M_X64 )  || defined( MIPSEL )     || \
+      defined( _MIPSEL )   || defined( __MIPSEL )|| defined( __MIPSEL__ )
 #  define PLATFORM_BYTE_ORDER IS_LITTLE_ENDIAN
 
 #elif defined( AMIGA )   || defined( applec )    || defined( __AS400__ )  || \
@@ -120,7 +121,8 @@
       defined( __MRC__ ) || defined( __MVS__ )   || defined( __MWERKS__ ) || \
       defined( sparc )   || defined( __sparc)    || defined( SYMANTEC_C ) || \
       defined( __VOS__ ) || defined( __TIGCC__ ) || defined( __TANDEM )   || \
-      defined( THINK_C ) || defined( __VMCMS__ )
+      defined( THINK_C ) || defined( __VMCMS__ ) || defined( MIPSEB  )    || \
+      defined( _MPISEB ) || defined( __MPISEB )  || defined( __MIPSEB__ )
 #  define PLATFORM_BYTE_ORDER IS_BIG_ENDIAN
 
 #elif 0     /* **** EDIT HERE IF NECESSARY **** */

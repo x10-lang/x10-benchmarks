@@ -33,11 +33,13 @@
  stored in memory.
 */
 
+#pragma mta expect parallel context
+
 #include <string.h>     /* for memcpy() etc.        */
 #include <stdio.h>
 
-#include "sha1.h"
-#include "sha_endian.h"
+#include "brg_sha1.h"
+#include "brg_endian.h"
 
 #if defined(__cplusplus)
 extern "C"
@@ -67,7 +69,7 @@ void rng_init(RNG_state *newstate, int seed)
 void rng_spawn(RNG_state *mystate, RNG_state *newstate, int spawnnumber)
 {
 	struct sha1_context ctx;
-	uint8  bytes[4];
+	uint_8t  bytes[4];
 	
 	bytes[0] = 0xFF & (spawnnumber >> 24);
 	bytes[1] = 0xFF & (spawnnumber >> 16);
@@ -82,7 +84,7 @@ void rng_spawn(RNG_state *mystate, RNG_state *newstate, int spawnnumber)
 
 int rng_rand(RNG_state *mystate){
         int r;
-	uint32 b =  (mystate[16] << 24) | (mystate[17] << 16)
+	uint_32t b =  (mystate[16] << 24) | (mystate[17] << 16)
 		| (mystate[18] << 8) | (mystate[19] << 0);
 	b = b & POS_MASK;
 	
@@ -94,7 +96,7 @@ int rng_rand(RNG_state *mystate){
 int rng_nextrand(RNG_state *mystate){
 	struct sha1_context ctx;
 	int r;
-	uint32 b;
+	uint_32t b;
 
 	sha1_begin(&ctx);
 	sha1_hash(mystate, 20, &ctx);
@@ -115,8 +117,8 @@ char * rng_showstate(RNG_state *state, char *s){
 
 /* describe random number generator type into string */
 int rng_showtype(char *strBuf, int ind) {
-  ind += sprintf(strBuf+ind, "SHA-1 (state size = %luB)",
-                 (unsigned long)sizeof(struct state_t));
+  ind += sprintf(strBuf+ind, "SHA-1 (state size = %uB)",
+                 (unsigned) sizeof(struct state_t));
   return ind;
 }
 
