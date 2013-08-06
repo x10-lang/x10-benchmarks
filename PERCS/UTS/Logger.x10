@@ -1,23 +1,23 @@
 public class Logger {
-    var nodesCount:Long = 0L;
-    var nodesGiven:Long = 0L;
+    var nodesCount:Long = 0;
+    var nodesGiven:Long = 0;
 
-    var stealsAttempted:Long = 0L;
-    var stealsPerpetrated:Long = 0L;
-    var stealsReceived:Long = 0L;
-    var stealsSuffered:Long = 0L;
-    var nodesReceived:Long = 0L;
+    var stealsAttempted:Long = 0;
+    var stealsPerpetrated:Long = 0;
+    var stealsReceived:Long = 0;
+    var stealsSuffered:Long = 0;
+    var nodesReceived:Long = 0;
 
-    var lifelineStealsAttempted:Long = 0L;
-    var lifelineStealsPerpetrated:Long = 0L;
-    var lifelineStealsReceived:Long = 0L;
-    var lifelineStealsSuffered:Long = 0L;
-    var lifelineNodesReceived:Long = 0L;
+    var lifelineStealsAttempted:Long = 0;
+    var lifelineStealsPerpetrated:Long = 0;
+    var lifelineStealsReceived:Long = 0;
+    var lifelineStealsSuffered:Long = 0;
+    var lifelineNodesReceived:Long = 0;
 
-    var lastStartStopLiveTimeStamp:Long = -1L;
-    var timeAlive:Long = 0L;
-    var timeDead:Long = 0L;
-    var startTime:Long = 0L;
+    var lastStartStopLiveTimeStamp:Long = -1;
+    var timeAlive:Long = 0;
+    var timeDead:Long = 0;
+    var startTime:Long = 0;
     val timeReference:Long;
     
     def this(b:Boolean) {
@@ -28,7 +28,7 @@ public class Logger {
 
     def startLive() {
         val time = System.nanoTime();
-        if (startTime == 0L) startTime = time;
+        if (startTime == 0) startTime = time;
         if (lastStartStopLiveTimeStamp >= 0) {
             timeDead += time - lastStartStopLiveTimeStamp;
         }
@@ -50,8 +50,8 @@ public class Logger {
             lifelineNodesReceived + " (lifeline)."); 
         Console.OUT.println(stealsPerpetrated + " successful direct steals."); 
         Console.OUT.println(lifelineStealsPerpetrated + " successful lifeline steals.");
-        Console.OUT.println("Performance: " + nodesCount + "/" + sub("" + (time/1E9), 0, 6) +
-            " = " + sub("" + (nodesCount/(time/1E3)), 0, 6) + "M nodes/s");
+        Console.OUT.println("Performance: " + nodesCount + "/" + sub("" + (time/1E9), 0n, 6n) +
+            " = " + sub("" + (nodesCount/(time/1E3)), 0n, 6n) + "M nodes/s");
     }
 
     private static def sub(str:String, start:Int, end:Int) = str.substring(start, Math.min(end, str.length()));
@@ -67,13 +67,13 @@ public class Logger {
 
     def get(verbose:Boolean) {
         if (verbose) {
-            Console.OUT.println("" + Runtime.hereInt() + " -> " +
-                sub("" + (timeAlive/1E9), 0, 6) + " : " +
-                sub("" + (timeDead/1E9), 0, 6) + " : " + 
-                sub("" + ((timeAlive + timeDead)/1E9), 0, 6) + " : " + 
-                sub("" + (100.0*timeAlive/(timeAlive+timeDead)), 0, 6) + "%" + " :: " +
-                sub("" + ((startTime-timeReference)/1E9), 0, 6) + " : " +
-                sub("" + ((lastStartStopLiveTimeStamp-timeReference)/1E9), 0, 6) + " :: " +
+            Console.OUT.println("" + Runtime.hereLong() + " -> " +
+                sub("" + (timeAlive/1E9), 0n, 6n) + " : " +
+                sub("" + (timeDead/1E9), 0n, 6n) + " : " + 
+                sub("" + ((timeAlive + timeDead)/1E9), 0n, 6n) + " : " + 
+                sub("" + (100.0*timeAlive/(timeAlive+timeDead)), 0n, 6n) + "%" + " :: " +
+                sub("" + ((startTime-timeReference)/1E9), 0n, 6n) + " : " +
+                sub("" + ((lastStartStopLiveTimeStamp-timeReference)/1E9), 0n, 6n) + " :: " +
                 stealsAttempted + " : " +
                 lifelineStealsAttempted + " : " +
                 (lifelineStealsAttempted - lifelineStealsPerpetrated));

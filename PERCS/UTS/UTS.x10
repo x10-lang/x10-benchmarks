@@ -7,9 +7,9 @@ import x10.util.Random;
 
 public final class UTS {
     val queue:Queue;
-    val lifelineThieves:FixedSizeStack[Int];
-    val thieves:FixedSizeStack[Int];
-    val lifelines:Rail[Int];
+    val lifelineThieves:FixedSizeStack[Long];
+    val thieves:FixedSizeStack[Long];
+    val lifelines:Rail[Long];
     val lifelinesActivated:Rail[Boolean];
     
     val n:Int;
@@ -17,7 +17,7 @@ public final class UTS {
     val m:Int;
     
     val random = new Random();
-    val victims:Rail[Int];
+    val victims:Rail[Long];
     val logger:Logger;
     
     @x10.compiler.Volatile transient var active:Boolean = false;
@@ -30,21 +30,21 @@ public final class UTS {
         this.n = n;
         this.w = w;
         this.m = m;
-        this.lifelines = new Rail[Int](z, -1);
+        this.lifelines = new Rail[Long](z, -1);
         
-        val h = Runtime.hereInt();
+        val h = Runtime.hereLong();
         
-        victims = new Rail[Int](m);
-        if (P>1) for (var i:Int=0; i<m; i++) {
-            while ((victims(i) = random.nextInt(P as Int)) == h);
+        victims = new Rail[Long](m);
+        if (P>1) for (var i:Long=0; i<m; i++) {
+            while ((victims(i) = random.nextLong(P)) == h);
         }
         
         // lifelines
-        var x:Int = 1;
-        var t:Int = 0;
-        for (var j:Int=0; j<z; j++) {
-            var v:Int = h;
-            for (var k:Int=1; k<l; k++) {
+        var x:Long = 1;
+        var t:Long = 0;
+        for (var j:Long=0; j<z; j++) {
+            var v:Long = h;
+            for (var k:Long=1; k<l; k++) {
                 v = v - v%(x*l) + (v+x*l-x)%(x*l);
                 if (v<P) {
                     lifelines(t++) = v;
@@ -55,8 +55,8 @@ public final class UTS {
         }
         
         queue = new Queue(b);
-        lifelineThieves = new FixedSizeStack[Int](lifelines.size+3);
-        thieves = new FixedSizeStack[Int](P);
+        lifelineThieves = new FixedSizeStack[Long](lifelines.size+3);
+        thieves = new FixedSizeStack[Long](P);
         lifelinesActivated = new Rail[Boolean](P);
         
         // 1st wave
@@ -69,7 +69,7 @@ public final class UTS {
     }
     
     @Inline final def processAtMostN() {
-        var i:Int=0;
+        var i:Long=0;
         for (; (i<n) && (queue.size>0); ++i) {
             queue.expand();
         }
@@ -91,7 +91,7 @@ public final class UTS {
     }
     
     @Inline def give(st:PlaceLocalHandle[UTS], loot:Fragment) {
-        val victim = Runtime.hereInt();
+        val victim = Runtime.hereLong();
         logger.nodesGiven += loot.hash.size;
         if (thieves.size() > 0) {
             val thief = thieves.pop();
@@ -129,10 +129,10 @@ public final class UTS {
     }
     
     def steal(st:PlaceLocalHandle[UTS]) {
-        if (P == 1L) return false;
-        val p = Runtime.hereInt();
+        if (P == 1) return false;
+        val p = Runtime.hereLong();
         empty = true;
-        for (var i:Int=0; i < w && empty; ++i) {
+        for (var i:Long=0; i < w && empty; ++i) {
             ++logger.stealsAttempted;
             waiting = true;
             logger.stopLive();
@@ -140,7 +140,7 @@ public final class UTS {
             while (waiting) Runtime.probe();
             logger.startLive();
         }
-        for (var i:Int=0; (i<lifelines.size) && empty && (0<=lifelines(i)); ++i) {
+        for (var i:Long=0; (i<lifelines.size) && empty && (0<=lifelines(i)); ++i) {
             val lifeline = lifelines(i);
             if (!lifelinesActivated(lifeline)) {
                 ++logger.lifelineStealsAttempted;
@@ -155,10 +155,10 @@ public final class UTS {
         return !empty;
     }
     
-    def request(st:PlaceLocalHandle[UTS], thief:Int, lifeline:Boolean) {
+    def request(st:PlaceLocalHandle[UTS], thief:Long, lifeline:Boolean) {
         try {
             if (lifeline) ++logger.lifelineStealsReceived; else ++logger.stealsReceived;
-            if (queue.size == 0L) {
+            if (queue.size == 0) {
                 if (lifeline) lifelineThieves.push(thief);
                 at (Place(thief)) @Uncounted async { st().waiting = false; }
             } else {
@@ -181,7 +181,7 @@ public final class UTS {
         loot.push(queue);
     }
     
-    def deal(st:PlaceLocalHandle[UTS], loot:Fragment, source:Int) {
+    def deal(st:PlaceLocalHandle[UTS], loot:Fragment, source:Long) {
         try {
             val lifeline = source >= 0;
             if (lifeline) lifelinesActivated(source) = false;
@@ -235,17 +235,17 @@ public final class UTS {
                                                                 Option("m", "", "Max potential victims"),
                                                                 Option("v", "", "Verbose. Default 0 (no).")]);
 
-        val b = opts("-b", 4);
-        val r = opts("-r", 19);
-        val d = opts("-d", 13);
-        val n = opts("-n", 511);
-        val l = opts("-l", 32);
-        val m = opts("-m", 1024);
+        val b = opts("-b", 4n);
+        val r = opts("-r", 19n);
+        val d = opts("-d", 13n);
+        val n = opts("-n", 511n);
+        val l = opts("-l", 32n);
+        val m = opts("-m", 1024n);
         val verbose = opts("-v", 0) != 0;
 
         val P = Place.MAX_PLACES;
 
-        var z0:Int = 1;
+        var z0:Int = 1n;
         var zz:Int = l;
         while (zz < P) {
             z0++;
@@ -276,7 +276,7 @@ public final class UTS {
         val logs:Rail[Logger];
         if (P >= 1024) {
             logs = new Rail[Logger](P/32, (i:Long)=>at (Place(i*32)) {
-                val h = Runtime.hereInt();
+                val h = Runtime.hereLong();
                 val n = min(32, P-h);
                 val logs = new Rail[Logger](n, (i:Long)=>at (Place(h+i)) st().logger.get(verbose));
                 val log = new Logger(false);

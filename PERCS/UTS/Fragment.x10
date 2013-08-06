@@ -2,7 +2,7 @@ final class Fragment {
     val hash:Rail[SHA1Rand];
     val lower:Rail[Int];
     val upper:Rail[Int];
-
+ 
     def this(size:Long) {
         hash = new Rail[SHA1Rand](size);
         lower = new Rail[Int](size);
@@ -10,19 +10,19 @@ final class Fragment {
     }
 
     static def make(queue:Queue) {
-        var s:Long = 0L;
-        for (var i:Long=0L; i<queue.size; ++i) {
+        var s:Long = 0;
+        for (var i:Long=0; i<queue.size; ++i) {
             if ((queue.upper(i) - queue.lower(i)) >= 2) ++s;
         }
-        if (s == 0L) return null;
+        if (s == 0) return null;
         val fragment = new Fragment(s);
-        s = 0L;
-        for (var i:Long=0L; i<queue.size; ++i) {
+        s = 0;
+        for (var i:Long=0; i<queue.size; ++i) {
             val p = queue.upper(i) - queue.lower(i);
             if (p >= 2) {
                 fragment.hash(s) = queue.hash(i);
                 fragment.upper(s) = queue.upper(i);
-                queue.upper(i) -= p/2;
+                queue.upper(i) -= p/2n;
                 fragment.lower(s++) = queue.upper(i);
             }
         }
@@ -33,9 +33,9 @@ final class Fragment {
         val h = hash.size;
         val q = queue.size;
         while (h + q > queue.hash.size) queue.grow();
-        Rail.copy(hash, 0L, queue.hash, q, h);
-        Rail.copy(lower, 0L, queue.lower, q, h);
-        Rail.copy(upper, 0L, queue.upper, q, h);
+        Rail.copy(hash, 0, queue.hash, q, h);
+        Rail.copy(lower, 0, queue.lower, q, h);
+        Rail.copy(upper, 0, queue.upper, q, h);
         queue.size += h;
     }
 }
