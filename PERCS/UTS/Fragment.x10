@@ -19,7 +19,7 @@ final class Fragment {
         s = 0;
         for (var i:Long=0; i<queue.size; ++i) {
             val p = queue.upper(i) - queue.lower(i);
-            if (p >= 2) {
+            if (p >= 2n) {
                 fragment.hash(s) = queue.hash(i);
                 fragment.upper(s) = queue.upper(i);
                 queue.upper(i) -= p/2n;
