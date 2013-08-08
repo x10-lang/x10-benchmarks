@@ -6,7 +6,7 @@
 * 
 * v3: v2 with additional single-place parallelism */
 class nbody {
-    public static def main(args: Array[String](1){rail}) {
+    public static def main(args:Rail[String]) {
     	val start = System.nanoTime();
         val n= Int.parse(args(0));
 
@@ -35,16 +35,17 @@ class nbody {
 
         def this() { 
             var p:vec = vec(0.0,0.0,0.0);
-            for (b in bodies) {
+            for (b in 0..(bodies.size-1)) {
                 p += bodies(b).v * bodies(b).mass;
             }
             bodies(0).offsetMomentum(p);
         }
 
         def advance(dt : double) {
-            finish for ([i] in 0..(bodies.size-1)) async {
+            finish for (i in 0..(bodies.size-1)) async {
                 val iBody = bodies(i);
-                for ([j] in (i+1)..(bodies.size-1)) async {
+                for (j in (i+1)..(bodies.size-1)) async {
+                    Console.OUT.println(Runtime.workerId());
                     val d = iBody.p - bodies(j).p;
 
                     val dSquared = d.sos();
@@ -59,19 +60,19 @@ class nbody {
                 }
             }
 
-            for (body in bodies) {
-                bodies(body).p += bodies(body).v * dt;
+            for (b in 0..(bodies.size-1)) {
+                bodies(b).p += bodies(b).v * dt;
             }
         }
 
         def energy() {
             var e : double = 0.0;
 
-            for ([i] in 0..(bodies.size-1)) {
+            for (i in 0..(bodies.size-1)) {
                 val iBody = bodies(i);
                 e += 0.5 * iBody.mass * iBody.v.sos();
 
-                for ([j] in (i+1)..(bodies.size-1)) {
+                for (j in (i+1)..(bodies.size-1)) {
                     val jBody = bodies(j);
                     val d = iBody.p - jBody.p;
                     val distance = Math.sqrt(d.sos());
