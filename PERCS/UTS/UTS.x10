@@ -1,3 +1,4 @@
+import x10.compiler.Ifdef;
 import x10.compiler.Inline;
 import x10.compiler.Pragma;
 import x10.compiler.Uncounted;
@@ -16,13 +17,23 @@ public final class UTS {
     val w:Int;
     val m:Int;
     
+    // debug
+    var last:Long;
+    var phase:Long;
+    var probes:Long;
+    
     val random = new Random();
     val victims:Rail[Long];
     val logger:Logger;
     
     @x10.compiler.Volatile transient var active:Boolean = false;
-    @x10.compiler.Volatile transient var empty:Boolean;
-    @x10.compiler.Volatile transient var waiting:Boolean;
+    @x10.compiler.Volatile transient var empty:Boolean = true;
+    @x10.compiler.Volatile transient var waiting:Boolean = false;
+    
+    @Inline def probe(n:Long) {
+        @Ifdef("LOG") { if (++probes%(1<<25n) == 0) Runtime.println(Runtime.hereLong() + " PROBING " + n + " (" + (probes>>25n) + ")"); }
+        Runtime.probe();
+    }
     
     val P = Place.MAX_PLACES;
     
@@ -73,6 +84,10 @@ public final class UTS {
         for (; (i<n) && (queue.size>0); ++i) {
             queue.expand();
         }
+        @Ifdef("LOG") {
+            if ((queue.count ^ last) > (1 << 25n)) Runtime.println(Runtime.hereLong() + " COUNTED " + queue.count);
+            last = queue.count;
+        }
         queue.count += i;
         return queue.size > 0;
     }
@@ -82,12 +97,16 @@ public final class UTS {
     final def processStack(st:PlaceLocalHandle[UTS]) {
         do {
             while (processAtMostN()) {
-                Runtime.probe();
+                probe(9999999);
                 distribute(st);
                 reject(st);
             }
             reject(st);
         } while (steal(st));
+        @Ifdef("LOG") {
+            if (queue.size > 0) Runtime.println(Runtime.hereLong() + " ERROR queue.size>0");
+            if (thieves.size() > 0) Runtime.println(Runtime.hereLong() + " ERROR thieves.size>0");
+        }
     }
     
     @Inline def give(st:PlaceLocalHandle[UTS], loot:Fragment) {
@@ -136,8 +155,9 @@ public final class UTS {
             ++logger.stealsAttempted;
             waiting = true;
             logger.stopLive();
-            at (Place(victims(random.nextInt(m)))) @Uncounted async st().request(st, p, false);
-            while (waiting) Runtime.probe();
+            val v = victims(random.nextInt(m));
+            at (Place(v)) @Uncounted async st().request(st, p, false);
+            while (waiting) probe(v);
             logger.startLive();
         }
         for (var i:Long=0; (i<lifelines.size) && empty && (0<=lifelines(i)); ++i) {
@@ -148,7 +168,7 @@ public final class UTS {
                 waiting = true;
                 logger.stopLive();
                 at (Place(lifeline)) @Uncounted async st().request(st, p, true);
-                while (waiting) Runtime.probe();
+                while (waiting) probe(-lifeline);
                 logger.startLive();
             }
         }
@@ -158,7 +178,7 @@ public final class UTS {
     def request(st:PlaceLocalHandle[UTS], thief:Long, lifeline:Boolean) {
         try {
             if (lifeline) ++logger.lifelineStealsReceived; else ++logger.stealsReceived;
-            if (queue.size == 0) {
+            if (empty || waiting) {
                 if (lifeline) lifelineThieves.push(thief);
                 at (Place(thief)) @Uncounted async { st().waiting = false; }
             } else {
@@ -185,10 +205,11 @@ public final class UTS {
         try {
             val lifeline = source >= 0;
             if (lifeline) lifelinesActivated(source) = false;
+            empty = false;
             if (active) {
-                empty = false;
                 processLoot(loot, lifeline);
             } else {
+                @Ifdef("LOG") { Runtime.println("" + Runtime.hereLong() + " LIVE (" + (phase++) + ")"); }
                 active = true;
                 logger.startLive();
                 processLoot(loot, lifeline);
@@ -196,6 +217,7 @@ public final class UTS {
                 processStack(st);
                 logger.stopLive();
                 active = false;
+                @Ifdef("LOG") { Runtime.println("" + Runtime.hereLong() + " DEAD (" + (phase++) + ")"); }
                 logger.nodesCount = queue.count;
             }
         } catch (v:CheckedThrowable) {
@@ -206,12 +228,15 @@ public final class UTS {
     def main(st:PlaceLocalHandle[UTS], seed:Int, d:Int) {
         @Pragma(Pragma.FINISH_DENSE) finish {
             try {
+                @Ifdef("LOG") { Runtime.println("" + Runtime.hereLong() + " LIVE (" + (phase++) + ")"); }
+                empty = false;
                 active = true;
                 logger.startLive();
                 queue.init(seed, d);
                 processStack(st);
                 logger.stopLive();
                 active = false;
+                @Ifdef("LOG") { Runtime.println("" + Runtime.hereLong() + " DEAD (" + (phase++) + ")"); }
                 logger.nodesCount = queue.count;
             } catch (v:CheckedThrowable) {
                 error(v);
