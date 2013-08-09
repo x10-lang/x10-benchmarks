@@ -309,7 +309,7 @@ public final class UTS {
                 return log;
             });
         } else {
-            logs = new Rail[Logger](P, (i:Long)=>at (Place(i)) st().logger);
+            logs = new Rail[Logger](P, (i:Long)=>at (Place(i)) st().logger.get(verbose));
         }
         val log = new Logger(false);
         log.collect(logs);
