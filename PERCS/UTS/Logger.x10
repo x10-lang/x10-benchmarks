@@ -74,6 +74,8 @@ public class Logger {
                 sub("" + (100.0*timeAlive/(timeAlive+timeDead)), 0n, 6n) + "%" + " :: " +
                 sub("" + ((startTime-timeReference)/1E9), 0n, 6n) + " : " +
                 sub("" + ((lastStartStopLiveTimeStamp-timeReference)/1E9), 0n, 6n) + " :: " +
+                stealsReceived + " : " +
+                lifelineStealsReceived + " : " +
                 stealsAttempted + " : " +
                 lifelineStealsAttempted + " : " +
                 (lifelineStealsAttempted - lifelineStealsPerpetrated));
