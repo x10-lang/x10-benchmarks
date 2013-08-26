@@ -1,6 +1,3 @@
-import x10.compiler.Pragma;
-import x10.util.Box;
-import x10.util.IndexedMemoryChunk;
 
 class RandomAccess {
 
@@ -15,25 +12,25 @@ class RandomAccess {
         while (n > PERIOD) n -= PERIOD;
         if (n == 0L) return 0x1L;
         var temp:Long = 0x1;
-        for (i=0; i<64; i++) {
+        for (i=0n; i<64n; i++) {
             m2(i) = temp;
             temp = (temp << 1) ^ (temp < 0 ? POLY : 0L);
             temp = (temp << 1) ^ (temp < 0 ? POLY : 0L);
         }
-        for (i=62; i>=0; i--) if (((n >> i) & 1) != 0L) break;
+        for (i=62n; i>=0n; i--) if (((n >> i) & 1n) != 0L) break;
         var ran:Long = 0x2;
-        while (i > 0) {
+        while (i > 0n) {
             temp = 0;
-            for (j=0; j<64; j++) if (((ran >> j) & 1) != 0L) temp ^= m2(j);
+            for (j=0n; j<64n; j++) if (((ran >> j) & 1n) != 0L) temp ^= m2(j);
             ran = temp;
-            i -= 1;
+            i -= 1n;
             if (((n >> i) & 1) != 0L)
                 ran = (ran << 1) ^ (ran < 0 ? POLY : 0L);
         }
         return ran;
     }
 
-    static def runBenchmark(plhimc: PlaceLocalHandle[Box[IndexedMemoryChunk[Long]]{self!=null}],
+    static def runBenchmark(plh: PlaceLocalHandle[Rail[Long]],
                             logLocalTableSize: Int, numUpdates: Long) {
         val mask = (1<<logLocalTableSize)-1;
         val local_updates = numUpdates / Place.MAX_PLACES;
@@ -44,7 +41,7 @@ class RandomAccess {
             val jj = Runtime.hereLong();
             val t = System.nanoTime();
             var ran:Long = HPCC_starts(jj*(numUpdates/Place.MAX_PLACES));
-            val imc = plhimc()();
+            val rail = plh() as Rail[Long]{self!=null};
             val size = logLocalTableSize;
             val mask1 = mask;
             val mask2 = Place.MAX_PLACES - 1;
@@ -55,9 +52,9 @@ class RandomAccess {
                 val index = (ran as Int) & mask1;
                 val update = ran;
                 if (place_id==jj) {
-                    imc(index) ^= update;
+                    rail(index) ^= update;
                 } else {
-                    imc.getCongruentSibling(Place(place_id)).remoteXor(index, update);
+                    GlobalRail.remoteXor(Unsafe.getCongruentSibling(rail, Place(place_id)), index, update);
                 }
                 ran = (ran << 1) ^ (ran<0L ? poly : 0L);
             }
@@ -83,11 +80,11 @@ class RandomAccess {
             return;
         }
 
-        var logLocalTableSize_ : Int = 12;
-        var updates_ : Int = 4;
+        var logLocalTableSize_ : Int = 12n;
+        var updates_ : Int = 4n;
 
         // parse arguments
-        for (var i:Int=0 ; i<args.size ; ) {
+        for (var i:Long=0 ; i<args.size ; ) {
             if (args(i).equals("-m")) {
                 i++;
                 if (i >= args.size) {
@@ -121,9 +118,10 @@ class RandomAccess {
         val numUpdates = updates_*tableSize;
 
         // create congruent array (same address at each place)
-        val plhimc = PlaceLocalHandle.makeFlat(PlaceGroup.WORLD, () => new Box(IndexedMemoryChunk.allocateZeroed[Long](localTableSize, 8, true)) as Box[IndexedMemoryChunk[Long]]{self!=null});
+        val init = ():Rail[Long] => { new Rail[Long](localTableSize, Runtime.MemoryAllocator.requireAllocator(true, true)) };;
+        val plh = PlaceLocalHandle.makeFlat[Rail[Long]](PlaceGroup.WORLD, init);
         PlaceGroup.WORLD.broadcastFlat(()=>{
-            for (i in 0..(localTableSize-1)) plhimc()()(i) = i as Long;
+            for (i in 0..(localTableSize-1)) plh()(i) = i as Long;
         });
 
         // print some info
@@ -138,7 +136,7 @@ class RandomAccess {
 
         // time it
         var cpuTime:Double = -System.nanoTime() * 1e-9D;
-        runBenchmark(plhimc, logLocalTableSize, numUpdates);
+        runBenchmark(plh, logLocalTableSize, numUpdates);
         cpuTime += System.nanoTime() * 1e-9D;
 
         // print statistics
@@ -147,11 +145,11 @@ class RandomAccess {
         Console.OUT.println(GUPs+" Billion(10^9) Updates per second (GUP/s)");
 
         // repeat for testing.
-        runBenchmark(plhimc, logLocalTableSize, numUpdates);
+        runBenchmark(plh, logLocalTableSize, numUpdates);
         PlaceGroup.WORLD.broadcastFlat(()=>{
-            var err:Int = 0;
+            var err:Int = 0n;
             for (i in 0..(localTableSize-1)) 
-                if (plhimc()()(i) != (i as Long)) err++;
+                if (plh()(i) != (i as Long)) err++;
             Console.OUT.println(here+": Found " + err + " errors.");
         });
 
