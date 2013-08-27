@@ -23,8 +23,8 @@ final class Random {
 }
 
 final class Parameters {
-    val openGapPenalty = 2;
-    val extendGapPenalty = 1;
+    val openGapPenalty = 2n;
+    val extendGapPenalty = 1n;
     val matchScore = 4y;
     val mismatchScore = -3y;
     val alphabetSize = 4;
@@ -46,19 +46,19 @@ final class Parameters {
         this.seed = seed;
         this.stride = stride;
 
-        for (var i:Int=0; i<alphabetSize;i++) {
-            for (var j:Int=0; j<alphabetSize;j++) {
+        for (var i:Int=0n; i<alphabetSize;i++) {
+            for (var j:Int=0n; j<alphabetSize;j++) {
                 scoringMatrix(i*alphabetSize+j) = (i==j) ? matchScore : mismatchScore;
             }
         }
 
         val maxScoreOnMatch = matchScore * shortLength;
         val maxAlignedLength = (openGapPenalty<=extendGapPenalty) ?
-                shortLength - 1 + maxScoreOnMatch/openGapPenalty :
+                shortLength - 1n + maxScoreOnMatch/openGapPenalty :
                     shortLength + (maxScoreOnMatch-openGapPenalty)/extendGapPenalty;
-        overlap = maxAlignedLength - 1;
-        val mostWeCanUse = (2*overlap>=longLength) ? 1 : (longLength-overlap)/overlap;
-        segmentCount = (mostWeCanUse>Place.MAX_PLACES) ? Place.MAX_PLACES : mostWeCanUse;
+        overlap = maxAlignedLength - 1n;
+        val mostWeCanUse = (2n*overlap>=longLength) ? 1n : (longLength-overlap)/overlap;
+        segmentCount = (mostWeCanUse>Place.MAX_PLACES) ? Place.MAX_PLACES as Int : mostWeCanUse;
         baseSegmentLength = overlap + (longLength-overlap)/segmentCount;
         shortfall = (longLength-overlap) % segmentCount;
 
@@ -82,11 +82,11 @@ struct Result(
     }
 
     def print() {
-        val line = 72;
+        val line = 72n;
         val quo = (short_.size as Int)/line;
         val mod = (short_.size as Int)-quo*line;
-        for (var i:Int=0; i<quo; i++) print(i*line, line);
-        if (mod > 0) print(quo*line, mod);
+        for (var i:Int=0n; i<quo; i++) print(i*line, line);
+        if (mod > 0n) print(quo*line, mod);
     }
 }
 
@@ -103,31 +103,31 @@ final class SSCA1 {
     val localSize:Int;
     val placeId = Runtime.hereInt();
 
-    var winningScore:Int = 0;
-    var shortLast:Int = -1;
-    var longLast:Int = -1;
+    var winningScore:Int = 0n;
+    var shortLast:Int = -1n;
+    var longLast:Int = -1n;
     
-    var bestPlace:Int = -1;
-    var bestScore:int = -1;
+    var bestPlace:Int = -1n;
+    var bestScore:int = -1n;
 
     def this(params:Parameters, verbose:Boolean) {
         this.params = params;
         val baseOffset = placeId * (params.baseSegmentLength-params.overlap);
         first = (placeId<params.shortfall) ? baseOffset+placeId: baseOffset+params.shortfall;
-        val size = (placeId<params.shortfall ? params.baseSegmentLength+1 : params.baseSegmentLength);
+        val size = (placeId<params.shortfall ? params.baseSegmentLength+1n : params.baseSegmentLength);
         localSize = size;
         last = first + size;
         val r = new Random(params.seed);
         short_ = new Rail[Byte](params.shortLength);
         long_ = new Rail[Byte](size);
-        for (var i:Int=0; i<params.shortLength; i++) {
+        for (var i:Int=0n; i<params.shortLength; i++) {
             short_(i) = r.next();
         }
-        for (var i:Int=0; i<last; i++) {
+        for (var i:Int=0n; i<last; i++) {
             val v = r.next();
             if (i>=first) long_(i-first) = v;
         }
-        tracebackMoves = new Rail[Rail[Byte]](params.shortLength+1, (Long)=>new Rail[Byte](size+1));
+        tracebackMoves = new Rail[Rail[Byte]](params.shortLength+1n, (Long)=>new Rail[Byte](size+1n));
         if (verbose) Console.OUT.println("place=" + placeId + " [" + first + ","+ last +"[");
     }
 
@@ -143,28 +143,28 @@ final class SSCA1 {
         val tracebackMoves = this.tracebackMoves;
         val localSize = this.localSize;
 
-        for (var i:Int=0; i<=shortSize; i++) tracebackMoves(i)(0) = STOP;
-        for (var j:Int=0; j<=localSize; j++) tracebackMoves(0)(j) = STOP;
+        for (var i:Int=0n; i<=shortSize; i++) tracebackMoves(i)(0n) = STOP;
+        for (var j:Int=0n; j<=localSize; j++) tracebackMoves(0n)(j) = STOP;
 
-        val bestScoreUpTo_I_J = new Rail[Int](localSize + 1);
+        val bestScoreUpTo_I_J = new Rail[Int](localSize + 1n);
 
-        var winningScore:Int = -1;
-        var shortLast:Int = -1;
-        var longLast:Int = -1;
+        var winningScore:Int = -1n;
+        var shortLast:Int = -1n;
+        var longLast:Int = -1n;
 
-        for (var i:Int=1; i<=shortSize; i++) {
-            var previousBestScore:Int = 0;
+        for (var i:Int=1n; i<=shortSize; i++) {
+            var previousBestScore:Int = 0n;
             val ti = tracebackMoves(i);
-            val ti1 = tracebackMoves(i-1);
-            val s = short_(i-1)*alphabetSize;
-            for (var j:Int=1; j<=localSize; j++) {
-                val scoreOfMatchAtLast = scoringMatrix(s + long_(j-1));
+            val ti1 = tracebackMoves(i-1n);
+            val s = short_(i-1n)*alphabetSize;
+            for (var j:Int=1n; j<=localSize; j++) {
+                val scoreOfMatchAtLast = scoringMatrix(s + long_(j-1n));
                 val scoreUsingLatestIJ = previousBestScore + scoreOfMatchAtLast;
                 val bestIfGapInsertedInI = bestScoreUpTo_I_J(j) - (ti1(j)==UP ? extendGapPenalty : openGapPenalty);
                 val bestIfGapInsertedInJ = bestScoreUpTo_I_J(j-1) - (ti(j-1)==LEFT ? extendGapPenalty : openGapPenalty);     
                 val direction = maxOrZero(scoreUsingLatestIJ, bestIfGapInsertedInI, bestIfGapInsertedInJ);
                 ti(j) = direction;
-                var winner:Int = 0;
+                var winner:Int = 0n;
                 switch (direction) {
                 case DIAGONAL: winner = scoreUsingLatestIJ; break;
                 case UP:       winner = bestIfGapInsertedInI; break;
@@ -200,9 +200,9 @@ final class SSCA1 {
 
     @Inline static def maxOrZero(a:Int, b:Int, c:Int) {
         if (a >= b) {
-            if (a >= c) return a > 0 ? DIAGONAL : STOP; else return c > 0 ? LEFT : STOP;
+            if (a >= c) return a > 0n ? DIAGONAL : STOP; else return c > 0n ? LEFT : STOP;
         } else {
-            if (b >= c) return b > 0 ? UP : STOP; else return c > 0 ? LEFT : STOP;
+            if (b >= c) return b > 0n ? UP : STOP; else return c > 0n ? LEFT : STOP;
         }
     }
 
@@ -235,8 +235,8 @@ final class SSCA1 {
 
     def check(s:Rail[Byte], l:Rail[Byte]) {
         var opened:Boolean = false;
-        var score:Int = 0;
-        for (var i:Int=0; i<s.size; i++) {
+        var score:Int = 0n;
+        for (var i:Int=0n; i<s.size; i++) {
             if (s(i) != GAP && l(i) != GAP) {
                 score += params.scoringMatrix((s(i)-A)*params.alphabetSize + (l(i)-A));
                 opened = false;
@@ -258,11 +258,11 @@ final class SSCA1 {
         @Pragma(Pragma.FINISH_HERE) finish for (var i:Int=id; i<m; i++) {
             at (Place(i)) async plh().run(plh, id, verbose);
         }
-        reduce(plh, 0, bestPlace, bestScore);
+        reduce(plh, 0n, bestPlace, bestScore);
     }
 
     def score(plh:PlaceLocalHandle[SSCA1], verbose:Boolean) {
-        @Pragma(Pragma.FINISH_HERE) finish for (var i:Int=0; i<params.segmentCount; i+=params.stride) {
+        @Pragma(Pragma.FINISH_HERE) finish for (var i:Int=0n; i<params.segmentCount; i+=params.stride) {
             at (Place(i)) async plh().loop(plh, verbose);
         }
         return bestPlace;
@@ -271,27 +271,27 @@ final class SSCA1 {
     static def sub(str:String, start:Int, end:Int) = str.substring(start, Math.min(end, str.length()));
 
     static def printTime(title:String, time:Long) {
-        Console.OUT.println(title + sub("" + (time/1e9), 0, 6) + "s");
+        Console.OUT.println(title + sub("" + (time/1e9), 0n, 6n) + "s");
     }
 
     public static def sqrt(var p:Int) {
         var r:Int = p;
-        while (p > 1) { p = p>>2; r = r>>1; }
+        while (p > 1n) { p = p>>2; r = r>>1; }
         return r;
     }
 
     public static def main(args:Rail[String]){here==Place.FIRST_PLACE} {
-        if (args.size < 2) {
+        if (args.size < 2n) {
             Console.ERR.println("Usage: ssca1 shortLength longLength [seed] [iterations] [stride] [verbose] [verify]");
-            System.setExitCode(1);
+            System.setExitCode(1n);
             return;
         }
         val shortLength = Int.parseInt(args(0));
         val longLength = Int.parseInt(args(1));
-        val seed = args.size>2 ? Int.parseInt(args(2)) : 1;
-        val iterations = args.size>3 ? Int.parseInt(args(3)) : 6;
-        val s = args.size>4 ? Int.parseInt(args(4)) : 0;
-        val stride = s==0 ? sqrt(Place.MAX_PLACES) : s;
+        val seed = args.size>2 ? Int.parseInt(args(2)) : 1n;
+        val iterations = args.size>3 ? Int.parseInt(args(3)) : 6n;
+        val s = args.size>4n ? Int.parseInt(args(4)) : 0n;
+        val stride = s==0n ? sqrt(Place.MAX_PLACES as int) : s;
         val verbose = args.size>5 ? Boolean.parseBoolean(args(5)) : false;
         val verify = args.size>6 ? Boolean.parseBoolean(args(6)) : false;
         val params = new Parameters(shortLength, longLength, seed, stride);
@@ -303,9 +303,9 @@ final class SSCA1 {
         var start_time:Long = 0;
         Console.OUT.println("Warmup");
 
-        for (var k:Int=0; k<iterations; k++) {
-            val v = verbose && (k==0);
-            if (k == 1) {
+        for (var k:Int=0n; k<iterations; k++) {
+            val v = verbose && (k==0n);
+            if (k == 1n) {
                 Console.OUT.println("Start Timer");
                 start_time = System.nanoTime();
             }
@@ -316,7 +316,7 @@ final class SSCA1 {
             val r = at (Place(p)) plh().trace(verify);
             printTime("Trace: ", System.nanoTime()-t);
             Console.OUT.println("place=" + p + " score=" + r.score + " short=[" + r.shortFirst + "," + r.shortLast + "[ long=[" + r.longFirst + "," + r.longLast +"[ length=" + r.short_.size);
-            if (k == 0) r.print();
+            if (k == 0n) r.print();
         }
         val stop_time = System.nanoTime();
         Console.OUT.println("Stop Timer");
