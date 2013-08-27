@@ -40,7 +40,7 @@ public final class SSCA2(N:Int) {
         val sigmaMap = new Rail[Long](N);
         val regularQueue = new FixedRailQueue[Int](N);
         val deltaMap = new Rail[Double](N);
-        var count:Int = 0;
+        var count:Int = 0n;
 
         allocTime = System.nanoTime() - allocTime;
 
@@ -122,12 +122,11 @@ public final class SSCA2(N:Int) {
         // Merge the results in this place with the results in other places.
         var globalMergeTime:Long = -System.nanoTime();
 
-        Team.WORLD.allreduce(here.id, // My ID.
-                betweennessMap, // Source buffer.
+        Team.WORLD.allreduce(betweennessMap, // Source buffer.
                 0, // Offset into the source buffer.
                 betweennessMap, // Destination buffer.
                 0, // Offset into the destination buffer.
-                N, // Number of elements.
+                N as long, // Number of elements.
                 Team.ADD); // Operation to be performed.
 
         globalMergeTime += System.nanoTime();
@@ -145,7 +144,7 @@ public final class SSCA2(N:Int) {
     private def permuteVertices() {
         val prng = new Random(1);
 
-        for(var i:Int=0; i<N; i++) {
+        for(var i:Int=0n; i<N; i++) {
             val indexToPick = prng.nextInt(N-i);
             val v = verticesToWorkOn(i);
             verticesToWorkOn(i) = verticesToWorkOn(i+indexToPick);
@@ -157,7 +156,7 @@ public final class SSCA2(N:Int) {
      * Dump the betweenness map.
      */
     private def printBetweennessMap() {
-        for(var i:Int=0; i<N; ++i) {
+        for(var i:Int=0n; i<N; ++i) {
             if(betweennessMap(i) != 0.0) {
                 Console.OUT.println("(" + i + ") -> " + betweennessMap(i));
             }
@@ -213,13 +212,13 @@ public final class SSCA2(N:Int) {
             Option("v", "", "Verbose")]);
 
         val seed:Long = cmdLineParams("-s", 2);
-        val n:Int = cmdLineParams("-n", 2);
+        val n:Int = cmdLineParams("-n", 2n);
         val a:Double = cmdLineParams("-a", 0.55);
         val b:Double = cmdLineParams("-b", 0.1);
         val c:Double = cmdLineParams("-c", 0.1);
         val d:Double = cmdLineParams("-d", 0.25);
-        val permute:Int = cmdLineParams("-p", 1); // on by default
-        val verbose:Int = cmdLineParams("-v", 0); // off by default
+        val permute:Int = cmdLineParams("-p", 1n); // on by default
+        val verbose:Int = cmdLineParams("-v", 0n); // off by default
 
         Console.OUT.println("Running SSCA2 with the following parameters:");
         Console.OUT.println("seed = " + seed);

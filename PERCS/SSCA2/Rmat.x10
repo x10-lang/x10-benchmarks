@@ -29,7 +29,7 @@ public struct Rmat {
 			d:Double) {
 		this.seed = seed;
 		this.n = n;
-		this.N = 1<<n;
+		this.N = 1n<<n;
 		this.a = a;
 		this.b = b;
 		this.c = c;
@@ -41,7 +41,7 @@ public struct Rmat {
 	 *  vector of M random numbers. Here, numElements is M!
 	 */
 	private def rand(dest:Rail[Double], rng:Random) {
-	    for(var i:Int=0;i<dest.size;++i) {
+	    for(var i:Int=0n;i<dest.size;++i) {
 	        dest(i) = rng.nextDouble();
 	    }
 	}
@@ -53,8 +53,8 @@ public struct Rmat {
 	 * integer-valued vector where there is a 1 if "V[i] > a" and 0 otherwise.
 	 */
 	private def greaterThan(dest:Rail[Int], lhs:Rail[Double], rhs:Double) {
-	    for(var i:Int=0;i<dest.size;++i) {
-	        dest(i) = (lhs(i) > rhs) ? 1 : 0;
+	    for(var i:Int=0n;i<dest.size;++i) {
+	        dest(i) = (lhs(i) > rhs) ? 1n : 0n;
 	    }
 	}
 
@@ -64,8 +64,8 @@ public struct Rmat {
 	 * resultant vector if "LHS[i] > RHS[i]", and 0 otherwise.
 	 */
 	private def greaterThan(dest:Rail[Int], lhs:Rail[Double], rhs:Rail[Double]) {
-	    for(var i:Int=0;i<dest.size;++i) {
-	        dest(i) = (lhs(i) > rhs(i)) ? 1 : 0;
+	    for(var i:Int=0n;i<dest.size;++i) {
+	        dest(i) = (lhs(i) > rhs(i)) ? 1n : 0n;
 	    }
 	}
 
@@ -76,8 +76,8 @@ public struct Rmat {
 	 * In other words, we flip V[i].
 	 */
 	private def multiply(dest:Rail[Double], lhs:Rail[Int], multiplier:Double, flip:Boolean) {
-	    for(var i:Int=0;i<dest.size;++i) {
-	        dest(i) = multiplier*(flip ? ((lhs(i) > 0) ? 0 : 1) : lhs(i));
+	    for(var i:Int=0n;i<dest.size;++i) {
+	        dest(i) = multiplier*(flip ? ((lhs(i) > 0n) ? 0n : 1n) : lhs(i));
 	    }
 	}
 
@@ -85,7 +85,7 @@ public struct Rmat {
 	 * A straightforward vector-scalar multiplication
 	 */
 	private def multiply(lhs:Rail[Int], multiplier:Int)  {
-	    for(var i:Int=0;i<lhs.size;++i) {
+	    for(var i:Int=0n;i<lhs.size;++i) {
 	        lhs(i) *= multiplier;
 	    }
 	}
@@ -94,7 +94,7 @@ public struct Rmat {
 	 * A straightforward addition of two vectors.
 	 */
 	private def add(lhs:Rail[Double], rhs:Rail[Double]) {
-	    for(var i:Int=0;i<lhs.size;++i) {
+	    for(var i:Int=0n;i<lhs.size;++i) {
 	        lhs(i) += rhs(i);
 	    }
 	}
@@ -103,7 +103,7 @@ public struct Rmat {
 	 * Same as above, but with a different type
 	 */
 	private def add(lhs:Rail[Int], rhs:Rail[Int]) {
-	    for(var i:Int=0;i<lhs.size;++i) {
+	    for(var i:Int=0n;i<lhs.size;++i) {
 	        lhs(i) += rhs(i);
 	    }
 	}
@@ -113,13 +113,13 @@ public struct Rmat {
 	 */
 	private def sparse(row:Rail[Int], col:Rail[Int]) {
 		val adjacencyGraph:Graph = new Graph(N);
-		for (var i:Int=0; i<row.size; ++i) adjacencyGraph.addEdge(row(i), col(i));
+		for (var i:Int=0n; i<row.size; ++i) adjacencyGraph.addEdge(row(i), col(i));
 		return adjacencyGraph;
 	}
 
 	public def generate() {
 		// Initialize M, and rng
-		val M = 8*N;
+		val M = 8n*N;
 		val rng = new Random(seed);
 
 		// Create index arrays
@@ -134,8 +134,8 @@ public struct Rmat {
 		val cNorm = c/(c+d);
 		val aNorm = a/(a+b);
 
-		for (var ib:Int=0; ib<n; ++ib) {
-		    val exponent = 1<<ib;
+		for (var ib:Int=0n; ib<n; ++ib) {
+		    val exponent = 1n<<ib;
 		    rand(r, rng);
 			greaterThan(iiBit, r, ab);
 			multiply(jjBitComparator, iiBit, cNorm, false);

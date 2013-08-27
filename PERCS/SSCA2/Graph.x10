@@ -21,9 +21,9 @@ public final class Graph {
     /** Constructor */
     public def this(N:Int) {
         this.N = N;
-        this.M = 0;
+        this.M = 0n;
         this.inDegreeMap = new Rail[Int](N);
-        this.offsetMap = new Rail[Int](N+1);
+        this.offsetMap = new Rail[Int](N+1n);
         this.reverseOffsetMap = new Rail[Int](N);
         this.adjacencyList = new Rail[ArrayList[Int]](N, (Long)=>new ArrayList[Int]());
         this.adjacencyMap = null;
@@ -86,20 +86,20 @@ public final class Graph {
         adjacencyMap = new Rail[Int](M);
 
         // Start copying over from the first vertex onwards.
-        var currentOffset:Int = 0;
-        for(var v:Int=0; v<N; ++v) {
+        var currentOffset:Int = 0n;
+        for(var v:Int=0n; v<N; ++v) {
             // Put in the starting offset for this vertex.
             offsetMap(v) = currentOffset;
 
             // Iterate over all the edges.
             val list = adjacencyList(v);
-            for(var i:Int=0; i<list.size(); ++i) {
+            for(var i:Int=0n; i<list.size(); ++i) {
                 adjacencyMap(currentOffset++) = list(i);
             }
         }
 
-        var offset:Int = 0;
-        for(var v:Int=0; v<N; ++v) {
+        var offset:Int = 0n;
+        for(var v:Int=0n; v<N; ++v) {
             reverseOffsetMap(v) = offset;
             offset += inDegreeMap(v);
         }
@@ -121,7 +121,7 @@ public final class Graph {
     public def addEdge(v:Int, w:Int): void {
         assert(adjacencyMap == null);
         adjacencyList(v).add(w);
-        inDegreeMap(w) += 1;
+        inDegreeMap(w) += 1n;
         M += 1;
     }
 
@@ -131,7 +131,7 @@ public final class Graph {
     public def toString():String {
         var outString:String = "";
 
-        for(var v:Int=0; v<N; ++v) {
+        for(var v:Int=0n; v<N; ++v) {
             for(w in adjacencyList(v)) {
                 outString += "(" + v + ", " + w + ")" + "\n";
             }

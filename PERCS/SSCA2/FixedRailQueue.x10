@@ -1,10 +1,9 @@
-import x10.util.IndexedMemoryChunk;
 
 /**
  * An implementation of a queue.
  */
-public final class FixedRailQueue[T] {
-  private val internalStorage:IndexedMemoryChunk[T];
+public final class FixedRailQueue[T]{T haszero} {
+  private val internalStorage:Rail[T]{self!=null};
   private var N:Int;
   private var head:Int;
   private var tail:Int;
@@ -12,9 +11,9 @@ public final class FixedRailQueue[T] {
   /** Construct a fixed size queue */
   public def this(N:Int) { 
     this.N = N;
-    this.internalStorage = IndexedMemoryChunk.allocateZeroed[T] (N);
-    this.head=0;
-    this.tail=0;
+    this.internalStorage = new Rail[T](N);
+    this.head=0n;
+    this.tail=0n;
   }
 
   /** Check if the queue is empty */
@@ -39,11 +38,12 @@ public final class FixedRailQueue[T] {
 
   /** Rewind. */
   @x10.compiler.Inline public def rewind() {
-    this.head=0;
+    this.head=0n;
   }
 
   /** Output the contents of the queue in the order they are stored */
   public def print () {
+    Console.OUT.print("h = "+head+", t = "+tail+", ");
     Console.OUT.print ("[");
     for (var i:Int=this.head; i<this.tail; ++i) {
       Console.OUT.print (((i==this.head)?"":",") + this.internalStorage(i));
@@ -52,12 +52,12 @@ public final class FixedRailQueue[T] {
   }
 
   public static def main (args:Rail[String]) {
-    val myQueue = new FixedRailQueue[Int] (4);
+    val myQueue = new FixedRailQueue[Int] (4n);
     
-    myQueue.push (1);
-    myQueue.push (2);
-    myQueue.push (3);
-    myQueue.push (4);
+    myQueue.push (1n);
+    myQueue.push (2n);
+    myQueue.push (3n);
+    myQueue.push (4n);
     myQueue.print ();
 
     myQueue.pop ();
@@ -68,12 +68,12 @@ public final class FixedRailQueue[T] {
     myQueue.pop ();
     myQueue.print ();
 
-    myQueue.push (5);
+    myQueue.push (5n);
     myQueue.print ();
 
-    myQueue.push (2);
-    myQueue.push (3);
-    myQueue.push (4);
+    myQueue.push (2n);
+    myQueue.push (3n);
+    myQueue.push (4n);
     myQueue.print ();
   }
 }
