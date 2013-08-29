@@ -1,5 +1,4 @@
 import x10.compiler.Native;
-import x10.util.IndexedMemoryChunk;
 import x10.util.Random;
 
 public final class BlockedArray implements (Int,Int)=>Double {
@@ -15,12 +14,13 @@ public final class BlockedArray implements (Int,Int)=>Double {
         public def this(I:Int, J:Int, bx:Int, by:Int, rand:Random) {
             min_x = I*bx;
             min_y = J*by;
-            max_x = (I+1)*bx-1;
-            max_y = (J+1)*by-1;
+            max_x = (I+1n)*bx-1n;
+            max_y = (J+1n)*by-1n;
             delta = by;
             offset = (I*bx+J)*by;
-            val raw = new Rail[Double](IndexedMemoryChunk.allocateZeroed[Double](bx*by, 8, IndexedMemoryChunk.hugePages()));
-            for(var i:Int = 0; i < bx*by; i++) raw(i) = rand.nextDouble()*10;
+            val allocator = Runtime.MemoryAllocator.requestAllocator(true, false);
+            val raw = new Rail[Double](bx*by, allocator);
+            for(var i:Int = 0n; i < bx*by; i++) raw(i) = rand.nextDouble()*10;
             this.raw = raw;
         }
     
@@ -68,15 +68,15 @@ public final class BlockedArray implements (Int,Int)=>Double {
         this.by = by;
         this.px = px;
         this.py = py;
-        val min_x = here.id%px;
-        val min_y = here.id/px;
+        val min_x = (here.id as Int)%px;
+        val min_y = (here.id as Int)/px;
         val nx = M/(bx*px);
-        val ny = (N-by)/(by*py)+(min_y==0 ? 1 : 0);
+        val ny = (N-by)/(by*py)+(min_y==0n ? 1n : 0n);
         this.min_x = min_x;
         this.min_y = min_y;
         this.ny = ny;
-        val rand = new Random(here.id*1000);
-        data = new Rail[Block](nx*ny, (k:Int)=>new Block(k/ny*px+min_x, k%ny*py+min_y, bx, by, rand));
+        val rand = new Random((here.id as Int)*1000n);
+        data = new Rail[Block](nx*ny, (k:Long)=>new Block((k as Int)/ny*px+min_x, (k as Int)%ny*py+min_y, bx, by, rand));
     }
 
     public operator this(i:Int, j:Int)
@@ -87,9 +87,9 @@ public final class BlockedArray implements (Int,Int)=>Double {
     public def block(I:Int, J:Int) = data((I-min_x)/px*ny+(J-min_y)/py);
     public def blockOf(i:Int, j:Int) = block(i/bx, j/by);
     public def placeOf(i:Int, j:Int) = placeOfBlock(i/bx, j/by);
-    public def hasBlock(I:Int, J:Int) = placeOfBlock(I, J) == here.id;
-    public def hasCol(J:Int) = here.id/px == J%py;
-    public def hasRow(I:Int) = here.id%px == I%px;
+    public def hasBlock(I:Int, J:Int) = placeOfBlock(I, J) == (here.id as Int);
+    public def hasCol(J:Int) = (here.id as Int)/px == J%py;
+    public def hasRow(I:Int) = (here.id as Int)%px == I%px;
     public def placeOfBlock(I:Int, J:Int) = I%px+J%py*px;
 
     public def blocks(min_x:Int, max_x:Int, min_y:Int, max_y:Int) {
@@ -105,7 +105,7 @@ public final class BlockedArray implements (Int,Int)=>Double {
     public def getRow(row:Int, min_y:Int, max_y:Int, rail:Rail[Double]) {
         val brow = row/bx;
         val view = blocks(brow, brow, min_y/by, max_y/by);
-        var n:Int = 0;
+        var n:Int = 0n;
         for (var J:Int = view.min_y; J <= view.max_y; J += py) {
             val b = view.block(view.min_x, J);
             for (var j:Int = Math.max(min_y, b.min_y); j <= Math.min(max_y, b.max_y); j++) {
@@ -118,7 +118,7 @@ public final class BlockedArray implements (Int,Int)=>Double {
     public def setRow(row:Int, min_y:Int, max_y:Int, rail:Rail[Double]) {
         val brow = row / bx;
         val view = blocks(brow, brow, min_y/by, max_y/by);
-        var n:Int = 0;
+        var n:Int = 0n;
         for (var J:Int = view.min_y; J <= view.max_y; J += py) {
             val b = view.block(view.min_x, J);
             for (var j:Int = Math.max(min_y, b.min_y); j <= Math.min(max_y, b.max_y); j++) {
@@ -130,7 +130,7 @@ public final class BlockedArray implements (Int,Int)=>Double {
     public def swapRow(row:Int, min_y:Int, max_y:Int, rail:Rail[Double]) {
         val brow = row / bx;
         val view = blocks(brow, brow, min_y/by, max_y/by);
-        var n:Int = 0;
+        var n:Int = 0n;
         for (var J:Int = view.min_y; J <= view.max_y; J += py) {
             val b = view.block(view.min_x, J);
             for (var j:Int = Math.max(min_y, b.min_y); j <= Math.min(max_y, b.max_y); j++) {
@@ -143,7 +143,7 @@ public final class BlockedArray implements (Int,Int)=>Double {
     }
 
     public static def make(M:Int, N:Int, bx:Int, by:Int, px:Int, py:Int) {
-        return PlaceLocalHandle.makeFlat[BlockedArray](Dist.makeUnique(),
+        return PlaceLocalHandle.makeFlat[BlockedArray](PlaceGroup.WORLD,
             ()=>new BlockedArray(M, N, bx, by, px ,py));
     }
 }
