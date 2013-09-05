@@ -1,0 +1,1 @@
+x10c++ $X10RTTRANSPORT -O LU.x10 -d tmp -cxx-prearg '-I..' -cxx-postarg '-lblas' -o lu
