@@ -1,5 +1,6 @@
 # HugePages_Total:    4096
 
+export GC_MARKERS=1
 
 ./ft 20 true -procs 32768 2>&1 | tee -a log.ft.32768
 ./ft 20 true -procs 16384 2>&1 | tee -a log.ft.16384

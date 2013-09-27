@@ -1,5 +1,6 @@
 # HugePages_Total:    4096
 
+export GC_MARKERS=1
 
 ./ra -m 28 -u 1 -procs 32768 2>&1 | tee -a log.ra.32768
 ./ra -m 28 -u 1 -procs 16384 2>&1 | tee -a log.ra.16384

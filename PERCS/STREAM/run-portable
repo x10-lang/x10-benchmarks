@@ -1,5 +1,7 @@
 # HugePages_Total:    3072
 
+export GC_MARKERS=1
+
 X10_NPLACES=1     ./stream 2>&1 | tee -a log.stream.00001
 X10_NPLACES=8     ./stream 2>&1 | tee -a log.stream.00008
 

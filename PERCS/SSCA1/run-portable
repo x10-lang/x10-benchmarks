@@ -1,5 +1,7 @@
 # HugePages_Total:       0
 
+export GC_MARKERS=1
+
 X10_NPLACES=1     ./ssca1 4000      40000 2>&1 | tee -a log.ssca1.00001
 X10_NPLACES=8     ./ssca1 4000     320000 2>&1 | tee -a log.ssca1.00008
 

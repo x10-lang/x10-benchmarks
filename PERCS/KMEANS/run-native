@@ -1,1 +1,2 @@
+export GC_MARKERS=1
 ./kmeans-native 40000 4096 12 5

@@ -1,5 +1,7 @@
 # HugePages_Total:       0
 
+export GC_MARKERS=1
+
 ./ssca2 -n 20 -procs 47040 2>&1 | tee -a log.ssca2.n20.47040
 ./ssca2 -n 20 -procs 32768 2>&1 | tee -a log.ssca2.n20.32768
 ./ssca2 -n 20 -procs 16384 2>&1 | tee -a log.ssca2.n20.16384

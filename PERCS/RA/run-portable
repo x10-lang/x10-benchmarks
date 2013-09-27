@@ -3,6 +3,8 @@
 #M=28
 M=20
 
+export GC_MARKERS=1
+
 X10_NPLACES=1     ./ra -m $M -u 1 2>&1 | tee -a log.ra.00001
 X10_NPLACES=8     ./ra -m $M -u 1 2>&1 | tee -a log.ra.00008
 

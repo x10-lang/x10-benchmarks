@@ -1,5 +1,7 @@
 # HugePages_Total:       0
 
+export GC_MARKERS=1
+
 ./uts -d 22 -procs 47040 2>&1 | tee -a log.uts.47040
 ./uts -d 22 -procs 32768 2>&1 | tee -a log.uts.32768
 ./uts -d 21 -procs 16384 2>&1 | tee -a log.uts.16384

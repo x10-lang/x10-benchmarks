@@ -1,5 +1,7 @@
 # HugePages_Total:    3072
 
+export GC_MARKERS=1
+
 ./stream -procs 47040 2>&1 | tee -a log.stream.47040
 ./stream -procs 32768 2>&1 | tee -a log.stream.32768
 ./stream -procs 16384 2>&1 | tee -a log.stream.16384

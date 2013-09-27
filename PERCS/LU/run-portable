@@ -1,5 +1,7 @@
 # HugePages_Total:    5120
 
+export GC_MARKERS=1
+
 X10_NPLACES=1     ./lu   17280 360   1   1 20  2>&1 | tee -a log.lu.00001
 
 exit 0
