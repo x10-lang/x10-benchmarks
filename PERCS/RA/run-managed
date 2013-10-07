@@ -3,8 +3,7 @@
 #M=28
 M=20
 
-# Note: Team APIs are not fully implemented in Managed X10 2.3, thus this program runs only with single place.
-x10 $X10RTTRANSPORT -np     1 -cp ra.jar RandomAccess -m $M -u 1 2>&1 | tee -a log.ra.managed.00001
+echo "Note: required memory allocator (Congruent and HugePages) is not available in Managed X10 2.4"
 
 exit 0
 
