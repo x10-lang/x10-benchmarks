@@ -377,7 +377,7 @@ class LU {
     }
 
     public static def main(args:Rail[String]) {
-        if (args.size < 4) {
+        if (args.size < 5) {
             Console.OUT.println("Usage: LU M B px py bk");
             Console.OUT.println("M = Matrix size,");
             Console.OUT.println("B = Block size, where B should perfectly divide M");
