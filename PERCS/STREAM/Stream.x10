@@ -1,3 +1,9 @@
+// memory per place: 3*8*args(0)
+// default: arg(0) = 64M -> 1.5G per place
+// args(0) is intended to remain constant (independent of the number of places0
+
+// p7ih: 32 places per node -> 48G -> 3072 16M pages
+
 import x10.util.Team;
 
 public class Stream {

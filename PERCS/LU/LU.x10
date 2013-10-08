@@ -1,3 +1,18 @@
+// memory per place: args(0)^2*8 / MAX_PLACES
+// args(0) is intended to double for every 4x increase in the number of places
+
+// p7ih with one place: args(0) = 17280 -> ~2.2G -> 5120 huge pages
+// p7ih with two places: args(0) = 24480 -> ~2.2G per place
+
+// parameters: M B px py bk
+// M is the number of columns in the distributed matrix
+// B is the block size
+// px, py is the periodicity of the block-block distribution
+// B * px must divide M
+// B * py must divide M
+// bk is subpanel size
+// bk must divide B (should be close to the square root of B)
+
 import x10.compiler.*;
 import x10.util.Team;
 

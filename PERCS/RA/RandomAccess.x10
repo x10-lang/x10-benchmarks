@@ -1,3 +1,9 @@
+// memory per place: 8*2^m
+// default: m = 12 -> 32M per place
+// m is intended to remain constant (independent of the number of places)
+
+// p7ih: -m 28 -> 2G per place
+// p7ih: 32 places per node -> 64G -> 4096 16M pages
 
 class RandomAccess {
 
