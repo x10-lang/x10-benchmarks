@@ -118,7 +118,9 @@ class RandomAccess {
         val numUpdates = updates_*tableSize;
 
         // create congruent array (same address at each place)
-        val init = ():Rail[Long] => { new Rail[Long](localTableSize, Runtime.MemoryAllocator.requireAllocator(true, true)) };;
+        val hugePagesAvailable = Runtime.MemoryAllocator.hugePagesAvailable();
+        Console.OUT.println("Huge pages available:    " + hugePagesAvailable);
+        val init = ():Rail[Long] => { new Rail[Long](localTableSize, Runtime.MemoryAllocator.requireAllocator(hugePagesAvailable, true)) };;
         val plh = PlaceLocalHandle.makeFlat[Rail[Long]](PlaceGroup.WORLD, init);
         PlaceGroup.WORLD.broadcastFlat(()=>{
             for (i in 0..(localTableSize-1)) plh()(i) = i as Long;
