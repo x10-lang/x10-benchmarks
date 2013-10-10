@@ -64,6 +64,7 @@ class RandomAccess {
                 }
                 ran = (ran << 1) ^ (ran<0L ? poly : 0L);
             }
+	    GlobalRail.flushRemoteOps();
             
             val u = System.nanoTime() - t;
 //            Runtime.println("" + jj + " -> " + (u/1e9));
