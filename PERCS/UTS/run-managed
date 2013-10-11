@@ -1,0 +1,42 @@
+#!/usr/bin/env bash
+
+#HEAP=3072m
+#X10FLAGS="-ms$HEAP -mx$HEAP"
+#DRYRUN=true
+#FULLRUN=true
+
+
+if [ -z "$FULLRUN" ]; then
+#
+# test run
+#
+for i in 0 3
+do
+p=$((2**$i))
+D=$((14+(($i+1)/2)))
+command="x10 $X10FLAGS $X10RTTRANSPORT -np $p -cp uts.jar UTS -d $D"
+[ -n "$DRYRUN" ] && echo "$command"
+[ -z "$DRYRUN" ] && $command 2>&1 | tee -a log.uts.managed.$(printf "%05d" $p)
+done
+
+exit 0
+fi
+
+
+#
+# full run for measurement
+#
+p=47040
+D=22
+command="x10 $X10FLAGS $X10RTTRANSPORT -np $p -cp uts.jar UTS -d $D"
+[ -n "$DRYRUN" ] && echo "$command"
+[ -z "$DRYRUN" ] && $command 2>&1 | tee -a log.uts.managed.$(printf "%05d" $p)
+
+for i in $(seq 15 -1 0)
+do
+p=$((2**$i))
+D=$((14+(($i+1)/2)))
+command="x10 $X10FLAGS $X10RTTRANSPORT -np $p -cp uts.jar UTS -d $D"
+[ -n "$DRYRUN" ] && echo "$command"
+[ -z "$DRYRUN" ] && $command 2>&1 | tee -a log.uts.managed.$(printf "%05d" $p)
+done
