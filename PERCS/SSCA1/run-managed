@@ -1,24 +1,38 @@
-# HugePages_Total:       0
+#!/usr/bin/env bash
 
-x10 $X10RTTRANSPORT -np     1 -cp ssca1.jar SSCA1 4000      40000 2>&1 | tee -a log.ssca1.managed.00001
-x10 $X10RTTRANSPORT -np     8 -cp ssca1.jar SSCA1 4000     320000 2>&1 | tee -a log.ssca1.managed.00008
+#HEAP=2048m
+#X10FLAGS="-ms$HEAP -mx$HEAP"
+#DRYRUN=true
+#FULLRUN=true
+
+
+if [ -z "$FULLRUN" ]; then
+#
+# test run
+#
+for p in 1 8
+do
+command="x10 $X10FLAGS $X10RTTRANSPORT -np $p -cp ssca1.jar SSCA1 4000 $((40000*$p))"
+[ -n "$DRYRUN" ] && echo "$command"
+[ -z "$DRYRUN" ] && $command 2>&1 | tee -a log.ssca1.managed.$(printf "%05d" $p)
+done
 
 exit 0
+fi
 
-x10 $X10RTTRANSPORT -np 47040 -cp ssca1.jar SSCA1 4000 1881600000 2>&1 | tee -a log.ssca1.managed.47040
-x10 $X10RTTRANSPORT -np 32768 -cp ssca1.jar SSCA1 4000 1310720000 2>&1 | tee -a log.ssca1.managed.32768
-x10 $X10RTTRANSPORT -np 16384 -cp ssca1.jar SSCA1 4000  655360000 2>&1 | tee -a log.ssca1.managed.16384
-x10 $X10RTTRANSPORT -np  8192 -cp ssca1.jar SSCA1 4000  327680000 2>&1 | tee -a log.ssca1.managed.08192
-x10 $X10RTTRANSPORT -np  4096 -cp ssca1.jar SSCA1 4000  163840000 2>&1 | tee -a log.ssca1.managed.04096
-x10 $X10RTTRANSPORT -np  2048 -cp ssca1.jar SSCA1 4000   81920000 2>&1 | tee -a log.ssca1.managed.02048
-x10 $X10RTTRANSPORT -np  1024 -cp ssca1.jar SSCA1 4000   40960000 2>&1 | tee -a log.ssca1.managed.01024
-x10 $X10RTTRANSPORT -np   512 -cp ssca1.jar SSCA1 4000   20480000 2>&1 | tee -a log.ssca1.managed.00512
-x10 $X10RTTRANSPORT -np   256 -cp ssca1.jar SSCA1 4000   10240000 2>&1 | tee -a log.ssca1.managed.00256
-x10 $X10RTTRANSPORT -np   128 -cp ssca1.jar SSCA1 4000    5120000 2>&1 | tee -a log.ssca1.managed.00128
-x10 $X10RTTRANSPORT -np    64 -cp ssca1.jar SSCA1 4000    2560000 2>&1 | tee -a log.ssca1.managed.00064
-x10 $X10RTTRANSPORT -np    32 -cp ssca1.jar SSCA1 4000    1280000 2>&1 | tee -a log.ssca1.managed.00032
-x10 $X10RTTRANSPORT -np    16 -cp ssca1.jar SSCA1 4000     640000 2>&1 | tee -a log.ssca1.managed.00016
-x10 $X10RTTRANSPORT -np     8 -cp ssca1.jar SSCA1 4000     320000 2>&1 | tee -a log.ssca1.managed.00008
-x10 $X10RTTRANSPORT -np     4 -cp ssca1.jar SSCA1 4000     160000 2>&1 | tee -a log.ssca1.managed.00004
-x10 $X10RTTRANSPORT -np     2 -cp ssca1.jar SSCA1 4000      80000 2>&1 | tee -a log.ssca1.managed.00002
-x10 $X10RTTRANSPORT -np     1 -cp ssca1.jar SSCA1 4000      40000 2>&1 | tee -a log.ssca1.managed.00001
+
+#
+# full run for measurement
+#
+p=47040
+command="x10 $X10FLAGS $X10RTTRANSPORT -np $p -cp ssca1.jar SSCA1 4000 $((40000*$p))"
+[ -n "$DRYRUN" ] && echo "$command"
+[ -z "$DRYRUN" ] && $command 2>&1 | tee -a log.ssca1.managed.$(printf "%05d" $p)
+
+for i in $(seq 15 -1 0)
+do
+p=$((2**i))
+command="x10 $X10FLAGS $X10RTTRANSPORT -np $p -cp ssca1.jar SSCA1 4000 $((40000*$p))"
+[ -n "$DRYRUN" ] && echo "$command"
+[ -z "$DRYRUN" ] && $command 2>&1 | tee -a log.ssca1.managed.$(printf "%05d" $p)
+done

@@ -1,28 +1,59 @@
-# HugePages_Total:       0
+#!/usr/bin/env bash
 
-x10 $X10RTTRANSPORT -np     1 -cp ssca2.jar SSCA2 -n 12 2>&1 | tee -a log.ssca2.managed.n12.00001
-x10 $X10RTTRANSPORT -np     8 -cp ssca2.jar SSCA2 -n 12 2>&1 | tee -a log.ssca2.managed.n12.00008
+HEAP=8192m
+X10FLAGS="-ms$HEAP -mx$HEAP"
+#DRYRUN=true
+#FULLRUN=true
+
+
+if [ -z "$FULLRUN" ]; then
+#
+# test run
+#
+for p in 8 1
+do
+N=16
+command="x10 $X10FLAGS $X10RTTRANSPORT -np $p -cp ssca2.jar SSCA2 -n $N"
+[ -n "$DRYRUN" ] && echo "$command"
+[ -z "$DRYRUN" ] && $command 2>&1 | tee -a log.ssca2.managed.n$N.$(printf "%05d" $p)
+done
 
 exit 0
+fi
 
-x10 $X10RTTRANSPORT -np 47040 -cp ssca2.jar SSCA2 -n 20 2>&1 | tee -a log.ssca2.managed.n20.47040
-x10 $X10RTTRANSPORT -np 32768 -cp ssca2.jar SSCA2 -n 20 2>&1 | tee -a log.ssca2.managed.n20.32768
-x10 $X10RTTRANSPORT -np 16384 -cp ssca2.jar SSCA2 -n 20 2>&1 | tee -a log.ssca2.managed.n20.16384
-x10 $X10RTTRANSPORT -np  8192 -cp ssca2.jar SSCA2 -n 20 2>&1 | tee -a log.ssca2.managed.n20.08192
-x10 $X10RTTRANSPORT -np  4096 -cp ssca2.jar SSCA2 -n 20 2>&1 | tee -a log.ssca2.managed.n20.04096
-x10 $X10RTTRANSPORT -np  2048 -cp ssca2.jar SSCA2 -n 20 2>&1 | tee -a log.ssca2.managed.n20.02048
 
-x10 $X10RTTRANSPORT -np  2048 -cp ssca2.jar SSCA2 -n 18 2>&1 | tee -a log.ssca2.managed.n18.02048
-x10 $X10RTTRANSPORT -np  1024 -cp ssca2.jar SSCA2 -n 18 2>&1 | tee -a log.ssca2.managed.n18.01024
-x10 $X10RTTRANSPORT -np   512 -cp ssca2.jar SSCA2 -n 18 2>&1 | tee -a log.ssca2.managed.n18.00512
-x10 $X10RTTRANSPORT -np   256 -cp ssca2.jar SSCA2 -n 18 2>&1 | tee -a log.ssca2.managed.n18.00256
-x10 $X10RTTRANSPORT -np   128 -cp ssca2.jar SSCA2 -n 18 2>&1 | tee -a log.ssca2.managed.n18.00128
-x10 $X10RTTRANSPORT -np    64 -cp ssca2.jar SSCA2 -n 18 2>&1 | tee -a log.ssca2.managed.n18.00064
-x10 $X10RTTRANSPORT -np    32 -cp ssca2.jar SSCA2 -n 18 2>&1 | tee -a log.ssca2.managed.n18.00032
+#
+# full run for measurement
+#
+p=47040
+N=20
+command="x10 $X10FLAGS $X10RTTRANSPORT -np $p -cp ssca2.jar SSCA2 -n $N"
+[ -n "$DRYRUN" ] && echo "$command"
+[ -z "$DRYRUN" ] && $command 2>&1 | tee -a log.ssca2.managed.n$N.$(printf "%05d" $p)
 
-x10 $X10RTTRANSPORT -np    32 -cp ssca2.jar SSCA2 -n 16 2>&1 | tee -a log.ssca2.managed.n16.00032
-x10 $X10RTTRANSPORT -np    16 -cp ssca2.jar SSCA2 -n 16 2>&1 | tee -a log.ssca2.managed.n16.00016
-x10 $X10RTTRANSPORT -np     8 -cp ssca2.jar SSCA2 -n 16 2>&1 | tee -a log.ssca2.managed.n16.00008
-x10 $X10RTTRANSPORT -np     4 -cp ssca2.jar SSCA2 -n 16 2>&1 | tee -a log.ssca2.managed.n16.00004
-x10 $X10RTTRANSPORT -np     2 -cp ssca2.jar SSCA2 -n 16 2>&1 | tee -a log.ssca2.managed.n16.00002
-x10 $X10RTTRANSPORT -np     1 -cp ssca2.jar SSCA2 -n 16 2>&1 | tee -a log.ssca2.managed.n16.00001
+for i in $(seq 15 -1 11)
+do
+p=$((2**i))
+N=20
+command="x10 $X10FLAGS $X10RTTRANSPORT -np $p -cp ssca2.jar SSCA2 -n $N"
+[ -n "$DRYRUN" ] && echo "$command"
+[ -z "$DRYRUN" ] && $command 2>&1 | tee -a log.ssca2.managed.n$N.$(printf "%05d" $p)
+done
+
+for i in $(seq 11 -1 5)
+do
+p=$((2**i))
+N=18
+command="x10 $X10FLAGS $X10RTTRANSPORT -np $p -cp ssca2.jar SSCA2 -n $N"
+[ -n "$DRYRUN" ] && echo "$command"
+[ -z "$DRYRUN" ] && $command 2>&1 | tee -a log.ssca2.managed.n$N.$(printf "%05d" $p)
+done
+
+for i in $(seq 5 -1 0)
+do
+p=$((2**i))
+N=16
+command="x10 $X10FLAGS $X10RTTRANSPORT -np $p -cp ssca2.jar SSCA2 -n $N"
+[ -n "$DRYRUN" ] && echo "$command"
+[ -z "$DRYRUN" ] && $command 2>&1 | tee -a log.ssca2.managed.n$N.$(printf "%05d" $p)
+done

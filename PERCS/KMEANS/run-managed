@@ -1,24 +1,38 @@
-# HugePages_Total:       0
+#!/usr/bin/env bash
 
-x10 $X10RTTRANSPORT -np     1 -cp kmeans.jar KMeans -n      40000 -c 4096 -d 12 -i 5 2>&1 | tee -a log.kmeans.managed.00001
-x10 $X10RTTRANSPORT -np     8 -cp kmeans.jar KMeans -n     320000 -c 4096 -d 12 -i 5 2>&1 | tee -a log.kmeans.managed.00008
+HEAP=2048m
+X10FLAGS="-ms$HEAP -mx$HEAP"
+#DRYRUN=true
+#FULLRUN=true
+
+
+if [ -z "$FULLRUN" ]; then
+#
+# test run
+#
+for p in 1 8
+do
+command="x10 $X10FLAGS $X10RTTRANSPORT -np $p -cp kmeans.jar KMeans -n $((40000*$p)) -c 4096 -d 12 -i 5"
+[ -n "$DRYRUN" ] && echo "$command"
+[ -z "$DRYRUN" ] && $command 2>&1 | tee -a log.kmeans.managed.$(printf "%05d" $p)
+done
 
 exit 0
+fi
 
-x10 $X10RTTRANSPORT -np 47040 -cp kmeans.jar KMeans -n 1881600000 -c 4096 -d 12 -i 5 2>&1 | tee -a log.kmeans.managed.47040
-x10 $X10RTTRANSPORT -np 32768 -cp kmeans.jar KMeans -n 1310720000 -c 4096 -d 12 -i 5 2>&1 | tee -a log.kmeans.managed.32768
-x10 $X10RTTRANSPORT -np 16384 -cp kmeans.jar KMeans -n  655360000 -c 4096 -d 12 -i 5 2>&1 | tee -a log.kmeans.managed.16384
-x10 $X10RTTRANSPORT -np  8192 -cp kmeans.jar KMeans -n  327680000 -c 4096 -d 12 -i 5 2>&1 | tee -a log.kmeans.managed.08192
-x10 $X10RTTRANSPORT -np  4096 -cp kmeans.jar KMeans -n  163840000 -c 4096 -d 12 -i 5 2>&1 | tee -a log.kmeans.managed.04096
-x10 $X10RTTRANSPORT -np  2048 -cp kmeans.jar KMeans -n   81920000 -c 4096 -d 12 -i 5 2>&1 | tee -a log.kmeans.managed.02048
-x10 $X10RTTRANSPORT -np  1024 -cp kmeans.jar KMeans -n   40960000 -c 4096 -d 12 -i 5 2>&1 | tee -a log.kmeans.managed.01024
-x10 $X10RTTRANSPORT -np   512 -cp kmeans.jar KMeans -n   20480000 -c 4096 -d 12 -i 5 2>&1 | tee -a log.kmeans.managed.00512
-x10 $X10RTTRANSPORT -np   256 -cp kmeans.jar KMeans -n   10240000 -c 4096 -d 12 -i 5 2>&1 | tee -a log.kmeans.managed.00256
-x10 $X10RTTRANSPORT -np   128 -cp kmeans.jar KMeans -n    5120000 -c 4096 -d 12 -i 5 2>&1 | tee -a log.kmeans.managed.00128
-x10 $X10RTTRANSPORT -np    64 -cp kmeans.jar KMeans -n    2560000 -c 4096 -d 12 -i 5 2>&1 | tee -a log.kmeans.managed.00064
-x10 $X10RTTRANSPORT -np    32 -cp kmeans.jar KMeans -n    1280000 -c 4096 -d 12 -i 5 2>&1 | tee -a log.kmeans.managed.00032
-x10 $X10RTTRANSPORT -np    16 -cp kmeans.jar KMeans -n     640000 -c 4096 -d 12 -i 5 2>&1 | tee -a log.kmeans.managed.00016
-x10 $X10RTTRANSPORT -np     8 -cp kmeans.jar KMeans -n     320000 -c 4096 -d 12 -i 5 2>&1 | tee -a log.kmeans.managed.00008
-x10 $X10RTTRANSPORT -np     4 -cp kmeans.jar KMeans -n     160000 -c 4096 -d 12 -i 5 2>&1 | tee -a log.kmeans.managed.00004
-x10 $X10RTTRANSPORT -np     2 -cp kmeans.jar KMeans -n      80000 -c 4096 -d 12 -i 5 2>&1 | tee -a log.kmeans.managed.00002
-x10 $X10RTTRANSPORT -np     1 -cp kmeans.jar KMeans -n      40000 -c 4096 -d 12 -i 5 2>&1 | tee -a log.kmeans.managed.00001
+
+#
+# full run for measurement
+#
+p=47040
+command="x10 $X10FLAGS $X10RTTRANSPORT -np $p -cp kmeans.jar KMeans -n $((40000*$p)) -c 4096 -d 12 -i 5"
+[ -n "$DRYRUN" ] && echo "$command"
+[ -z "$DRYRUN" ] && $command 2>&1 | tee -a log.kmeans.managed.$(printf "%05d" $p)
+
+for i in $(seq 15 -1 0)
+do
+p=$((2**i))
+command="x10 $X10FLAGS $X10RTTRANSPORT -np $p -cp kmeans.jar KMeans -n $((40000*$p)) -c 4096 -d 12 -i 5"
+[ -n "$DRYRUN" ] && echo "$command"
+[ -z "$DRYRUN" ] && $command 2>&1 | tee -a log.kmeans.managed.$(printf "%05d" $p)
+done

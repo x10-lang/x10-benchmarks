@@ -1,26 +1,38 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
-SIZE=$((1024*1024))
+HEAP=2560m
+X10FLAGS="-ms$HEAP -mx$HEAP"
+#DRYRUN=true
+#FULLRUN=true
 
-x10 $X10RTTRANSPORT -np     1 -cp stream.jar Stream $SIZE 2>&1 | tee -a log.stream.managed.00001
-x10 $X10RTTRANSPORT -np     8 -cp stream.jar Stream $SIZE 2>&1 | tee -a log.stream.managed.00008
+
+if [ -z "$FULLRUN" ]; then
+#
+# test run
+#
+for p in 1 8
+do
+command="x10 $X10FLAGS $X10RTTRANSPORT -np $p -cp stream.jar Stream"
+[ -n "$DRYRUN" ] && echo "$command"
+[ -z "$DRYRUN" ] && $command 2>&1 | tee -a log.stream.managed.$(printf "%05d" $p)
+done
 
 exit 0
+fi
 
-x10 $X10RTTRANSPORT -np 47040 -cp stream.jar Stream $SIZE 2>&1 | tee -a log.stream.managed.47040
-x10 $X10RTTRANSPORT -np 32768 -cp stream.jar Stream $SIZE 2>&1 | tee -a log.stream.managed.32768
-x10 $X10RTTRANSPORT -np 16384 -cp stream.jar Stream $SIZE 2>&1 | tee -a log.stream.managed.16384
-x10 $X10RTTRANSPORT -np  8192 -cp stream.jar Stream $SIZE 2>&1 | tee -a log.stream.managed.08192
-x10 $X10RTTRANSPORT -np  4096 -cp stream.jar Stream $SIZE 2>&1 | tee -a log.stream.managed.04096
-x10 $X10RTTRANSPORT -np  2048 -cp stream.jar Stream $SIZE 2>&1 | tee -a log.stream.managed.02048
-x10 $X10RTTRANSPORT -np  1024 -cp stream.jar Stream $SIZE 2>&1 | tee -a log.stream.managed.01024
-x10 $X10RTTRANSPORT -np   512 -cp stream.jar Stream $SIZE 2>&1 | tee -a log.stream.managed.00512
-x10 $X10RTTRANSPORT -np   256 -cp stream.jar Stream $SIZE 2>&1 | tee -a log.stream.managed.00256
-x10 $X10RTTRANSPORT -np   128 -cp stream.jar Stream $SIZE 2>&1 | tee -a log.stream.managed.00128
-x10 $X10RTTRANSPORT -np    64 -cp stream.jar Stream $SIZE 2>&1 | tee -a log.stream.managed.00064
-x10 $X10RTTRANSPORT -np    32 -cp stream.jar Stream $SIZE 2>&1 | tee -a log.stream.managed.00032
-x10 $X10RTTRANSPORT -np    16 -cp stream.jar Stream $SIZE 2>&1 | tee -a log.stream.managed.00016
-x10 $X10RTTRANSPORT -np     8 -cp stream.jar Stream $SIZE 2>&1 | tee -a log.stream.managed.00008
-x10 $X10RTTRANSPORT -np     4 -cp stream.jar Stream $SIZE 2>&1 | tee -a log.stream.managed.00004
-x10 $X10RTTRANSPORT -np     2 -cp stream.jar Stream $SIZE 2>&1 | tee -a log.stream.managed.00002
-x10 $X10RTTRANSPORT -np     1 -cp stream.jar Stream $SIZE 2>&1 | tee -a log.stream.managed.00001
+
+#
+# full run for measurement
+#
+p=47040
+command="x10 $X10FLAGS $X10RTTRANSPORT -np $p -cp stream.jar Stream"
+[ -n "$DRYRUN" ] && echo "$command"
+[ -z "$DRYRUN" ] && $command 2>&1 | tee -a log.stream.managed.$(printf "%05d" $p)
+
+for i in $(seq 15 -1 0)
+do
+p=$((2**i))
+command="x10 $X10FLAGS $X10RTTRANSPORT -np $p -cp stream.jar Stream"
+[ -n "$DRYRUN" ] && echo "$command"
+[ -z "$DRYRUN" ] && $command 2>&1 | tee -a log.stream.managed.$(printf "%05d" $p)
+done
