@@ -14,7 +14,7 @@ qsub --env $ENV_ARGS -t 10 -n 2 --mode c16 -O $PROG.00032 $PROG $SIZE
 qsub --env $ENV_ARGS -t 10 -n 4 --mode c16 -O $PROG.00064 $PROG $SIZE
 qsub --env $ENV_ARGS -t 10 -n 8 --mode c16 -O $PROG.00128 $PROG $SIZE
 qsub --env $ENV_ARGS -t 10 -n 16 --mode c16 -O $PROG.00256 $PROG $SIZE
-qsub --env $ENV_ARGS -t 10 -n 32 --mode c16 -O $PROG.00512 $PROG$SIZE
+qsub --env $ENV_ARGS -t 10 -n 32 --mode c16 -O $PROG.00512 $PROG $SIZE
 qsub --env $ENV_ARGS -t 15 -n 64 --mode c16 -O $PROG.01024 $PROG $SIZE
 qsub --env $ENV_ARGS -t 15 -n 128 --mode c16 -O $PROG.02048 $PROG $SIZE
 qsub --env $ENV_ARGS -t 15 -n 256 --mode c16 -O $PROG.04096 $PROG $SIZE
