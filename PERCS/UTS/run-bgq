@@ -2,7 +2,7 @@ export ENV_ARGS='GC_MARKERS=1:X10_STATIC_THREADS=1:X10_NTHREADS=1:X10RT_MPI_ENAB
 
 export PROG=uts.xlc.mpi
 
-qsub --env $ENV_ARGS -t 15 -n 1 --mode c1 -O $PROG.00001 $PROG -d 13
+qsub --env $ENV_ARGS -t 20 -n 1 --mode c1 -O $PROG.00001 $PROG -d 13
 qsub --env $ENV_ARGS -t 15 -n 1 --mode c2 -O $PROG.00002 $PROG -d 13
 qsub --env $ENV_ARGS -t 15 -n 1 --mode c4 -O $PROG.00004 $PROG -d 14 
 qsub --env $ENV_ARGS -t 15 -n 1 --mode c8 -O $PROG.00008 $PROG -d 14 
