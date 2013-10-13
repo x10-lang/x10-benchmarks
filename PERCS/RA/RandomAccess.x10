@@ -1,5 +1,5 @@
 // memory per place: 8*2^m
-// default: m = 12 -> 32M per place
+// default: m = 12 -> 32K per place
 // m is intended to remain constant (independent of the number of places)
 
 // p7ih: -m 28 -> 2G per place
