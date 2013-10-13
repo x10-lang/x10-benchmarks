@@ -9,4 +9,4 @@ qsub --env $ENV_ARGS -t 30 -n 1 --mode c16 -O $LU_EXE.00016 $LU_EXE 34560 360 4 
 qsub --env $ENV_ARGS -t 60 -n 4 --mode c16 -O $LU_EXE.00064 $LU_EXE 69120 360 8 8 20
 qsub --env $ENV_ARGS -t 120 -n 16 --mode c16 -O $LU_EXE.00256 $LU_EXE 138240 360 16 16 20
 qsub --env $ENV_ARGS -t 120 -n 64 --mode c16 -O $LU_EXE.01024 $LU_EXE 276480 360 32 32 20
-qsub --env $ENV_ARGS -t 120 -n 128 --mode c16 -O $LU_EXE.02048 $LU_EXE 552960 360 64 64 20
+qsub --env $ENV_ARGS -t 120 -n 128 --mode c16 -O $LU_EXE.04096 $LU_EXE 552960 360 64 64 20
