@@ -3,7 +3,10 @@ export ENV_ARGS='GC_MARKERS=1:X10_STATIC_THREADS=1:X10_NTHREADS=1'
 
 export LU_EXE=lu.xlc.pami
 
-
-# 8640
-qsub --env $ENV_ARGS -t 20 -n 1 --mode c16 -O $LU_EXE.00016.34560 $LU_EXE 34560 360 4 4 20
-
+qsub --env $ENV_ARGS -t 15 -n 1 --mode c1 -O $LU_EXE.00001 $LU_EXE 8640 360 1 1 20
+qsub --env $ENV_ARGS -t 15 -n 1 --mode c4 -O $LU_EXE.00004 $LU_EXE 17280 360 2 2 20
+qsub --env $ENV_ARGS -t 30 -n 1 --mode c16 -O $LU_EXE.00016 $LU_EXE 34560 360 4 4 20
+qsub --env $ENV_ARGS -t 60 -n 4 --mode c16 -O $LU_EXE.00064 $LU_EXE 69120 360 8 8 20
+qsub --env $ENV_ARGS -t 120 -n 16 --mode c16 -O $LU_EXE.00256 $LU_EXE 138240 360 16 16 20
+qsub --env $ENV_ARGS -t 120 -n 64 --mode c16 -O $LU_EXE.01024 $LU_EXE 276480 360 32 32 20
+qsub --env $ENV_ARGS -t 120 -n 128 --mode c16 -O $LU_EXE.02048 $LU_EXE 552960 360 64 64 20
