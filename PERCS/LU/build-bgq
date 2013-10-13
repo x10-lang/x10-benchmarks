@@ -3,7 +3,7 @@
 export ESSLPATH=/soft/libraries/essl/current
 export XLFPATH=/soft/compilers/ibmcmp-aug2013
 
-export X10RTTRANSPORT=mpi
+export X10RTTRANSPORT=pami
 
 $X10_ROOT/x10.dist/bin/x10c++ -x10rt $X10RTTRANSPORT -O -NO_CHECKS -d tmp -cxx-prearg -I.. -report postcompile=5 \
   -cxx-prearg -I$ESSLPATH/include \
@@ -14,5 +14,6 @@ $X10_ROOT/x10.dist/bin/x10c++ -x10rt $X10RTTRANSPORT -O -NO_CHECKS -d tmp -cxx-p
   -cxx-postarg -lxlf90_r \
   -cxx-postarg -lxlfmath \
   -cxx-postarg -lxl \
+  -cxx-postarg -lrt \
   LU.x10 \
   -o lu.xlc.$X10RTTRANSPORT
