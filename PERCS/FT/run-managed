@@ -1,0 +1,41 @@
+#!/usr/bin/env bash
+
+#
+# TODO: implement JNI wrapper for FFT
+#
+
+#HEAP=2048m
+#X10FLAGS="-ms$HEAP -mx$HEAP"
+#DRYRUN=true
+#FULLRUN=true
+
+M0=13
+
+if [ -z "$FULLRUN" ]; then
+#
+# test run
+#
+for i in 0 3
+do
+p=$((2**i))
+M=$(($M0+($i/2)))
+command="x10 $X10FLAGS $X10RTTRANSPORT -np $p -cp ft.jar FT $M true"
+[ -n "$DRYRUN" ] && echo "$command"
+[ -z "$DRYRUN" ] && $command 2>&1 | tee -a log.ft.managed.$(printf "%05d" $p)
+done
+
+exit 0
+fi
+
+
+#
+# full run for measurement
+#
+for i in $(seq 15 -1 0)
+do
+p=$((2**i))
+M=$(($M0+($i/2)))
+command="x10 $X10FLAGS $X10RTTRANSPORT -np $p -cp ft.jar FT $M true"
+[ -n "$DRYRUN" ] && echo "$command"
+[ -z "$DRYRUN" ] && $command 2>&1 | tee -a log.ft.managed.$(printf "%05d" $p)
+done
