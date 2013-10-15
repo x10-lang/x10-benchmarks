@@ -121,12 +121,17 @@ public class RNG {
     public static void init(SHA1Rand newstate, int seed) {
         MessageDigest md = sha1_begin();
 
-        sha1_hash(zeroes16, md);
-
         byte[] bytes = null;
         if (updateAsBatch) bytes = new byte[4];
-
+        sha1_hash(zeroes16, md);
         sha1_hash(seed, md, bytes);
+
+        /*
+        assert updateAsBatch;
+        byte[] bytes = new byte[20];
+        int2bytes(seed, bytes, 4);
+        sha1_hash(bytes, md);
+        */
 
         sha1_end(newstate, md);
     }
