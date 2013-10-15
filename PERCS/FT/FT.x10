@@ -9,6 +9,7 @@ import x10.compiler.Native;
 import x10.compiler.NativeCPPInclude;
 import x10.compiler.NativeCPPOutputFile;
 import x10.compiler.NativeCPPCompilationUnit;
+import x10.compiler.NativeRep;
 import x10.util.Team;
 
 @NativeCPPInclude("ft_natives.h")
@@ -19,18 +20,23 @@ import x10.util.Team;
 @NativeCPPCompilationUnit("zfft1d.c")
 @NativeCPPCompilationUnit("ft_natives.cc")
 
-class Random {
+@NativeRep("java", "java.util.Random", null, null)
+final class Random {
     @Native("c++", "srandom(#seed)")
-    static native def srandom(seed:Int):void;
+    @Native("java", "")
+    private static native def srandom(seed:Int):void;
 
     @Native("c++", "random()")
+    @Native("java", "#this.nextLong()")
     native def rand():Long;
 
+    @Native("java", "new java.util.Random(#seed)")
     def this(seed:Int) {
         srandom(seed);
     }
 
-    def next() = rand() / (4294967296L as Double);
+    @Native("java", "(#this.nextLong() / ((double) 4294967296L))")
+    def next():Double = rand() / (4294967296L as Double);
 }
 
 class FT {

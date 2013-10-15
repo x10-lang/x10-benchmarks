@@ -58,7 +58,8 @@ import x10.util.Team;
 @NativeRep("java", "java.util.Random", null, null)
 final class Random {
     @Native("c++", "srandom(#seed)")
-    private static def srandom(seed:Int):void {}
+    @Native("java", "")
+    private static native def srandom(seed:Int):void;
 
     @Native("c++", "random()")
     @Native("java", "#this.nextLong()")
