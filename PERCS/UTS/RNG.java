@@ -11,6 +11,17 @@ public class RNG {
     private static final boolean updateAsBatch = true;
     private static final boolean useLongBatch = true;
 
+    private static void int2bytes(int w, byte[] bytes, int off) {
+        int offby4 = off * 4;
+        bytes[offby4+0] = (byte)(w >> 24);
+        bytes[offby4+1] = (byte)(w >> 16);
+        bytes[offby4+2] = (byte)(w >>  8);
+        bytes[offby4+3] = (byte)(w >>  0);
+    }
+    private static int bytes2int(byte[] bytes, int off) {
+        int offby4 = off * 4;
+        return ((0xff & bytes[offby4+0]) << 24) | ((0xff & bytes[offby4+1]) << 16) | ((0xff & bytes[offby4+2]) << 8) | ((0xff & bytes[offby4+3]) << 0);
+    }
     private static MessageDigest sha1_begin() {
         MessageDigest md = null;
         try {
@@ -20,13 +31,6 @@ public class RNG {
     }
     private static void sha1_hash(byte[] bytes, MessageDigest md) {
         md.update(bytes);
-    }
-    private static void int2bytes(int w, byte[] bytes, int off) {
-        int offby4 = off * 4;
-        bytes[offby4+0] = (byte)(w >> 24);
-        bytes[offby4+1] = (byte)(w >> 16);
-        bytes[offby4+2] = (byte)(w >>  8);
-        bytes[offby4+3] = (byte)(w >>  0);
     }
     private static void sha1_hash(int w, MessageDigest md, byte[] bytes) {
         if (bytes != null) {
@@ -88,22 +92,11 @@ public class RNG {
     }
     private static void sha1_end(SHA1Rand newstate, MessageDigest md) {
         byte[] digest = md.digest();
-        int w;
-
-        w = (digest[ 0] << 24) | (digest[ 1] << 16) | (digest[ 2] << 8) | (digest[ 3] << 0);
-        newstate.w0 = w;
-
-        w = (digest[ 4] << 24) | (digest[ 5] << 16) | (digest[ 6] << 8) | (digest[ 7] << 0);
-        newstate.w1 = w;
-
-        w = (digest[ 8] << 24) | (digest[ 9] << 16) | (digest[10] << 8) | (digest[11] << 0);
-        newstate.w2 = w;
-
-        w = (digest[12] << 24) | (digest[13] << 16) | (digest[14] << 8) | (digest[15] << 0);
-        newstate.w3 = w;
-
-        w = (digest[16] << 24) | (digest[17] << 16) | (digest[18] << 8) | (digest[19] << 0);
-        newstate.w4 = w;
+        newstate.w0 = bytes2int(digest, 0);
+        newstate.w1 = bytes2int(digest, 1);
+        newstate.w2 = bytes2int(digest, 2);
+        newstate.w3 = bytes2int(digest, 3);
+        newstate.w4 = bytes2int(digest, 4);
     }
 
     /*
