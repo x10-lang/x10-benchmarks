@@ -41,9 +41,11 @@ final class Random {
 
 class FT {
     @Native("c++", "execute_plan(#1, &(#2)->raw[0], &(#3)->raw[0], #4, #5, #6)")
+    @Native("java", "FTNatives.execute_plan(#plan, #A.getDoubleArray(), #B.getDoubleArray(), #SQRTN, #i0, #i1)")
     native static def execute_plan(plan:Long, A:Rail[Double], B:Rail[Double], SQRTN:Int, i0:Int, i1:Int):void;
 
     @Native("c++", "create_plan(#1, #2, #3)")
+    @Native("java", "FTNatives.create_plan(#SQRTN, #direction, #flags)")
     native static def create_plan(SQRTN:Int, direction:Int, flags:Int):Long;
 
     var A:Rail[Double];
