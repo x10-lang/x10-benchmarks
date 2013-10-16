@@ -4,8 +4,9 @@
 # TODO: implement JNI wrapper for BLAS
 #
 
+X10FLAGS="-libpath ."
 HEAP=3072m
-X10FLAGS="-ms$HEAP -mx$HEAP"
+X10FLAGS="-ms$HEAP -mx$HEAP $X10FLAGS"
 #DRYRUN=true
 #FULLRUN=true
 

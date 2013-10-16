@@ -1,1 +1,3 @@
 x10c -O -NO_CHECKS -o lu.jar LU.x10
+
+g++ -O2 -finline-functions -I$JAVA_HOME/include essl_natives.cc ESSL.cc -shared -fPIC -lblas -o libESSL.so

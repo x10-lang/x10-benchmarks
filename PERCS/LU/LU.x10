@@ -21,24 +21,31 @@ import x10.util.Team;
 class LU {
 
     @NativeCPPExtern
+    @Native("java", "ESSL.blockTriSolve(#me.getDoubleArray(), #diag.getDoubleArray(), #B)")
         native static def blockTriSolve(me:Rail[Double], diag:Rail[Double], B:Int):void;
 
     @NativeCPPExtern
+    @Native("java", "ESSL.blockTriSolveDiag(#diag.getDoubleArray(), #min, #max, #B)")
         native static def blockTriSolveDiag(diag:Rail[Double], min:Int, max:Int, B:Int):void;
 
     @NativeCPPExtern
+    @Native("java", "ESSL.blockBackSolve(#me.getDoubleArray(), #diag.getDoubleArray(), #B)")
         native static def blockBackSolve(me:Rail[Double], diag:Rail[Double], B:Int):void;
 
     @NativeCPPExtern
+    @Native("java", "ESSL.blockMulSub(#me.getDoubleArray(), #left.getDoubleArray(), #upper.getDoubleArray(), #B)")
         native static def blockMulSub(me:Rail[Double], left:Rail[Double], upper:Rail[Double], B:Int):void;
 
     @NativeCPPExtern
+    @Native("java", "ESSL.blockMulSubDiag(#diag.getDoubleArray(), #min, #max, #B)")
         native static def blockMulSubDiag(diag:Rail[Double], min:Int, max:Int, B:Int):void;
 
     @NativeCPPExtern
+    @Native("java", "ESSL.blockMulSubPanel(#me.getDoubleArray(), #diag.getDoubleArray(), #min, #max, #B)")
         native static def blockMulSubPanel(me:Rail[Double], diag:Rail[Double], min:Int, max:Int, B:Int):void;
 
     @NativeCPPExtern
+    @Native("java", "ESSL.blockMulSubRow(#me.getDoubleArray(), #diag.getDoubleArray(), #B, #j, #cond)")
         native static def blockMulSubRow(me:Rail[Double], diag:Rail[Double], B:Int, j:Int, cond:boolean):void;
 
     val M:Int;
