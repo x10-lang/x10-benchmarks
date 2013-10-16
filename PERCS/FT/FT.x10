@@ -101,7 +101,7 @@ class FT {
 
     def check() {
         val random = new Random(I);
-        val threshold = 1.0e-15*Math.log(N as double)/Math.log(2.0)*16;
+        val threshold = 1.0e-15*Math.log(N as Double)/Math.log(2.0)*16;
         for (var q:Int=0n; q<A.size; ++q) {
             val expected = random.next() - 0.5;
             if (Math.abs(A(q)-expected) > threshold) Console.ERR.println("Error at "+q+" "+A(q)+" "+expected);
@@ -150,7 +150,7 @@ class FT {
     }
 
     def scatter() {
-        val n1 = Place.MAX_PLACES as int;
+        val n1 = Place.MAX_PLACES as Int;
         val n2 = nRows;
         val FFTE_NBLK = 16n;
 
@@ -190,7 +190,7 @@ class FT {
 
         // Output
         val secs = format(timers(12) - timers(0));
-        val Gigaflops = 1.0e-9*N*5*Math.log(N as double)/Math.log(2.0)/secs;
+        val Gigaflops = 1.0e-9*N*5*Math.log(N as Double)/Math.log(2.0)/secs;
         if (I == 0n) Console.OUT.println("execution time=" + secs + " secs" + " Gigaflops=" + Gigaflops);
         val steps = ["transpose1", "alltoall1 ", "scatter1  ", "row_ffts1 ",
                 "transpose2", "alltoall2 ", "scatter2  ", "twiddle   ", "row_ffts2 ",
@@ -228,7 +228,7 @@ class FT {
 
         // Output
         if (I == 0n) Console.OUT.println("Now combining forward and inverse FTT measurements");
-        val Gigaflops = 2.0e-9*N*5*Math.log(N as double)/Math.log(2.0)/secs;
+        val Gigaflops = 2.0e-9*N*5*Math.log(N as Double)/Math.log(2.0)/secs;
         if (I == 0n) Console.OUT.println("execution time=" + secs + " secs"+" Gigaflops="+Gigaflops);
 
         // Verification
@@ -240,11 +240,11 @@ class FT {
     }
 
     public static def main(args:Rail[String]) {
-        val M = (args.size > 0) ? Int.parseInt(args(0)) : 10n;
-        val verify = (args.size > 1) ? Boolean.parseBoolean(args(1)) : false;
+        val M = (args.size > 0) ? Int.parse(args(0)) : 10n;
+        val verify = (args.size > 1) ? Boolean.parse(args(1)) : false;
         val SQRTN = 1n << M;
         val N = (SQRTN as Long) * SQRTN;
-        val nRows = SQRTN / (Place.MAX_PLACES as int);
+        val nRows = SQRTN / (Place.MAX_PLACES as Int);
         val localSize = 2n * SQRTN * nRows;
         val mbytes = N*2.0*8.0*2/(1024*1024);
 
@@ -252,7 +252,7 @@ class FT {
             " localSize=" + localSize + " MAX_PLACES=" + Place.MAX_PLACES +
             " Mem=" + mbytes + " mem/MAX_PLACES=" + mbytes/Place.MAX_PLACES);
 
-        if (nRows * (Place.MAX_PLACES as int) != SQRTN) {
+        if (nRows * (Place.MAX_PLACES as Int) != SQRTN) {
             Console.ERR.println("SQRTN must be divisible by Place.MAX_PLACES!");
             return;
         }
