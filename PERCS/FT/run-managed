@@ -1,9 +1,5 @@
 #!/usr/bin/env bash
 
-#
-# TODO: implement JNI wrapper for FFT
-#
-
 X10FLAGS="-libpath ."
 HEAP=3072m
 X10FLAGS="-ms$HEAP -mx$HEAP $X10FLAGS"
@@ -12,11 +8,14 @@ X10FLAGS="-ms$HEAP -mx$HEAP $X10FLAGS"
 
 M0=13
 
+
 if [ -z "$FULLRUN" ]; then
+# Note: overwrite to reduce time
+M0=3
 #
 # test run
 #
-for i in 0 3
+for i in 0 1
 do
 p=$((2**i))
 M=$(($M0+($i/2)))

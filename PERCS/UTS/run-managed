@@ -7,12 +7,13 @@ X10FLAGS="-ms$HEAP -mx$HEAP"
 
 D0=14
 
+
 if [ -z "$FULLRUN" ]; then
+# Note: overwrite to reduce time
+D0=12
 #
 # test run
 #
-# Note: overwrite D0 with 12 to reduce time
-D0=12
 for i in 0 3
 do
 p=$((2**$i))
