@@ -69,9 +69,7 @@ class FT {
         fftwPlan = create_plan(SQRTN, -1n, 0n);
         fftwInversePlan = create_plan(SQRTN, 1n, 0n);
 
-        val hugePagesAvailable = Runtime.MemoryAllocator.hugePagesAvailable();
-        Console.OUT.println("Huge pages available: " + hugePagesAvailable);
-        val allocator = Runtime.MemoryAllocator.requestAllocator(hugePagesAvailable, false);
+        val allocator = Runtime.MemoryAllocator.requestAllocator(true, false);
         A = new Rail[Double](localSize, allocator);
         B = new Rail[Double](localSize, allocator);
 
