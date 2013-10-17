@@ -62,7 +62,7 @@ final class Random {
     private static native def srandom(seed:Int):void;
 
     @Native("c++", "random()")
-    @Native("java", "#this.nextLong()")
+    @Native("java", "((long) #this.nextInt())")
     native def rand():Long;
 
     @Native("java", "new java.util.Random(#seed)")
@@ -70,7 +70,7 @@ final class Random {
         srandom(seed);
     }
 
-    @Native("java", "(((float) #this.nextLong()) / 2147483648f)")
+    @Native("java", "(((float) ((long) #this.nextInt())) / 2147483648f)")
     def next():Float = (rand() as Float)/2147483648f;
 }
 

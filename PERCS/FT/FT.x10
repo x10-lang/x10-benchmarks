@@ -27,7 +27,7 @@ final class Random {
     private static native def srandom(seed:Int):void;
 
     @Native("c++", "random()")
-    @Native("java", "#this.nextLong()")
+    @Native("java", "((long) #this.nextInt())")
     native def rand():Long;
 
     @Native("java", "new java.util.Random(#seed)")
@@ -35,7 +35,7 @@ final class Random {
         srandom(seed);
     }
 
-    @Native("java", "(#this.nextLong() / ((double) 4294967296L))")
+    @Native("java", "(((long) #this.nextInt()) / ((double) 4294967296L))")
     def next():Double = rand() / (4294967296L as Double);
 }
 

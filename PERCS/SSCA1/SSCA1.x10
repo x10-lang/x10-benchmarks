@@ -11,7 +11,7 @@ final class Random {
     private static native def srandom(seed:Int):void;
 
     @Native("c++", "random()")
-    @Native("java", "#this.nextLong()")
+    @Native("java", "((long) #this.nextInt())")
     native def rand():Long;
 
     @Native("java", "new java.util.Random(#seed)")
@@ -19,7 +19,7 @@ final class Random {
         srandom(seed);
     }
 
-    @Native("java", "((byte) (#this.nextLong() & 3L))")
+    @Native("java", "((byte) (((long) #this.nextInt()) & 3L))")
     def next():Byte = (rand() & 3L) as Byte; // 0..alphabetSize-1
 }
 
