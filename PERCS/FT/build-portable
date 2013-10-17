@@ -1,1 +1,1 @@
-x10c++ $X10RTTRANSPORT -O -NO_CHECKS -STATIC_CHECKS FT.x10 -d tmp -cxx-prearg '-I..' -o ft
+x10c++ $X10RTTRANSPORT -report postcompile=5 -O -NO_CHECKS -STATIC_CHECKS FT.x10 -d tmp -cxx-prearg '-I..' -o ft
