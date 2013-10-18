@@ -1,4 +1,21 @@
+/*
+ *  This file is part of the X10 project (http://x10-lang.org).
+ *
+ *  This file is licensed to You under the Eclipse Public License (EPL);
+ *  You may not use this file except in compliance with the License.
+ *  You may obtain a copy of the License at
+ *      http://www.opensource.org/licenses/eclipse-1.0.php
+ *
+ *  (C) Copyright IBM Corporation 2006-2010.
+ */
+
+import x10.util.Option;
+import x10.util.OptionsParser;
+
 import x10.compiler.Inline;
+import x10.io.CustomSerialization;
+import x10.io.Serializer;
+import x10.io.Deserializer;
 
 // memory per place: 8*2^m
 // default: m = 12 -> 32K per place
@@ -38,7 +55,7 @@ class RandomAccessNonCongruent {
         return ran;
     }
 
-    static def runBenchmark(dr:DistRail, logLocalTableSize:Int, numUpdates:Long) {
+    static def runBenchmark(dr:DistRail, logLocalTableSize:Long, numUpdates:Long) {
         val mask = (1<<logLocalTableSize)-1;
         val local_updates = numUpdates / Place.MAX_PLACES;
 
@@ -64,63 +81,40 @@ class RandomAccessNonCongruent {
         });
     }
 
-    private static def help (err:Boolean) {
-        if (here.id!=0L) return;
-        val out = err ? Console.ERR : Console.OUT;
-        out.println("Usage: ra [-m <mem>] [-u <updates>]");
-        out.println("where");
-        out.println("   <mem> is the log2 size of the local table (default 12)");
-        out.println("   <updates> is the number of updates per element (default 4)");
-    }
-
     public static def main (args:Rail[String]) {
-
-        if ((Place.MAX_PLACES & (Place.MAX_PLACES-1)) > 0) {
+        if (!Math.powerOf2(Place.MAX_PLACES)) {
             Console.ERR.println("The number of places must be a power of 2.");
             return;
         }
 
-        var logLocalTableSize_ : Int = 12n;
-        var updates_ : Int = 4n;
-
-        // parse arguments
-        for (var i:Long=0 ; i<args.size ; ) {
-            if (args(i).equals("-m")) {
-                i++;
-                if (i >= args.size) {
-                    if (here.id==0L)
-                        Console.ERR.println("Too few cmdline params.");
-                    help(true);
-                    return;
-                }
-                logLocalTableSize_ = Int.parseInt(args(i++));
-            } else if (args(i).equals("-u")) {
-                i++;
-                if (i >= args.size) {
-                    if (here.id==0L)
-                        Console.ERR.println("Too few cmdline params.");
-                    help(true);
-                    return;
-                }
-                updates_ = Int.parseInt(args(i++));
-            } else {
-                if (here.id==0L)
-                    Console.ERR.println("Unrecognised cmdline param: \""+args(i)+"\"");
-                help(true);
-                return;
-            }
+        val opts = new OptionsParser(args, [
+            Option("d", "dumpTable", "print first elements of local tables after each phase"),
+            Option("c", "congruent", "use congruent memory (same virtual address in all places)"),
+            Option("l", "largePages", "use large pages when allocating table"),
+	    Option.HELP
+	], [
+            Option("m", "magnitude", "log2 size of the local table (default 12)"),
+            Option("u", "updates", "number of updates per element (default 4)")
+        ]);
+        if (opts.wantsUsageOnly("ra")) {
+            return;
         }
 
-        // calculate the size of update array (must be a power of 2)
-        val logLocalTableSize = logLocalTableSize_;
+        val logLocalTableSize = opts("-m", 12);
+        val updates = opts("-u", 4);
+	val dumpTable = opts("-d");
+	val largePages = opts("-l");
+	val congruent = opts("-c");
+
+        // calculate the size of update array
         val localTableSize = 1<<logLocalTableSize;
-        val tableSize = (localTableSize as Long)*Place.MAX_PLACES;
-        val numUpdates = updates_*tableSize;
+        val tableSize = localTableSize * Place.MAX_PLACES;
+        val numUpdates = updates * tableSize;
 
         // create distributed rail 
-        val hugePagesAvailable = Runtime.MemoryAllocator.hugePagesAvailable();
-        Console.OUT.println("Huge pages available:    " + hugePagesAvailable);
-	val dr = new DistRail(PlaceGroup.WORLD, localTableSize, hugePagesAvailable, (i:long)=>i);
+	val dr = new DistRail(PlaceGroup.WORLD, localTableSize, congruent, largePages, (i:long)=>i);
+
+	if (dumpTable) dr.printAll();
 
         // print some info
         Console.OUT.println("Main table size:         2^"+logLocalTableSize+"*"+Place.MAX_PLACES
@@ -137,6 +131,8 @@ class RandomAccessNonCongruent {
         runBenchmark(dr, logLocalTableSize, numUpdates);
         cpuTime += System.nanoTime() * 1e-9D;
 
+	if (dumpTable) dr.printAll();
+
         // print statistics
         val GUPs = (cpuTime > 0.0 ? 1.0 / cpuTime : -1.0) * numUpdates / 1e9;
         Console.OUT.println("CPU time used: "+cpuTime+" seconds");
@@ -151,21 +147,26 @@ class RandomAccessNonCongruent {
             Console.OUT.println(here+": Found " + err + " errors.");
         });
 
+	if (dumpTable) dr.printAll();
+
         // print statistics again
         Console.OUT.println("CPU time used: "+cpuTime+" seconds");
         Console.OUT.println(GUPs+" Billion(10^9) Updates per second (GUP/s)");
     }
 }
 
-final class DistRail {
+final class DistRail implements CustomSerialization {
     val localData:PlaceLocalHandle[Rail[Long]];
     val rails:PlaceLocalHandle[Rail[GlobalRail[Long]]];
     val pg:PlaceGroup;
+    transient val cachedLocalData:Rail[Long];
+    transient val cachedRails:Rail[GlobalRail[Long]];
 
-    public def this(pg:PlaceGroup, localSize:Long, hugePages:boolean, init:(Long)=>Long) {
+    public def this(pg:PlaceGroup, localSize:Long, congruent:boolean, 
+                    hugePages:boolean, init:(Long)=>Long) {
         val ld = PlaceLocalHandle.makeFlat[Rail[Long]](pg, () => {
-            if (hugePages) {
-                val alloc = Runtime.MemoryAllocator.requestAllocator(hugePages, false);
+            if (hugePages || congruent ) {
+                val alloc = Runtime.MemoryAllocator.requireAllocator(hugePages, congruent);
 	        val r:Rail[Long] = new Rail[Long](localSize, alloc);
                 for (i in r.range()) {
                     r(i) = init(i);
@@ -176,6 +177,7 @@ final class DistRail {
             }
         });
 	localData = ld;
+	cachedLocalData = ld();
 
 	val grs:Rail[GlobalRail[Long]] = Unsafe.allocRailUninitialized[GlobalRail[Long]](pg.size());
 	finish for (p in pg) {
@@ -183,22 +185,36 @@ final class DistRail {
 	}
 
 	rails = PlaceLocalHandle.makeFlat[Rail[GlobalRail[Long]]](pg, ()=>{ grs });
+	cachedRails = rails();
 	this.pg = pg;
+    }
+
+    public def this(ds:Deserializer) {
+        localData = ds.readAny() as PlaceLocalHandle[Rail[Long]];
+        rails = ds.readAny() as PlaceLocalHandle[Rail[GlobalRail[Long]]];
+	pg = ds.readAny() as PlaceGroup;
+	cachedLocalData = localData();
+	cachedRails = rails();
+    }
+
+    public def serialize(s:Serializer) {
+        s.writeAny(localData);
+	s.writeAny(rails);
+        s.writeAny(pg);
     }
 
     public @Inline operator this(index:Long):Long = localData()(index);
 
     public @Inline operator this(index:Long)=(v:Long):Long{self==v} {
-        localData()(index) = v;
+        cachedLocalData(index) = v;
         return v;
     }
 
     public @Inline def xor(p:Place, index:Long, update:Long) {
         if (p == here) {
-	    val rr = localData();
-            rr(index) ^= update;
+            cachedLocalData(index) ^= update;
         } else {
-            GlobalRail.remoteXor(rails()(p.id), index, update);
+            GlobalRail.remoteXor(cachedRails(p.id), index, update);
         }
     }
 
