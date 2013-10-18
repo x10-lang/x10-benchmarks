@@ -195,8 +195,8 @@ final class DistRail {
 
     public @Inline def xor(p:Place, index:Long, update:Long) {
         if (p == here) {
-	    val r = localData();
-            r(index) ^= update;
+	    val rr = localData();
+            rr(index) ^= update;
         } else {
             GlobalRail.remoteXor(rails()(p.id), index, update);
         }
