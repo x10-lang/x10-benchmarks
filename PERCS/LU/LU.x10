@@ -46,7 +46,7 @@ class LU {
 
     @NativeCPPExtern
     @Native("java", "ESSL.blockMulSubRow(#me.getDoubleArray(), #diag.getDoubleArray(), #B, #j, #cond)")
-        native static def blockMulSubRow(me:Rail[Double], diag:Rail[Double], B:Int, j:Int, cond:boolean):void;
+        native static def blockMulSubRow(me:Rail[Double], diag:Rail[Double], B:Int, j:Int, cond:Boolean):void;
 
     val M:Int;
     val N:Int;
@@ -184,7 +184,7 @@ class LU {
                         val j = LUCol - J * B;
                         if (I == J) {
                             val div0 = 1.0 / b(j*B+j);
-                            for (var i:int=j+1n; i < B; i++)
+                            for (var i:Int=j+1n; i < B; i++)
                             {
                                 b(i*B+j) *= div0;
                                 for (var k:Int=j+1n; k<max; k++) b(i*B+k) -= b(i*B+j)*b(j*B+k);
@@ -387,7 +387,7 @@ class LU {
         val A_last_panel = A_here.blocks(0n, MB, NB, NB);
         if (!A_last_panel.empty()) {
             for (var I:Int = A_last_panel.min_x; I <= A_last_panel.max_x; I += px) {
-                for (var i:int=0n; i < B; i++) {
+                for (var i:Int=0n; i < B; i++) {
                     val v = 1.0 - A_here.block(I, NB)(I*B+i, M);
                     max = Math.max(max, v * v);
                 }

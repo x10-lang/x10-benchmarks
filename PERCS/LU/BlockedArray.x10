@@ -1,4 +1,3 @@
-import x10.compiler.Native;
 import x10.util.Random;
 
 public final class BlockedArray implements (Int,Int)=>Double {
@@ -24,12 +23,10 @@ public final class BlockedArray implements (Int,Int)=>Double {
             this.raw = raw;
         }
     
-        //@Native("c++", "(*(#0)->FMGL(raw))[-(#0)->FMGL(offset) + (#2) * (#0)->FMGL(delta) + (#3)] = (#1)")
         public operator this(i:Int, j:Int) = (v:Double) {
             raw(i*delta+j-offset) = v;
         }
     
-        //@Native("c++", "(*(#0)->FMGL(raw))[-(#0)->FMGL(offset) + (#1) * (#0)->FMGL(delta) + (#2)]")
         public operator this(i:Int, j:Int) = raw(i*delta+j-offset);
     }
 
