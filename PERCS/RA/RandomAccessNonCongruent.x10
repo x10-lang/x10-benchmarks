@@ -159,6 +159,7 @@ final class DistRail implements CustomSerialization {
     val localData:PlaceLocalHandle[Rail[Long]];
     val rails:PlaceLocalHandle[Rail[GlobalRail[Long]]];
     val pg:PlaceGroup;
+    val congruent:Boolean;
     transient val cachedLocalData:Rail[Long];
     transient val cachedRails:Rail[GlobalRail[Long]];
 
@@ -187,12 +188,14 @@ final class DistRail implements CustomSerialization {
 	rails = PlaceLocalHandle.makeFlat[Rail[GlobalRail[Long]]](pg, ()=>{ grs });
 	cachedRails = rails();
 	this.pg = pg;
+	this.congruent = congruent;
     }
 
     public def this(ds:Deserializer) {
         localData = ds.readAny() as PlaceLocalHandle[Rail[Long]];
         rails = ds.readAny() as PlaceLocalHandle[Rail[GlobalRail[Long]]];
 	pg = ds.readAny() as PlaceGroup;
+	congruent = ds.readAny() as Boolean;
 	cachedLocalData = localData();
 	cachedRails = rails();
     }
@@ -201,9 +204,10 @@ final class DistRail implements CustomSerialization {
         s.writeAny(localData);
 	s.writeAny(rails);
         s.writeAny(pg);
+	s.writeAny(congruent);
     }
 
-    public @Inline operator this(index:Long):Long = localData()(index);
+    public @Inline operator this(index:Long):Long = cachedLocalData(index);
 
     public @Inline operator this(index:Long)=(v:Long):Long{self==v} {
         cachedLocalData(index) = v;
@@ -214,7 +218,12 @@ final class DistRail implements CustomSerialization {
         if (p == here) {
             cachedLocalData(index) ^= update;
         } else {
-            GlobalRail.remoteXor(cachedRails(p.id), index, update);
+	    if (congruent) {
+	        val target = Unsafe.getCongruentSibling(cachedLocalData, p);
+                GlobalRail.remoteXor(target, index, update);
+            } else {
+                GlobalRail.remoteXor(cachedRails(p.id), index, update);
+            }
         }
     }
 
