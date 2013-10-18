@@ -1,0 +1,1 @@
+x10c++ $X10RTTRANSPORT -O -NO_CHECKS -STATIC_CHECKS RandomAccessOld.x10 -o ra_old

@@ -1,1 +1,0 @@
-x10c++ $X10RTTRANSPORT -O -NO_CHECKS -STATIC_CHECKS RandomAccessNonCongruent.x10 -d tmp -cxx-prearg '-I..' -o ra
