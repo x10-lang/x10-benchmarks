@@ -58,16 +58,14 @@ class RandomAccess {
         dr.pg.broadcastFlat(()=>{
             val numLocalUpdates = numUpdates / Place.MAX_PLACES;
             var ran:Long = HPCC_starts(here.id*numLocalUpdates);
-            val size = logLocalTableSize;
             val mask1 = (1<<logLocalTableSize)-1;
             val mask2 = Place.MAX_PLACES - 1;
-            val poly = POLY;
             for (1..numLocalUpdates) {
-                val place_id = (ran >> size) & mask2;
+                val placeId = (ran >> logLocalTableSize) & mask2;
                 val index = ran & mask1;
                 val update = ran;
-                dr.xor(Place(place_id), index, update);
-                ran = (ran << 1) ^ (ran < 0 ? poly : 0);
+                dr.xor(placeId, index, update);
+                ran = (ran << 1) ^ (ran < 0 ? POLY : 0);
             }
 	    GlobalRail.flushRemoteOps();
         });
@@ -203,15 +201,15 @@ final class DistRail {
         return v;
     }
 
-    public @Inline def xor(p:Place, index:Long, update:Long) {
-        if (p == here) {
+    public @Inline def xor(placeId:Long, index:Long, update:Long) {
+        if (placeId == Runtime.hereLong()) {
             cachedLocalData(index) ^= update;
         } else {
 	    if (congruent) {
-	        val target = Unsafe.getCongruentSibling(cachedLocalData, p);
+	        val target = Unsafe.getCongruentSibling(cachedLocalData, Place(placeId));
                 GlobalRail.remoteXor(target, index, update);
             } else {
-                GlobalRail.remoteXor(cachedRails(p.id), index, update);
+                GlobalRail.remoteXor(cachedRails(placeId), index, update);
             }
         }
     }
