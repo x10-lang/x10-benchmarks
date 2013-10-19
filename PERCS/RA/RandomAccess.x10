@@ -34,49 +34,42 @@ class RandomAccess {
         val m2 = new Rail[Long](64);
         while (n < 0) n += PERIOD;
         while (n > PERIOD) n -= PERIOD;
-        if (n == 0L) return 0x1L;
+        if (n == 0) return 0x1;
         var temp:Long = 0x1;
         for (i=0n; i<64n; i++) {
             m2(i) = temp;
-            temp = (temp << 1) ^ (temp < 0 ? POLY : 0L);
-            temp = (temp << 1) ^ (temp < 0 ? POLY : 0L);
+            temp = (temp << 1) ^ (temp < 0 ? POLY : 0);
+            temp = (temp << 1) ^ (temp < 0 ? POLY : 0);
         }
-        for (i=62n; i>=0n; i--) if (((n >> i) & 1n) != 0L) break;
+        for (i=62n; i>=0n; i--) if (((n >> i) & 1n) != 0) break;
         var ran:Long = 0x2;
         while (i > 0n) {
             temp = 0;
-            for (j=0n; j<64n; j++) if (((ran >> j) & 1n) != 0L) temp ^= m2(j);
+            for (j=0n; j<64n; j++) if (((ran >> j) & 1n) != 0) temp ^= m2(j);
             ran = temp;
             i -= 1n;
-            if (((n >> i) & 1) != 0L)
-                ran = (ran << 1) ^ (ran < 0 ? POLY : 0L);
+            if (((n >> i) & 1) != 0)
+                ran = (ran << 1) ^ (ran < 0 ? POLY : 0);
         }
         return ran;
     }
 
     static def runBenchmark(dr:DistRail, logLocalTableSize:Long, numUpdates:Long) {
-        val mask = (1<<logLocalTableSize)-1;
-        val local_updates = numUpdates / Place.MAX_PLACES;
-
         dr.pg.broadcastFlat(()=>{
-            val jj = Runtime.hereLong();
-            val t = System.nanoTime();
-            var ran:Long = HPCC_starts(jj*(numUpdates/Place.MAX_PLACES));
+            val numLocalUpdates = numUpdates / Place.MAX_PLACES;
+            var ran:Long = HPCC_starts(here.id*numLocalUpdates);
             val size = logLocalTableSize;
-            val mask1 = mask;
+            val mask1 = (1<<logLocalTableSize)-1;
             val mask2 = Place.MAX_PLACES - 1;
             val poly = POLY;
-            val lu = local_updates;
-            for (var k:Long=0 ; k<lu ; k+=1) {
-                val place_id = ((ran>>size) as Int) & mask2;
-                val index = (ran as Int) & mask1;
+            for (1..numLocalUpdates) {
+                val place_id = (ran >> size) & mask2;
+                val index = ran & mask1;
                 val update = ran;
                 dr.xor(Place(place_id), index, update);
-                ran = (ran << 1) ^ (ran<0L ? poly : 0L);
+                ran = (ran << 1) ^ (ran < 0 ? poly : 0);
             }
 	    GlobalRail.flushRemoteOps();
-            
-            val u = System.nanoTime() - t;
         });
     }
 
@@ -164,7 +157,7 @@ final class DistRail {
     transient val cachedLocalData:Rail[Long]{self!=null};
     @NonEscaping private final def reloadCachedLocalData():Rail[Long]{self!=null} {
       val r = localData();
-      return r != null ? r : new Rail[Long]();
+      return r != null ? r as Rail[Long]{self!=null} : new Rail[Long]();
     }
 
     @TransientInitExpr(reloadCachedRails())
