@@ -179,7 +179,9 @@ final class DistRail {
                 }
                 return r;
             } else {
-                return new Rail[Long](localSize, init);
+                val r = new Rail[Long](localSize, init);
+                @Native("c++", "x10::lang::RemoteOps::registerForRemoteOps(r);") { }
+                return r;
             }
         });
 	localData = ld;
