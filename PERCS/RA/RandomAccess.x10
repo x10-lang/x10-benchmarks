@@ -15,6 +15,8 @@ import x10.util.OptionsParser;
 import x10.compiler.Inline;
 import x10.compiler.TransientInitExpr;
 import x10.compiler.NonEscaping;
+import x10.compiler.NativeCPPInclude;
+import x10.compiler.Native;
 
 // memory per place: 8*2^m
 // default: m = 12 -> 32K per place
@@ -145,6 +147,7 @@ class RandomAccess {
     }
 }
 
+@NativeCPPInclude("x10/lang/RemoteOps.h")
 final class DistRail {
     val pg:PlaceGroup;
     val congruent:Boolean;
@@ -201,13 +204,18 @@ final class DistRail {
         return v;
     }
 
-    public @Inline def xor(placeId:Long, index:Long, update:Long) {
+    @Native("c++", "x10::lang::RemoteOps::remoteXor(#placeId, #cld, #index, #update)")
+    private static @Inline def congruent_xor(placeId:Long, cld:Rail[Long]{self!=null}, index:Long, update:Long):void {
+        val target = Unsafe.getCongruentSibling(cld, Place(placeId));
+        GlobalRail.remoteXor(target, index, update);
+    }
+
+    public @Inline def xor(placeId:Long, index:Long, update:Long):void {
         if (placeId == Runtime.hereLong()) {
             cachedLocalData(index) ^= update;
         } else {
 	    if (congruent) {
-	        val target = Unsafe.getCongruentSibling(cachedLocalData, Place(placeId));
-                GlobalRail.remoteXor(target, index, update);
+	        congruent_xor(placeId, cachedLocalData, index, update);
             } else {
                 GlobalRail.remoteXor(cachedRails(placeId), index, update);
             }
