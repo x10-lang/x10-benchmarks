@@ -91,6 +91,12 @@ public class RandomAccess {
 	val dumpTable = opts("-d");
 	val largePages = opts("-l");
 	val congruent = opts("-c");
+        if (largePages) {
+            Console.OUT.println("Will request large pages.  Available? " +Runtime.MemoryAllocator.hugePagesAvailable());
+        }
+        if (congruent) {
+            Console.OUT.println("Will request congruent pages.  Available? " +Runtime.MemoryAllocator.congruentAvailable());
+        }
 
         // calculate the size of update array
         val localTableSize = 1<<logLocalTableSize;
