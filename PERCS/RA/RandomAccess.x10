@@ -12,12 +12,6 @@
 import x10.util.Option;
 import x10.util.OptionsParser;
 
-import x10.compiler.Inline;
-import x10.compiler.TransientInitExpr;
-import x10.compiler.NonEscaping;
-import x10.compiler.NativeCPPInclude;
-import x10.compiler.Native;
-
 // memory per place: 8*2^m
 // default: m = 12 -> 32K per place
 // m is intended to remain constant (independent of the number of places)
@@ -25,7 +19,7 @@ import x10.compiler.Native;
 // p7ih: -m 28 -> 2G per place
 // p7ih: 32 places per node -> 64G -> 4096 16M pages
 
-class RandomAccess {
+public class RandomAccess {
 
     static POLY = 0x0000000000000007L;
     static PERIOD = 1317624576693539401L;
@@ -144,89 +138,5 @@ class RandomAccess {
         // print statistics again
         Console.OUT.println("CPU time used: "+cpuTime+" seconds");
         Console.OUT.println(GUPs+" Billion(10^9) Updates per second (GUP/s)");
-    }
-}
-
-@NativeCPPInclude("x10/lang/RemoteOps.h")
-final class DistRail {
-    val pg:PlaceGroup;
-    val congruent:Boolean;
-    val localData:PlaceLocalHandle[Rail[Long]];
-    val rails:PlaceLocalHandle[Rail[GlobalRail[Long]]];
-
-    @TransientInitExpr(reloadCachedLocalData())
-    transient val cachedLocalData:Rail[Long]{self!=null};
-    @NonEscaping private final def reloadCachedLocalData():Rail[Long]{self!=null} {
-      val r = localData();
-      return r != null ? r as Rail[Long]{self!=null} : new Rail[Long]();
-    }
-
-    @TransientInitExpr(reloadCachedRails())
-    transient val cachedRails:Rail[GlobalRail[Long]];
-    @NonEscaping private final def reloadCachedRails() = rails();
-
-    public def this(pg:PlaceGroup, localSize:Long, congruent:boolean, 
-                    hugePages:boolean, init:(Long)=>Long) {
-	this.pg = pg;
-	this.congruent = congruent;
-
-        val ld = PlaceLocalHandle.makeFlat[Rail[Long]](pg, () => {
-            if (hugePages || congruent ) {
-                val alloc = Runtime.MemoryAllocator.requireAllocator(hugePages, congruent);
-	        val r:Rail[Long] = new Rail[Long](localSize, alloc);
-                for (i in r.range()) {
-                    r(i) = init(i);
-                }
-                return r;
-            } else {
-                val r = new Rail[Long](localSize, init);
-                @Native("c++", "x10::lang::RemoteOps::registerForRemoteOps(r);") { }
-                return r;
-            }
-        });
-	localData = ld;
-	cachedLocalData = reloadCachedLocalData();
-
-	if (congruent) {
-	    rails = PlaceLocalHandle.makeFlat[Rail[GlobalRail[Long]]](pg, ()=>null);
-        } else {
-	    val grs:Rail[GlobalRail[Long]] = Unsafe.allocRailUninitialized[GlobalRail[Long]](pg.size());
-	    finish for (p in pg) {
-                async grs(p.id) = at (p) GlobalRail[Long](ld() as Rail[Long]{self!=null});
-	    }
-	    rails = PlaceLocalHandle.makeFlat[Rail[GlobalRail[Long]]](pg, ()=>{ grs });
-        } 
-	cachedRails = reloadCachedRails();
-    }
-
-    public @Inline operator this(index:Long):Long = cachedLocalData(index);
-
-    public @Inline operator this(index:Long)=(v:Long):Long{self==v} {
-        cachedLocalData(index) = v;
-        return v;
-    }
-
-    @Native("c++", "x10::lang::RemoteOps::remoteXor(#placeId, #cld, #index, #update)")
-    private static @Inline def congruent_xor(placeId:Long, cld:Rail[Long]{self!=null}, index:Long, update:Long):void {
-        val target = Unsafe.getCongruentSibling(cld, Place(placeId));
-        GlobalRail.remoteXor(target, index, update);
-    }
-
-    public @Inline def xor(placeId:Long, index:Long, update:Long):void {
-        if (placeId == Runtime.hereLong()) {
-            cachedLocalData(index) ^= update;
-        } else {
-	    if (congruent) {
-	        congruent_xor(placeId, cachedLocalData, index, update);
-            } else {
-                GlobalRail.remoteXor(cachedRails(placeId), index, update);
-            }
-        }
-    }
-
-    public def printAll() {
-        for (p in pg) {
-            at (p) Console.OUT.println(here+": "+localData());
-        }    
     }
 }
