@@ -1,0 +1,9 @@
+./ra-mpi -m 28 -u 1 -c -l -procs 256   2>&1 | tee -a log.ra-mpi.00256
+./ra-mpi -m 28 -u 1 -c -l -procs 128   2>&1 | tee -a log.ra-mpi.00128
+./ra-mpi -m 28 -u 1 -c -l -procs 64    2>&1 | tee -a log.ra-mpi.00064
+./ra-mpi -m 28 -u 1 -c -l -procs 32    2>&1 | tee -a log.ra-mpi.00032
+./ra-mpi -m 28 -u 1 -c -l -procs 16    2>&1 | tee -a log.ra-mpi.00016
+./ra-mpi -m 28 -u 1 -c -l -procs 8     2>&1 | tee -a log.ra-mpi.00008
+./ra-mpi -m 28 -u 1 -c -l -procs 4     2>&1 | tee -a log.ra-mpi.00004
+./ra-mpi -m 28 -u 1 -c -l -procs 2     2>&1 | tee -a log.ra-mpi.00002
+./ra-mpi -m 28 -u 1 -c -l -procs 1     2>&1 | tee -a log.ra-mpi.00001

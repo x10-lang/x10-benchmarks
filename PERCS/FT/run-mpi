@@ -1,0 +1,13 @@
+# at larger sizes, the default PAMI all-to-all algorithm will fail
+export X10RT_PAMI_ALLTOALL_ALG=1
+./ft-mpi 17 true -procs 256   2>&1 | tee -a log.ft-mpi.00256
+# at smaller sizes the default all-to-all algorithm is faster
+export X10RT_PAMI_ALLTOALL_ALG=0
+./ft-mpi 16 true -procs 128   2>&1 | tee -a log.ft-mpi.00128
+./ft-mpi 16 true -procs 64    2>&1 | tee -a log.ft-mpi.00064
+./ft-mpi 15 true -procs 32    2>&1 | tee -a log.ft-mpi.00032
+./ft-mpi 15 true -procs 16    2>&1 | tee -a log.ft-mpi.00016
+./ft-mpi 14 true -procs 8     2>&1 | tee -a log.ft-mpi.00008
+./ft-mpi 14 true -procs 4     2>&1 | tee -a log.ft-mpi.00004
+./ft-mpi 13 true -procs 2     2>&1 | tee -a log.ft-mpi.00002
+./ft-mpi 13 true -procs 1     2>&1 | tee -a log.ft-mpi.00001

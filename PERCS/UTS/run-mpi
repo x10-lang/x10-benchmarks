@@ -1,0 +1,9 @@
+./uts-mpi -d 18 -procs 256   2>&1 | tee -a log.uts-mpi.00256
+./uts-mpi -d 18 -procs 128   2>&1 | tee -a log.uts-mpi.00128
+./uts-mpi -d 17 -procs 64    2>&1 | tee -a log.uts-mpi.00064
+./uts-mpi -d 17 -procs 32    2>&1 | tee -a log.uts-mpi.00032
+./uts-mpi -d 16 -procs 16    2>&1 | tee -a log.uts-mpi.00016
+./uts-mpi -d 16 -procs 8     2>&1 | tee -a log.uts-mpi.00008
+./uts-mpi -d 15 -procs 4     2>&1 | tee -a log.uts-mpi.00004
+./uts-mpi -d 15 -procs 2     2>&1 | tee -a log.uts-mpi.00002
+./uts-mpi -d 14 -procs 1     2>&1 | tee -a log.uts-mpi.00001

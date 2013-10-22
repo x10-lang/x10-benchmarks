@@ -1,0 +1,9 @@
+./stream-mpi -procs 256   2>&1 | tee -a log.stream-mpi.00256
+./stream-mpi -procs 128   2>&1 | tee -a log.stream-mpi.00128
+./stream-mpi -procs 64    2>&1 | tee -a log.stream-mpi.00064
+./stream-mpi -procs 32    2>&1 | tee -a log.stream-mpi.00032
+./stream-mpi -procs 16    2>&1 | tee -a log.stream-mpi.00016
+./stream-mpi -procs 8     2>&1 | tee -a log.stream-mpi.00008
+./stream-mpi -procs 4     2>&1 | tee -a log.stream-mpi.00004
+./stream-mpi -procs 2     2>&1 | tee -a log.stream-mpi.00002
+./stream-mpi -procs 1     2>&1 | tee -a log.stream-mpi.00001

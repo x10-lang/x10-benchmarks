@@ -1,0 +1,12 @@
+./lu-mpi   17280 360   1   1 20 -procs 1     2>&1 | tee -a log.lu-mpi.00001
+
+./lu-mpi   97920 360   8   4 20 -procs 32    2>&1 | tee -a log.lu-mpi.00032
+
+./lu-mpi  195840 360  16   8 20 -procs 128   2>&1 | tee -a log.lu-mpi.00128
+./lu-mpi   48960 360   4   2 20 -procs 8     2>&1 | tee -a log.lu-mpi.00008
+./lu-mpi   24480 360   2   1 20 -procs 2     2>&1 | tee -a log.lu-mpi.00002
+
+./lu-mpi  276480 360  16  16 20 -procs 256   2>&1 | tee -a log.lu-mpi.00256
+./lu-mpi  138240 360   8   8 20 -procs 64    2>&1 | tee -a log.lu-mpi.00064
+./lu-mpi   69120 360   4   4 20 -procs 16    2>&1 | tee -a log.lu-mpi.00016
+./lu-mpi   34560 360   2   2 20 -procs 4     2>&1 | tee -a log.lu-mpi.00004
