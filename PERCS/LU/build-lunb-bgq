@@ -1,0 +1,19 @@
+#!/bin/bash
+
+export ESSLPATH=/soft/libraries/essl/current
+export XLFPATH=/soft/compilers/ibmcmp-aug2013
+
+export X10RTTRANSPORT=mpi
+
+$X10_ROOT/x10.dist/bin/x10c++ -x10rt $X10RTTRANSPORT -O -NO_CHECKS -d tmp -cxx-prearg -I.. -report postcompile=5 \
+  -cxx-prearg -I$ESSLPATH/include \
+  -cxx-postarg -L$ESSLPATH/lib64 \
+  -cxx-postarg -lesslbg \
+  -cxx-postarg -L$XLFPATH/xlf/bg/14.1/lib64 \
+  -cxx-postarg -lxlopt \
+  -cxx-postarg -lxlf90_r \
+  -cxx-postarg -lxlfmath \
+  -cxx-postarg -lxl \
+  -cxx-postarg -lrt \
+  LUNB.x10 \
+  -o lunb.xlc.$X10RTTRANSPORT
