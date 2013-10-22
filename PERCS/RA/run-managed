@@ -6,6 +6,8 @@ X10FLAGS="-ms$HEAP -mx$HEAP"
 #FULLRUN=true
 
 M=28
+#U=1
+U=0.25
 
 
 if [ -z "$FULLRUN" ]; then
@@ -17,9 +19,9 @@ M=18
 for i in 0 1
 do
 p=$((2**$i))
-command="x10 $X10FLAGS $X10RTTRANSPORT -np $p -cp ra.jar RandomAccess -m $M -u 1"
+command="x10 $X10FLAGS $X10RTTRANSPORT -np $p -cp ra.jar RandomAccess -m $M -u $U"
 [ -n "$DRYRUN" ] && echo "$command"
-[ -z "$DRYRUN" ] && $command 2>&1 | tee -a log.ra.managed.m$M.$(printf "%05d" $p)
+[ -z "$DRYRUN" ] && $command 2>&1 | tee -a log.ra.managed.m$M.u$U.$(printf "%05d" $p)
 done
 
 exit 0
@@ -32,7 +34,7 @@ fi
 for i in $(seq 15 -1 0)
 do
 p=$((2**$i))
-command="x10 $X10FLAGS $X10RTTRANSPORT -np $p -cp ra.jar RandomAccess -m $M -u 1"
+command="x10 $X10FLAGS $X10RTTRANSPORT -np $p -cp ra.jar RandomAccess -m $M -u $U"
 [ -n "$DRYRUN" ] && echo "$command"
-[ -z "$DRYRUN" ] && $command 2>&1 | tee -a log.ra.managed.m$M.$(printf "%05d" $p)
+[ -z "$DRYRUN" ] && $command 2>&1 | tee -a log.ra.managed.m$M.u$U.$(printf "%05d" $p)
 done
