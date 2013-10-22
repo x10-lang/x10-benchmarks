@@ -1,1 +1,3 @@
-x10c -O -NO_CHECKS RandomAccess.x10 -o ra.jar
+# workaround for XTENLANG-3300
+#x10c -O -NO_CHECKS RandomAccess.x10 -o ra.jar
+x10c -NO_CHECKS RandomAccess.x10 -o ra.jar
