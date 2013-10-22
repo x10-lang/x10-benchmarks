@@ -56,6 +56,21 @@ struct MyTeam {
         }
         state.set(1);
     }
+
+    def halfBarrier(me:Long) {
+        val index = this.index;
+        val master = this.master(index);
+        val count = this.count(index);
+        val state = this.state(index);
+        val cl1 = index == 0 ? cl10 : cl11;
+        val cl2 = index == 0 ? cl20 : cl21;
+        if(here.id == me) {
+            for (var I:Long = 0; I<count; ++I) if (I+master != me) Runtime.x10rtSendMessage(I+master, cl1, null);
+        } else {
+            while(state.get() != 0) Runtime.probe();
+            state.set(1);
+        }
+    }
 }
 
 @NativeCPPInclude("essl_natives.h")
@@ -185,6 +200,7 @@ class LUNB {
         if (!A_ext_panel_j.empty()) {
           val LUColStart:Int = J * B;
           val nb = B/bk;
+          val v = J%px+J%py*px;
           for (var K:Int=0n; K<nb; K++) {
             val min = K*bk;
             val max = min + bk;
@@ -216,7 +232,7 @@ class LUNB {
                 timer.stop(6);
                 timer.start(7);
                 timer.start(11);
-                myCol.barrier();
+                myCol.halfBarrier(v);
                 col.bcast(Place.place(J%px), rowForBroadcast, 0, rowForBroadcast, 0, rowForBroadcast.size);
                 timer.stop(11);
                 timer.stop(7);
