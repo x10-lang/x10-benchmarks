@@ -47,19 +47,33 @@ public class UTSTaskBag[UTSTreeNode] implements TaskBag[UTSTreeNode]{
 		fragment.pushWA(sentoutTree);
 		
 		return new UTSTaskBag[UTSTreeNode](sentoutTree);
-	
+		
 	}
 	
+	// original code
+	// public def merge(var tbb:TaskBag[UTSTreeNode]):void {
+	// 	    val tb:UTSTaskBag[UTSTreeNode] = tbb as UTSTaskBag[UTSTreeNode]; // Question: Wei is there a better way to do this?
+	//         val tbqueue:UTSTree = tb.queue;
+	// 		val h = tbqueue.hash.size; // incoming taskbag size
+	// 		val q = queue.size; // my own size
+	// 		while (h + q > queue.hash.size) queue.grow(); // if more than i can accept once, i grow
+	// 		Rail.copy(tbqueue.hash, 0, queue.hash, q, h); // src srcidx, dest, destidx, #
+	// 		Rail.copy(tbqueue.lower, 0, queue.lower, q, h);
+	// 		Rail.copy(tbqueue.upper, 0, queue.upper, q, h);
+	// 		queue.size += h;
+	// 	
+	// }
+	
 	public def merge(var tbb:TaskBag[UTSTreeNode]):void {
-		    val tb:UTSTaskBag[UTSTreeNode] = tbb as UTSTaskBag[UTSTreeNode]; // Question: Wei is there a better way to do this?
-	        val tbqueue:UTSTree = tb.queue;
-			val h = tbqueue.hash.size; // incoming taskbag size
-			val q = queue.size; // my own size
-			while (h + q > queue.hash.size) queue.grow(); // if more than i can accept once, i grow
-			Rail.copy(tbqueue.hash, 0, queue.hash, q, h); // src srcidx, dest, destidx, #
-			Rail.copy(tbqueue.lower, 0, queue.lower, q, h);
-			Rail.copy(tbqueue.upper, 0, queue.upper, q, h);
-			queue.size += h;
+		val tb:UTSTaskBag[UTSTreeNode] = tbb as UTSTaskBag[UTSTreeNode]; // Question: Wei is there a better way to do this?
+		val tbqueue:UTSTree = tb.queue;
+		val h = tbqueue.size; // incoming taskbag size BUG, originally it was tbqueue.hash.size
+		val q = queue.size; // my own size
+		while (h + q > queue.hash.size) queue.grow(); // if more than i can accept once, i grow
+		Rail.copy(tbqueue.hash, 0, queue.hash, q, h); // src srcidx, dest, destidx, #
+		Rail.copy(tbqueue.lower, 0, queue.lower, q, h);
+		Rail.copy(tbqueue.upper, 0, queue.upper, q, h);
+		queue.size += h;
 		
 	}
 	
