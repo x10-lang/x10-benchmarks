@@ -52,6 +52,7 @@ public class RandomAccess {
 
     static def runBenchmark(dr:DistRail, logLocalTableSize:Long, numUpdates:Long) {
         dr.pg.broadcastFlat(()=>{
+          finish {
             val numLocalUpdates = numUpdates / Place.MAX_PLACES;
             var ran:Long = HPCC_starts(here.id*numLocalUpdates);
             val mask1 = (1<<logLocalTableSize)-1;
@@ -63,7 +64,8 @@ public class RandomAccess {
                 dr.xor(placeId, index, update);
                 ran = (ran << 1) ^ (ran < 0 ? POLY : 0);
             }
-	    GlobalRail.flushRemoteOps();
+            GlobalRail.flushRemoteOps();
+          }
         });
     }
 
