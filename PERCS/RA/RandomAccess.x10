@@ -89,7 +89,7 @@ public class RandomAccess {
         }
 
         val logLocalTableSize = opts("-m", 12);
-        val updates = opts("-u", 4);
+        val updates = opts("-u", 4d);
 	val dumpTable = opts("-d");
 	val largePages = opts("-l");
 	val congruent = opts("-c");
@@ -103,7 +103,7 @@ public class RandomAccess {
         // calculate the size of update array
         val localTableSize = 1<<logLocalTableSize;
         val tableSize = localTableSize * Place.MAX_PLACES;
-        val numUpdates = updates * tableSize;
+        val numUpdates = (updates * tableSize) as Long;
 
         // create distributed rail 
 	val dr = new DistRail(PlaceGroup.WORLD, localTableSize, congruent, largePages, (i:long)=>i);
