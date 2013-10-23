@@ -1,0 +1,19 @@
+export ENV_ARGS='GC_MARKERS=1:X10_STATIC_THREADS=1:X10_NTHREADS=1:X10RT_EMULATE_REMOTE_OP=1'
+
+export PROG=ra.xlc.pami
+
+qsub --env $ENV_ARGS -t 15 -n 1 --mode c1 -O $PROG.emu.00001 $PROG -m 25 -u 1 
+qsub --env $ENV_ARGS -t 15 -n 1 --mode c2 -O $PROG.emu.00002 $PROG -m 25 -u 1
+qsub --env $ENV_ARGS -t 15 -n 1 --mode c4 -O $PROG.emu.00004 $PROG -m 25 -u 1
+qsub --env $ENV_ARGS -t 15 -n 1 --mode c8 -O $PROG.emu.00008 $PROG -m 25 -u 1
+qsub --env $ENV_ARGS -t 15 -n 1 --mode c16 -O $PROG.emu.00016 $PROG -m 25 -u 1
+qsub --env $ENV_ARGS -t 20 -n 2 --mode c16 -O $PROG.emu.00032 $PROG -m 25 -u 1
+qsub --env $ENV_ARGS -t 20 -n 4 --mode c16 -O $PROG.emu.00064 $PROG -m 25 -u 1
+qsub --env $ENV_ARGS -t 20 -n 8 --mode c16 -O $PROG.emu.00128 $PROG -m 25 -u 1
+qsub --env $ENV_ARGS -t 20 -n 16 --mode c16 -O $PROG.emu.00256 $PROG -m 25 -u 1
+qsub --env $ENV_ARGS -t 30 -n 32 --mode c16 -O $PROG.emu.00512 $PROG -m 25 -u 1
+qsub --env $ENV_ARGS -t 30 -n 64 --mode c16 -O $PROG.emu.01024 $PROG -m 25 -u 1
+qsub --env $ENV_ARGS -t 30 -n 128 --mode c16 -O $PROG.emu.02048 $PROG -m 25 -u 1
+qsub --env $ENV_ARGS -t 30 -n 256 --mode c16 -O $PROG.emu.04096 $PROG -m 25 -u 1
+qsub --env $ENV_ARGS -t 30 -n 512 --mode c16 -O $PROG.emu.08192 $PROG -m 25 -u 1
+qsub --env $ENV_ARGS -t 30 -n 1024 --mode c16 -O $PROG.emu.16384 $PROG -m 25 -u 1
