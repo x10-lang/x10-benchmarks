@@ -1,1 +1,1 @@
-x10c++ $X10RTTRANSPORT -O -NO_CHECKS -STATIC_CHECKS RandomAccess.x10 -o ra
+x10c++ $X10RTTRANSPORT -report postcompile=5 -O -NO_CHECKS -STATIC_CHECKS RandomAccess.x10 -o ra
