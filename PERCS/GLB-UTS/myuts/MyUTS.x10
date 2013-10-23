@@ -65,14 +65,18 @@ public class MyUTS extends GlobalJobRunner[UTSTreeNode, Long]{
 				                                                        "   z=" + z);
 		
 		val myuts: MyUTS = new MyUTS();
+		// uncomment it to get it work
 		myuts.setResultReducer(new UTSResultReducible());
 		var time:Long = System.nanoTime();
 		result:Long = myuts.main(()=>new LocalJobRunner[UTSTreeNode, Long](new UTSTaskFrame(b,r,d), n, w, l, z, m));
 		time = System.nanoTime() - time;
-		Console.OUT.println("result: "+ result);
+		Console.OUT.println("Time spent: " + (time/1E9));
+		Console.OUT.println("Result: "+ result);
 		Console.OUT.println("Throughput: "+result/(time/1E3)+ " M nodes/s");
-		//val st = PlaceLocalHandle.makeFlat[LocalJobRunner[UTSTreeNode, Long]](PlaceGroup.WORLD, ()=>new LocalJobRunner[UTSTreeNode, Long](new UTSTaskFrame(b,r,d), n, w, l, z, m));
+		// end of uncomment it to get it work
 		
+		//myuts.dryRun(()=>new LocalJobRunner[UTSTreeNode, Long](new UTSTaskFrame(b,r,d), n, w, l, z, m));
+	
 		
 	}
 	

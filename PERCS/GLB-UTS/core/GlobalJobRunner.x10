@@ -23,14 +23,15 @@ public abstract class GlobalJobRunner[T,Z] {
 	public def main(init:()=>LocalJobRunner[T,Z]):Z{
 		val P = Place.MAX_PLACES;
 		val st = PlaceLocalHandle.makeFlat[LocalJobRunner[T, Z]](PlaceGroup.WORLD, init);
+		
 		Console.OUT.println("Starting...");
-		//var time:Long = System.nanoTime();
+	
 		st().main(st); // Wei: the main computation is started from here and ended after it is done
-		//time = System.nanoTime() - time;
-		//Console.OUT.println("Wei's studio.");
-		results: Rail[Z] = new Rail[Z](P, (i:Long)=>at (Place(i)) st().getTF().getResult());
+	
+		//results: Rail[Z] = new Rail[Z](P, (i:Long)=>at (Place(i)) st().getTF().getResult());
+		results: Rail[Z] = collectResults(st);
 		result:Z = getFinalResult(results);
-		//Console.OUT.println("Finished.");
+		
 		return result;
 		
 		// note: we will need to do more more work on reduction once we have it running on large machines
@@ -54,11 +55,44 @@ public abstract class GlobalJobRunner[T,Z] {
 		
 	}
 	
+	/**
+	 * collect all the results
+	 */
+	public def collectResults(st:PlaceLocalHandle[LocalJobRunner[T, Z]]):Rail[Z]
+	{
+		val P = Place.MAX_PLACES;
+		if (P >= 1024) {
+			collectedResults:Rail[Z] = new Rail[Z](P/32, (i:Long)=>at (Place(i*32)) {
+				val h = Runtime.hereLong();
+				val n = min(32, P-h);
+				val localResults:Rail[Z] = new Rail[Z](n, (i:Long)=>at (Place(h+i)) st().getTF().getResult());
+				return getFinalResult(localResults); // reduce loal results 
+				
+			});
+		   return collectedResults;
+		} else {
+			//logs = new Rail[Logger](P, (i:Long)=>at (Place(i)) st().logger.get(verbose));
+			results: Rail[Z] = new Rail[Z](P, (i:Long)=>at (Place(i)) st().getTF().getResult());
+		    return results;
+		}
+	}
+	
+	
+	
 	public def getFinalResult(results: Rail[Z]):Z{
 		var r : Z = this.getResultReducer().zero();		
 		for(p in results){
 			r = this.getResultReducer()(r,p);
 		}
 		return r;
+	}
+	
+	// added on Oct 22, for debugging purpose
+	public def dryRun(init:()=>LocalJobRunner[T,Z]):void{
+		val P = Place.MAX_PLACES;
+		val st = PlaceLocalHandle.makeFlat[LocalJobRunner[T, Z]](PlaceGroup.WORLD, init);
+		for(var ii:Long=0L; ii < P; ii++){
+			at(Place(ii)) st().printLifelines();
+		}
 	}
 }

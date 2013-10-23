@@ -264,5 +264,26 @@ public class LocalJobRunner[T,Z] {
 	}
 	
 	
+	// added by Wei Oct 22
+	public def printLifelines():void{
+		Console.OUT.print(Runtime.hereLong() + ":");
+		for(li in this.lifelines){
+			Console.OUT.print(li+" ");
+		}
+		Console.OUT.print(" lifeline activatd: ");
+		for(lla in lifelinesActivated){
+			Console.OUT.print(lla+" ");
+		}
+		Console.OUT.print(" lifelinethieves: ");
+		for (llt in lifelineThieves.data){
+			Console.OUT.print(llt+" ");
+		}
+		Console.OUT.print(" thieves: ");
+		for (t in thieves.data){
+			Console.OUT.print(t+" ");
+		}
+		
+		Console.OUT.println();
+	}
 
 }
