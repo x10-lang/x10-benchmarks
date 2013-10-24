@@ -47,7 +47,6 @@ class FT2DRep(M:Long, verify:Boolean) {
     native static def create_plan(SQRTN:Int, direction:Int, flags:Int):Long;
     
     static class ComplexArray_2(M:Long, N:Long) {
-    	val dom=Region.make(0..(M-1),(0..(N-1)));
     	//need to be var because we are using the red black idiom
     	var A0:Rail[Double]{self!=null};
     	def this(A0:Rail[Double]{self!=null}, M:Long, N:Long) {
@@ -68,11 +67,10 @@ class FT2DRep(M:Long, verify:Boolean) {
     val localSize=SQRTN*nRows*2n;
     val allocator=Runtime.MemoryAllocator.requestAllocator(true, false);
     
-    val A0 =new Rail[Double](localSize,allocator); 
-    val B0 =new Rail[Double](localSize,allocator);
+    val A0=new Rail[Double](localSize,allocator); 
+    val B0=new Rail[Double](localSize,allocator);
     val A=new ComplexArray_2(A0,nRowsL,SQRTNL);
     val B=new ComplexArray_2(B0,SQRTNL,nRowsL); // transposed shape
-    val O=new Array_2[Complex](nRowsL,SQRTNL); // original data, for verification
     val fftwPlan=create_plan(SQRTN,-1n,0n);
     val fftwInversePlan=create_plan(SQRTN,1n,0n);
     
@@ -84,8 +82,9 @@ class FT2DRep(M:Long, verify:Boolean) {
     				" localSize=" + localSize + " MAX_PLACES=" + Place.MAX_PLACES +
     				              " Mem=" + mbytes + " mem/MAX_PLACES=" + mbytes/Place.MAX_PLACES);
 		val r = new Random2(I);
-	    for ([i,j] in A.dom)
-	       O(i,j)=A(i,j)=Complex(r.next()-0.5,r.next()-0.5);
+		for (i in 0..(A.M-1))
+			for (j in 0..(A.N-1)) 
+				A(i,j)=Complex(r.next()-0.5,r.next()-0.5);
 	
     }
    
@@ -95,22 +94,24 @@ class FT2DRep(M:Long, verify:Boolean) {
 
     @Inline min(i:Long, j:Long):Long=i<j?i:j;
     @Inline global(i:Long):Long = (I*nRows+i);
-    @Inline def root(sign:Int, N:Long, u:Long):Complex = {
-    	val W_N=2.0*Math.PI/N,UW=u*W_N;
-    	Complex(Math.cos(UW), -sign*Math.sin(UW))
-    }
-    
     def bytwiddle(sign:Int) {
-        for ([i,j] in A.dom) 
-	    A(i,j) *= root(sign, N, global(i)*j);
+    	val W_N=2.0*Math.PI/N;
+    	for (i in 0..(A.M-1))
+    		for (j in 0..(A.N-1)) {
+    			val UW=global(i)*j*W_N;
+    			A(i,j) *= Complex(Math.cos(UW), -sign*Math.sin(UW));
+    		}
     }
 
     def check() {
-        val threshold = 1.0e-15*Math.log(N as Double)/Math.log(2.0)*16;
-        for ([i,j] in A.dom) {
-            if ((A(i,j)-O(i,j)).abs() > threshold) 
-            	Console.ERR.println("Error at ("+i+","+j+") "+A(i,j)+", expected "+O(i,j));
-        }
+    	val threshold = 1.0e-15*Math.log(N as Double)/Math.log(2.0)*16;
+    	val random = new Random2(I);
+    	for (i in 0..(A.M-1))
+    		for (j in 0..(A.N-1)) {
+    			val c =Complex(random.next()-0.5,random.next()-0.5);
+            if ((A(i,j)-c).abs() > threshold) 
+            	Console.ERR.println("Error at ("+i+","+j+") "+A(i,j)+", expected "+c);
+    		}
     }
     def warmup() {
         val chunkSize = 2 * nRows * nRows; 
