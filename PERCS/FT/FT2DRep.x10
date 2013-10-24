@@ -28,12 +28,16 @@ import x10.regionarray.Region;
  * method. See e.g. 
  * <a url="http://courses.engr.illinois.edu/cs554/notes/13_fft_8up.pdf">FFT lecture</a>.
  * 
- * <p>The input is represented as a 2D SQRTN * SQRTN array of Complex,
- * row partitioned across P places. Local FFT computations are performed using
- * FFTW. 
+ * <p>The input is represented as a 2D SQRTN * (SQRTN) array of Complex.
+ * The array is row partitioned across P places. To perform an FFT, each place transposes
+ * its data, performs an all to all, scatters the data to the correct indices (thus 
+ * completing a global transpose), then performs a local FFT operation (using FFTW), 
+ * then a global transpose, then a bytwiddle and local FFT, completing with a global transpose.
+ * <p> Validation is done by performing a forward FFT, then a reverse FFT. These should compute
+ * the identity transformation. (Reverse FFT is the same as a forward fft with the sign changed
+ * for the bytwiddle operation.)
  */
 class FT2DRep(M:Long, verify:Boolean) {
-	// TODO Fix native code so it takes a Rail[Complex]
     @Native("c++", "execute_plan(#1, &(#2)->raw[0], &(#3)->raw[0], #4, #5, #6)")
     @Native("java", "FTNatives.execute_plan(#plan, #A.getDoubleArray(), #B.getDoubleArray(), #SQRTN, #i0, #i1)")
     native static def execute_plan(plan:Long, A:Rail[Double], B:Rail[Double], SQRTN:Int, i0:Int, i1:Int):void;
@@ -41,21 +45,34 @@ class FT2DRep(M:Long, verify:Boolean) {
     @Native("c++", "create_plan(#1, #2, #3)")
     @Native("java", "FTNatives.create_plan(#SQRTN, #direction, #flags)")
     native static def create_plan(SQRTN:Int, direction:Int, flags:Int):Long;
-
+    
     val SQRTNL=1<<M,SQRTN=SQRTNL as Int,N=SQRTNL*SQRTNL;
     val I=Runtime.hereInt();
     val nRowsL=SQRTN/Place.MAX_PLACES, nRows=nRowsL as Int, nCols=SQRTN;
     val localSize=SQRTN*nRows*2n;
     val allocator=Runtime.MemoryAllocator.requestAllocator(true, false);
     
-    //need to be var because we are using the red black idiom
-    var A0:Rail[Double]{self!=null}=new Rail[Double](localSize,allocator);
-    var B0:Rail[Double]{self!=null}=new Rail[Double](localSize,allocator);
-    
-    val A=Array_2.makeView(A0,nRowsL,SQRTNL*2);
-    val B=Array_2.makeView(B0,SQRTNL*2,nRowsL); // transposed shape
-    val O=new Array_2[Double](nRows,SQRTN);
-    val dom=Region.make(0n..(nRows-1n),(0n..(nCols-1n)));
+    static class ComplexArray_2(M:Long, N:Long) {
+        val dom=Region.make(0..(M-1),(0..(N-1)));
+         //need to be var because we are using the red black idiom
+        var A0:Rail[Double]{self!=null};
+        def this(A0:Rail[Double]{self!=null}, M:Long, N:Long) {
+	    property(M,N);
+            this.A0=A0;
+	}
+        @Inline def index(i:Long,j:Long)=i*N*2+2*j;
+	@Inline public operator this(i:Long, j:Long):Complex=Complex(A0(index(i,j)),A0(index(i,j)+1));
+    	@Inline public operator this(i:Long, j:Long)=(v:Complex):Complex ={
+	    A0(index(i,j)) = v.re;
+	    A0(index(i,j)+1)=v.im;
+    		v
+    	}
+    }
+    val A0 =new Rail[Double](localSize,allocator); 
+    val B0 =new Rail[Double](localSize,allocator);
+    val A=new ComplexArray_2(A0,nRowsL,SQRTNL);
+    val B=new ComplexArray_2(B0,SQRTNL,nRowsL); // transposed shape
+    val O=new Array_2[Complex](nRowsL,SQRTNL); // original data, for verification
     val fftwPlan=create_plan(SQRTN,-1n,0n);
     val fftwInversePlan=create_plan(SQRTN,1n,0n);
     
@@ -66,83 +83,89 @@ class FT2DRep(M:Long, verify:Boolean) {
     		Console.OUT.println("M=" + M + " SQRTN=" + SQRTN + " N=" + N + " nRows=" + nRows +
     				" localSize=" + localSize + " MAX_PLACES=" + Place.MAX_PLACES +
     				              " Mem=" + mbytes + " mem/MAX_PLACES=" + mbytes/Place.MAX_PLACES);
-    	val r = new Random2(I);
-    	for ([i,j] in dom)
-    		O(i,j)=A(i,j)=r.next()-0.5;
+		val r = new Random2(I);
+	for ([i,j] in A.dom)
+	    O(i,j)=A(i,j)=Complex(r.next()-0.5,r.next()-0.5);
+	
     }
    
     def rowFFTS(fwd:Boolean) {
-        execute_plan(fwd?fftwPlan:fftwInversePlan, A0, B0, SQRTN, 0n, nRows);
+	        execute_plan(fwd?fftwPlan:fftwInversePlan, A.A0, B.A0, SQRTN, 0n, nRows);
     }
 
     @Inline min(i:Long, j:Long):Long=i<j?i:j;
-    @Inline global(i:Long,j:Long):Long = (I*nRows+i)*j;
+    @Inline global(i:Long):Long = (I*nRows+i);
     @Inline def root(sign:Int, N:Long, u:Long):Complex = {
     	val W_N=2.0*Math.PI/N,UW=u*W_N;
-    	Complex(Math.cos(UW), sign*Math.sin(UW))
+    	Complex(Math.cos(UW), -sign*Math.sin(UW))
     }
-    @Inline def get(A:Array_2[Double], i:Long,j:Long):Complex=Complex(A(i,2*j),A(i,2*j+1));
-    @Inline def set(A:Array_2[Double], i:Long,j:Long,v:Complex) {
-    	A(i,2*j) = v.re;
-    	A(i,2*j+1)=v.im;
-    }
+    
     def bytwiddle(sign:Int) {
-        for ([i,j] in dom) 
-        	set(A,i,j, get(A,i,j)*root(sign, N, (global(i,j))));
+        for ([i,j] in A.dom) 
+	    A(i,j) *= root(sign, N, global(i)*j);
     }
 
     def check() {
         val threshold = 1.0e-15*Math.log(N as Double)/Math.log(2.0)*16;
-        for ([i,j] in dom) {
-            if ((get(A,i,j)-get(O,i,j)).abs() > threshold) 
+        for ([i,j] in A.dom) {
+            if ((A(i,j)-O(i,j)).abs() > threshold) 
             	Console.ERR.println("Error at ("+i+","+j+") "+A(i,j)+", expected "+O(i,j));
         }
     }
-
     def warmup() {
         val chunkSize = 2 * nRows * nRows; 
         var t:Long = -System.nanoTime();
-        Team.WORLD.alltoall(A0, 0, B0, 0, chunkSize);
+        Team.WORLD.alltoall(A.A0, 0, B.A0, 0, chunkSize);
         t += System.nanoTime();
         if (I == 0n) Console.OUT.println("1st alltoall: " + format(t) + " s");
         t = -System.nanoTime();
-        Team.WORLD.alltoall(A0, 0, B0, 0, chunkSize);
+        Team.WORLD.alltoall(A.A0, 0, B.A0, 0, chunkSize);
         t += System.nanoTime();
         if (I == 0n) Console.OUT.println("2nd alltoall: " + format(t) + " s");
     }
+
 /*
      * TODO: determine vocabulary of annotations on loops that would permit
-     * a declarative specification of this particular loop nest, specified on
-     * for ([i,j] in A.indices()) B(j,i)=A(i,j)
+     * a declarative specification of this particular loop nest.
+     * Tiled version of loop: for ([i,j] in (0..(nRows-1)*(0..(nCols-1)))) B(j,i)=A(i,j)
      */
     def transpose() {
-        for (p in 0n..(Place.MAX_PLACES as Int-1n)) 
-        	for (var ii:Int=0n; ii<nRows; ii+=16n) 
-        		for (var jj:Int=p*nRows; jj<(p+1)*nRows; jj+=16n) 
-        			for (i in ii..(min(ii+16n,nRows)-1n)) 
-        				for (j in jj..(min(jj+16n,SQRTN)-1n)) 
+        val n1 = Place.MAX_PLACES as Int,n2=nRows as Int;
+        for (p in 0n..(n1-1n)) 
+        	for (var ii:Int=0n; ii<n2; ii+=16n) 
+        		for (var jj:Int=p*n2; jj<(p+1)*n2; jj+=16n) 
+        			for (i in ii..(min(ii+16n,n2)-1n)) 
+        				for (j in jj..(min(jj+16n,nCols)-1n)) 
         					B(j,i) = A(i,j);
     }
 
     def alltoall() {
-        Team.WORLD.alltoall(B0,0,A0,0,1*nRows*nRows);
-        val C = B0;
-        B0 = A0;
-        A0 = C;
+        Team.WORLD.alltoall(B.A0,0,A.A0,0,2*nRows*nRows);
+        val C = B.A0;
+        B.A0 = A.A0;
+        A.A0 = C;
     }
 
+    /**
+      Scatter elements to the right positions. 
+      After a local transpose and an all to all, each location has nPlaces
+      arrays, each of size nRows x nRows in row-major order. These need to be collected into
+      a single nRows x (nRows*nPlaces) array in row-major order.
+     
+      Tiled version of loop:       
+        for ([i,p,j] in (0..(n2-1))*(0..(n1-1))*(0..(n2-1)) A(i,n2*p+j)=B(n2*p+i,j);
+     */
     def scatter() {
         val n1 = Place.MAX_PLACES as Int,n2=nRows;
-        for (k in 0..(nRows-1)) 
+        for (i in 0..(n2-1)) 
         	for (var ii:Int=0n; ii<n1; ii += 16n) 
         		for (var jj:Int=0n; jj<n2; jj += 16n) 
-        			for (i in ii..(min(ii+16n,n1)-1)) 
+        			for (p in ii..(min(ii+16n,n1)-1)) 
         				for (j in jj..(min(jj+16n,n2)-1)) 
-        					A(k*n1+i, j)=B(i*n2+k,j);
+					    A(i,n2*p+j)=B(n2*p+i,j);
     }
 
     static def format(t:Long) = (t as Double) * 1.0e-9;
-
     def globalTranspose(i:Long,timers:Rail[Long]{self!=null}) {
     	timers(i)=System.nanoTime(); transpose();
     	timers(i+1)=System.nanoTime(); alltoall();
@@ -157,10 +180,13 @@ class FT2DRep(M:Long, verify:Boolean) {
     def compute(fwd:Boolean) {
         val timers = new Rail[Long](13);
         globalTranspose(0,timers);
+
         timers(3)=System.nanoTime(); rowFFTS(fwd);
         globalTranspose(4,timers);
+
         timers(7)=System.nanoTime(); bytwiddle(fwd?1n:-1n);
         timers(8)=System.nanoTime(); rowFFTS(fwd);
+
         globalTranspose(9,timers);// transpose back to unscrambled order
         timers(12)=System.nanoTime(); 
         // Output
@@ -191,8 +217,8 @@ class FT2DRep(M:Long, verify:Boolean) {
         secs += compute(false);
         Team.WORLD.barrier();
         if (I == 0n) {// Output
-        	Console.OUT.println("Reverse FFT complete");
-        	Console.OUT.println("Now combining forward and inverse FTT measurements");
+	    Console.OUT.println("Reverse FFT complete");
+	    Console.OUT.println("Now combining forward and inverse FTT measurements");
             val Gigaflops = 2.0e-9*N*5*Math.log(N as Double)/Math.log(2.0)/secs;
             Console.OUT.println("execution time=" + secs + " secs"+" Gigaflops="+Gigaflops);
         }
@@ -211,8 +237,7 @@ class FT2DRep(M:Long, verify:Boolean) {
             Console.ERR.println("SQRTN must be divisible by Place.MAX_PLACES!");
             return;
         }
-        val plh = PlaceLocalHandle.makeFlat[FT2DRep](PlaceGroup.WORLD, 
-        		()=>new FT2DRep(M, verify));
+        val plh = PlaceLocalHandle.makeFlat[FT2DRep](PlaceGroup.WORLD, ()=>new FT2DRep(M, verify));
         PlaceGroup.WORLD.broadcastFlat(()=>{plh().run();});
     }
 }
