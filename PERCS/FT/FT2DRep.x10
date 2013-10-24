@@ -46,28 +46,28 @@ class FT2DRep(M:Long, verify:Boolean) {
     @Native("java", "FTNatives.create_plan(#SQRTN, #direction, #flags)")
     native static def create_plan(SQRTN:Int, direction:Int, flags:Int):Long;
     
+    static class ComplexArray_2(M:Long, N:Long) {
+    	val dom=Region.make(0..(M-1),(0..(N-1)));
+    	//need to be var because we are using the red black idiom
+    	var A0:Rail[Double]{self!=null};
+    	def this(A0:Rail[Double]{self!=null}, M:Long, N:Long) {
+    		property(M,N);
+    		this.A0=A0;
+    	}
+    	@Inline def index(i:Long,j:Long)=i*N*2+2*j;
+    	@Inline public operator this(i:Long, j:Long):Complex=Complex(A0(index(i,j)),A0(index(i,j)+1));
+    	@Inline public operator this(i:Long, j:Long)=(v:Complex):Complex ={
+    		A0(index(i,j)) = v.re;
+    		A0(index(i,j)+1)=v.im;
+    		v
+    	}
+    }
     val SQRTNL=1<<M,SQRTN=SQRTNL as Int,N=SQRTNL*SQRTNL;
     val I=Runtime.hereInt();
     val nRowsL=SQRTN/Place.MAX_PLACES, nRows=nRowsL as Int, nCols=SQRTN;
     val localSize=SQRTN*nRows*2n;
     val allocator=Runtime.MemoryAllocator.requestAllocator(true, false);
     
-    static class ComplexArray_2(M:Long, N:Long) {
-        val dom=Region.make(0..(M-1),(0..(N-1)));
-         //need to be var because we are using the red black idiom
-        var A0:Rail[Double]{self!=null};
-        def this(A0:Rail[Double]{self!=null}, M:Long, N:Long) {
-	    property(M,N);
-            this.A0=A0;
-	}
-        @Inline def index(i:Long,j:Long)=i*N*2+2*j;
-	@Inline public operator this(i:Long, j:Long):Complex=Complex(A0(index(i,j)),A0(index(i,j)+1));
-    	@Inline public operator this(i:Long, j:Long)=(v:Complex):Complex ={
-	    A0(index(i,j)) = v.re;
-	    A0(index(i,j)+1)=v.im;
-    		v
-    	}
-    }
     val A0 =new Rail[Double](localSize,allocator); 
     val B0 =new Rail[Double](localSize,allocator);
     val A=new ComplexArray_2(A0,nRowsL,SQRTNL);
@@ -84,13 +84,13 @@ class FT2DRep(M:Long, verify:Boolean) {
     				" localSize=" + localSize + " MAX_PLACES=" + Place.MAX_PLACES +
     				              " Mem=" + mbytes + " mem/MAX_PLACES=" + mbytes/Place.MAX_PLACES);
 		val r = new Random2(I);
-	for ([i,j] in A.dom)
-	    O(i,j)=A(i,j)=Complex(r.next()-0.5,r.next()-0.5);
+	    for ([i,j] in A.dom)
+	       O(i,j)=A(i,j)=Complex(r.next()-0.5,r.next()-0.5);
 	
     }
    
     def rowFFTS(fwd:Boolean) {
-	        execute_plan(fwd?fftwPlan:fftwInversePlan, A.A0, B.A0, SQRTN, 0n, nRows);
+	   execute_plan(fwd?fftwPlan:fftwInversePlan, A.A0, B.A0, SQRTN, 0n, nRows);
     }
 
     @Inline min(i:Long, j:Long):Long=i<j?i:j;
@@ -124,7 +124,7 @@ class FT2DRep(M:Long, verify:Boolean) {
         if (I == 0n) Console.OUT.println("2nd alltoall: " + format(t) + " s");
     }
 
-/*
+    s/*
      * TODO: determine vocabulary of annotations on loops that would permit
      * a declarative specification of this particular loop nest.
      * Tiled version of loop: for ([i,j] in (0..(nRows-1)*(0..(nCols-1)))) B(j,i)=A(i,j)
