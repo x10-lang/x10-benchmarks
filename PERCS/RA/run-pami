@@ -1,0 +1,9 @@
+./ra -m 28 -u 1 -c -l -procs 256   2>&1 | tee -a log.ra.00256
+./ra -m 28 -u 1 -c -l -procs 128   2>&1 | tee -a log.ra.00128
+./ra -m 28 -u 1 -c -l -procs 64    2>&1 | tee -a log.ra.00064
+./ra -m 28 -u 1 -c -l -procs 32    2>&1 | tee -a log.ra.00032
+./ra -m 28 -u 1 -c -l -procs 16    2>&1 | tee -a log.ra.00016
+./ra -m 28 -u 1 -c -l -procs 8     2>&1 | tee -a log.ra.00008
+./ra -m 28 -u 1 -c -l -procs 4     2>&1 | tee -a log.ra.00004
+./ra -m 28 -u 1 -c -l -procs 2     2>&1 | tee -a log.ra.00002
+./ra -m 28 -u 1 -c -l -procs 1     2>&1 | tee -a log.ra.00001
