@@ -124,7 +124,7 @@ class FT2DRep(M:Long, verify:Boolean) {
         if (I == 0n) Console.OUT.println("2nd alltoall: " + format(t) + " s");
     }
 
-    s/*
+    /*
      * TODO: determine vocabulary of annotations on loops that would permit
      * a declarative specification of this particular loop nest.
      * Tiled version of loop: for ([i,j] in (0..(nRows-1)*(0..(nCols-1)))) B(j,i)=A(i,j)
