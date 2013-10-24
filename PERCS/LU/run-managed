@@ -6,6 +6,10 @@ X10FLAGS="-ms$HEAP -mx$HEAP $X10FLAGS"
 #DRYRUN=true
 #FULLRUN=true
 
+APP=LU
+#APP=LUNB
+app=`echo $APP | tr "[A-Z]" "[a-z]"`
+
 BK=20
 
 
@@ -18,13 +22,13 @@ BK=3
 B=$((18*$BK))
 M0=$((48*$B))
 M1=$((20*$B))
-for i in 0 2
+for i in 0 1
 do
 j=$((2**$i))
 p=$(($j*$j))
-command="x10 $X10FLAGS $X10RTTRANSPORT -np $p -cp lu.jar LU $(($M0*$j)) $B $j $j $BK"
+command="x10 $X10FLAGS $X10RTTRANSPORT -np $p -cp lu.jar $APP $(($M0*$j)) $B $j $j $BK"
 [ -n "$DRYRUN" ] && echo "$command"
-[ -z "$DRYRUN" ] && $command 2>&1 | tee -a log.lu.managed.bk$BK.$(printf "%05d" $p)
+[ -z "$DRYRUN" ] && $command 2>&1 | tee -a log.$app.managed.bk$BK.$(printf "%05d" $p)
 done
 
 exit 0
@@ -41,10 +45,10 @@ for i in $(seq 7 -1 0)
 do
 j=$((2**$i))
 p=$(($j*$j))
-command="x10 $X10FLAGS $X10RTTRANSPORT -np $((2*$p)) -cp lu.jar LU $((($M0+$M1)*$j)) $B $((2*$j)) $j $BK"
+command="x10 $X10FLAGS $X10RTTRANSPORT -np $((2*$p)) -cp lu.jar $APP $((($M0+$M1)*$j)) $B $((2*$j)) $j $BK"
 [ -n "$DRYRUN" ] && echo "$command"
-[ -z "$DRYRUN" ] && $command 2>&1 | tee -a log.lu.managed.bk$BK.$(printf "%05d" $((2*$p)))
-command="x10 $X10FLAGS $X10RTTRANSPORT -np $p -cp lu.jar LU $(($M0*$j)) $B $j $j $BK"
+[ -z "$DRYRUN" ] && $command 2>&1 | tee -a log.$app.managed.bk$BK.$(printf "%05d" $((2*$p)))
+command="x10 $X10FLAGS $X10RTTRANSPORT -np $p -cp lu.jar $APP $(($M0*$j)) $B $j $j $BK"
 [ -n "$DRYRUN" ] && echo "$command"
-[ -z "$DRYRUN" ] && $command 2>&1 | tee -a log.lu.managed.bk$BK.$(printf "%05d" $p)
+[ -z "$DRYRUN" ] && $command 2>&1 | tee -a log.$app.managed.bk$BK.$(printf "%05d" $p)
 done
