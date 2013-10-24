@@ -1,0 +1,15 @@
+./ssca2-mpi -n 17 -procs 256   2>&1 | tee -a log.ssca2-mpi.n17.00256
+./ssca2-mpi -n 17 -procs 128   2>&1 | tee -a log.ssca2-mpi.n17.00128
+./ssca2-mpi -n 17 -procs 64    2>&1 | tee -a log.ssca2-mpi.n17.00064
+./ssca2-mpi -n 17 -procs 32    2>&1 | tee -a log.ssca2-mpi.n17.00032
+
+./ssca2-mpi -n 16 -procs 256   2>&1 | tee -a log.ssca2-mpi.n16.00256
+./ssca2-mpi -n 16 -procs 128   2>&1 | tee -a log.ssca2-mpi.n16.00128
+./ssca2-mpi -n 16 -procs 64    2>&1 | tee -a log.ssca2-mpi.n16.00064
+./ssca2-mpi -n 16 -procs 32    2>&1 | tee -a log.ssca2-mpi.n16.00032
+./ssca2-mpi -n 16 -procs 32    2>&1 | tee -a log.ssca2-mpi.n16.00032
+./ssca2-mpi -n 16 -procs 16    2>&1 | tee -a log.ssca2-mpi.n16.00016
+./ssca2-mpi -n 16 -procs 8     2>&1 | tee -a log.ssca2-mpi.n16.00008
+./ssca2-mpi -n 16 -procs 4     2>&1 | tee -a log.ssca2-mpi.n16.00004
+./ssca2-mpi -n 16 -procs 2     2>&1 | tee -a log.ssca2-mpi.n16.00002
+./ssca2-mpi -n 16 -procs 1     2>&1 | tee -a log.ssca2-mpi.n16.00001
