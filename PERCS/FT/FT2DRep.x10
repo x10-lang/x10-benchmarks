@@ -46,7 +46,7 @@ class FT2DRep(M:Long, verify:Boolean) {
     @Native("java", "FTNatives.create_plan(#SQRTN, #direction, #flags)")
     native static def create_plan(SQRTN:Int, direction:Int, flags:Int):Long;
     
-    static class ComplexArray_2(M:Long, N:Long) {
+    static final class ComplexArray_2(M:Long, N:Long) {
     	//need to be var because we are using the red black idiom
     	var A0:Rail[Double]{self!=null};
     	def this(A0:Rail[Double]{self!=null}, M:Long, N:Long) {
