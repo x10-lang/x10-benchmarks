@@ -37,7 +37,7 @@ import x10.regionarray.Region;
  * the identity transformation. (Reverse FFT is the same as a forward fft with the sign changed
  * for the bytwiddle operation.)
  */
-class FT2DRepNativeComplex(M:Long, verify:Boolean) {
+class FTNew(M:Long, verify:Boolean) {
     // TODO: pass through as complex** to native code
     @Native("c++", "execute_plan(#1, (x10_double*)(&(#2->raw())->raw[0]), (x10_double*)(&(#3->raw())->raw[0]), #4, #5, #6)")
     @Native("java", "FTNatives.execute_plan(#plan, #A.getDoubleArray(), #B.getDoubleArray(), #SQRTN, #i0, #i1)")
