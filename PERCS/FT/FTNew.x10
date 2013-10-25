@@ -218,7 +218,7 @@ class FTNew(M:Long, verify:Boolean) {
             Console.ERR.println("SQRTN must be divisible by Place.MAX_PLACES!");
             return;
         }
-        val plh = PlaceLocalHandle.makeFlat[FT2DRep](PlaceGroup.WORLD, ()=>new FT2DRep(M, verify));
+        val plh = PlaceLocalHandle.makeFlat[FTNew](PlaceGroup.WORLD, ()=>new FTNew(M, verify));
         PlaceGroup.WORLD.broadcastFlat(()=>{plh().run();});
     }
 }
