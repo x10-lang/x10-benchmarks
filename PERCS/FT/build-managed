@@ -1,3 +1,3 @@
-x10c -O -NO_CHECKS -o ft.jar FT.x10
+x10c -O -NO_CHECKS -o ft.jar FT.x10 FT2DRep.x10
 
 g++ -O2 -finline-functions -I$JAVA_HOME/include fft235.c wrapfftw.c zfft1d.c ft_natives.cc FTNatives.cc -shared -fPIC -o libFTNatives.so

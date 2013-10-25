@@ -6,6 +6,10 @@ X10FLAGS="-ms$HEAP -mx$HEAP $X10FLAGS"
 #DRYRUN=true
 #FULLRUN=true
 
+APP=FT
+#APP=FT2DRep
+app=`echo $APP | tr "[A-Z]" "[a-z]"`
+
 M0=13
 
 
@@ -19,9 +23,9 @@ for i in 0 1
 do
 p=$((2**i))
 M=$(($M0+($i/2)))
-command="x10 $X10FLAGS $X10RTTRANSPORT -np $p -cp ft.jar FT $M true"
+command="x10 $X10FLAGS $X10RTTRANSPORT -np $p -cp ft.jar $APP $M true"
 [ -n "$DRYRUN" ] && echo "$command"
-[ -z "$DRYRUN" ] && $command 2>&1 | tee -a log.ft.managed.$(printf "%05d" $p)
+[ -z "$DRYRUN" ] && $command 2>&1 | tee -a log.$app.managed.$(printf "%05d" $p)
 done
 
 exit 0
@@ -35,7 +39,7 @@ for i in $(seq 15 -1 0)
 do
 p=$((2**i))
 M=$(($M0+($i/2)))
-command="x10 $X10FLAGS $X10RTTRANSPORT -np $p -cp ft.jar FT $M true"
+command="x10 $X10FLAGS $X10RTTRANSPORT -np $p -cp ft.jar $APP $M true"
 [ -n "$DRYRUN" ] && echo "$command"
-[ -z "$DRYRUN" ] && $command 2>&1 | tee -a log.ft.managed.$(printf "%05d" $p)
+[ -z "$DRYRUN" ] && $command 2>&1 | tee -a log.$app.managed.$(printf "%05d" $p)
 done
