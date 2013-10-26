@@ -39,7 +39,7 @@ import x10.regionarray.Region;
  */
 class FTNew(M:Long, verify:Boolean) {
     // TODO: pass through as complex** to native code
-    @Native("c++", "execute_plan(#1, (x10_double*)(&(#2->raw())->raw[0]), (x10_double*)(&(#3->raw())->raw[0]), #4, #5, #6)")
+    @Native("c++", "execute_plan(#1, (x10_double*)(&((#2->raw())->raw[0])), (x10_double*)(&((#3->raw())->raw[0])), #4, #5, #6)")
     @Native("java", "FTNatives.execute_plan(#plan, #A.getDoubleArray(), #B.getDoubleArray(), #SQRTN, #i0, #i1)")
     native static def execute_plan(plan:Long, A:Array_2[Complex], B:Array_2[Complex], SQRTN:Int, i0:Int, i1:Int):void;
 
@@ -52,8 +52,8 @@ class FTNew(M:Long, verify:Boolean) {
     val nRowsL=SQRTN/Place.MAX_PLACES, nRows=nRowsL as Int, nCols=SQRTN;
     val localSize=SQRTN*nRows;
     
-    var A:Array_2[Complex] = new Array_2[Complex](nRowsL, SQRTNL);
-    var B:Array_2[Complex] = new Array_2[Complex](SQRTNL, nRowsL); // transposed shape
+    val A = new Array_2[Complex](nRowsL, SQRTNL);
+    val B = new Array_2[Complex](SQRTNL, nRowsL); // transposed shape
     val fftwPlan=create_plan(SQRTN,-1n,0n);
     val fftwInversePlan=create_plan(SQRTN,1n,0n);
     
@@ -122,9 +122,9 @@ class FTNew(M:Long, verify:Boolean) {
 
     def alltoall() {
         Team.WORLD.alltoall(B.raw(),0,A.raw(),0,(nRows*nRows) as Long);
-        val C = B;
-        B = A;
-        A = C;
+        val tmp = B.raw();
+        B.modifyRaw(A.raw() as Rail[Complex]{self!=null,self.size==B.size});
+        A.modifyRaw(tmp as Rail[Complex]{self!=null,self.size==B.size});
     }
 
     /**
@@ -142,7 +142,7 @@ class FTNew(M:Long, verify:Boolean) {
         	for (var ii:Int=0n; ii<n1; ii += 16n) 
         		for (var jj:Int=0n; jj<n2; jj += 16n) 
         			for (p in ii..(min(ii+16n,n1)-1)) 
-        				for (j in jj..(min(jj+16n,n2)-1)) 
+        				for (j in jj..(min(jj+16n,n2)-1))
 					    A(i,n2*p+j)=B(n2*p+i,j);
     }
 
