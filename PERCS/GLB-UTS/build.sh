@@ -1,2 +1,2 @@
 #!/bin/bash
-x10c++ -STATIC_CHECKS -g -O ./myuts/MyUTS.x10 -o ./MyUTS
+x10c++ -d tmp -STATIC_CHECKS -g -O ./myuts/MyUTS.x10 -o ./MyUTS
