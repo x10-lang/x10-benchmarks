@@ -1,0 +1,49 @@
+#!/usr/bin/env bash
+
+HEAP=4096m
+X10FLAGS="-ms$HEAP -mx$HEAP"
+#DRYRUN=true
+#FULLRUN=true
+
+APP=myuts.MyUTS
+app=`echo $APP | tr "[A-Z]" "[a-z]"`
+
+D0=14
+
+
+if [ -z "$FULLRUN" ]; then
+# Note: overwrite to reduce time
+D0=12
+#
+# test run
+#
+for i in 0 3
+do
+p=$((2**$i))
+D=$(($D0+(($i+1)/2)))
+command="x10 $X10FLAGS $X10RTTRANSPORT -np $p -cp uts.jar $APP -d $D"
+[ -n "$DRYRUN" ] && echo "$command"
+[ -z "$DRYRUN" ] && $command 2>&1 | tee -a log.$app.managed.d$D.$(printf "%05d" $p)
+done
+
+exit 0
+fi
+
+
+#
+# full run for measurement
+#
+p=47040
+D=$(($D0+8))
+command="x10 $X10FLAGS $X10RTTRANSPORT -np $p -cp uts.jar $APP -d $D"
+[ -n "$DRYRUN" ] && echo "$command"
+[ -z "$DRYRUN" ] && $command 2>&1 | tee -a log.$app.managed.d$D.$(printf "%05d" $p)
+
+for i in $(seq 15 -1 0)
+do
+p=$((2**$i))
+D=$(($D0+(($i+1)/2)))
+command="x10 $X10FLAGS $X10RTTRANSPORT -np $p -cp uts.jar $APP -d $D"
+[ -n "$DRYRUN" ] && echo "$command"
+[ -z "$DRYRUN" ] && $command 2>&1 | tee -a log.$app.managed.d$D.$(printf "%05d" $p)
+done
