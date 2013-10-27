@@ -4,6 +4,7 @@ import x10.compiler.*;
 @NativeCPPInclude("brg_sha1.h")
 @NativeCPPInclude("brg_endian.h")
 @NativeCPPCompilationUnit("brg_sha1.c")
+//@NativeRep("java", "SHA1Rand2", null, "SHA1Rand2.$RTT")
 public struct SHA1Rand {
     val w0 = 0n; val w1 = 0n; val w2 = 0n; val w3 = 0n; val w4 = 0n; // 20 bytes
     val depth:Int;
