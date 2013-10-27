@@ -49,6 +49,7 @@ class FTNew(M:Long, verify:Boolean) {
     
     val SQRTNL=1<<M,SQRTN=SQRTNL as Int,N=SQRTNL*SQRTNL;
     val I=Runtime.hereInt();
+    val IL=Runtime.hereInt();
     val nRowsL=SQRTN/Place.MAX_PLACES, nRows=nRowsL as Int, nCols=SQRTN;
     val localSize=SQRTN*nRows;
     
@@ -75,7 +76,7 @@ class FTNew(M:Long, verify:Boolean) {
     }
 
     @Inline min(i:Long, j:Long):Long=i<j?i:j;
-    @Inline global(i:Long):Long = (I*nRows+i);
+    @Inline global(i:Long):Long = (IL*nRowsL+i);
     def bytwiddle(sign:Int) {
     	val W_N=2.0*Math.PI/N;
     	for ([i,j] in A.indices()) {
