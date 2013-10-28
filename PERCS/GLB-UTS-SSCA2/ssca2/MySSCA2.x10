@@ -52,7 +52,7 @@ public class MySSCA2{
 		val permute:Int = opts("-p", 1n); // on by default
 		val verbose:Int = opts("-v", 1n); // off by default
 
-		val i:Int = opts("-i", 4n); // default is 4, a better default value
+		val i:Int = opts("-i", 4n); // default is 4 to get better performance
 		val t:Int = opts("-t", 1n);
 		val g = opts("-g", 1n);
 		
@@ -73,12 +73,19 @@ public class MySSCA2{
 		val w = opts("-w", z);
 
 		
-		
+		Console.OUT.println("Running SSCA2-G with the following parameters:");
+		Console.OUT.println("seed = " + seed);
+		Console.OUT.println("N = " + (1<<n));
+		Console.OUT.println("a = " + a);
+		Console.OUT.println("b = " + b);
+		Console.OUT.println("c = " + c);
+		Console.OUT.println("d = " + d);
+		Console.OUT.println("places = " + Place.MAX_PLACES);
+		Console.OUT.println("interval = " + i);
+		Console.OUT.println("l = " + l);
+		Console.OUT.println("permute = " + permute);
 		val myssca2 = new GlobalJobRunner[SSCA2TaskItem, SSCA2Result]( GLBParameters(g, w, l, z, m,verbose), new SSCA2ResultReducible((1<<n) as Int ));
-		// uncomment it to get it work
-	
-	
-		
+			
 		result:SSCA2Result = myssca2.main( ()=>(new SSCA2TaskFrame(Rmat(seed, n, a, b, c, d),i,t, permute, verbose)) );
 		
 		
