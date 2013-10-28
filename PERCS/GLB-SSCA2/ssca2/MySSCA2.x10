@@ -86,7 +86,7 @@ public class MySSCA2 extends GlobalJobRunner[SSCA2TaskItem, SSCA2Result]{
 		val t:Int = opts("-t", 1n);
 		val g = opts("-g", 1n);
 		
-		val l = opts("-l", 32n);
+		val l = opts("-l", 2n); // default should be 2, so workload can distribute fast
 		val m = opts("-m", 1024n);
 	
 
