@@ -82,7 +82,7 @@ public class MySSCA2 extends GlobalJobRunner[SSCA2TaskItem, SSCA2Result]{
 		val permute:Int = opts("-p", 1n); // on by default
 		val verbose:Int = opts("-v", 0n); // off by default
 
-		val i:Int = opts("-i", 8n);
+		val i:Int = opts("-i", 4n); // change to 4 to get a better performance
 		val t:Int = opts("-t", 1n);
 		val g = opts("-g", 1n);
 		
