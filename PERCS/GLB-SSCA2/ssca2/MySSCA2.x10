@@ -102,16 +102,17 @@ public class MySSCA2 extends GlobalJobRunner[SSCA2TaskItem, SSCA2Result]{
 
 		val w = opts("-w", z);
 
-		// Console.OUT.println("places=" + P +
-		// 		"   b=" + b +
-		// 		        "   r=" + r +
-		// 		                "   d=" + d +
-		// 		                        "   w=" + w +
-		// 		                                "   n=" + n +
-		// 		                                        "   l=" + l + 
-		// 		                                                "   m=" + m + 
-		// 		                                                        "   z=" + z);
-		
+		Console.OUT.println("Running SSCA2-G with the following parameters:");
+		Console.OUT.println("seed = " + seed);
+		Console.OUT.println("N = " + (1<<n));
+		Console.OUT.println("a = " + a);
+		Console.OUT.println("b = " + b);
+		Console.OUT.println("c = " + c);
+		Console.OUT.println("d = " + d);
+		Console.OUT.println("places = " + Place.MAX_PLACES);
+		Console.OUT.println("interval = " + i);
+		Console.OUT.println("l = " + l);
+		Console.OUT.println("permute = " + permute);
 		val myssca2: MySSCA2 = new MySSCA2();
 		// uncomment it to get it work
 		myssca2.setResultReducer(new SSCA2ResultReducible((1<<n) as Int));
