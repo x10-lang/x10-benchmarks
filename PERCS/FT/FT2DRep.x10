@@ -83,7 +83,7 @@ class FT2DRep(M:Long, verify:Boolean) {
     		Console.OUT.println("M=" + M + " SQRTN=" + SQRTN + " N=" + N + " nRows=" + nRows +
     				" localSize=" + localSize + " MAX_PLACES=" + Place.MAX_PLACES +
     				              " Mem=" + mbytes + " mem/MAX_PLACES=" + mbytes/Place.MAX_PLACES);
-		val r = new Random2(I);
+		val r = new Random(I);
 		for (i in 0..(A.M-1))
 			for (j in 0..(A.N-1)) 
 				A(i,j)=Complex(r.next()-0.5,r.next()-0.5);
@@ -107,7 +107,7 @@ class FT2DRep(M:Long, verify:Boolean) {
 
     def check() {
     	val threshold = 1.0e-15*Math.log(N as Double)/Math.log(2.0)*16;
-    	val random = new Random2(I);
+    	val random = new Random(I);
     	for (i in 0..(A.M-1))
     		for (j in 0..(A.N-1)) {
     			val c =Complex(random.next()-0.5,random.next()-0.5);

@@ -2,7 +2,7 @@ import x10.compiler.Native;
 import x10.compiler.NativeRep;
 
 @NativeRep("java", "java.util.Random", null, null)
-final class Random2 {
+final class Random {
     @Native("c++", "srandom(#seed)")
     @Native("java", "")
     private static native def srandom(seed:Int):void;

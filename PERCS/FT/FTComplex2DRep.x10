@@ -67,7 +67,7 @@ class FTComplex2DRep(M:Long, verify:Boolean) {
     		Console.OUT.println("M=" + M + " SQRTN=" + SQRTN + " N=" + N + " nRows=" + nRows +
     				" localSize=" + localSize + " MAX_PLACES=" + Place.MAX_PLACES +
     				              " Mem=" + mbytes + " mem/MAX_PLACES=" + mbytes/Place.MAX_PLACES);
-    	val r = new Random2(I);
+    	val r = new Random(I);
     	for ([i,j] in O.indices())
     		O(i,j)=A(i,j)=Complex(r.next()-0.5,r.next()-0.5);
     }

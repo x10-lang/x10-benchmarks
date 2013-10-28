@@ -62,7 +62,7 @@ class FTNew(M:Long, verify:Boolean) {
     val B = new Array_2[Complex](nColsL, nRowsL); // transposed shape
     val fftwPlan=create_plan(nCols,-1n,0n);
     val fftwInversePlan=create_plan(nCols,1n,0n);
-    @Inline  final static def randomComplex(r:Random2)=Complex(r.next()-0.5, r.next()-0.5);
+    @Inline  final static def randomComplex(r:Random)=Complex(r.next()-0.5, r.next()-0.5);
     def this(M:Long, verify:Boolean) {
         property(M,verify);
         val mbytes = N*2.0*8.0*2/(1024*1024);
@@ -70,7 +70,7 @@ class FTNew(M:Long, verify:Boolean) {
                 Console.OUT.println("M=" + M + " SQRTN=" + SQRTN + " N=" + N + " nRows=" + nRows +
                                 " localSize=" + localSize + " MAX_PLACES=" + Place.MAX_PLACES +
                                               " Mem=" + mbytes + " mem/MAX_PLACES=" + mbytes/Place.MAX_PLACES);
-                val r = new Random2(I);
+                val r = new Random(I);
                 for ([i, j] in A.indices())
                         A(i,j)=randomComplex(r);
         
@@ -92,7 +92,7 @@ class FTNew(M:Long, verify:Boolean) {
 
     def check() {
         val threshold = 1.0e-15*Math.log(N as Double)/Math.log(2.0)*16;
-        val r = new Random2(I);
+        val r = new Random(I);
         for ([i,j] in A.indices()) {
             val c =randomComplex(r);
             if ((A(i,j)-c).abs() > threshold) 
