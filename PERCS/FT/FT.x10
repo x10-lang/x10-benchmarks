@@ -10,6 +10,8 @@ import x10.compiler.NativeCPPInclude;
 import x10.compiler.NativeCPPOutputFile;
 import x10.compiler.NativeCPPCompilationUnit;
 import x10.compiler.NativeRep;
+import x10.util.Option;
+import x10.util.OptionsParser;
 import x10.util.Team;
 
 @NativeCPPInclude("ft_natives.h")
@@ -238,8 +240,18 @@ class FT {
     }
 
     public static def main(args:Rail[String]) {
-        val M = (args.size > 0) ? Int.parse(args(0)) : 10n;
-        val verify = (args.size > 1) ? Boolean.parse(args(1)) : false;
+        val opts = new OptionsParser(args, [
+            Option("v", "verify", "verify results"),
+            Option.HELP
+        ], [
+            Option("m", "magnitude", "log2 size of the vector (default 10)")
+        ]);
+        if (opts.wantsUsageOnly("")) {
+            return;
+        }
+        val M = opts("-m", 10n);
+        val verify = opts("-v", false);
+
         val SQRTN = 1n << M;
         val N = (SQRTN as Long) * SQRTN;
         val nRows = SQRTN / (Place.MAX_PLACES as Int);

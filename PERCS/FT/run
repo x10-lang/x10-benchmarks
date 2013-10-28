@@ -4,21 +4,21 @@ export GC_MARKERS=1
 
 # at larger sizes, the default PAMI all-to-all algorithm will fail
 export X10RT_PAMI_ALLTOALL_ALG=1
-./ft 20 true -procs 32768 2>&1 | tee -a log.ft.32768
-./ft 20 true -procs 16384 2>&1 | tee -a log.ft.16384
-./ft 19 true -procs 8192  2>&1 | tee -a log.ft.08192
-./ft 19 true -procs 4096  2>&1 | tee -a log.ft.04096
-./ft 18 true -procs 2048  2>&1 | tee -a log.ft.02048
-./ft 18 true -procs 1024  2>&1 | tee -a log.ft.01024
-./ft 17 true -procs 512   2>&1 | tee -a log.ft.00512
-./ft 17 true -procs 256   2>&1 | tee -a log.ft.00256
+./ft -m 20 -v -procs 32768 2>&1 | tee -a log.ft.32768
+./ft -m 20 -v -procs 16384 2>&1 | tee -a log.ft.16384
+./ft -m 19 -v -procs 8192  2>&1 | tee -a log.ft.08192
+./ft -m 19 -v -procs 4096  2>&1 | tee -a log.ft.04096
+./ft -m 18 -v -procs 2048  2>&1 | tee -a log.ft.02048
+./ft -m 18 -v -procs 1024  2>&1 | tee -a log.ft.01024
+./ft -m 17 -v -procs 512   2>&1 | tee -a log.ft.00512
+./ft -m 17 -v -procs 256   2>&1 | tee -a log.ft.00256
 # at smaller sizes the default all-to-all algorithm is faster
 export X10RT_PAMI_ALLTOALL_ALG=0
-./ft 16 true -procs 128   2>&1 | tee -a log.ft.00128
-./ft 16 true -procs 64    2>&1 | tee -a log.ft.00064
-./ft 15 true -procs 32    2>&1 | tee -a log.ft.00032
-./ft 15 true -procs 16    2>&1 | tee -a log.ft.00016
-./ft 14 true -procs 8     2>&1 | tee -a log.ft.00008
-./ft 14 true -procs 4     2>&1 | tee -a log.ft.00004
-./ft 13 true -procs 2     2>&1 | tee -a log.ft.00002
-./ft 13 true -procs 1     2>&1 | tee -a log.ft.00001
+./ft -m 16 -v -procs 128   2>&1 | tee -a log.ft.00128
+./ft -m 16 -v -procs 64    2>&1 | tee -a log.ft.00064
+./ft -m 15 -v -procs 32    2>&1 | tee -a log.ft.00032
+./ft -m 15 -v -procs 16    2>&1 | tee -a log.ft.00016
+./ft -m 14 -v -procs 8     2>&1 | tee -a log.ft.00008
+./ft -m 14 -v -procs 4     2>&1 | tee -a log.ft.00004
+./ft -m 13 -v -procs 2     2>&1 | tee -a log.ft.00002
+./ft -m 13 -v -procs 1     2>&1 | tee -a log.ft.00001
