@@ -18,8 +18,9 @@ public final class SHA1Rand2 extends x10.core.Struct implements X10JavaSerializa
 
     public MessageDigest md;
     public int depth;
-        
-        
+    private static final boolean updateAsBatch = true;
+    public final byte[] bytes = updateAsBatch ? new byte[4] : null; // work buffer
+
     public static X10JavaSerializable $_deserialize_body(SHA1Rand2 $_obj, X10JavaDeserializer $deserializer) throws IOException {
         $_obj.md = (MessageDigest) $deserializer.readRefUsingReflection();
         $_obj.depth = $deserializer.readInt();

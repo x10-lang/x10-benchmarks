@@ -8,9 +8,6 @@ import java.security.NoSuchAlgorithmException;
 
 public class RNG2 {
 
-    private static final boolean updateAsBatch = true;
-    private static final boolean useLongBatch = true;
-
     private static void int2bytes(int w, byte[] bytes, int off) {
         int offby4 = off * 4;
         bytes[offby4+0] = (byte)(w >> 24);
@@ -43,7 +40,7 @@ public class RNG2 {
             md.update((byte)(w >>  0));
         }
     }
-    private static void sha1_hash(SHA1Rand2 mystate, MessageDigest md, byte[] bytes) {
+    private static void sha1_hash(SHA1Rand2 mystate, MessageDigest md) {
         byte[] digest = mystate.md.digest();
         md.update(digest);
     }
@@ -73,10 +70,8 @@ public class RNG2 {
     public static void init(SHA1Rand2 newstate, int seed) {
         MessageDigest md = sha1_begin();
 
-        byte[] bytes = null;
-        if (updateAsBatch) bytes = new byte[4];
         sha1_hash(zeroes16, md);
-        sha1_hash(seed, md, bytes);
+        sha1_hash(seed, md, newstate.bytes);
 
         sha1_end(newstate, md);
     }
@@ -100,16 +95,8 @@ public class RNG2 {
     public static void spawn(SHA1Rand2 mystate, SHA1Rand2 newstate, int spawnnumber) {
         MessageDigest md = sha1_begin();
 
-        byte[] bytes = null;
-        if (updateAsBatch) {
-            if (useLongBatch)
-                bytes = new byte[20];
-            else
-                bytes = new byte[4];
-        }
-
-        sha1_hash(mystate, md, bytes);
-        sha1_hash(spawnnumber, md, bytes);
+        sha1_hash(mystate, md);
+        sha1_hash(spawnnumber, md, newstate.bytes);
 
         sha1_end(newstate, md);
     }
