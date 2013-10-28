@@ -52,7 +52,7 @@ public class MySSCA2{
 		val permute:Int = opts("-p", 1n); // on by default
 		val verbose:Int = opts("-v", 1n); // off by default
 
-		val i:Int = opts("-i", 8n); // default is 8
+		val i:Int = opts("-i", 4n); // default is 4, a better default value
 		val t:Int = opts("-t", 1n);
 		val g = opts("-g", 1n);
 		
