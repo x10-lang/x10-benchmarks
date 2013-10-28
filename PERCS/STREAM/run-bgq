@@ -5,18 +5,18 @@ export PROG=stream.xlc.mpi
 
 export SIZE=38000000
 
-qsub --env $ENV_ARGS -t 10 -n 1 --mode c1 -O $PROG.00001 $PROG $SIZE
-qsub --env $ENV_ARGS -t 10 -n 1 --mode c2 -O $PROG.00002 $PROG $SIZE
-qsub --env $ENV_ARGS -t 10 -n 1 --mode c4 -O $PROG.00004 $PROG $SIZE
-qsub --env $ENV_ARGS -t 10 -n 1 --mode c8 -O $PROG.00008 $PROG $SIZE
-qsub --env $ENV_ARGS -t 10 -n 1 --mode c16 -O $PROG.00016 $PROG $SIZE
-qsub --env $ENV_ARGS -t 10 -n 2 --mode c16 -O $PROG.00032 $PROG $SIZE
-qsub --env $ENV_ARGS -t 10 -n 4 --mode c16 -O $PROG.00064 $PROG $SIZE
-qsub --env $ENV_ARGS -t 10 -n 8 --mode c16 -O $PROG.00128 $PROG $SIZE
-qsub --env $ENV_ARGS -t 10 -n 16 --mode c16 -O $PROG.00256 $PROG $SIZE
-qsub --env $ENV_ARGS -t 10 -n 32 --mode c16 -O $PROG.00512 $PROG $SIZE
-qsub --env $ENV_ARGS -t 15 -n 64 --mode c16 -O $PROG.01024 $PROG $SIZE
-qsub --env $ENV_ARGS -t 15 -n 128 --mode c16 -O $PROG.02048 $PROG $SIZE
-qsub --env $ENV_ARGS -t 15 -n 256 --mode c16 -O $PROG.04096 $PROG $SIZE
-qsub --env $ENV_ARGS -t 20 -n 512 --mode c16 -O $PROG.08192 $PROG $SIZE
-qsub --env $ENV_ARGS -t 20 -n 1024 --mode c16 -O $PROG.16384 $PROG $SIZE
+qsub --env $ENV_ARGS -t 10 -n 1 --mode c1 -O $PROG.00001 $PROG -n $SIZE
+qsub --env $ENV_ARGS -t 10 -n 1 --mode c2 -O $PROG.00002 $PROG -n $SIZE
+qsub --env $ENV_ARGS -t 10 -n 1 --mode c4 -O $PROG.00004 $PROG -n $SIZE
+qsub --env $ENV_ARGS -t 10 -n 1 --mode c8 -O $PROG.00008 $PROG -n $SIZE
+qsub --env $ENV_ARGS -t 10 -n 1 --mode c16 -O $PROG.00016 $PROG -n $SIZE
+qsub --env $ENV_ARGS -t 10 -n 2 --mode c16 -O $PROG.00032 $PROG -n $SIZE
+qsub --env $ENV_ARGS -t 10 -n 4 --mode c16 -O $PROG.00064 $PROG -n $SIZE
+qsub --env $ENV_ARGS -t 10 -n 8 --mode c16 -O $PROG.00128 $PROG -n $SIZE
+qsub --env $ENV_ARGS -t 10 -n 16 --mode c16 -O $PROG.00256 $PROG -n $SIZE
+qsub --env $ENV_ARGS -t 10 -n 32 --mode c16 -O $PROG.00512 $PROG -n $SIZE
+qsub --env $ENV_ARGS -t 15 -n 64 --mode c16 -O $PROG.01024 $PROG -n $SIZE
+qsub --env $ENV_ARGS -t 15 -n 128 --mode c16 -O $PROG.02048 $PROG -n $SIZE
+qsub --env $ENV_ARGS -t 15 -n 256 --mode c16 -O $PROG.04096 $PROG -n $SIZE
+qsub --env $ENV_ARGS -t 20 -n 512 --mode c16 -O $PROG.08192 $PROG -n $SIZE
+qsub --env $ENV_ARGS -t 20 -n 1024 --mode c16 -O $PROG.16384 $PROG -n $SIZE

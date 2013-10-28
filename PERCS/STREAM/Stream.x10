@@ -1,9 +1,11 @@
-// memory per place: 3*8*args(0)
-// default: arg(0) = 64M -> 1.5G per place
-// args(0) is intended to remain constant (independent of the number of places0
+// memory per place: 3*8*n
+// default: n = 64M -> 1.5G per place
+// n is intended to remain constant (independent of the number of places)
 
 // p7ih: 32 places per node -> 48G -> 3072 16M pages
 
+import x10.util.Option;
+import x10.util.OptionsParser;
 import x10.util.Team;
 
 public class Stream {
@@ -20,7 +22,17 @@ public class Stream {
     public static def main(args:Rail[String]){here == Place.FIRST_PLACE} {
         val verified = new Cell[Boolean](true);
         val times = GlobalRef[Rail[double]](new Rail[double](NUM_TIMES));
-        val N0 = args.size>0? long.parse(args(0)) : DEFAULT_SIZE;
+
+        val opts = new OptionsParser(args, [
+            Option.HELP as Option
+        ], [
+            Option("n", "", "size of local arrays (default " + DEFAULT_SIZE + ")")
+        ]);
+        if (opts.wantsUsageOnly("")) {
+            return;
+        }
+        val N0 = opts("-n", DEFAULT_SIZE);
+
         val N = N0 * NUM_PLACES;
         val localSize =  N0;
 
@@ -73,7 +85,7 @@ public class Stream {
         val size = (3*8*N/MEG);
         val rate = (3*8*N) / (1.0E9*time);
         Console.OUT.println("Number of places=" + NUM_PLACES);
-        Console.OUT.println("Size of arrays: " + size +" MB (total)" + size/NUM_PLACES + " MB (per place)");
+        Console.OUT.println("Size of arrays: " + size +" MB (total) " + size/NUM_PLACES + " MB (per place)");
         Console.OUT.println("Min time: " + time + " rate=" + rate + " GB/s");
         Console.OUT.println("Result is " + (verified ? "verified." : "NOT verified."));
     }                                
