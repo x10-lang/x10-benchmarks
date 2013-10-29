@@ -1,1 +1,1 @@
-x10c -O -NO_CHECKS -o uts.jar myuts/MyUTS.x10
+x10c -O -NO_CHECKS -o uts.jar uts/UTS.x10

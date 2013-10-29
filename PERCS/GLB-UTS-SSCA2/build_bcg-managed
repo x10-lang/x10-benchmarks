@@ -1,0 +1,1 @@
+x10c -O -NO_CHECKS -o bcg.jar bcg/BCG.x10

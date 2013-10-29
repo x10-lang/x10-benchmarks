@@ -5,7 +5,7 @@ X10FLAGS="-ms$HEAP -mx$HEAP"
 #DRYRUN=true
 #FULLRUN=true
 
-APP=myuts.MyUTS
+APP=uts.UTS
 app=`echo $APP | tr "[A-Z]" "[a-z]"`
 
 D0=14

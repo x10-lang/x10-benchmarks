@@ -1,0 +1,62 @@
+#!/usr/bin/env bash
+
+HEAP=8192m
+X10FLAGS="-ms$HEAP -mx$HEAP"
+#DRYRUN=true
+#FULLRUN=true
+
+APP=bcg.BCG
+app=`echo $APP | tr "[A-Z]" "[a-z]"`
+
+
+if [ -z "$FULLRUN" ]; then
+#
+# test run
+#
+for p in 8 1
+do
+N=16
+command="x10 $X10FLAGS $X10RTTRANSPORT -np $p -cp bcg.jar $APP -n $N"
+[ -n "$DRYRUN" ] && echo "$command"
+[ -z "$DRYRUN" ] && $command 2>&1 | tee -a log.$app.managed.n$N.$(printf "%05d" $p)
+done
+
+exit 0
+fi
+
+
+#
+# full run for measurement
+#
+p=47040
+N=20
+command="x10 $X10FLAGS $X10RTTRANSPORT -np $p -cp bcg.jar $APP -n $N"
+[ -n "$DRYRUN" ] && echo "$command"
+[ -z "$DRYRUN" ] && $command 2>&1 | tee -a log.$app.managed.n$N.$(printf "%05d" $p)
+
+for i in $(seq 15 -1 11)
+do
+p=$((2**i))
+N=20
+command="x10 $X10FLAGS $X10RTTRANSPORT -np $p -cp bcg.jar $APP -n $N"
+[ -n "$DRYRUN" ] && echo "$command"
+[ -z "$DRYRUN" ] && $command 2>&1 | tee -a log.$app.managed.n$N.$(printf "%05d" $p)
+done
+
+for i in $(seq 11 -1 5)
+do
+p=$((2**i))
+N=18
+command="x10 $X10FLAGS $X10RTTRANSPORT -np $p -cp bcg.jar $APP -n $N"
+[ -n "$DRYRUN" ] && echo "$command"
+[ -z "$DRYRUN" ] && $command 2>&1 | tee -a log.$app.managed.n$N.$(printf "%05d" $p)
+done
+
+for i in $(seq 5 -1 0)
+do
+p=$((2**i))
+N=16
+command="x10 $X10FLAGS $X10RTTRANSPORT -np $p -cp bcg.jar $APP -n $N"
+[ -n "$DRYRUN" ] && echo "$command"
+[ -z "$DRYRUN" ] && $command 2>&1 | tee -a log.$app.managed.n$N.$(printf "%05d" $p)
+done
