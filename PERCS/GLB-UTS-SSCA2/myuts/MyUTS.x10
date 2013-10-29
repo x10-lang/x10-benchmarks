@@ -64,19 +64,19 @@ public class MyUTS{
 				                                        "   l=" + l + 
 				                                                "   m=" + m + 
 				                                                        "   z=" + z);
-		val myuts = new GlobalJobRunner[UTSTreeNode, Long](  GLBParameters(n, w, l, z, m,verbose),  Reducible.SumReducer[Long]()   );
-		//val myuts = new GlobalJobRunner[UTSTreeNode, Long](  GLBParameters(n, w, l, z, m,verbose), new UTSResultReducible()  );
+		val myuts_ = new GlobalJobRunner[UTSTreeNode, Long](  GLBParameters(n, w, l, z, m,verbose),  Reducible.SumReducer[Long]()   );
+		//val myuts_ = new GlobalJobRunner[UTSTreeNode, Long](  GLBParameters(n, w, l, z, m,verbose), new UTSResultReducible()  );
 		// uncomment it to get it work
 	
 		var time:Long = System.nanoTime();
-		result:Long = myuts.main(()=>new UTSTaskFrame(b,r,d));
+		result:Long = myuts_.main(()=>new UTSTaskFrame(b,r,d));
 		time = System.nanoTime() - time;
 		Console.OUT.println("Time spent: " + (time/1E9));
 		Console.OUT.println("Result: "+ result);
 		Console.OUT.println("Throughput: "+result/(time/1E3)+ " M nodes/s");
 		// end of uncomment it to get it work
 		
-		//myuts.dryRun(()=>new LocalJobRunner[UTSTreeNode, Long](new UTSTaskFrame(b,r,d), n, w, l, z, m));
+		//myuts_.dryRun(()=>new LocalJobRunner[UTSTreeNode, Long](new UTSTaskFrame(b,r,d), n, w, l, z, m));
 	
 		
 	}
