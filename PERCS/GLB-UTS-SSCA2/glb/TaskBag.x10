@@ -4,7 +4,10 @@ package glb;
  * A bag (multiset) of tasks. This is implemented by a user of the 
  * GLB library.
  * 
- * Todo: Add a sequential iterator for tasks in the bag.
+ * <p> A simple implementation of this interface is provided by 
+ * ArrayListTaskBag. It uses an ArrayList as the backing data structure
+ * for the bag. 
+ * 
  */
 public interface TaskBag {
 	
