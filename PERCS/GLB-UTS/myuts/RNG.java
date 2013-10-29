@@ -128,13 +128,6 @@ public class RNG {
         sha1_hash(zeroes16, md);
         sha1_hash(seed, md, bytes);
 
-        /*
-        assert updateAsBatch;
-        byte[] bytes = new byte[20];
-        int2bytes(seed, bytes, 4);
-        sha1_hash(bytes, md);
-        */
-
         sha1_end(newstate, md);
     }
 
