@@ -48,6 +48,7 @@ public class GlobalJobRunner[T,Z] {
 		collectResultTime = System.nanoTime() - collectResultTime;
 		if(st().verbose >= 1n){
 			Console.OUT.println("Reap time(s):" + (collectResultTime / 1E9));
+			Console.OUT.println("Process time(C+R)(s):" + ((crunchNumberTime+collectResultTime) / 1E9));
 			Console.OUT.println("Process rate(C+R)/(C+R+S): " +((crunchNumberTime+collectResultTime)/1E9)*100.0/((crunchNumberTime+collectResultTime+setupTime)/1E9)+"%");
 		}
 		if(st().verbose >= 2n){

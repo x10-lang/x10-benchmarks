@@ -38,6 +38,7 @@ public abstract class GlobalJobRunner[T,Z] {
 		result:Z = getFinalResult(results);
 		collectResultTime = System.nanoTime() - collectResultTime;
 		Console.OUT.println("Reap time(s):" + (collectResultTime / 1E9));
+		Console.OUT.println("Process time(C+R)(s):" + ((crunchNumberTime+collectResultTime) / 1E9));
 		Console.OUT.println("Process rate(C+R)/(C+R+S): " +((crunchNumberTime+collectResultTime)/1E9)*100.0/((crunchNumberTime+collectResultTime+setupTime)/1E9)+"%");
 		@Ifdef("LOG"){
 			printLog(st);// added on Oct 27 to print out the log
