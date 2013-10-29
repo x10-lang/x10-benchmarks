@@ -1,10 +1,10 @@
 package fib;
 
-import core.TaskBag;
-import core.TaskFrame;
-import core.GlobalJobRunner;
-import core.ArrayListTaskBag;
-import core.GLBParameters;
+import glb.TaskBag;
+import glb.TaskFrame;
+import glb.GlobalJobRunner;
+import glb.ArrayListTaskBag;
+import glb.GLBParameters;
 
 /**
  * An illustration of the use of the GLB framework. 
