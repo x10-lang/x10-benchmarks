@@ -63,9 +63,7 @@ class LocalJobRunner[Z] {
 	/** Verbose level, for collecting data / debugging purposes*/
 	val verbose:Int; 
 	
-	/** when verbose level is VERBOSE_MAX it will output workstealing status, used for users who are interested in
-	 * understanding what kind of traffic is going on in GLB */
-	static val VERBOSE_MAX:Int =1024n;
+	
 	
 	/** variables used for synchronization, made sure not to be optimized out by the compiler */ 
 	@x10.compiler.Volatile transient var active:Boolean = false;
@@ -127,7 +125,7 @@ class LocalJobRunner[Z] {
 	 * @param n used for debugging purpose, a debugging id
 	 */
 	@Inline def probe(n:Long) {
-		if(verbose == VERBOSE_MAX) { if (++probes%(1<<25n) == 0) Runtime.println(Runtime.hereLong() + " PROBING " + n + " (" + (probes>>25n) + ")"); }
+		if(verbose ==  GLBParameters.VERBOSE_MAX) { if (++probes%(1<<25n) == 0) Runtime.println(Runtime.hereLong() + " PROBING " + n + " (" + (probes>>25n) + ")"); }
 		Runtime.probe();
 	}
 	
@@ -148,7 +146,7 @@ class LocalJobRunner[Z] {
 			}
 			reject(st); 
 		} while (steal(st)); 
-		if(verbose == VERBOSE_MAX) {
+		if(verbose == GLBParameters.VERBOSE_MAX) {
 			if (tf.getTaskBag().size() > 0) Runtime.println(Runtime.hereLong() + " ERROR taskbag.size>0");
 			if (thieves.size() > 0) Runtime.println(Runtime.hereLong() + " ERROR thieves.size>0");
 		}
@@ -187,7 +185,7 @@ class LocalJobRunner[Z] {
 	 */
 	@Inline private def give(st:PlaceLocalHandle[LocalJobRunner[Z]], loot:TaskBag) {
 		val victim = Runtime.hereLong();
-		logger.nodesGiven += loot.size();
+		logger.tbSentSize += loot.size();
 		if (thieves.size() > 0) {
 			val thief = thieves.pop();
 			if (thief >= 0) {
@@ -220,14 +218,14 @@ class LocalJobRunner[Z] {
 			if (active) {
 				processLoot(loot, lifeline);
 			} else {
-				if(VERBOSE_MAX == verbose) { Runtime.println("" + Runtime.hereLong() + " LIVE (" + (phase++) + ")"); }
+				if(GLBParameters.VERBOSE_MAX == verbose) { Runtime.println("" + Runtime.hereLong() + " LIVE (" + (phase++) + ")"); }
 				active = true;
 				logger.startLive();
 				processLoot(loot, lifeline);
 				processStack(st);
 				logger.stopLive();
 				active = false;
-				if(verbose == VERBOSE_MAX) { Runtime.println("" + Runtime.hereLong() + " DEAD (" + (phase++) + ")"); }
+				if(verbose == GLBParameters.VERBOSE_MAX) { Runtime.println("" + Runtime.hereLong() + " DEAD (" + (phase++) + ")"); }
 				
 			}
 		} catch (v:CheckedThrowable) {
@@ -244,10 +242,10 @@ class LocalJobRunner[Z] {
 		val n = loot.size();
 		if (lifeline) {
 			++logger.lifelineStealsPerpetrated;
-			logger.lifelineNodesReceived += n;
+			logger.lifelineTbReceivedSize += n;
 		} else {
 			++logger.stealsPerpetrated;
-			logger.nodesReceived += n;
+			logger.tbReceivedSize += n;
 		}
 		this.tf.getTaskBag().merge(loot);
 		
@@ -331,14 +329,7 @@ class LocalJobRunner[Z] {
 		}
 	}
 	
-	/**
-	 * Print exceptions
-	 * @param v exeception
-	 */
-	static def error(v:CheckedThrowable) {
-		Runtime.println("Exception at " + here);
-		v.printStackTrace();
-	}
+	
 	
 	/**
 	 * Entry point of GLB framework. The workflow is terminated when 
@@ -350,7 +341,7 @@ class LocalJobRunner[Z] {
 		
 		@Pragma(Pragma.FINISH_DENSE) finish { 
 			try {
-				@Ifdef("LOG") { Runtime.println("" + Runtime.hereLong() + " LIVE (" + (phase++) + ")"); }
+				if(verbose == GLBParameters.VERBOSE_MAX) { Runtime.println("" + Runtime.hereLong() + " LIVE (" + (phase++) + ")"); }
 				empty = false;
 				active = true;
 				logger.startLive();	
@@ -358,7 +349,7 @@ class LocalJobRunner[Z] {
 				processStack(st);		
 				logger.stopLive();
 				active = false;
-				if(verbose == VERBOSE_MAX) { Runtime.println("" + Runtime.hereLong() + " DEAD (" + (phase++) + ")"); }
+				if(verbose == GLBParameters.VERBOSE_MAX) { Runtime.println("" + Runtime.hereLong() + " DEAD (" + (phase++) + ")"); }
 			} catch (v:CheckedThrowable) {
 				error(v);
 			}
@@ -390,4 +381,12 @@ class LocalJobRunner[Z] {
 		Console.OUT.println();
 	}
 	
+	/**
+	 * Print exceptions
+	 * @param v exeception
+	 */
+	static def error(v:CheckedThrowable) {
+		Runtime.println("Exception at " + here);
+		v.printStackTrace();
+	}
 }

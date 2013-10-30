@@ -49,7 +49,7 @@ public class BCTaskFrame extends TaskFrame[BCResult]{
 	
 	public def getResult()=new BCResult(this.bc_.betweennessMap);
 	public def getTaskBag()=tb;
-	public def getReducer()=new BCResultReducible(bc_.N);
+	public def getReducer()= BCResult.getReducer(this.verticesNum);
 	
 	
 	/**

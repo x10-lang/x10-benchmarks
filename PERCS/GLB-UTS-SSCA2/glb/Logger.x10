@@ -3,20 +3,22 @@ package glb;
  * Class that collects lifeline statistics of GLB
  */
 class Logger {
-    //var nodesCount:Long = 0;
-    var nodesGiven:Long = 0;
-
+   
+    var tbSentSize:Long = 0;
+    var tbReceivedSize:Long = 0;
+    var lifelineTbReceivedSize:Long = 0;
+    
     var stealsAttempted:Long = 0;
     var stealsPerpetrated:Long = 0;
     var stealsReceived:Long = 0;
     var stealsSuffered:Long = 0;
-    var nodesReceived:Long = 0;
+    
 
     var lifelineStealsAttempted:Long = 0;
     var lifelineStealsPerpetrated:Long = 0;
     var lifelineStealsReceived:Long = 0;
     var lifelineStealsSuffered:Long = 0;
-    var lifelineNodesReceived:Long = 0;
+    
 
     var lastStartStopLiveTimeStamp:Long = -1;
     var timeAlive:Long = 0;
@@ -49,9 +51,9 @@ class Logger {
         for (l in logs) add(l);
     }
 
-    def stats(time:Long) {
-        Console.OUT.println(nodesGiven + " nodes stolen = " + nodesReceived + " (direct) + " +
-            lifelineNodesReceived + " (lifeline)."); 
+    def stats() {
+        Console.OUT.println(tbSentSize + " size of stolen taskbag  = " + tbReceivedSize + " (direct) + " +
+        lifelineTbReceivedSize + " (lifeline)."); 
         Console.OUT.println(stealsPerpetrated + " successful direct steals."); 
         Console.OUT.println(lifelineStealsPerpetrated + " successful lifeline steals.");
      
@@ -61,10 +63,10 @@ class Logger {
 
     def add(other:Logger) {
        
-        nodesGiven += other.nodesGiven;
-        nodesReceived += other.nodesReceived;
+    	tbSentSize += other.tbSentSize;
+    	tbReceivedSize += other.tbReceivedSize;
         stealsPerpetrated += other.stealsPerpetrated;
-        lifelineNodesReceived += other.lifelineNodesReceived;
+        lifelineTbReceivedSize += other.lifelineTbReceivedSize;
         lifelineStealsPerpetrated += other.lifelineStealsPerpetrated;
     }
 

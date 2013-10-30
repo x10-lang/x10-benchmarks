@@ -16,7 +16,7 @@ import x10.util.OptionsParser;
  */
 public class GlobalLoadBalancer[Z](glbParam:GLBParameters) {
 	@Inline static def min(i:Long, j:Long) = i < j ? i : j;
-	
+	val P = Place.MAX_PLACES;
 	/**
 	 * Entry point for user to run GlobalLoadBalancer 
 	 * It has three phases (1) setup phase (2) calculation phase (3) result collection phase
@@ -25,7 +25,7 @@ public class GlobalLoadBalancer[Z](glbParam:GLBParameters) {
 	public def run(init:()=>TaskFrame[Z]):Z{
 		
 		/*setup phase*/
-		val P = Place.MAX_PLACES;
+		
 		var setupTime:Long = System.nanoTime();
 		val st = PlaceLocalHandle.makeFlat[LocalJobRunner[Z]](PlaceGroup.WORLD, 
 				()=>new LocalJobRunner(init, this.glbParam));
@@ -54,6 +54,7 @@ public class GlobalLoadBalancer[Z](glbParam:GLBParameters) {
 					((crunchNumberTime+collectResultTime+setupTime)/1E9)+"%");
 		}
 		if(st().verbose >= 2n) printLog(st);		
+		if(st().verbose == GLBParameters.VERBOSE_MAX) collectLifelineStatus(st);
 		return result;
 	}
 	
@@ -65,7 +66,6 @@ public class GlobalLoadBalancer[Z](glbParam:GLBParameters) {
 	 */
 	protected def collectResults(st:PlaceLocalHandle[LocalJobRunner[Z]]):Rail[Z]
 	{
-		val P = Place.MAX_PLACES;
 		if (P >= 1024) {
 			collectedResults:Rail[Z] = new Rail[Z](P/32, (i:Long)=>at (Place(i*32)) {
 				val h = Runtime.hereLong();
@@ -91,7 +91,42 @@ public class GlobalLoadBalancer[Z](glbParam:GLBParameters) {
 		return r;
 	}
 	
+	protected def collectLifelineStatus(st:PlaceLocalHandle[LocalJobRunner[Z]]):void{
+		val logs:Rail[Logger];
+		if (P >= 1024) {
+			logs = new Rail[Logger](P/32, (i:Long)=>at (Place(i*32)) {
+				val h = Runtime.hereLong();
+				val n = min(32, P-h);
+				val logs = new Rail[Logger](n, (i:Long)=>at (Place(h+i)) st().logger.get(this.glbParam.v==GLBParameters.VERBOSE_MAX));
+				val log = new Logger(false);
+				log.collect(logs);
+				return log;
+			});
+		} else {
+			logs = new Rail[Logger](P, (i:Long)=>at (Place(i)) st().logger.get(this.glbParam.v==GLBParameters.VERBOSE_MAX));
+		}
+		val log = new Logger(false);
+		log.collect(logs);
+		log.stats();
+	}
 	
+	
+	
+	
+	
+	
+	
+	/**
+	 * Create task frame on each place. Used for debugging purpose only.
+	 */
+	protected def dryRun(init:()=>TaskFrame[Z]):void{
+		val P = Place.MAX_PLACES;
+		val st = PlaceLocalHandle.makeFlat[LocalJobRunner[Z]](PlaceGroup.WORLD, 
+				()=>new LocalJobRunner(init, this.glbParam));
+		for(var ii:Long=0L; ii < P; ii++){
+			at(Place(ii)) st().printLifelines();
+		}
+	}
 	
 	/**
 	 * Print logging information on each place if user is interested in collecting computation numbers
@@ -103,18 +138,6 @@ public class GlobalLoadBalancer[Z](glbParam:GLBParameters) {
 			at(Place(i)){
 				st().getTF().printLog();
 			}
-		}
-	}
-	
-	/**
-	 * Create task frame on each place. Used for debugging purpose only.
-	 */
-	protected def dryRun(init:()=>TaskFrame[Z]):void{
-		val P = Place.MAX_PLACES;
-		val st = PlaceLocalHandle.makeFlat[LocalJobRunner[Z]](PlaceGroup.WORLD, 
-				()=>new LocalJobRunner(init, this.glbParam));
-		for(var ii:Long=0L; ii < P; ii++){
-			at(Place(ii)) st().printLifelines();
 		}
 	}
 }
