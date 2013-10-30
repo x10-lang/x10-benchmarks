@@ -47,7 +47,7 @@ public class UTS{
 				                                        "   l=" + l + 
 				                                                "   m=" + m + 
 				                                                        "   z=" + z);
-		val myuts_ = new GlobalJobRunner[Long](  GLBParameters(n, w, l, z, m,verbose));
+		val myuts_ = new GlobalJobRunner[Long](GLBParameters(n, w, l, z, m,verbose));
 		var time:Long = System.nanoTime();
 		result:Long = myuts_.main(()=>new UTSTaskFrame(b,r,d));
 		time = System.nanoTime() - time;

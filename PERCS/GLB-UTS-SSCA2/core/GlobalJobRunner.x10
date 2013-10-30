@@ -51,7 +51,7 @@ public class GlobalJobRunner[T,Z] {
 			Console.OUT.println("Process time(C+R)(s):" + ((crunchNumberTime+collectResultTime) / 1E9));
 			Console.OUT.println("Process rate(C+R)/(C+R+S): " +((crunchNumberTime+collectResultTime)/1E9)*100.0/((crunchNumberTime+collectResultTime+setupTime)/1E9)+"%");
 		}
-		if(st().verbose >= 2n){
+		if(st().verbose >= 3n){
 			printLog(st);// added on Oct 27 to print out the log
 		}
 		return result;

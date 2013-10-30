@@ -83,10 +83,9 @@ public class SSCA2TaskFrame extends TaskFrame[SSCA2TaskItem, SSCA2Result]{
 	
 	// @override print log
 	public def printLog():void{
-		@Ifdef("LOG"){
-			Console.OUT.println("Place " + Runtime.hereLong()+ " Alloc time: " + ssca2.allocTime/(1E9));
-			Console.OUT.println("Place " + Runtime.hereLong()+ " processing time: " + ssca2.processingTime/(1E9));
-		}
+			Console.OUT.println("Place " + Runtime.hereLong()+ " Alloc time: " + ssca2_.allocTime/(1E9));
+			Console.OUT.println("Place " + Runtime.hereLong()+ " processing time: " + ssca2_.processingTime/(1E9));
+		
 	}
 	
 	
