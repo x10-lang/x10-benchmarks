@@ -1,7 +1,7 @@
 package glb;
 import x10.compiler.Inline;
 /**
- * 
+ * Stack backed by an array
  */
 final class FixedSizeStack[T]{T haszero} {
     val data:Rail[T];
