@@ -9,6 +9,13 @@ X10_NPLACES=4     ./ft -m 8 -v 2>&1 | tee -a log.ft.00004
 X10_NPLACES=2     ./ft -m 6 -v 2>&1 | tee -a log.ft.00002
 X10_NPLACES=1     ./ft -m 6 -v 2>&1 | tee -a log.ft.00001
 
+X10_NPLACES=1     ./ftnew -m 3 -v 2>&1 | tee -a log.ftnew.00001
+X10_NPLACES=8     ./ftnew -m 3 -v 2>&1 | tee -a log.ftnew.00008
+X10_NPLACES=8     ./ftnew -m 8 -v 2>&1 | tee -a log.ftnew.00008
+X10_NPLACES=4     ./ftnew -m 8 -v 2>&1 | tee -a log.ftnew.00004
+X10_NPLACES=2     ./ftnew -m 6 -v 2>&1 | tee -a log.ftnew.00002
+X10_NPLACES=1     ./ftnew -m 6 -v 2>&1 | tee -a log.ftnew.00001
+
 exit 0
 
 X10_NPLACES=32768 ./ft -m 20 -v 2>&1 | tee -a log.ft.32768

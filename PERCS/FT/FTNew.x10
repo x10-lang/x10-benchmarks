@@ -15,8 +15,6 @@ import x10.util.OptionsParser;
 import x10.util.Team;
 import x10.array.Array_2;
 import x10.compiler.Inline;
-import x10.compiler.NonEscaping;
-import x10.regionarray.Region;
 
 @NativeCPPInclude("ft_natives.h")
 @NativeCPPOutputFile("hpccfft.h")
@@ -42,9 +40,9 @@ import x10.regionarray.Region;
  */
 class FTNew(M:Long, verify:Boolean) {
     // TODO: pass through as complex** to native code
-    @Native("c++", "execute_plan(#1, (x10_double*)(&((#2->raw())->raw[0])), (x10_double*)(&((#3->raw())->raw[0])), #4, #5, #6)")
+    @Native("c++", "execute_plan(#1, (x10_double*)(&((#2)->raw[0])), (x10_double*)(&((#3)->raw[0])), #4, #5, #6)")
     @Native("java", "FTNatives.execute_plan(#plan, #A.getDoubleArray(), #B.getDoubleArray(), #SQRTN, #i0, #i1)")
-    native static def execute_plan(plan:Long, A:Array_2[Complex], B:Array_2[Complex], SQRTN:Int, i0:Int, i1:Int):void;
+    native static def execute_plan(plan:Long, A:Rail[Complex], B:Rail[Complex], SQRTN:Int, i0:Int, i1:Int):void;
 
     @Native("c++", "create_plan(#1, #2, #3)")
     @Native("java", "FTNatives.create_plan(#SQRTN, #direction, #flags)")
@@ -77,7 +75,7 @@ class FTNew(M:Long, verify:Boolean) {
     }
    
     def rowFFTS(fwd:Boolean) {
-           execute_plan(fwd?fftwPlan:fftwInversePlan, A, B, SQRTN, 0n, nRows);
+           execute_plan(fwd?fftwPlan:fftwInversePlan, A.raw(), B.raw(), SQRTN, 0n, nRows);
     }
 
     @Inline def min(i:Long, j:Long):Long=i<j?i:j;
