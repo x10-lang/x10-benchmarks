@@ -1,0 +1,39 @@
+#!/usr/bin/env bash
+
+HEAP=4096m
+X10FLAGS="-ms$HEAP -mx$HEAP"
+#DRYRUN=true
+#FULLRUN=true
+
+APP=fib.Fib
+app=`echo $APP | tr "[A-Z]" "[a-z]"`
+
+
+if [ -z "$FULLRUN" ]; then
+#
+# test run
+#
+for i in 0 3
+do
+N=$((35+$i))
+p=$((2**$i))
+command="x10 $X10FLAGS $X10RTTRANSPORT -np $p -cp fib.jar $APP $N"
+[ -n "$DRYRUN" ] && echo "$command"
+[ -z "$DRYRUN" ] && $command 2>&1 | tee -a log.$app.managed.$N.$(printf "%05d" $p)
+done
+
+exit 0
+fi
+
+
+#
+# full run for measurement
+#
+for i in $(seq 15 -1 0)
+do
+N=$((35+$i))
+p=$((2**$i))
+command="x10 $X10FLAGS $X10RTTRANSPORT -np $p -cp fib.jar $APP $N"
+[ -n "$DRYRUN" ] && echo "$command"
+[ -z "$DRYRUN" ] && $command 2>&1 | tee -a log.$app.managed.$N.$(printf "%05d" $p)
+done
