@@ -42,57 +42,53 @@ class FTNew(M:Long, verify:Boolean) {
     // TODO: pass through as complex** to native code
     @Native("c++", "execute_plan(#1, (x10_double*)(&((#2)->raw[0])), (x10_double*)(&((#3)->raw[0])), #4, #5, #6)")
     @Native("java", "FTNatives.execute_plan(#plan, #A.getDoubleArray(), #B.getDoubleArray(), #SQRTN, #i0, #i1)")
-    native static def execute_plan(plan:Long, A:Rail[Complex], B:Rail[Complex], SQRTN:Int, i0:Int, i1:Int):void;
+    native static def execute_plan(plan:Long, A:Rail[Complex], B:Rail[Complex], SQRTN:Long, i0:Long, i1:Long):void;
 
     @Native("c++", "create_plan(#1, #2, #3)")
     @Native("java", "FTNatives.create_plan(#SQRTN, #direction, #flags)")
-    native static def create_plan(SQRTN:Int, direction:Int, flags:Int):Long;
+    native static def create_plan(SQRTN:Long, direction:Int, flags:Int):Long;
     
-    val SQRTNL = 1<<M;
-    val SQRTN = SQRTNL as Int;
-    val N = SQRTNL*SQRTNL;
-    val I = Runtime.hereInt();
-    val IL = Runtime.hereLong();
-    val nRowsL = SQRTN/Place.MAX_PLACES;
-    val nRows = nRowsL as Int;
-    val nColsL = SQRTNL;
-    val nCols = nColsL as Int;
+    val SQRTN = 1<<M;
+    val N = SQRTN*SQRTN;
+    val I = Runtime.hereLong();
+    val nRows = SQRTN/Place.MAX_PLACES;
+    val nCols = SQRTN;
     val localSize = nRows*nCols;
-    val chunkSize = nRows*nRows as Long; 
-    val places = 0..(Place.MAX_PLACES-1);
-    val rows = 0..(nRows-1);
+    val chunkSize = nRows*nRows;
     
-    val A = new Array_2[Complex](nRowsL, nColsL);
-    val B = new Array_2[Complex](nColsL, nRowsL); // transposed shape
-    val fftwPlan = create_plan(nCols,-1n,0n);
-    val fftwInversePlan = create_plan(nCols,1n,0n);
+    val A = new Array_2[Complex](nRows, nCols);
+    val B = new Array_2[Complex](nCols, nRows); // transposed shape
+    val fftwPlan = create_plan(nCols, -1n, 0n);
+    val fftwInversePlan = create_plan(nCols, 1n, 0n);
 
     @Inline final static def randomComplex(r:Random)=Complex(r.next()-0.5, r.next()-0.5);
 
     def this(M:Long, verify:Boolean) {
-        property(M,verify);
+        property(M, verify);
         val mbytes = N*2.0*8.0*2/(1024*1024);
-        if (I==0n) 
+        if (I==0) {
                 Console.OUT.println("M=" + M + " SQRTN=" + SQRTN + " N=" + N + " nRows=" + nRows +
-                                " localSize=" + localSize + " MAX_PLACES=" + Place.MAX_PLACES +
-                                              " Mem=" + mbytes + " mem/MAX_PLACES=" + mbytes/Place.MAX_PLACES);
-                val r = new Random(I);
-                for ([i, j] in A.indices())
-                        A(i,j)=randomComplex(r);
-        
+                                    " localSize=" + localSize + " MAX_PLACES=" + Place.MAX_PLACES +
+                                    " Mem=" + mbytes + " mem/MAX_PLACES=" + mbytes/Place.MAX_PLACES);
+        }
+        val r = new Random(I);
+        for ([i, j] in A.indices()) {
+            A(i,j)=randomComplex(r);
+        }
     }
    
     def rowFFTS(fwd:Boolean) {
-           execute_plan(fwd?fftwPlan:fftwInversePlan, A.raw(), B.raw(), SQRTN, 0n, nRows);
+           execute_plan(fwd?fftwPlan:fftwInversePlan, A.raw(), B.raw(), SQRTN, 0, nRows);
     }
 
-    @Inline def min(i:Long, j:Long):Long=i<j?i:j;
-    @Inline def global(i:Long):Long = (IL*nRowsL+i);
+    @Inline final def min(i:Long, j:Long):Long=i<j?i:j;
+    @Inline final def global(i:Long):Long = (I*nRows+i);
     def bytwiddle(sign:Int) {
         val W_N = 2.0*Math.PI/N;
+        val s = -sign as Double;
         for ([i,j] in A.indices()) {
            val UW = global(i)*j*W_N;
-           A(i,j) *= Complex(Math.cos(UW), -sign*Math.sin(UW));
+           A(i,j) *= Complex(Math.cos(UW), s*Math.sin(UW));
         }
     }
 
@@ -105,15 +101,16 @@ class FTNew(M:Long, verify:Boolean) {
                 Console.ERR.println("Error at ("+i+","+j+") "+A(i,j)+", expected "+c);
         }
     }
+
     def warmup() {
         var t:Long = -System.nanoTime();
         Team.WORLD.alltoall(A.raw(), 0, B.raw(), 0, chunkSize);
         t += System.nanoTime();
-        if (I == 0n) Console.OUT.println("1st alltoall: " + format(t) + " s");
+        if (I == 0) Console.OUT.println("1st alltoall: " + format(t) + " s");
         t = -System.nanoTime();
         Team.WORLD.alltoall(A.raw(), 0, B.raw(), 0, chunkSize);
         t += System.nanoTime();
-        if (I == 0n) Console.OUT.println("2nd alltoall: " + format(t) + " s");
+        if (I == 0) Console.OUT.println("2nd alltoall: " + format(t) + " s");
     }
 
     /*
@@ -122,18 +119,18 @@ class FTNew(M:Long, verify:Boolean) {
      * Tiled version of loop: for ([i,j] in (0..(nRows-1)*(0..(nCols-1)))) B(j,i)=A(i,j)
      */
     def transpose() {
-        val n1 = Place.MAX_PLACES as Int;
-	val n2 = nRows as Int;
-        for (p in places) 
-                for (var ii:Int=0n; ii<n2; ii+=16n) 
-                        for (var jj:Int=p as Int*n2; jj<(p+1n)*n2; jj+=16n) 
-                                for (i in ii..(min(ii+16n,n2)-1n)) 
-                                        for (j in jj..(min(jj+16n,nCols)-1n)) 
-                                                B(j,i) = A(i,j);
+        val n1 = Place.MAX_PLACES;
+	val n2 = nRows;
+        for (p in 0..(Place.MAX_PLACES-1)) 
+            for (var ii:Long=0; ii<n2; ii+=16) 
+                for (var jj:Long=p*n2; jj<(p+1)*n2; jj+=16) 
+                    for (i in ii..(min(ii+16,n2)-1)) 
+                        for (j in jj..(min(jj+16,nCols)-1)) 
+                            B(j,i) = A(i,j);
     }
 
     def alltoall() {
-        Team.WORLD.alltoall(B.raw(),0,A.raw(),0,chunkSize);
+        Team.WORLD.alltoall(B.raw(), 0, A.raw(), 0, chunkSize);
         val tmp = B.raw();
         B.modifyRaw(A.raw() as Rail[Complex]{self!=null,self.size==B.size});
         A.modifyRaw(tmp as Rail[Complex]{self!=null,self.size==B.size});
@@ -149,17 +146,16 @@ class FTNew(M:Long, verify:Boolean) {
         for ([i,p,j] in (0..(n2-1))*(0..(n1-1))*(0..(n2-1)) A(i,n2*p+j)=B(n2*p+i,j);
      */
     def scatter() {
-        val n1 = Place.MAX_PLACES as Int;
-        for (i in rows) 
-                for (var ii:Int=0n; ii<n1; ii += 16n) 
-                        for (var jj:Int=0n; jj<nRows; jj += 16n) 
-                                for (p in ii..(min(ii+16n,n1)-1)) 
-                                        for (j in jj..(min(jj+16n,nRows)-1))
-                                            A(i,nRows*p+j)=B(nRows*p+i,j);
+        val n1 = Place.MAX_PLACES;
+        for (i in 0..(nRows-1)) 
+            for (var ii:Long=0; ii<n1; ii += 16) 
+                for (var jj:Long=0; jj<nRows; jj += 16) 
+                    for (p in ii..(min(ii+16,n1)-1)) 
+                        for (j in jj..(min(jj+16,nRows)-1))
+                            A(i,nRows*p+j)=B(nRows*p+i,j);
     }
 
-    static def format(t:Long) = (t as Double) * 1.0e-9;
-    def globalTranspose(i:Long,timers:Rail[Long]{self!=null}) {
+    def globalTranspose(i:Long, timers:Rail[Long]{self!=null}) {
         timers(i)=System.nanoTime(); transpose();
         timers(i+1)=System.nanoTime(); alltoall();
         timers(i+2)=System.nanoTime(); scatter();
@@ -185,11 +181,11 @@ class FTNew(M:Long, verify:Boolean) {
         // Output
         val secs = format(timers(12) - timers(0));
         val Gigaflops = 1.0e-9*N*5*Math.log(N as Double)/Math.log(2.0)/secs;
-        if (I == 0n) Console.OUT.println("execution time=" + secs + " secs" + " Gigaflops=" + Gigaflops);
+        if (I == 0) Console.OUT.println("execution time=" + secs + " secs" + " Gigaflops=" + Gigaflops);
         val steps = ["transpose1", "alltoall1 ", "scatter1  ", "row_ffts1 ",
                 "transpose2", "alltoall2 ", "scatter2  ", "twiddle   ", "row_ffts2 ",
                 "transpose3", "alltoall3 ", "scatter3  "];
-        if (I == 0n) {
+        if (I == 0) {
             for (i in steps.range()) 
                 Console.OUT.println("Step " + steps(i) + " took " + format(timers(i+1) - timers(i)) + " s");
             val v = timers(12)-timers(11) + timers(10)-timers(6) + timers(5)-timers(2) + timers(1)-timers(0);
@@ -200,27 +196,29 @@ class FTNew(M:Long, verify:Boolean) {
     }
     
     def run() {
-        if (I == 0n) Console.OUT.println("Warmup"); //Warmup
+        if (I == 0) Console.OUT.println("Warmup"); //Warmup
         warmup();
         Team.WORLD.barrier();
-        if (I == 0n) Console.OUT.println("Warmup complete;starting FFT");
+        if (I == 0) Console.OUT.println("Warmup complete;starting FFT");
         var secs:Double = compute(true);
         Team.WORLD.barrier();
-        if (I == 0n) Console.OUT.println("FFT complete; starting reverse FFT");
+        if (I == 0) Console.OUT.println("FFT complete; starting reverse FFT");
         secs += compute(false);
         Team.WORLD.barrier();
-        if (I == 0n) {// Output
+        if (I == 0) {// Output
             Console.OUT.println("Reverse FFT complete");
             Console.OUT.println("Now combining forward and inverse FTT measurements");
             val Gigaflops = 2.0e-9*N*5*Math.log(N as Double)/Math.log(2.0)/secs;
             Console.OUT.println("execution time=" + secs + " secs"+" Gigaflops="+Gigaflops);
         }
         if (verify) {  // Verification
-            if (I == 0n) Console.OUT.println("Start verification");
+            if (I == 0) Console.OUT.println("Start verification");
             check();
-            if (I == 0n) Console.OUT.println("Verification complete");
+            if (I == 0) Console.OUT.println("Verification complete");
         }
     }
+
+    static def format(t:Long) = (t as Double) * 1.0e-9;
     
     public static def main(args:Rail[String]) {
         val opts = new OptionsParser(args, [
@@ -234,9 +232,9 @@ class FTNew(M:Long, verify:Boolean) {
         }
         val M = opts("-m", 10n);
         val verify = opts("-v", false);
-        val SQRTN = 1n << M;
-	val nRows = SQRTN / (Place.MAX_PLACES as Int);
-        if (nRows * (Place.MAX_PLACES as Int) != SQRTN) {
+        val SQRTN = 1 << M;
+	val nRows = SQRTN / Place.MAX_PLACES;
+        if (nRows * Place.MAX_PLACES != SQRTN) {
             Console.ERR.println("SQRTN must be divisible by Place.MAX_PLACES!");
             return;
         }

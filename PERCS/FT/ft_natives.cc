@@ -12,16 +12,16 @@
 
 extern "C" {
 
-int64_t create_plan(signed int SQRTN, signed int direction, signed int flags) {
-  return (int64_t)HPCC_fftw_create_plan(SQRTN, (fftw_direction) direction, flags);
+int64_t create_plan(int64_t SQRTN, int32_t direction, int32_t flags) {
+    return (int64_t)HPCC_fftw_create_plan(SQRTN, (fftw_direction) direction, flags);
 }
 
 /* row-major array indexing */
 #define SUB(A, i, j) (A)[(i)*SQRTN+(j)]
 
 /* transform row i, for i0 <= i < i1 */
-void execute_plan(int64_t plan, double* A_x10PoInTeR, double* B_x10PoInTeR, signed int SQRTN, signed int i0, signed int i1) {
-  int i;
+void execute_plan(int64_t plan, double* A_x10PoInTeR, double* B_x10PoInTeR, int64_t SQRTN, int64_t i0, int64_t i1) {
+  int64_t i;
   hpcc_fftw_plan p = (hpcc_fftw_plan) plan;
   fftw_complex *A = (fftw_complex *) A_x10PoInTeR;
   fftw_complex *B = (fftw_complex *) B_x10PoInTeR;

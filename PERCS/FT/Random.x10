@@ -11,9 +11,9 @@ final class Random {
     @Native("java", "((long) #this.nextInt())")
     native def rand():Long;
 
-    @Native("java", "new java.util.Random(#seed)")
-    def this(seed:Int) {
-        srandom(seed);
+    @Native("java", "new java.util.Random((int)(#seed))")
+    def this(seed:Long) {
+        srandom(seed as Int);
     }
 
     @Native("java", "(((long) #this.nextInt()) / ((double) 4294967296L))")
