@@ -48,9 +48,15 @@ class FTNew(M:Long, verify:Boolean) {
     @Native("java", "FTNatives.create_plan(#SQRTN, #direction, #flags)")
     native static def create_plan(SQRTN:Int, direction:Int, flags:Int):Long;
     
-    val SQRTNL=1<<M,SQRTN=SQRTNL as Int,N=SQRTNL*SQRTNL;
-    val I=Runtime.hereInt(), IL=Runtime.hereLong();
-    val nRowsL=SQRTN/Place.MAX_PLACES, nRows=nRowsL as Int, nColsL=SQRTNL,nCols=nColsL as Int;
+    val SQRTNL = 1<<M;
+    val SQRTN = SQRTNL as Int;
+    val N = SQRTNL*SQRTNL;
+    val I = Runtime.hereInt();
+    val IL = Runtime.hereLong();
+    val nRowsL = SQRTN/Place.MAX_PLACES;
+    val nRows = nRowsL as Int;
+    val nColsL = SQRTNL;
+    val nCols = nColsL as Int;
     val localSize = nRows*nCols;
     val chunkSize = nRows*nRows as Long; 
     val places = 0..(Place.MAX_PLACES-1);
@@ -58,9 +64,11 @@ class FTNew(M:Long, verify:Boolean) {
     
     val A = new Array_2[Complex](nRowsL, nColsL);
     val B = new Array_2[Complex](nColsL, nRowsL); // transposed shape
-    val fftwPlan=create_plan(nCols,-1n,0n);
-    val fftwInversePlan=create_plan(nCols,1n,0n);
-    @Inline  final static def randomComplex(r:Random)=Complex(r.next()-0.5, r.next()-0.5);
+    val fftwPlan = create_plan(nCols,-1n,0n);
+    val fftwInversePlan = create_plan(nCols,1n,0n);
+
+    @Inline final static def randomComplex(r:Random)=Complex(r.next()-0.5, r.next()-0.5);
+
     def this(M:Long, verify:Boolean) {
         property(M,verify);
         val mbytes = N*2.0*8.0*2/(1024*1024);
@@ -81,9 +89,9 @@ class FTNew(M:Long, verify:Boolean) {
     @Inline def min(i:Long, j:Long):Long=i<j?i:j;
     @Inline def global(i:Long):Long = (IL*nRowsL+i);
     def bytwiddle(sign:Int) {
-        val W_N=2.0*Math.PI/N;
+        val W_N = 2.0*Math.PI/N;
         for ([i,j] in A.indices()) {
-           val UW=global(i)*j*W_N;
+           val UW = global(i)*j*W_N;
            A(i,j) *= Complex(Math.cos(UW), -sign*Math.sin(UW));
         }
     }
@@ -114,7 +122,8 @@ class FTNew(M:Long, verify:Boolean) {
      * Tiled version of loop: for ([i,j] in (0..(nRows-1)*(0..(nCols-1)))) B(j,i)=A(i,j)
      */
     def transpose() {
-        val n1 = Place.MAX_PLACES as Int,n2=nRows as Int;
+        val n1 = Place.MAX_PLACES as Int;
+	val n2 = nRows as Int;
         for (p in places) 
                 for (var ii:Int=0n; ii<n2; ii+=16n) 
                         for (var jj:Int=p as Int*n2; jj<(p+1n)*n2; jj+=16n) 
@@ -225,7 +234,8 @@ class FTNew(M:Long, verify:Boolean) {
         }
         val M = opts("-m", 10n);
         val verify = opts("-v", false);
-        val SQRTN = 1n << M, nRows = SQRTN / (Place.MAX_PLACES as Int);
+        val SQRTN = 1n << M;
+	val nRows = SQRTN / (Place.MAX_PLACES as Int);
         if (nRows * (Place.MAX_PLACES as Int) != SQRTN) {
             Console.ERR.println("SQRTN must be divisible by Place.MAX_PLACES!");
             return;
