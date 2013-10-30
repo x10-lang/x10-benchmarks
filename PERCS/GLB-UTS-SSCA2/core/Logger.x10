@@ -22,7 +22,7 @@ public class Logger {
     val timeReference:Long;
     
     def this(b:Boolean) {
-        if (b) x10.util.Team.WORLD.barrier();
+    	if (b) x10.util.Team.WORLD.barrier();
         timeReference = System.nanoTime();
     }
     

@@ -2,7 +2,7 @@ package bcg;
 import x10.util.ArrayList;
 
 /**
- * An class that provides all the functionality of an unweighted graph.
+ * A class that provides all the functionality of an unweighted graph.
  */
 public final class Graph {
     private val N:Int; // number of vertices

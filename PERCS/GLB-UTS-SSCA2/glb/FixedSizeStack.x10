@@ -1,6 +1,8 @@
 package glb;
 import x10.compiler.Inline;
-
+/**
+ * 
+ */
 final class FixedSizeStack[T]{T haszero} {
     val data:Rail[T];
     private var size:Long;

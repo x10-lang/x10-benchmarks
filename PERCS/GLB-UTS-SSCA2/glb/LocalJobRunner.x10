@@ -149,7 +149,7 @@ class LocalJobRunner[Z] {
 			reject(st); 
 		} while (steal(st)); 
 		if(verbose == VERBOSE_MAX) {
-			if (tf.getTaskBag().size() > 0) Runtime.println(Runtime.hereLong() + " ERROR queue.size>0");
+			if (tf.getTaskBag().size() > 0) Runtime.println(Runtime.hereLong() + " ERROR taskbag.size>0");
 			if (thieves.size() > 0) Runtime.println(Runtime.hereLong() + " ERROR thieves.size>0");
 		}
 	}

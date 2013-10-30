@@ -26,13 +26,7 @@ public class BCTaskBag implements TaskBag {
 		this.tail = (this.size -1n) as Int;
 	}
 	
-	// public def this(size:Int, splitThreashold:Int){
-	// 	this(splitThreashold);
-	// 	this.size = size; // just a place holder, don't d
-	// 	// this.data = new Rail[SSCA2TaskItem](size);
-	// 	// this.head = 0n;
-	// 	// this.tail = (this.size -1n) as Int;
-	// }
+	
 	
 	/**
 	 * vertices number : 1<<n;
@@ -58,11 +52,9 @@ public class BCTaskBag implements TaskBag {
 		Rail.copy(this.data,this.tail-numElems+1n ,dstData, 0L, numElems);
 		this.size = this.size /2n;
 		this.tail = this.tail - numElems as Int;
-		// @Ifdef("LOG"){
-		// 	Console.OUT.println("size:"+this.size+" head:"+this.head+" tail:"+this.tail);
-		// 	assert(this.size == this.tail-this.head +1n);
-		// }
-		// at most will waste log(N)*Interval*sizeof(initial taskbag) memory, probably not a big deal to not to delete the other half
+	
+		// at most will waste log(N)*Interval*sizeof(initial taskbag) memory,
+		//probably not a big deal to not to delete the other half
 		return new BCTaskBag(dstData, this.splitThreashold);
 	}
 	
@@ -95,14 +87,10 @@ public class BCTaskBag implements TaskBag {
 	 * set public for testing purpose only
 	 */
 	@Inline public  def pop():BCTaskItem{
-		//assert(this.size > 0);
 		result:BCTaskItem = this.data(head);
 		this.head+=1n;
 		this.size--;
-		// @Ifdef("LOG"){
-		// 	Console.OUT.println("head: "+head + " tail: " + tail + " sise: " + size);
-		// }
-		//assert(this.size == this.tail-this.head +1n);
+	
 		return result;
 	}
 }

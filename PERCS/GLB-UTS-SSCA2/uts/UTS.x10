@@ -12,7 +12,7 @@ import x10.util.OptionsParser;
 import glb.LifelineGenerator;
 import glb.TaskBag;
 import glb.GLBParameters;
-import glb.GlobalJobRunner;
+import glb.GlobalLoadBalancer;
 
 public class UTS{
 	
@@ -26,7 +26,7 @@ public class UTS{
 		                                                        Option("w", "", "Number of thieves to send out. Default 1."),
 		                                                        Option("l", "", "Base of the lifeline"),
 		                                                        Option("m", "", "Max potential victims"),
-		                                                        Option("v", "", "Verbose. Default 0 (no).")]);
+		                                                        Option("v", "", "Verbose level")]);
 
 		val b = opts("-b", 4n);
 		val r = opts("-r", 19n);
@@ -47,9 +47,9 @@ public class UTS{
 				                                        "   l=" + l + 
 				                                                "   m=" + m + 
 				                                                        "   z=" + z);
-		val myuts_ = new GlobalJobRunner[Long](GLBParameters(n, w, l, z, m,verbose));
+		val myuts_ = new GlobalLoadBalancer[Long](GLBParameters(n, w, l, z, m,verbose));
 		var time:Long = System.nanoTime();
-		result:Long = myuts_.main(()=>new UTSTaskFrame(b,r,d));
+		result:Long = myuts_.run(()=>new UTSTaskFrame(b,r,d));
 		time = System.nanoTime() - time;
 		Console.OUT.println("Time spent: " + (time/1E9));
 		Console.OUT.println("Result: "+ result);

@@ -12,7 +12,7 @@ import x10.util.OptionsParser;
 import glb.LifelineGenerator;
 import glb.TaskBag;
 import glb.GLBParameters;
-import glb.GlobalJobRunner;
+import glb.GlobalLoadBalancer;
 
 public class BCG{
 	public static def main(args:Rail[String]) {
@@ -39,11 +39,9 @@ public class BCG{
 		val d:Double = opts("-d", 0.25);
 		val permute:Int = opts("-p", 1n); // on by default
 		val verbose:Int = opts("-v", 1n); // off by default
-
 		val i:Int = opts("-i", 4n); // default is 4 to get better performance
 		val t:Int = opts("-t", 1n);
-		val g = opts("-g", 1n);
-		
+		val g = opts("-g", 1n);		
 		val l = opts("-l", 2n); // default is 2 to distribute workload fast
 		val m = opts("-m", 1024n);
 	
@@ -72,9 +70,9 @@ public class BCG{
 		Console.OUT.println("interval = " + i);
 		Console.OUT.println("l = " + l);
 		Console.OUT.println("permute = " + permute);
-		val myssca2 = new GlobalJobRunner[BCResult]( GLBParameters(g, w, l, z, m,verbose));
+		val myssca2 = new GlobalLoadBalancer[BCResult]( GLBParameters(g, w, l, z, m,verbose));
 			
-		val result = myssca2.main( ()=>(new BCTaskFrame(Rmat(seed, n, a, b, c, d),i,t, permute, verbose)) );
+		val result = myssca2.run( ()=>(new BCTaskFrame(Rmat(seed, n, a, b, c, d),i,t, permute)) );
 		
 		if (verbose >=2n) printBetweennessMap(result.betweennessMap, (1<<n) as Int);
 	}

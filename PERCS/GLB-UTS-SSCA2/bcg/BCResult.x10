@@ -1,7 +1,7 @@
 package bcg;
 
 /**
- * The result is essentially betweeness map
+ * Class represents BC result,  which is essentially the betweeness map
  */
 public class BCResult {
 	val N:Int;

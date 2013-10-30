@@ -80,38 +80,6 @@ final class UTSTree {
 
     private static def sub(str:String, start:Int, end:Int) = str.substring(start, Math.min(end, str.length()));
 
-    public static def main(Rail[String]) {
-        val queue = new Queue(4n); // branching factor
-        var time:Long = System.nanoTime();
-        queue.init(19n, 13n); // seed, depth, Q:given these two parameters, even in distributed manner, the tree is deterministic? with branching factor
-        while (queue.size > 0) {
-            queue.expand();
-            ++queue.count;
-        }
-        time = System.nanoTime() - time;
-        Console.OUT.println("Performance = " + queue.count + "/" +
-                sub("" + time/1e9, 0n, 6n) + " = " +
-                sub("" + (queue.count/(time/1e3)), 0n, 6n) + "M nodes/s");
-    }
     
-    public def equals(_tree:UTSTree):Boolean{ // gotta write a better comparable method later
-    	Console.OUT.println("hash size:"+hash.size);
-    	Console.OUT.println("lower size:"+lower.size);
-    	Console.OUT.println("upper size:"+upper.size);
-    	assert(hash.size == lower.size);
-    	assert(hash.size == upper.size);
-    	Console.OUT.println("here");
-    	if(this.hash.size==_tree.hash.size && this.lower.size==_tree.lower.size
-    			&& this.upper.size == _tree.upper.size && this.size == _tree.size){
-    		// for(var i:Long=0L; i< hash.size; i++){
-    		// 	if(this.hash(i)() == _tree.hash(i)() && this.lower(i)==_tree.lower(i) && this.upper(i)==_tree.lower(i)){
-    		// 		//pass
-    		// 	}else{
-    		// 		return false;
-    		// 	}
-    		// } // note to write the right equals for UTSTree is a bit tricky, as the elements are the same but the orders are different TODO
-    		return true;
-    	}
-    	return false;
-    }
+    
 }

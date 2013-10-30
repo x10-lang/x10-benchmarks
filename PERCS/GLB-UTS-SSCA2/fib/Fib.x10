@@ -2,7 +2,7 @@ package fib;
 
 import glb.TaskBag;
 import glb.TaskFrame;
-import glb.GlobalJobRunner;
+import glb.GlobalLoadBalancer;
 import glb.ArrayListTaskBag;
 import glb.GLBParameters;
 
@@ -36,8 +36,8 @@ public class Fib(n:Long) {
         }
     }
     public def run():Long {
-        val g = new GlobalJobRunner[Long](GLBParameters.Default);
-        return g.main(()=>new FibFrame());
+        val g = new GlobalLoadBalancer[Long](GLBParameters.Default);
+        return g.run(()=>new FibFrame());
     }
     static def fib(n:Long):Long=n<2? n: fib(n-1)+fib(n-2);
     public static def main(args:Rail[String]) {

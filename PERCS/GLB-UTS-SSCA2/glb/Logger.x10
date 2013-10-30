@@ -1,6 +1,9 @@
 package glb;
+/**
+ * Class that collects lifeline statistics of GLB
+ */
 class Logger {
-    var nodesCount:Long = 0;
+    //var nodesCount:Long = 0;
     var nodesGiven:Long = 0;
 
     var stealsAttempted:Long = 0;
@@ -51,14 +54,13 @@ class Logger {
             lifelineNodesReceived + " (lifeline)."); 
         Console.OUT.println(stealsPerpetrated + " successful direct steals."); 
         Console.OUT.println(lifelineStealsPerpetrated + " successful lifeline steals.");
-        Console.OUT.println("Performance: " + nodesCount + "/" + sub("" + (time/1E9), 0n, 6n) +
-            " = " + sub("" + (nodesCount/(time/1E3)), 0n, 6n) + "M nodes/s");
+     
     }
 
     private static def sub(str:String, start:Int, end:Int) = str.substring(start, Math.min(end, str.length()));
 
     def add(other:Logger) {
-        nodesCount += other.nodesCount;
+       
         nodesGiven += other.nodesGiven;
         nodesReceived += other.nodesReceived;
         stealsPerpetrated += other.stealsPerpetrated;

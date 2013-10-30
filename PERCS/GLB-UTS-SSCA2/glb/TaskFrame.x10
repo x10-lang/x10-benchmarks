@@ -6,6 +6,16 @@ package glb;
  * GLB implementation. It has an associated task bag. 
  */
 public abstract class TaskFrame[Z] {
+	
+	/**
+	 * Perform initialization. Called when the TaskFrame is first created.
+	 * If the computation is supposed to be initiated with a root task, then
+	 * the programmer should arrange matters so that the root task is added 
+	 * to the task bag at a single place (usually place zero). If the computation
+	 * can start with many tasks executing simultaneously, then initTask() may
+	 * initialize non-empt task bags at more than one (perhaps all) places.
+	 */
+	abstract public def initTask():void; 
 
 	/**
 	 * Run at most n tasks in the associated task bag. Return true
@@ -14,30 +24,25 @@ public abstract class TaskFrame[Z] {
 	 abstract public def runAtMostNTasks(n:Long):Boolean;
 	 
 	 /**
-	  * Return the reducer of type Z associated with this job.
+	  * Return the underlying task bag.
 	  */
-	 abstract public def getReducer():Reducible[Z];
+	 abstract public def getTaskBag():TaskBag;
+	 
 	 /**
 	  * Return the result accumulated so far for all executed tasks.
 	  */
 	 abstract public def getResult():Z;
 	 
 	 /**
-	  * Perform initialization. Called when the TaskFrame is first created.
-	  * If the computation is supposed to be initiated with a root task, then
-	  * the programmer should arrange matters so that the root task is added 
-	  * to the task bag at a single place (usually place zero). If the computation
-	  * can start with many tasks executing simultaneously, then initTask() may
-	  * initialize non-empt task bags at more than one (perhaps all) places.
+	  * Return the reducer of type Z associated with this job.
 	  */
-	 abstract public def initTask():void; 
+	 abstract public def getReducer():Reducible[Z];
+	
 	 
 	 /**
-	  * Return the underlying task bag.
+	  * Auxiliary function that user can overwrite to print the statistics one cares about,
+	  * e.g., computation time. This function will be called only after all the calculation
+	  * and results reduction are done.
 	  */
-	 abstract public def getTaskBag():TaskBag;
-	 
-	 public def printLog():void{
-		 //do nothing, override it to print out the logs that you want
-	 }
+	 protected def printLog():void{}
 }
