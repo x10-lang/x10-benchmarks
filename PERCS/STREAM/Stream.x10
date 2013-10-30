@@ -21,7 +21,7 @@ public class Stream {
 
     public static def main(args:Rail[String]){here == Place.FIRST_PLACE} {
         val verified = new Cell[Boolean](true);
-        val times = GlobalRef[Rail[double]](new Rail[double](NUM_TIMES));
+        val times = GlobalRef[Rail[Double]](new Rail[Double](NUM_TIMES));
 
         val opts = new OptionsParser(args, [
             Option.HELP as Option
@@ -41,23 +41,23 @@ public class Stream {
         PlaceGroup.WORLD.broadcastFlat(()=>{
                 val p = here.id;
                 val allocator = Runtime.MemoryAllocator.requestAllocator(true, false);
-                val a = new Rail[double](localSize, allocator);
-                val b = new Rail[double](localSize, allocator);
-                val c = new Rail[double](localSize, allocator);
+                val a = new Rail[Double](localSize, allocator);
+                val b = new Rail[Double](localSize, allocator);
+                val c = new Rail[Double](localSize, allocator);
                 
-                for (var i:long=0; i<localSize; i++) {
+                for (var i:Long=0; i<localSize; i++) {
                     b(i) = 1.5 * (p*localSize+i);
                     c(i) = 2.5 * (p*localSize+i);
                 }
                 
                 val beta = alpha;
                 
-                for (var j:long=0; j<NUM_TIMES; j++) {
+                for (var j:Long=0; j<NUM_TIMES; j++) {
                     if (p==0) {
                         val t = times as GlobalRef[Rail[Double]]{self.home==here};
                         t()(j) = -now();
                     }
-                    for (var i:long=0; i<localSize; i++)
+                    for (var i:Long=0; i<localSize; i++)
                         a(i) = b(i) + beta*c(i);
                     Team.WORLD.barrier();
                     if (p==0) {
@@ -67,21 +67,21 @@ public class Stream {
                 }
                 
                 // verification
-                for (var i:long=0; i<localSize; i++)
+                for (var i:Long=0; i<localSize; i++)
                     if (a(i) != b(i) + alpha*c(i)) 
                         verified.set(false);
             });
 
-        var min:double = 1000000;
-        for (var j:long=1; j<NUM_TIMES; j++)
+        var min:Double = 1000000;
+        for (var j:Long=1; j<NUM_TIMES; j++)
             if (times()(j) < min)
                 min = times()(j);
         printStats(N, min, verified());
     }
 
-    static def now():double = System.nanoTime() * 1e-9;
+    static def now():Double = System.nanoTime() * 1e-9;
 
-    static def printStats(N:long, time:double, verified:boolean) {
+    static def printStats(N:Long, time:Double, verified:Boolean) {
         val size = (3*8*N/MEG);
         val rate = (3*8*N) / (1.0E9*time);
         Console.OUT.println("Number of places=" + NUM_PLACES);
