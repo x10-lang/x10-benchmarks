@@ -48,34 +48,23 @@ class FTNew(M:Long, verify:Boolean) {
     @Native("java", "FTNatives.create_plan(#SQRTN, #direction, #flags)")
     native static def create_plan(SQRTN:Long, direction:Int, flags:Int):Long;
     
+    static val I = Runtime.hereLong();
+    static val r = new Random(I);
+    
     val SQRTN = 1<<M;
     val N = SQRTN*SQRTN;
-    val I = Runtime.hereLong();
+    
     val nRows = SQRTN/Place.MAX_PLACES;
     val nCols = SQRTN;
     val localSize = nRows*nCols;
     val chunkSize = nRows*nRows;
     
-    val A = new Array_2[Complex](nRows, nCols);
+    val A = new Array_2[Complex](nRows, nCols, (i:Long,j:Long)=>randomComplex(r));
     val B = new Array_2[Complex](nCols, nRows); // transposed shape
     val fftwPlan = create_plan(nCols, -1n, 0n);
     val fftwInversePlan = create_plan(nCols, 1n, 0n);
 
     @Inline final static def randomComplex(r:Random)=Complex(r.next()-0.5, r.next()-0.5);
-
-    def this(M:Long, verify:Boolean) {
-        property(M, verify);
-        val mbytes = N*2.0*8.0*2/(1024*1024);
-        if (I==0) {
-                Console.OUT.println("M=" + M + " SQRTN=" + SQRTN + " N=" + N + " nRows=" + nRows +
-                                    " localSize=" + localSize + " MAX_PLACES=" + Place.MAX_PLACES +
-                                    " Mem=" + mbytes + " mem/MAX_PLACES=" + mbytes/Place.MAX_PLACES);
-        }
-        val r = new Random(I);
-        for ([i, j] in A.indices()) {
-            A(i,j)=randomComplex(r);
-        }
-    }
    
     def rowFFTS(fwd:Boolean) {
            execute_plan(fwd?fftwPlan:fftwInversePlan, A.raw(), B.raw(), SQRTN, 0, nRows);
@@ -120,7 +109,7 @@ class FTNew(M:Long, verify:Boolean) {
      */
     def transpose() {
         val n1 = Place.MAX_PLACES;
-	val n2 = nRows;
+        val n2 = nRows;
         for (p in 0..(Place.MAX_PLACES-1)) 
             for (var ii:Long=0; ii<n2; ii+=16) 
                 for (var jj:Long=p*n2; jj<(p+1)*n2; jj+=16) 
@@ -227,9 +216,7 @@ class FTNew(M:Long, verify:Boolean) {
         ], [
             Option("m", "magnitude", "log2 size of the vector (default 10)")
         ]);
-        if (opts.wantsUsageOnly("")) {
-            return;
-        }
+        if (opts.wantsUsageOnly("")) return;
         val M = opts("-m", 10n);
         val verify = opts("-v", false);
         val SQRTN = 1 << M;
@@ -239,6 +226,12 @@ class FTNew(M:Long, verify:Boolean) {
             return;
         }
         val plh = PlaceLocalHandle.makeFlat[FTNew](PlaceGroup.WORLD, ()=>new FTNew(M, verify));
+        val o=plh();
+        val mbytes = o.N*2.0*8.0*2/(1024*1024);
+        Console.OUT.println("M=" + o.M + " SQRTN=" + o.SQRTN + " N=" + o.N + " nRows=" + o.nRows +
+                " localSize=" + o.localSize + " MAX_PLACES=" + Place.MAX_PLACES +
+                              " Mem=" + mbytes + " mem/MAX_PLACES=" + mbytes/Place.MAX_PLACES);
+        
         PlaceGroup.WORLD.broadcastFlat(()=>{plh().run();});
     }
 }
