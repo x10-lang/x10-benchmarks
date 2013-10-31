@@ -4,12 +4,12 @@ import x10.compiler.Inline;
 
 public class UTSTaskFrame extends glb.TaskFrame[Long]{ 
 	
-	var last:Long;
-	var tb:UTSTaskBag{self!=null}; 
-	var seed:int; 
-	var depth:int; 
-	var branchfactor:int; 
-	var result:Long = 0L;
+	//var last:Long;
+	private var tb:UTSTaskBag{self!=null}; 
+	private var seed:int; 
+	private var depth:int; 
+	private var branchfactor:int; 
+	private var result:Long = 0L;
 	
 	/**
 	 * Constructor

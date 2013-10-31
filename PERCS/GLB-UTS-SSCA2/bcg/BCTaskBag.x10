@@ -5,10 +5,10 @@ import x10.compiler.Inline;
 public class BCTaskBag implements TaskBag {
 	
 	/*backing data storage*/
-	public var data:Rail[BCTaskItem];
-	public var head:Int = 0n;
-	public var tail:Int = 0n;	
-	public var size:Int = 0n; // note size not necessarily the same as data.size, 
+	private var data:Rail[BCTaskItem];
+	private var head:Int = 0n;
+	private var tail:Int = 0n;	
+	private var size:Int = 0n; // note size not necessarily the same as data.size, 
 							  //but it should be always the same as tail-head+1, except when tail==head==0==size
 	
 	/* split threshold, when resulting split bag is smaller than this, choose not not split, tunnable*/

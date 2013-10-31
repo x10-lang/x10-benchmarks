@@ -14,65 +14,65 @@ import x10.compiler.Pragma;
 class LocalJobRunner[Z] {
 	
 	/** Task frame, responsible for crunching numbers */
-	val tf:TaskFrame[Z];
+	private val tf:TaskFrame[Z];
 	
 	/** Random buddies, a runner first probes its random buddy, only when none of the random buddies responds
 	 *  it starts to probe its lifeline buddies */
-	val victims:Rail[Long]; 
+	private val victims:Rail[Long]; 
 	
 	/** Lifeline buddies */
-	val lifelines:Rail[Long];
+	private val lifelines:Rail[Long];
 	
 	/** The granularity of tasks to run in a batch before starts to probe network to respond to work-stealing 
 	 * requests. The smaller n is, the more responsive to the work-stealing requests; on the other hand, less focused
 	 * on computation */
-	val n:Int; 
+	private val n:Int; 
 	
 	/** Local place id */
-	val h:Long;
-	
-	/** Logger to record the work-stealing status */
-	val logger:Logger; 
+	private val h:Long;
 	
 	/** Read as I am the "lifeline buddy" of my "lifelinethieves" */
-	val lifelineThieves:FixedSizeStack[Long]; 
+	private val lifelineThieves:FixedSizeStack[Long]; 
 	
 	/** Thieves that send stealing requests*/
-	val thieves:FixedSizeStack[Long];
+	private val thieves:FixedSizeStack[Long];
 	
 	/** The data structure to keep a key invariant: 
 	 * At any time, at most one message has been sent on an
 	 * outgoing lifeline (and hence at most one message has
 	 * been received on an incoming lifeline).*/
-	val lifelinesActivated:Rail[Boolean];
+	private val lifelinesActivated:Rail[Boolean];
 	
 	/** Total number of places */
-	val P = Place.MAX_PLACES;
+	private val P = Place.MAX_PLACES;
 	
 	/** Random number, used when picking a non-lifeline victim/buddy */
-	val random = new Random();
+	private val random = new Random();
 	
 	/** Number of random victims to probe before sending requests to lifeline buddy*/
-	val w:Int; 
+	private val w:Int; 
 	
 	/** Maximum number of random victims */
-	val m:Int; 
+	private val m:Int; 
 	
 	/** Verbose level, for collecting data / debugging purposes*/
-	val verbose:Int; 
+	protected val verbose:Int; 
+	
+	/** Logger to record the work-stealing status */
+	protected val logger:Logger; 
 	
 	
 	
 	/** variables used for synchronization, made sure not to be optimized out by the compiler */ 
-	@x10.compiler.Volatile transient var active:Boolean = false;
-	@x10.compiler.Volatile transient var empty:Boolean = true;
-	@x10.compiler.Volatile transient var waiting:Boolean = false; 
+	@x10.compiler.Volatile private transient var active:Boolean = false;
+	@x10.compiler.Volatile private transient var empty:Boolean = true;
+	@x10.compiler.Volatile private transient var waiting:Boolean = false; 
 	
 	
 	/** variables used for lifeline debugging purpose */
-	var last:Long;
-	var phase:Long;
-	var probes:Long;
+	private var last:Long;
+	private var phase:Long;
+	private var probes:Long;
 	
 	/**
 	 * Class constructor
@@ -116,13 +116,13 @@ class LocalJobRunner[Z] {
 	/**
 	 * @return task frame
 	 */
-	def getTF():TaskFrame[Z]=this.tf;
+	protected def getTF():TaskFrame[Z]=this.tf;
 	
 	/**
 	 * Probe network. 
 	 * @param n used for debugging purpose, a debugging id
 	 */
-	@Inline def probe(n:Long) {
+	@Inline private def probe(n:Long) {
 		if(verbose ==  GLBParameters.VERBOSE_MAX) { if (++probes%(1<<25n) == 0) Runtime.println(Runtime.hereLong() + " PROBING " + n + " (" + (probes>>25n) + ")"); }
 		Runtime.probe();
 	}
@@ -135,7 +135,7 @@ class LocalJobRunner[Z] {
 	 * (4) when running out of tasks, steal from others
 	 * @param st the place local handle of LJR
 	 */
-	final def processStack(st:PlaceLocalHandle[LocalJobRunner[Z]]) { 
+	private final def processStack(st:PlaceLocalHandle[LocalJobRunner[Z]]) { 
 		do {
 			while (processAtMostN()) {
 				probe(9999999);		
@@ -155,7 +155,7 @@ class LocalJobRunner[Z] {
 	 * @return true when successfully executing n tasks
 	 *         false when finishing less than n tasks (i.e., running out of tasks) 
 	 */
-	@Inline protected final def processAtMostN():Boolean {	
+	@Inline private final def processAtMostN():Boolean {	
 		val result:Boolean =  this.tf.runAtMostNTasks(this.n); 
 		return result;
 	}
@@ -165,7 +165,7 @@ class LocalJobRunner[Z] {
 	 * {@link #give(PlaceLocalHandle[LocalJobRunner[Z]],TaskBag)} method
 	 * @param st place local handle of LJR
 	 */
-	@Inline protected def distribute(st:PlaceLocalHandle[LocalJobRunner[Z]]) {
+	@Inline private def distribute(st:PlaceLocalHandle[LocalJobRunner[Z]]) {
 		var loot:TaskBag;
 		while (((thieves.size() > 0) || 
 				(lifelineThieves.size() > 0)) && (loot = this.tf.getTaskBag().split()) != null) {			
@@ -208,7 +208,7 @@ class LocalJobRunner[Z] {
 	 * @param loot Task to share
 	 * @param source victim id
 	 */
-	def deal(st:PlaceLocalHandle[LocalJobRunner[Z]], loot:TaskBag, source:Long) {
+	private def deal(st:PlaceLocalHandle[LocalJobRunner[Z]], loot:TaskBag, source:Long) {
 		try {
 			val lifeline = source >= 0;
 			if (lifeline) lifelinesActivated(source) = false; 
@@ -236,7 +236,7 @@ class LocalJobRunner[Z] {
 	 * @param loot task bag to merge
 	 * @param lifeline if it is from a lifeline buddy
 	 */
-	@Inline final def processLoot(loot:TaskBag, lifeline:Boolean) {
+	@Inline private final def processLoot(loot:TaskBag, lifeline:Boolean) {
 		val n = loot.size();
 		if (lifeline) {
 			++logger.lifelineStealsPerpetrated;
@@ -253,7 +253,7 @@ class LocalJobRunner[Z] {
 	 * Rejecting thieves when no task to share (or worth sharing). Note, never reject lifeline thief,
 	 * instead put it into the lifelineThieves stack,
 	 */
-	@Inline def reject(st:PlaceLocalHandle[LocalJobRunner[Z]]) {
+	@Inline private def reject(st:PlaceLocalHandle[LocalJobRunner[Z]]) {
 		while (thieves.size() > 0) {
 			val thief = thieves.pop();
 			if (thief >= 0) {
@@ -277,7 +277,7 @@ class LocalJobRunner[Z] {
 	 * 
 	 * @param st PHL for LJR
 	 */
-	def steal(st:PlaceLocalHandle[LocalJobRunner[Z]]) {
+	private def steal(st:PlaceLocalHandle[LocalJobRunner[Z]]) {
 		if (P == 1) return false;
 		val p = Runtime.hereLong(); // the place the thief lives
 		empty = true;
@@ -312,7 +312,7 @@ class LocalJobRunner[Z] {
 	 * @param thief place id of thief
 	 * @param lifeline if I am the lifeline buddy of the remote thief
 	 */
-	def request(st:PlaceLocalHandle[LocalJobRunner[Z]], thief:Long, lifeline:Boolean) {
+	private def request(st:PlaceLocalHandle[LocalJobRunner[Z]], thief:Long, lifeline:Boolean) {
 		try {
 			if (lifeline) ++logger.lifelineStealsReceived; else ++logger.stealsReceived;
 			if (empty || waiting) {
@@ -335,7 +335,7 @@ class LocalJobRunner[Z] {
 	 * (2) Lifeline steals are responded
 	 * @param place local handle for LJR
 	 */
-	def main(st:PlaceLocalHandle[LocalJobRunner[Z]]) {
+	protected def main(st:PlaceLocalHandle[LocalJobRunner[Z]]) {
 		
 		@Pragma(Pragma.FINISH_DENSE) finish { 
 			try {
@@ -359,7 +359,7 @@ class LocalJobRunner[Z] {
 	/**
 	 * print lifeline, for debugging purpose only
 	 */
-	def printLifelines():void{
+	protected def printLifelines():void{
 		Console.OUT.print(Runtime.hereLong() + ":");
 		for(li in this.lifelines){
 			Console.OUT.print(li+" ");
@@ -383,7 +383,7 @@ class LocalJobRunner[Z] {
 	 * Print exceptions
 	 * @param v exeception
 	 */
-	static def error(v:CheckedThrowable) {
+	private static def error(v:CheckedThrowable) {
 		Runtime.println("Exception at " + here);
 		v.printStackTrace();
 	}

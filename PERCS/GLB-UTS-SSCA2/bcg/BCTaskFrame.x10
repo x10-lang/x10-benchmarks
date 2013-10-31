@@ -7,22 +7,22 @@ import glb.TaskBag;
 
 public class BCTaskFrame extends TaskFrame[BCResult]{
 	/*task bag*/
-	val tb:BCTaskBag;
+	private val tb:BCTaskBag;
 	
 	/*vertice number*/
-	val verticesNum:Int;
+	private val verticesNum:Int;
 	
 	/*The interval of the graph to work on*/
-	val interval:Int;
+	private val interval:Int;
 	
 	/*BC worker, work-horse*/
-	val bc_:BC;
+	private val bc_:BC;
 	
 	/*graph to work on*/
-	val graph:Graph;
+	private val graph:Graph;
 	
 	/*split threshold */
-	var splitThreshold:Int;
+	private var splitThreshold:Int;
 	/**
 	 * @overide the initTask
 	 */

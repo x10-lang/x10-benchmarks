@@ -8,7 +8,7 @@ import x10.compiler.Inline;
  */
 public class GlobalLoadBalancer[Z](glbParam:GLBParameters) {
 	@Inline static def min(i:Long, j:Long) = i < j ? i : j;
-	val P = Place.MAX_PLACES;
+	private val P = Place.MAX_PLACES;
 	/**
 	 * Entry point for user to run GlobalLoadBalancer 
 	 * It has three phases (1) setup phase (2) calculation phase (3) result collection phase
@@ -56,7 +56,7 @@ public class GlobalLoadBalancer[Z](glbParam:GLBParameters) {
 	 * @param st PLH for LJR
 	 * @return results for reducer to reduce
 	 */
-	protected def collectResults(st:PlaceLocalHandle[LocalJobRunner[Z]]):Rail[Z]
+	private def collectResults(st:PlaceLocalHandle[LocalJobRunner[Z]]):Rail[Z]
 	{
 		if (P >= 1024) {
 			collectedResults:Rail[Z] = new Rail[Z](P/32, (i:Long)=>at (Place(i*32)) {
@@ -77,13 +77,13 @@ public class GlobalLoadBalancer[Z](glbParam:GLBParameters) {
 	 * @param results Array that contains result from each place
 	 * @param reducer Reducer that can reduce all the local results to a global one
 	 */
-	protected def reduce(results: Rail[Z], reducer:Reducible[Z]):Z{
+	private def reduce(results: Rail[Z], reducer:Reducible[Z]):Z{
 		var r : Z = reducer.zero();		
 		for(p in results) r = reducer(r,p);
 		return r;
 	}
 	
-	protected def collectLifelineStatus(st:PlaceLocalHandle[LocalJobRunner[Z]]):void{
+	private def collectLifelineStatus(st:PlaceLocalHandle[LocalJobRunner[Z]]):void{
 		val logs:Rail[Logger];
 		if (P >= 1024) {
 			logs = new Rail[Logger](P/32, (i:Long)=>at (Place(i*32)) {
@@ -107,7 +107,7 @@ public class GlobalLoadBalancer[Z](glbParam:GLBParameters) {
 	 * Create task frame on each place. Used for debugging purpose only.
 	 * @param init function closure to create a task frame
 	 */
-	protected def dryRun(init:()=>TaskFrame[Z]):void{
+	private def dryRun(init:()=>TaskFrame[Z]):void{
 		val P = Place.MAX_PLACES;
 		val st = PlaceLocalHandle.makeFlat[LocalJobRunner[Z]](PlaceGroup.WORLD, 
 				()=>new LocalJobRunner(init, this.glbParam));
@@ -120,7 +120,7 @@ public class GlobalLoadBalancer[Z](glbParam:GLBParameters) {
 	 * Print logging information on each place if user is interested in collecting computation numbers
 	 * @param st PLH for LJR
 	 */
-	protected def printLog(st:PlaceLocalHandle[LocalJobRunner[Z]]):void{
+	private def printLog(st:PlaceLocalHandle[LocalJobRunner[Z]]):void{
 		val P = Place.MAX_PLACES;
 		for(var i:Long =0L; i < P; ++i){
 			at(Place(i)){

@@ -5,8 +5,8 @@ package bcg;
  */
 public class BCResult {
 	// betweenness map and its size
-	val N:Int;
-	val betweennessMap:Rail[Double];
+	private val N:Int;
+	protected val betweennessMap:Rail[Double];
 	
 	/**
 	 * Constructor called by {@link #zero()}
