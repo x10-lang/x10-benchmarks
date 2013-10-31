@@ -15,6 +15,9 @@ import glb.GLBParameters;
 import glb.GlobalLoadBalancer;
 
 public class BCG{
+	/**
+	 * Main function for BCG, Betweenness-Centrality-GLB
+	 */
 	public static def main(args:Rail[String]) {
 		val opts = new OptionsParser(args, new Rail[Option](), [
 		    Option("s", "", "seed to generate random graph"),
@@ -77,12 +80,20 @@ public class BCG{
 		if (verbose >=2n) printBetweennessMap(result.betweennessMap, (1<<n) as Int);
 	}
 	
+	/**
+	 * Print out result
+	 * @param betweennessMap result of BCG
+	 * @param N size of betweennessMap
+	 */
     protected static def printBetweennessMap(betweennessMap:Rail[Double], N:Int) {
 	for(i in 0n..(N-1n)) 
 	    if (betweennessMap(i) != 0.0) 
 		Console.OUT.println("(" + i + ") -> " + sub(""+betweennessMap(i), 0n, 6n));
     }
 
+    /**
+     * substring helper function
+     */
 	private static def sub(str:String, start:Int, end:Int) = str.substring(start, Math.min(end, str.length()));
 	
 }

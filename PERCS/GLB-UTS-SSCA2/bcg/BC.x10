@@ -13,6 +13,7 @@ import x10.compiler.Ifdef;
 public final class BC(N:Int) {
 	val graph:Graph;
 	
+	
 	val verticesToWorkOn = new Rail[Int](N, (i:Long)=>i as Int);
 	val betweennessMap = new Rail[Double](N);
 	var allocTime:Long = 0L;
@@ -30,7 +31,11 @@ public final class BC(N:Int) {
 	var count:Int = 0n;
 	
 	
-	
+	/**
+	 * Constructor
+	 * @param graph random graph to work on, inside the constructor, various helper data structured
+	 * will be allocated.
+	 */
 	public def this(graph:Graph) {
 		property(graph.numVertices());
 		this.graph = graph;
@@ -46,13 +51,7 @@ public final class BC(N:Int) {
 		allocTime += System.nanoTime();
 	}
 	
-	static def make(rmat:Rmat, permute:Int, verbose:Int) {
-		val graph = rmat.generate();
-		graph.compress();
-		val s = new BC(graph);
-		if (permute > 0) s.permuteVertices();
-		return s;
-	}
+	
 	
 	/**
 	 * Helper function that processes a set of vertices --- i.e, calculates 
@@ -135,7 +134,7 @@ public final class BC(N:Int) {
 	}
 	
 	/**
-	 * A function to shuffle the vertices randomly to give better work dist.
+	 * A function to shuffle the vertices randomly to give better work distribution
 	 */
 	protected def permuteVertices() {
 		val prng = new Random(1);
@@ -149,7 +148,7 @@ public final class BC(N:Int) {
 	}
 	
 	/**
-	 * Dump the betweenness map.
+	 * Print the betweenness map.
 	 */
 	protected def printBetweennessMap() {
 		for(var i:Int=0n; i<N; ++i) {
@@ -159,6 +158,13 @@ public final class BC(N:Int) {
 		}
 	}
 	
+	/**
+	 * Get the subsrting of a given string
+	 * @param str parent string
+	 * @param start start idx 
+	 * @param end end idx
+	 * @return sub string of str with [start, end(or end of str))
+	 */
 	private static def sub(str:String, start:Int, end:Int) = str.substring(start, Math.min(end, str.length()));
 	
 	

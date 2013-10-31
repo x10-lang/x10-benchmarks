@@ -8,19 +8,35 @@ import glb.TaskBag;
 
 
 public class BCTaskFrame extends TaskFrame[BCResult]{
+	/*task bag*/
 	val tb:BCTaskBag;
+	
+	/*vertice number*/
 	val verticesNum:Int;
+	
+	/*The interval of the graph to work on*/
 	val interval:Int;
+	
+	/*BC worker, work-horse*/
 	val bc_:BC;
+	
+	/*graph to work on*/
 	val graph:Graph;
+	
+	/*split threshold */
 	var splitThreshold:Int;
 	/**
-	 * should be only called by the master task frame
+	 * @overide the initTask
 	 */
 	public def initTask():void {
 		this.tb.init(this.verticesNum, this.interval);
 	}
-	
+	/**
+	 * Constructor
+	 * @param rmat RMAT representation of the graph
+	 * @param splitThreshold split threshold
+	 * @permute 0 not to permute 1 to permute
+	 */
 	public def this(rmat:Rmat, interval:Int, splitThreshold:Int, permute:Int) {
 		// init bc the workhorse
 		val graph = rmat.generate();
@@ -35,6 +51,9 @@ public class BCTaskFrame extends TaskFrame[BCResult]{
 		this.tb = new BCTaskBag(this.splitThreshold); // should just use a split threshold as a constructor, later on, more data will be either initialized or merged TODO
 	}
 	
+	/**
+	 * @Override
+	 */
 	public def runAtMostNTasks(var n:Long):Boolean {
 		var tasksRun:Long = 0L;
 		while((tb.size() > 0) && (tasksRun < n)){
@@ -47,6 +66,9 @@ public class BCTaskFrame extends TaskFrame[BCResult]{
 		return (tasksRun==n);
 	}
 	
+	/**
+	 * @Override
+	 */
 	public def getResult()=new BCResult(this.bc_.betweennessMap);
 	public def getTaskBag()=tb;
 	public def getReducer()= BCResult.getReducer(this.verticesNum);

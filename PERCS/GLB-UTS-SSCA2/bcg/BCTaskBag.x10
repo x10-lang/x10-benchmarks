@@ -6,14 +6,19 @@ import glb.TaskBag;
 
 public class BCTaskBag implements TaskBag {
 	
+	/*backing data storage*/
 	public var data:Rail[BCTaskItem];
 	public var head:Int = 0n;
-	public var tail:Int = 0n;
-	
+	public var tail:Int = 0n;	
 	public var size:Int = 0N; // note size not necessarily the same as data.size, but it should be always the same as tail-head+1, except when tail==head==0==size
 	
-	public var splitThreashold:Int = 10n;// subject to change
+	/* split threshold, when resulting split bag is smaller than this, choose not not split, tunnable*/
+	public var splitThreashold:Int = 10n;
 	
+	/**
+	 * Constructor 
+	 * @param splitThreshold split threshold
+	 */
 	public def this(splitThreashold:Int){
 		this.splitThreashold = splitThreashold;
 	}
@@ -76,7 +81,7 @@ public class BCTaskBag implements TaskBag {
 			this.head = 0n;
 			this.data = tmpData;
 		}
-		// TODO: auto-generated method stub
+		
 	}
 	
 	
@@ -86,11 +91,10 @@ public class BCTaskBag implements TaskBag {
 	 * Below are helper methods
 	 * set public for testing purpose only
 	 */
-	@Inline public  def pop():BCTaskItem{
+	@Inline protected  def pop():BCTaskItem{
 		result:BCTaskItem = this.data(head);
 		this.head+=1n;
 		this.size--;
-	
 		return result;
 	}
 }
