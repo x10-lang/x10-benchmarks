@@ -1,12 +1,10 @@
 package glb;
 import x10.compiler.Inline;
 import x10.util.Random;
-
 import x10.compiler.Ifdef;
 import x10.compiler.Uncounted;
 import x10.compiler.Pragma;
-import x10.util.Option;
-import x10.util.OptionsParser;
+;
 
 /**
  * The local runner for the GLB framework. An instance of this class runs at each

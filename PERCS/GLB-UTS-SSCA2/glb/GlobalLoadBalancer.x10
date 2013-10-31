@@ -1,14 +1,6 @@
 package glb;
 
-import x10.compiler.Pragma;
 import x10.compiler.Inline;
-import x10.util.Random;
-
-import x10.compiler.Ifdef;
-import x10.compiler.Uncounted;
-
-import x10.util.Option;
-import x10.util.OptionsParser;
 
 /**
  * The top level class of the Global Load Balancing (GLB) framework.
