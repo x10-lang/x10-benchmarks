@@ -1,6 +1,6 @@
 package uts;
 
-import x10.compiler.*;
+import x10.compiler.Inline;
 
 public class UTSTaskFrame extends glb.TaskFrame[Long]{ 
 	
@@ -10,9 +10,13 @@ public class UTSTaskFrame extends glb.TaskFrame[Long]{
 	var depth:int; 
 	var branchfactor:int; 
 	var result:Long = 0L;
-	public def getResult():Long=result;
-	public def getTaskBag():UTSTaskBag=tb;
-	public def getReducer()=Reducible.SumReducer[Long]();
+	
+	/**
+	 * Constructor
+	 * @param branch factor
+	 * @param seed random number generator
+	 * @param depth depth of the tree
+	 */
 	public def this(branchfactor:Int, seed:Int, depth:Int){
 		this.branchfactor = branchfactor;
 		this.seed = seed;
@@ -20,18 +24,33 @@ public class UTSTaskFrame extends glb.TaskFrame[Long]{
 		this.tb = new UTSTaskBag(branchfactor);
 	}
 	
-	@Inline public def runAtMostNTasks(tb:UTSTaskBag, n:Long):Boolean{
+	/**
+	 * @Override
+	 */
+	public def initTask(): void{
+		this.tb.initBag(this.seed, this.depth); 
+	}
+	/**
+	 * @Override
+	 */
+	@Inline public def runAtMostNTasks(n:Long):Boolean=runAtMostNTasks(this.tb as UTSTaskBag, n);
+
+	@Inline private def runAtMostNTasks(tb:UTSTaskBag, n:Long):Boolean{
 		var i:Long=0;
 		for (; (i<n) && (tb.size()>0); ++i) {
 			tb.expand();
 		}
-		tb.incByI(i);
-		result = tb.getCount();// WA 10/20
+		tb.incByI(i); // has traversed i number of nodes
+		result = tb.getCount();// update result
 		return tb.size() > 0;
 	}
-	@Inline public def runAtMostNTasks(n:Long):Boolean=runAtMostNTasks(this.tb as UTSTaskBag, n);
-	public def initTask(): void{
-		this.tb.initTree(this.seed, this.depth); 
-	}
+	
+	/**
+	 * @Override
+	 */
+	public def getResult():Long=result;
+	public def getTaskBag():UTSTaskBag=tb;
+	public def getReducer()=Reducible.SumReducer[Long]();
+	
 	
 }

@@ -1,28 +1,25 @@
 package uts;
-
-import x10.compiler.*;
-
-import x10.util.Random;
 import x10.util.Option;
 import x10.util.OptionsParser;
-
 import glb.GLBParameters;
 import glb.GlobalLoadBalancer;
 
 public class UTS{
 	
-	
+	/**
+	 * Main function for UTS, Unbalanced Tree Search
+	 */
 	public static def main(args:Rail[String]) {
 		val opts = new OptionsParser(args, new Rail[Option](), [
-		     Option("b", "", "Branching factor"),
-		     Option("r", "", "Seed (0 <= r < 2^31"),
-		     Option("d", "", "Tree depth"),
-		     Option("n", "", "Number of nodes to process before probing. Default 200."),
-		     Option("w", "", "Number of thieves to send out. Default 1."),
-		     Option("l", "", "Base of the lifeline"),
-		     Option("m", "", "Max potential victims"),
-		     Option("v", "", "Verbose level")]);
-
+		    Option("b", "", "Branching factor"),
+		    Option("r", "", "Seed (0 <= r < 2^31"),
+		    Option("d", "", "Tree depth"),
+		    Option("n", "", "Number of nodes to process before probing. Default 200."),
+		    Option("w", "", "Number of thieves to send out. Default 1."),
+		    Option("l", "", "Base of the lifeline"),
+		    Option("m", "", "Max potential victims"),
+		    Option("v", "", "Verbose level")]);
+		
 		val b = opts("-b", 4n);
 		val r = opts("-r", 19n);
 		val d = opts("-d", 13n);
@@ -49,7 +46,7 @@ public class UTS{
 		Console.OUT.println("Time spent: " + (time/1E9));
 		Console.OUT.println("Result: "+ result);
 		Console.OUT.println("Throughput: "+result/(time/1E3)+ " M nodes/s");
-	
+		
 	}
 	
 	

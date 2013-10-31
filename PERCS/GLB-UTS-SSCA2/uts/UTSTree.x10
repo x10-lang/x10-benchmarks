@@ -1,20 +1,34 @@
 package uts; 
-import x10.compiler.*;
-// it was the Queue.x10
-final class UTSTree {
-    var hash:Rail[SHA1Rand];
-    var lower:Rail[Int]; // Wei: Question: shouldn't lower elements values are always 0 ? only in seq code
-    var upper:Rail[Int];
-    var size:Long; // Wei: Q: seems not initialized, is it true default value is always 0 ?
+import x10.compiler.Inline;
 
+/**
+ * Data structure to represent the Geometric tree
+ */
+final class UTSTree {
+	/*descriptor array*/
+    var hash:Rail[SHA1Rand];
+    /*unvisited children lower array*/
+    var lower:Rail[Int]; // It always starts 0, but if merging happens it can become non-zero
+    /*unvisited children upper array*/
+    var upper:Rail[Int];
+    /*number of the effective elements in hash/lower/upper, one hash/lower/upper 3-tuple represents a node
+     note, this is however not the size of the tree.*/
+    var size:Long; 
+
+    /*denominator*/
     val den:Double;
 
+    /*number of nodes have been visited*/
     var count:Long;
 
-    val factor:Int; // WA 10/18
-    def this(factor:Int) { // Wei: factor is the branching factor, expected value not the max value 
-    	                   // Does this imply if we are really unlucky, the tree can be really large, but
-    	                   // since we have bounded depth it terminates
+    /*branching factor*/
+    val factor:Int; 
+    
+    /**
+     * Constructor
+     * @param factor, branching factor,expected value not the max value 
+     */
+    def this(factor:Int) { // 
         hash = new Rail[SHA1Rand](4096);
         lower = new Rail[Int](4096);
         upper = new Rail[Int](4096);
@@ -22,15 +36,22 @@ final class UTSTree {
         this.factor = factor;
     }
 
+    /**
+     * @param seed raondom seed
+     * @param height distance from the bottom of the trees
+     */
     @Inline def init(seed:Int, height:Int) {
         push(SHA1Rand(seed, height));
         ++count; // now we have a root node
     }
 
+    /**
+     * Grow a new node
+     * @param h node descriptor
+     */
     @Inline def push(h:SHA1Rand):void {
         val u = Math.floor(Math.log(1.0 - h() / 2147483648.0) / den) as Int;
         if(u > 0n) { 
-        	assert(hash.size >= 4096L);// added by Wei Oct 22, 2012
             if(size >= hash.size){
             	grow();
             }
@@ -40,6 +61,9 @@ final class UTSTree {
         }
     }
 
+    /**
+     * Explore the tree in a depth-first manner
+     */
     @Inline def expand() {
         val top = size - 1;
         val h = hash(top);
@@ -47,9 +71,9 @@ final class UTSTree {
         val l = lower(top);
         val u = upper(top) - 1n;
         
-        if(d > 1n) { // cutoff depth, the guard ?
-            if(u == l) --size; else upper(top) = u; // Q: grow the next child , what if u==l==0, probably it is the last child to grow ?
-            push(SHA1Rand(h, u, d - 1n)); // will call grow, parent id, child idx used as the generator, and depth
+        if(d > 1n) { // cutoff depth
+            if(u == l) --size; else upper(top) = u; 
+            push(SHA1Rand(h, u, d - 1n)); 
         } else {
             --size;
             count += u - l;
@@ -57,27 +81,25 @@ final class UTSTree {
     }
 
     /**
-     * grow size by 2 
+     * grow by doubling the tree size 
      */
     def grow():void {
         val capacity = size * 2;
-        @Ifdef("LOG") {
-            Console.OUT.println(Runtime.hereLong() + " grow capacity to " + capacity);
-        }
         val h = new Rail[SHA1Rand](capacity);
         Rail.copy(hash, 0, h, 0, size);
         hash = h;
         val l = new Rail[Int](capacity);
-        Rail.copy(lower, 0, l, 0, size);//Wei: copy syntax: src, srcIdx, dest, destIdx, # to copy
+        Rail.copy(lower, 0, l, 0, size);
         lower = l;
         val u = new Rail[Int](capacity);
         Rail.copy(upper, 0, u, 0, size);
         upper = u;
-        @Ifdef("LOG"){
-        	Console.OUT.println(Runtime.hereLong() + "finish grow capacity to " + capacity);
-        }
+      
     }
 
+    /**
+     * Substring helper function
+     */
     private static def sub(str:String, start:Int, end:Int) = str.substring(start, Math.min(end, str.length()));
 
     
