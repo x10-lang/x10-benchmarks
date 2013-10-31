@@ -48,8 +48,8 @@ class FTNew(M:Long, verify:Boolean) {
     @Native("java", "FTNatives.create_plan(#SQRTN, #direction, #flags)")
     native static def create_plan(SQRTN:Long, direction:Int, flags:Int):Long;
     
-    static val I = Runtime.hereLong();
-    static val r = new Random(I);
+    val I = Runtime.hereLong();
+    static val r = new Random(Runtime.hereLong());
     
     val SQRTN = 1<<M;
     val N = SQRTN*SQRTN;
@@ -70,14 +70,13 @@ class FTNew(M:Long, verify:Boolean) {
            execute_plan(fwd?fftwPlan:fftwInversePlan, A.raw(), B.raw(), SQRTN, 0, nRows);
     }
 
-    @Inline final def min(i:Long, j:Long):Long=i<j?i:j;
-    @Inline final def global(i:Long):Long = (I*nRows+i);
     def bytwiddle(sign:Int) {
         val W_N = 2.0*Math.PI/N;
         val s = -sign as Double;
+        val globalBase = I*nRows;
         for ([i,j] in A.indices()) {
-           val UW = global(i)*j*W_N;
-           A(i,j) *= Complex(Math.cos(UW), s*Math.sin(UW));
+            val UW = (globalBase+i)*j*W_N;
+            A(i,j) *= Complex(Math.cos(UW), s*Math.sin(UW));
         }
     }
 
@@ -113,8 +112,8 @@ class FTNew(M:Long, verify:Boolean) {
         for (p in 0..(Place.MAX_PLACES-1)) 
             for (var ii:Long=0; ii<n2; ii+=16) 
                 for (var jj:Long=p*n2; jj<(p+1)*n2; jj+=16) 
-                    for (i in ii..(min(ii+16,n2)-1)) 
-                        for (j in jj..(min(jj+16,nCols)-1)) 
+                    for (i in ii..(Math.min(ii+16,n2)-1)) 
+                        for (j in jj..(Math.min(jj+16,nCols)-1)) 
                             B(j,i) = A(i,j);
     }
 
@@ -139,8 +138,8 @@ class FTNew(M:Long, verify:Boolean) {
         for (i in 0..(nRows-1)) 
             for (var ii:Long=0; ii<n1; ii += 16) 
                 for (var jj:Long=0; jj<nRows; jj += 16) 
-                    for (p in ii..(min(ii+16,n1)-1)) 
-                        for (j in jj..(min(jj+16,nRows)-1))
+                    for (p in ii..(Math.min(ii+16,n1)-1)) 
+                        for (j in jj..(Math.min(jj+16,nRows)-1))
                             A(i,nRows*p+j)=B(nRows*p+i,j);
     }
 
