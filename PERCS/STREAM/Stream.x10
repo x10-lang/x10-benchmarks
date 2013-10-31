@@ -39,28 +39,24 @@ public class Stream {
             val b = new Rail[Double](localSize, allocator);
             val c = new Rail[Double](localSize, allocator);
 
-            for (var i:Long=0; i<localSize; i++) {
+            for (i in 0..(localSize-1)) {
                 b(i) = 1.5 * (p*localSize+i);
                 c(i) = 2.5 * (p*localSize+i);
             }
 
             val beta = alpha;
-            for (var j:Long=0; j<NUM_TIMES; j++) {
-                if (p==0) {
-                    val t = times as GlobalRef[Rail[Double]]{self.home==here};
-                    t()(j) = -now();
-                }
-                for (var i:Long=0; i<localSize; i++)
-                    a(i) = b(i) + beta*c(i);
+            for (j in 0..(NUM_TIMES-1)) {
+                
+                if (p==0) at(times) {times()(j) = -now();}
+                
+                for (i in 0..(localSize-1)) a(i) = b(i) + beta*c(i);
                 Team.WORLD.barrier();
-                if (p==0) {
-                    val t = times as GlobalRef[Rail[Double]]{self.home==here};
-                    t()(j) += now();
-                }
+                
+                if (p==0) at(times) {times()(j) += now();}
             }
 
             // verification
-            for (var i:Long=0; i<localSize; i++)
+            for (i in 0..(localSize-1))
                 if (a(i) != b(i) + alpha*c(i)) 
                     verified.set(false);
         });
