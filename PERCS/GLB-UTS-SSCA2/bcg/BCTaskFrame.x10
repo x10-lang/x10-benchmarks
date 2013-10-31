@@ -1,7 +1,5 @@
 package bcg;
 
-import x10.compiler.Ifdef;
-
 import glb.TaskFrame;
 import glb.TaskBag;
 

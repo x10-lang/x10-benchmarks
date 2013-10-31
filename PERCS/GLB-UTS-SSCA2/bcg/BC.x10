@@ -1,12 +1,6 @@
 package bcg;
-
-import x10.compiler.Pragma;
 import x10.util.Random;
-import x10.util.OptionsParser;
-import x10.util.Option;
-import x10.util.Team;
-import x10.util.concurrent.Lock;
-import x10.compiler.Ifdef;
+
 /**
  * The workhorse of Betweenness Centrality
  */

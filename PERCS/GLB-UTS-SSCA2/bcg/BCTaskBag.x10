@@ -1,28 +1,32 @@
 package bcg;
-import x10.compiler.Ifdef;
-import x10.compiler.Inline;
 
 import glb.TaskBag;
-
+import x10.compiler.Inline;
 public class BCTaskBag implements TaskBag {
 	
 	/*backing data storage*/
 	public var data:Rail[BCTaskItem];
 	public var head:Int = 0n;
 	public var tail:Int = 0n;	
-	public var size:Int = 0N; // note size not necessarily the same as data.size, but it should be always the same as tail-head+1, except when tail==head==0==size
+	public var size:Int = 0n; // note size not necessarily the same as data.size, 
+							  //but it should be always the same as tail-head+1, except when tail==head==0==size
 	
 	/* split threshold, when resulting split bag is smaller than this, choose not not split, tunnable*/
 	public var splitThreashold:Int = 10n;
 	
 	/**
-	 * Constructor 
+	 * Constructor, called when 
 	 * @param splitThreshold split threshold
 	 */
 	public def this(splitThreashold:Int){
 		this.splitThreashold = splitThreashold;
 	}
 	
+	/**
+	 * Constructor 
+	 * @param data
+	 * @param splitThreashold split threshold
+	 */
 	public def this(data:Rail[BCTaskItem], splitThreashold:Int){
 		this(splitThreashold);
 		this.data = data;
@@ -34,11 +38,11 @@ public class BCTaskBag implements TaskBag {
 	
 	
 	/**
-	 * vertices number : 1<<n;
-	 * interval is how many vertices we place into a taskitem
+	 * @param verticesNumber vertices number 
+	 * @param interval is how many vertices we place into a taskitem
 	 * set to be public for testing purpose only
 	 */
-	public def init(verticesNumber:Int, interval:Int){
+	protected def init(verticesNumber:Int, interval:Int){
 		assert(verticesNumber % interval == 0n);
 		this.size = verticesNumber / interval;
 		this.data = new Rail[BCTaskItem](size, (i:Long)=>new BCTaskItem( (i*interval) as Int,(((i+1)*interval)-1n) as Int));
@@ -47,7 +51,8 @@ public class BCTaskBag implements TaskBag {
 	}
 	
 	/**
-	 * return null if not worth spliting,
+	 * @Override
+	 * @return null if half the size of task bag falls short of the splilt threshold size
 	 * otherwise return last half of data.
 	 */
 	@Inline public def split():BCTaskBag {
@@ -59,10 +64,13 @@ public class BCTaskBag implements TaskBag {
 		this.tail = this.tail - numElems as Int;
 	
 		// at most will waste log(N)*Interval*sizeof(initial taskbag) memory,
-		//probably not a big deal to not to delete the other half
+		//probably not a big deal to not to delete the other half TODO
 		return new BCTaskBag(dstData, this.splitThreashold);
 	}
 	
+	/**
+	 * @Override merge two taskbags
+	 */
 	@Inline public def merge(var tb:TaskBag):void {
 		if(this.size==0n){
 			this.data = (tb as BCTaskBag).data;
@@ -84,12 +92,14 @@ public class BCTaskBag implements TaskBag {
 		
 	}
 	
-	
+	/**
+	 * @Override
+	 */
     @Inline public def size():Long =size;
 	
 	/**
-	 * Below are helper methods
-	 * set public for testing purpose only
+	 * 
+	 * @return the first element and move forward the head pointer
 	 */
 	@Inline protected  def pop():BCTaskItem{
 		result:BCTaskItem = this.data(head);

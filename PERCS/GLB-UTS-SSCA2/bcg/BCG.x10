@@ -1,15 +1,6 @@
 package bcg;
-
-import x10.compiler.Pragma;
-import x10.compiler.Inline;
-import x10.util.Random;
-import x10.compiler.Ifdef;
-import x10.compiler.Uncounted;
-
 import x10.util.Option;
 import x10.util.OptionsParser;
-
-import glb.LifelineGenerator;
 import glb.TaskBag;
 import glb.GLBParameters;
 import glb.GlobalLoadBalancer;
