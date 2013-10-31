@@ -1,12 +1,8 @@
 package uts;
 
-import x10.compiler.Inline;
-import x10.compiler.Ifdef;
+import x10.compiler.*;
 
-import glb.TaskFrame;
-import glb.TaskBag;
-
-public class UTSTaskFrame extends TaskFrame[Long]{ 
+public class UTSTaskFrame extends glb.TaskFrame[Long]{ 
 	
 	var last:Long;
 	var tb:UTSTaskBag{self!=null}; 

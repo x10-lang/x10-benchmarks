@@ -61,8 +61,8 @@ final class UTSTree {
      */
     def grow():void {
         val capacity = size * 2;
-        @Ifdef("LOG"){
-        	Console.OUT.println(Runtime.hereLong() + " grow capacity to " + capacity);
+        @Ifdef("LOG") {
+            Console.OUT.println(Runtime.hereLong() + " grow capacity to " + capacity);
         }
         val h = new Rail[SHA1Rand](capacity);
         Rail.copy(hash, 0, h, 0, size);
