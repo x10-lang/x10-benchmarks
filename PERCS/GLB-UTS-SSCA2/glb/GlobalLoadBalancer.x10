@@ -111,13 +111,9 @@ public class GlobalLoadBalancer[Z](glbParam:GLBParameters) {
 	}
 	
 	
-	
-	
-	
-	
-	
 	/**
 	 * Create task frame on each place. Used for debugging purpose only.
+	 * @param init function closure to create a task frame
 	 */
 	protected def dryRun(init:()=>TaskFrame[Z]):void{
 		val P = Place.MAX_PLACES;
