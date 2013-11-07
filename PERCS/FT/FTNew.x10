@@ -93,12 +93,12 @@ class FTNew(M:Long, verify:Boolean) {
     def warmup() {
         var t:Long = -System.nanoTime();
         Team.WORLD.alltoall(A.raw(), 0, B.raw(), 0, chunkSize);
-        t += System.nanoTime();
-        if (I == 0) Console.OUT.println("1st alltoall: " + format(t) + " s");
-        t = -System.nanoTime();
+        t += System.nanoTime(); val t_=t;
+        if (I == 0) Logger.info(()=>"1st alltoall: " + format(t_) + " s");
+        t = -System.nanoTime(); 
         Team.WORLD.alltoall(A.raw(), 0, B.raw(), 0, chunkSize);
-        t += System.nanoTime();
-        if (I == 0) Console.OUT.println("2nd alltoall: " + format(t) + " s");
+        t += System.nanoTime(); val t__=t;
+        if (I == 0) Logger.info(()=>"2nd alltoall: " + format(t__) + " s");
     }
 
     /*
@@ -143,10 +143,14 @@ class FTNew(M:Long, verify:Boolean) {
                             A(i,nRows*p+j)=B(nRows*p+i,j);
     }
 
-    def globalTranspose(i:Long, timers:Rail[Long]{self!=null}) {
-        timers(i)=System.nanoTime(); transpose();
-        timers(i+1)=System.nanoTime(); alltoall();
-        timers(i+2)=System.nanoTime(); scatter();
+    def globalTranspose(t:Long, timers:Rail[Long]{self!=null}, j:Int, tumbler:Tumbler) {
+        timers(t)=System.nanoTime(); transpose();
+        
+        if (tumbler!= null) tumbler.await(j);
+        timers(t+1)=System.nanoTime(); alltoall();
+        if (tumbler != null) tumbler.advance(j);
+        
+        timers(t+2)=System.nanoTime(); scatter();
     }
     
     /**
@@ -154,55 +158,55 @@ class FTNew(M:Long, verify:Boolean) {
      * DFT algorithm, else run the inverse DFT algorithm.
      * Return the time it takes to perform the operation.
      */ 
-    def compute(fwd:Boolean) {
+    def compute(j:Int, tumbler:Tumbler, fwd:Boolean) {
         val timers = new Rail[Long](13);
-        globalTranspose(0,timers);
+        globalTranspose(0,timers, j, tumbler);
 
         timers(3)=System.nanoTime(); rowFFTS(fwd);
-        globalTranspose(4,timers);
+        globalTranspose(4,timers, j, tumbler);
 
         timers(7)=System.nanoTime(); bytwiddle(fwd?1n:-1n);
         timers(8)=System.nanoTime(); rowFFTS(fwd);
 
-        globalTranspose(9,timers);// transpose back to unscrambled order
+        globalTranspose(9, timers, j, tumbler);// transpose back to unscrambled order
         timers(12)=System.nanoTime(); 
         // Output
         val secs = format(timers(12) - timers(0));
         val Gigaflops = 1.0e-9*N*5*Math.log(N as Double)/Math.log(2.0)/secs;
-        if (I == 0) Console.OUT.println("execution time=" + secs + " secs" + " Gigaflops=" + Gigaflops);
+        if (I == 0) Logger.info(()=>"execution time=" + secs + " secs" + " Gigaflops=" + Gigaflops);
         val steps = ["transpose1", "alltoall1 ", "scatter1  ", "row_ffts1 ",
                 "transpose2", "alltoall2 ", "scatter2  ", "twiddle   ", "row_ffts2 ",
                 "transpose3", "alltoall3 ", "scatter3  "];
         if (I == 0) {
             for (i in steps.range()) 
-                Console.OUT.println("Step " + steps(i) + " took " + format(timers(i+1) - timers(i)) + " s");
+                Logger.info(()=>"Step " + steps(i) + " took " + format(timers(i+1) - timers(i)) + " s");
             val v = timers(12)-timers(11) + timers(10)-timers(6) + timers(5)-timers(2) + timers(1)-timers(0);
-            Console.OUT.println("Computation time: " + format(v) + "s of total time: "
+            Logger.info(()=>"Computation time: " + format(v) + "s of total time: "
                     + secs + "s (" + (100*format(v)/secs) + "%)");
         }
         return secs;
     }
     
     def run() {
-        if (I == 0) Console.OUT.println("Warmup"); //Warmup
+        if (I == 0) Logger.info(()=>"Warmup"); //Warmup
         warmup();
         Team.WORLD.barrier();
-        if (I == 0) Console.OUT.println("Warmup complete;starting FFT");
-        var secs:Double = compute(true);
+        if (I == 0) Logger.info(()=>"Warmup complete;starting FFT");
+        var secs:Double = compute(0n, null, true);
         Team.WORLD.barrier();
-        if (I == 0) Console.OUT.println("FFT complete; starting reverse FFT");
-        secs += compute(false);
+        if (I == 0) Logger.info(()=>"FFT complete; starting reverse FFT");
+        secs += compute(0n, null, false);
         Team.WORLD.barrier();
         if (I == 0) {// Output
-            Console.OUT.println("Reverse FFT complete");
-            Console.OUT.println("Now combining forward and inverse FTT measurements");
-            val Gigaflops = 2.0e-9*N*5*Math.log(N as Double)/Math.log(2.0)/secs;
-            Console.OUT.println("execution time=" + secs + " secs"+" Gigaflops="+Gigaflops);
+            Logger.info(()=>"Reverse FFT complete");
+            Logger.info(()=>"Now combining forward and inverse FTT measurements");
+            val Gigaflops = 2.0e-9*N*5*Math.log(N as Double)/Math.log(2.0)/secs, secs_=secs;
+            Logger.info(()=>"execution time=" + secs_ + " secs"+" Gigaflops="+Gigaflops);
         }
         if (verify) {  // Verification
-            if (I == 0) Console.OUT.println("Start verification");
+            if (I == 0) Logger.info(()=>"Start verification");
             check();
-            if (I == 0) Console.OUT.println("Verification complete");
+            if (I == 0) Logger.info(()=>"Verification complete");
         }
     }
 
@@ -219,7 +223,7 @@ class FTNew(M:Long, verify:Boolean) {
         val M = opts("-m", 10n);
         val verify = opts("-v", false);
         val SQRTN = 1 << M;
-	val nRows = SQRTN / Place.MAX_PLACES;
+        val nRows = SQRTN / Place.MAX_PLACES;
         if (nRows * Place.MAX_PLACES != SQRTN) {
             Console.ERR.println("SQRTN must be divisible by Place.MAX_PLACES!");
             return;
@@ -227,7 +231,7 @@ class FTNew(M:Long, verify:Boolean) {
         val plh = PlaceLocalHandle.makeFlat[FTNew](PlaceGroup.WORLD, ()=>new FTNew(M, verify));
         val o=plh();
         val mbytes = o.N*2.0*8.0*2/(1024*1024);
-        Console.OUT.println("M=" + o.M + " SQRTN=" + o.SQRTN + " N=" + o.N + " nRows=" + o.nRows +
+        Logger.info(()=>"M=" + o.M + " SQRTN=" + o.SQRTN + " N=" + o.N + " nRows=" + o.nRows +
                 " localSize=" + o.localSize + " MAX_PLACES=" + Place.MAX_PLACES +
                               " Mem=" + mbytes + " mem/MAX_PLACES=" + mbytes/Place.MAX_PLACES);
         
