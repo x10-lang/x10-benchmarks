@@ -73,10 +73,17 @@ public class Logger {
                 sub("" + ((timeAlive + timeDead)/1E9), 0n, 6n) + " : " + 
                 sub("" + (100.0*timeAlive/(timeAlive+timeDead)), 0n, 6n) + "%" + " :: " +
                 sub("" + ((startTime-timeReference)/1E9), 0n, 6n) + " : " +
-                sub("" + ((lastStartStopLiveTimeStamp-timeReference)/1E9), 0n, 6n) + " :: " +
+                sub("" + ((lastStartStopLiveTimeStamp-timeReference)/1E9), 0n, 6n)  + " :: " +
+                nodesCount + " :: " +
+                nodesGiven + " : " +
+                nodesReceived + " : " +
+                lifelineNodesReceived + " :: " +
                 stealsReceived + " : " +
-                lifelineStealsReceived + " : " +
+                lifelineStealsReceived + " :: " +
+                stealsSuffered + " : " +
+                lifelineStealsSuffered + " :: " +
                 stealsAttempted + " : " +
+                (stealsAttempted - stealsPerpetrated) + " :: " +
                 lifelineStealsAttempted + " : " +
                 (lifelineStealsAttempted - lifelineStealsPerpetrated));
         }
