@@ -41,7 +41,7 @@ public class UTS{
 				                                                        "   z=" + z);
 		val myuts_ = new GlobalLoadBalancer[Long](GLBParameters(n, w, l, z, m,verbose));
 		var time:Long = System.nanoTime();
-		result:Long = myuts_.run(()=>new UTSTaskFrame(b,r,d));
+		result:Long = myuts_.run(()=>new UTSTaskFrame(b,r,d), 1n);
 		time = System.nanoTime() - time;
 		Console.OUT.println("Time spent: " + (time/1E9));
 		Console.OUT.println("Result: "+ result);

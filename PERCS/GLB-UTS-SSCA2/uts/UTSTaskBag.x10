@@ -90,6 +90,14 @@ public class UTSTaskBag implements glb.TaskBag{
 	protected def getCount():Long=tree.count;
 	
 	/**
+	 * This is not a naturally balanced workload, so shouldnt really need to implement anything
+	 * on Nov 8, 2013
+	 */
+	public def breakEven(chunkNum:Int):Rail[glb.TaskBag]{
+	    return null;
+	}
+	
+	/**
 	 * Helper class used to merge two trees together
 	 */
 	final class Fragment {

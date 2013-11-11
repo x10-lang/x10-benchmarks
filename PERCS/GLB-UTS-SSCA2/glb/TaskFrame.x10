@@ -17,6 +17,12 @@ public abstract class TaskFrame[Z] {
 	 */
 	abstract public def initTask():void; 
 
+
+     /**
+ 	 * add on Nov 10, 2013 for initializing the task per place, specific to BC type of workload
+     */
+     public def initTask(placeID: Long, maxPlace:Long):void{}
+
 	/**
 	 * Run at most n tasks in the associated task bag. Return true
      * if more items are left in the associated task bag to process.

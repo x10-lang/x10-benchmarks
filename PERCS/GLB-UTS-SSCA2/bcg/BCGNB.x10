@@ -4,8 +4,10 @@ import x10.util.OptionsParser;
 import glb.TaskBag;
 import glb.GLBParameters;
 import glb.GlobalLoadBalancer;
-
-public class BCG{
+/**
+ * added on nov 8, 2013
+ */
+public class BCGNB{
 	/**
 	 * Main function for BCG, Betweenness-Centrality-GLB
 	 */
@@ -66,7 +68,7 @@ public class BCG{
 		Console.OUT.println("permute = " + permute);
 		val myssca2 = new GlobalLoadBalancer[BCResult]( GLBParameters(g, w, l, z, m,verbose));
 			
-		val result = myssca2.run( ()=>(new BCTaskFrame(Rmat(seed, n, a, b, c, d),i,t, permute)), 1n );
+		val result = myssca2.run( ()=>(new BCNBTaskFrame(Rmat(seed, n, a, b, c, d),i,t, permute)), 3n );// CHANGE, nov 8, 2013
 		
 		if (verbose >=2n) printBetweennessMap(result.betweennessMap, (1<<n) as Int);
 	}

@@ -14,7 +14,7 @@ public class GlobalLoadBalancer[Z](glbParam:GLBParameters) {
 	 * It has three phases (1) setup phase (2) calculation phase (3) result collection phase
 	 * @param init function closure to create task frame
 	 */
-	public def run(init:()=>TaskFrame[Z]):Z{
+	public def run(init:()=>TaskFrame[Z], balancedLevel:Int):Z{
 		
 		/*setup phase*/
 		
@@ -29,7 +29,7 @@ public class GlobalLoadBalancer[Z](glbParam:GLBParameters) {
 		var crunchNumberTime:Long = System.nanoTime();
 		
 		/*calculation phase*/
-		st().main(st); 
+		st().main(st, balancedLevel); 
 		crunchNumberTime = System.nanoTime() - crunchNumberTime;
 		if(st().verbose >= 1n) Console.OUT.println("Processing time P (s): " + (crunchNumberTime / 1E9));
 		

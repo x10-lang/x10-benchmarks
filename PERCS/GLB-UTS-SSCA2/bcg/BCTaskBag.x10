@@ -49,6 +49,22 @@ public class BCTaskBag implements TaskBag {
 		this.head = 0n;
 		this.tail = (this.size -1n) as Int;
 	}
+
+	/**
+	 * added on Nov 10, 2013
+	 */
+	protected def init(verticesNumber:Int, interval:Int, p:Long, P:Long){
+		assert((verticesNumber % (interval*P)) == 0L);
+		this.size = verticesNumber / (interval * P) as Int;
+		val startingPoint:Int = (verticesNumber/P * p) as Int;
+		//Console.OUT.println("place " + p + " starting point:" + startingPoint);
+		//Console.OUT.println("place " + p + " size:" + this.size);
+		this.data = new Rail[BCTaskItem](size, 
+				(i:Long)=>new BCTaskItem( (startingPoint +(i*interval)) as Int,((startingPoint + (i+1)*interval)-1n) as Int));
+		this.head = 0n;
+		this.tail = (this.size -1n) as Int;
+		
+	}
 	
 	/**
 	 * @Override
@@ -107,4 +123,13 @@ public class BCTaskBag implements TaskBag {
 		this.size--;
 		return result;
 	}
+
+    /**
+     * TODO
+     */
+	public def breakEven(chunkNum:Int):Rail[TaskBag]{
+         return null;
+	}
+
+
 }

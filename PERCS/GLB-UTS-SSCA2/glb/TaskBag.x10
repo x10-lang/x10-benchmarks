@@ -29,4 +29,6 @@ public interface TaskBag {
 	 */
 	public def size():Long; 
 	
+	//public def breakEven(chunkNum:Int):Rail[TaskBag]; // TODO this might be a better interface
+	
 }
