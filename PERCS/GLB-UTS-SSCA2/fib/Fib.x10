@@ -36,8 +36,8 @@ public class Fib(n:Long) {
         }
     }
     public def run():Long {
-        val g = new GlobalLoadBalancer[Long](GLBParameters.Default);
-        return g.run(()=>new FibFrame(), 1n);
+        val g = new GlobalLoadBalancer[Long](GLBParameters.Default, GlobalLoadBalancer.BALANCED_LEVEL_NUB);
+        return g.run(()=>new FibFrame());
     }
     static def fib(n:Long):Long=n<2? n: fib(n-1)+fib(n-2);
     public static def main(args:Rail[String]) {

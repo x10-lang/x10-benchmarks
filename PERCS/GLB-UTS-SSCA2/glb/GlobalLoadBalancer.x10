@@ -4,9 +4,15 @@ import x10.compiler.Inline;
 
 /**
  * The top level class of the Global Load Balancing (GLB) framework.
- * 
+ * @param glbParam GLB parameters
+ * @param balancedLevel 1-- unbalanced,UTS type, 3 --balanced, BC type, 
+ *        2 is deliberately left out for other type, the higher it goes, the more 
+ *        naturally balanced
  */
-public class GlobalLoadBalancer[Z](glbParam:GLBParameters) {
+public class GlobalLoadBalancer[Z](glbParam:GLBParameters, balancedLevel:Int) {
+	public static val BALANCED_LEVEL_NB:Int =  3n;
+	public static val BALANCED_LEVEL_NUB:Int = 1n;
+	
 	@Inline static def min(i:Long, j:Long) = i < j ? i : j;
 	private val P = Place.MAX_PLACES;
 	/**
@@ -14,13 +20,13 @@ public class GlobalLoadBalancer[Z](glbParam:GLBParameters) {
 	 * It has three phases (1) setup phase (2) calculation phase (3) result collection phase
 	 * @param init function closure to create task frame
 	 */
-	public def run(init:()=>TaskFrame[Z], balancedLevel:Int):Z{
+	public def run(init:()=>TaskFrame[Z]):Z{
 		
 		/*setup phase*/
 		
 		var setupTime:Long = System.nanoTime();
 		val st = PlaceLocalHandle.makeFlat[LocalJobRunner[Z]](PlaceGroup.WORLD, 
-				()=>new LocalJobRunner(init, this.glbParam));
+				()=>new LocalJobRunner(init, this.glbParam, balancedLevel));
 		
 		setupTime = System.nanoTime() - setupTime;
 		if(st().verbose >= 1n){
@@ -29,7 +35,7 @@ public class GlobalLoadBalancer[Z](glbParam:GLBParameters) {
 		var crunchNumberTime:Long = System.nanoTime();
 		
 		/*calculation phase*/
-		st().main(st, balancedLevel); 
+		st().main(st); 
 		crunchNumberTime = System.nanoTime() - crunchNumberTime;
 		if(st().verbose >= 1n) Console.OUT.println("Processing time P (s): " + (crunchNumberTime / 1E9));
 		
@@ -110,7 +116,7 @@ public class GlobalLoadBalancer[Z](glbParam:GLBParameters) {
 	private def dryRun(init:()=>TaskFrame[Z]):void{
 		val P = Place.MAX_PLACES;
 		val st = PlaceLocalHandle.makeFlat[LocalJobRunner[Z]](PlaceGroup.WORLD, 
-				()=>new LocalJobRunner(init, this.glbParam));
+				()=>new LocalJobRunner(init, this.glbParam, BALANCED_LEVEL_NUB));
 		for(var ii:Long=0L; ii < P; ii++){
 			at(Place(ii)) st().printLifelines();
 		}

@@ -57,8 +57,8 @@ public class BCTaskBag implements TaskBag {
 		assert((verticesNumber % (interval*P)) == 0L);
 		this.size = verticesNumber / (interval * P) as Int;
 		val startingPoint:Int = (verticesNumber/P * p) as Int;
-		//Console.OUT.println("place " + p + " starting point:" + startingPoint);
-		//Console.OUT.println("place " + p + " size:" + this.size);
+		// Console.OUT.println("place " + p + " starting point:" + startingPoint);
+		// Console.OUT.println("place " + p + " size:" + this.size);
 		this.data = new Rail[BCTaskItem](size, 
 				(i:Long)=>new BCTaskItem( (startingPoint +(i*interval)) as Int,((startingPoint + (i+1)*interval)-1n) as Int));
 		this.head = 0n;

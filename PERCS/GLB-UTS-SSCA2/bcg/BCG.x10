@@ -64,9 +64,10 @@ public class BCG{
 		Console.OUT.println("interval = " + i);
 		Console.OUT.println("l = " + l);
 		Console.OUT.println("permute = " + permute);
-		val myssca2 = new GlobalLoadBalancer[BCResult]( GLBParameters(g, w, l, z, m,verbose));
+		val myssca2 = new GlobalLoadBalancer[BCResult]( GLBParameters(g, w, l, z, m,verbose),
+				GlobalLoadBalancer.BALANCED_LEVEL_NUB);
 			
-		val result = myssca2.run( ()=>(new BCTaskFrame(Rmat(seed, n, a, b, c, d),i,t, permute)), 1n );
+		val result = myssca2.run( ()=>(new BCTaskFrame(Rmat(seed, n, a, b, c, d),i,t, permute)));
 		
 		if (verbose >=2n) printBetweennessMap(result.betweennessMap, (1<<n) as Int);
 	}

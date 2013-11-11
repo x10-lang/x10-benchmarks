@@ -1,1 +1,1 @@
-x10c++ -d tmp -STATIC_CHECKS -g -O ./bcg/BCGNB.x10 -o ./BCGNB
+x10c++ -d tmp -STATIC_CHECKS -g -O -NO_CHECKS ./bcg/BCGNB.x10 -o ./BCGNB

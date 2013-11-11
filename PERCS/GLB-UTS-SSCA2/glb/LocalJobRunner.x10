@@ -61,7 +61,7 @@ class LocalJobRunner[Z] {
 	/** Logger to record the work-stealing status */
 	protected val logger:Logger; 
 	
-	
+	val balancedLevel:Int;// added on Nov 11, 2013
 	
 	/** variables used for synchronization, made sure not to be optimized out by the compiler */ 
 	@x10.compiler.Volatile private transient var active:Boolean = false;
@@ -79,7 +79,7 @@ class LocalJobRunner[Z] {
 	 * @param init function closure to init the local taskframe
 	 * @param glbParam global lifeline parameters
 	 */
-	def this(init:()=>TaskFrame[Z],glbParam:GLBParameters) {
+	def this(init:()=>TaskFrame[Z],glbParam:GLBParameters, balancedLevel:Int) {
 		
 		// setup glb parameters and initialize taskfram
 		this.n = glbParam.n;
@@ -88,7 +88,10 @@ class LocalJobRunner[Z] {
 		this.verbose = glbParam.v;
 		this.tf = init();
 		this.h = Runtime.hereLong();
-		
+		this.balancedLevel = balancedLevel;
+		if(this.balancedLevel == GlobalLoadBalancer.BALANCED_LEVEL_NB){
+			this.tf.initTask(h, P); // added on Nov 11, 2013, initialize task
+		}
 		// initialize random victims
 		this.victims = new Rail[Long](m);
 		if (P>1) for (var i:Long=0; i<m; i++) {
@@ -104,11 +107,12 @@ class LocalJobRunner[Z] {
 		lifelinesActivated = new Rail[Boolean](P);
 		
 		// bootstrap the workload distribution by injecting some lifeline stealing requests
-		// if (3*h+1 < P) lifelineThieves.push(3*h+1);
-		// if (3*h+2 < P) lifelineThieves.push(3*h+2);
-		// if (3*h+3 < P) lifelineThieves.push(3*h+3);
-		// if (h > 0) lifelinesActivated((h-1)/3) = true;
-		
+		if(this.balancedLevel == GlobalLoadBalancer.BALANCED_LEVEL_NUB){
+			if (3*h+1 < P) lifelineThieves.push(3*h+1);
+			if (3*h+2 < P) lifelineThieves.push(3*h+2);
+			if (3*h+3 < P) lifelineThieves.push(3*h+3);
+			if (h > 0) lifelinesActivated((h-1)/3) = true;
+		}
 		// setup lifeline logger, for statistics collecting purpose
 		logger = new Logger(true);		
 	}
@@ -337,17 +341,15 @@ class LocalJobRunner[Z] {
 	 * (1) No one has work to do
 	 * (2) Lifeline steals are responded
 	 * @param place local handle for LJR
-	 * @param balancedLevel 1-- unbalanced,UTS type, 3 --balanced, BC type, 
-	 *        2 is deliberately left out for other type, the higher it goes, the more 
-	 *        naturally balanced
+	 * 
 	 */
-	protected def main(st:PlaceLocalHandle[LocalJobRunner[Z]], balancedLevel:Int ) {
-		if(balancedLevel == 1n){ // UTS type
-		    mainNUB(st);
-		}else if(balancedLevel == 3n){ // BC type
-		    mainNB(st);
+	protected def main(st:PlaceLocalHandle[LocalJobRunner[Z]] ) {
+		if(this.balancedLevel == 1n){ // UTS type
+			mainNUB(st);
+		}else if(this.balancedLevel == 3n){ // BC type
+			mainNB(st);
 		}else{
-		    // left blank
+			// left blank
 		}
 		
 	}
@@ -356,21 +358,21 @@ class LocalJobRunner[Z] {
 	 * UTS kind of natrually unbalanced job, original trickle down implementation
 	 */
 	protected def mainNUB(st:PlaceLocalHandle[LocalJobRunner[Z]]){
-	    @Pragma(Pragma.FINISH_DENSE) finish { 
-	        try {
-	            if(verbose == GLBParameters.VERBOSE_MAX) { Runtime.println("" + Runtime.hereLong() + " LIVE (" + (phase++) + ")"); }
-	            empty = false;
-	            active = true;
-	            logger.startLive();	
-	            this.tf.initTask(); 
-	            processStack(st);		
-	            logger.stopLive();
-	            active = false;
-	            if(verbose == GLBParameters.VERBOSE_MAX) { Runtime.println("" + Runtime.hereLong() + " DEAD (" + (phase++) + ")"); }
-	        } catch (v:CheckedThrowable) {
-	            error(v);
-	        }
-	    } 
+		@Pragma(Pragma.FINISH_DENSE) finish { 
+			try {
+				if(verbose == GLBParameters.VERBOSE_MAX) { Runtime.println("" + Runtime.hereLong() + " LIVE (" + (phase++) + ")"); }
+				empty = false;
+				active = true;
+				logger.startLive();	
+				this.tf.initTask(); 
+				processStack(st);		
+				logger.stopLive();
+				active = false;
+				if(verbose == GLBParameters.VERBOSE_MAX) { Runtime.println("" + Runtime.hereLong() + " DEAD (" + (phase++) + ")"); }
+			} catch (v:CheckedThrowable) {
+				error(v);
+			}
+		} 
 	}
 	
 	
@@ -378,33 +380,24 @@ class LocalJobRunner[Z] {
 	 * BC kind of natrually balanced job
 	 */
 	protected def mainNB(st:PlaceLocalHandle[LocalJobRunner[Z]]){
-	    @Pragma(Pragma.FINISH_DENSE) finish { 
-	        try {
-	            for(i in 0l..(P-1l)){
-	                at(Place(i)) @Uncounted{
-	                    //if(verbose == GLBParameters.VERBOSE_MAX) { Runtime.println("" + Runtime.hereLong() + " LIVE (" + (phase++) + ")"); }
-	                    // empty = false;
-	                    // active = true;
-	                    // logger.startLive();	
-	                    // this.tf.initTask(); 
-	                    async {
-	                    	st().empty = false;
-	                    	st().active = true;
-	                    	st().logger.startLive();	
-	                    	st().tf.initTask(i, P);
-	                    	st().processStack(st);// Really ?		
-	                    	st().logger.stopLive();
-	                    	st().active = false;
-	                    }
-	                //     logger.stopLive();
-	                //     active = false;
-	                //     if(verbose == GLBParameters.VERBOSE_MAX) { Runtime.println("" + Runtime.hereLong() + " DEAD (" + (phase++) + ")"); }
-	               }
-	             }
-	        } catch (v:CheckedThrowable) {
-	            error(v);
-	        }
-	    } 
+		@Pragma(Pragma.FINISH_DENSE) finish { 
+			try {
+				for(i in 0l..(P-1l)){
+					at(Place(i)) async {
+						st().empty = false;
+						st().active = true;
+						st().logger.startLive();	
+						//st().tf.initTask(i, P);
+						st().processStack(st);// Really ?		
+						st().logger.stopLive();
+						st().active = false;
+					}
+					
+				}
+			} catch (v:CheckedThrowable) {
+				error(v);
+			}
+		} 
 	}
 	
 	
@@ -440,8 +433,8 @@ class LocalJobRunner[Z] {
 		Runtime.println("Exception at " + here);
 		v.printStackTrace();
 	}
-
-        //////////////// below are added on November 08 to support Natuarlly-Balanced workload ///////////
+	
+	//////////////// below are added on November 08 to support Natuarlly-Balanced workload ///////////
 	// protected def mainNB(st:PlaceLocalHandle[LocalJobRunner[Z]]) {
 	//     
 	//     @Pragma(Pragma.FINISH_DENSE) finish { 
@@ -463,9 +456,9 @@ class LocalJobRunner[Z] {
 	//         
 	//     } 
 	// }
-    
-
-
-
-
+	
+	
+	
+	
+	
 }
