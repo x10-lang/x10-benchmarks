@@ -315,7 +315,7 @@ class LocalJobRunner[Z] {
 	 * @param thief place id of thief
 	 * @param lifeline if I am the lifeline buddy of the remote thief
 	 */
-	private def request(st:PlaceLocalHandle[LocalJobRunner[Z]], thief:Long, lifeline:Boolean) {
+	protected def request(st:PlaceLocalHandle[LocalJobRunner[Z]], thief:Long, lifeline:Boolean) {
 		try {
 			if (lifeline) ++logger.lifelineStealsReceived; else ++logger.stealsReceived;
 			if (empty || waiting) {
