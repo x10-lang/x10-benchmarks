@@ -64,10 +64,11 @@ public class GlobalLoadBalancer[Z](glbParam:GLBParameters, balancedLevel:Int) {
 	 */
 	private def collectResults(st:PlaceLocalHandle[LocalJobRunner[Z]]):Rail[Z]
 	{
+		val groupSize:Long = 128l; // it was 32 before
 		if (P >= 1024) {
-			collectedResults:Rail[Z] = new Rail[Z](P/32, (i:Long)=>at (Place(i*32)) {
+			collectedResults:Rail[Z] = new Rail[Z](P/groupSize, (i:Long)=>at (Place(i*groupSize)) {
 				val h = Runtime.hereLong();
-				val n = min(32, P-h);
+				val n = min(groupSize, P-h);
 				val localResults:Rail[Z] = new Rail[Z](n, (i:Long)=>at (Place(h+i)) st().getTF().getResult());
 				return reduce(localResults,st().getTF().getReducer()); // reduce loal results 
 			});
@@ -91,6 +92,7 @@ public class GlobalLoadBalancer[Z](glbParam:GLBParameters, balancedLevel:Int) {
 	
 	private def collectLifelineStatus(st:PlaceLocalHandle[LocalJobRunner[Z]]):void{
 		val logs:Rail[Logger];
+		//val groupSize:Long = 128l;
 		if (P >= 1024) {
 			logs = new Rail[Logger](P/32, (i:Long)=>at (Place(i*32)) {
 				val h = Runtime.hereLong();
