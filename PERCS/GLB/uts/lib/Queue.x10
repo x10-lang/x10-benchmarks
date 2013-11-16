@@ -2,7 +2,7 @@ package uts.lib;
 
 import x10.compiler.*;
 
-public final class TaskQueue extends uts.UTS implements glb.TaskQueue {
+public final class Queue extends uts.UTS implements glb.TaskQueue {
     public def this(factor:Int) {
         super(factor);
     }
@@ -22,7 +22,7 @@ public final class TaskQueue extends uts.UTS implements glb.TaskQueue {
             if ((upper(i) - lower(i)) >= 2) ++s;
         }
         if (s == 0) return null;
-        val bag = new TaskBag(s);
+        val bag = new Bag(s);
         s = 0;
         for (var i:Long=0; i<size; ++i) {
             val p = upper(i) - lower(i);
@@ -36,7 +36,7 @@ public final class TaskQueue extends uts.UTS implements glb.TaskQueue {
         return bag;
     }
 
-    @Inline public def merge(bag:TaskBag) {
+    @Inline public def merge(bag:Bag) {
         val h = bag.size();
         val q = size;
         while (h + q > hash.size) grow();
@@ -47,7 +47,7 @@ public final class TaskQueue extends uts.UTS implements glb.TaskQueue {
     }
 
     @Inline public def merge(bag:glb.TaskBag) {
-        merge(bag as TaskBag);
+        merge(bag as Bag);
     }
 
     @Inline public def count() = count;

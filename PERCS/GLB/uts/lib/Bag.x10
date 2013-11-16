@@ -2,7 +2,7 @@ package uts.lib;
 
 import x10.compiler.*;
 
-public final class TaskBag implements glb.TaskBag {
+public final class Bag implements glb.TaskBag {
     public val hash:Rail[uts.SHA1Rand];
     public val lower:Rail[Int];
     public val upper:Rail[Int];

@@ -1,13 +1,11 @@
-package uts.lib;
+package uts.dist;
 
 import x10.compiler.*;
 import x10.util.Option;
 import x10.util.OptionsParser;
 import x10.util.Random;
 
-import glb.GLB;
-
-public final class UTS {
+public final class UTSD {
     public static def main(args:Rail[String]) {
         val opts = new OptionsParser(args, new Rail[Option](), [
                                                                 Option("b", "", "Branching factor"),
@@ -48,17 +46,16 @@ public final class UTS {
                                                         "   l=" + l + 
                                                                 "   m=" + m + 
                                                                         "   z=" + z);
-        val init = ()=>{ return new TaskQueue(b); };
-        val glb = new GLB(init, n, w, l, z, m);
-        
+
+        val st = PlaceLocalHandle.makeFlat[Worker](PlaceGroup.WORLD, ()=>new Worker(b, d, n, w, l, z, m));
+
         Console.OUT.println("Starting...");
         var time:Long = System.nanoTime();
-        val start = ()=>{ (glb.taskQueue() as TaskQueue).init(r, d); };
-        glb.run(start);
+        st().main(st, r, d);
         time = System.nanoTime() - time;
         Console.OUT.println("Finished.");
 
-        val count = glb.stats(verbose);
+        val count = Worker.stats(st, verbose);
 
         TaskQueue.print(time, count);
     }
