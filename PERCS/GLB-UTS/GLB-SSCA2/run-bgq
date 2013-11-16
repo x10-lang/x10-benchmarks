@@ -1,0 +1,33 @@
+export ENV_ARGS='GC_MARKERS=1:X10_STATIC_THREADS=1:X10_NTHREADS=1:X10RT_MPI_FORCE_COLLECTIVES=true'
+
+export BC_EXE=bc-glb.xlc.mpi
+#export BC_SZ=16
+export BC_SZ=17
+
+qsub --env $ENV_ARGS -t 30 -n 2 --mode c16 -O $BC_EXE.$BC_SZ.00032 $BC_EXE -n $BC_SZ
+qsub --env $ENV_ARGS -t 15 -n 4 --mode c16 -O $BC_EXE.$BC_SZ.00064 $BC_EXE -n $BC_SZ
+qsub --env $ENV_ARGS -t 15 -n 8 --mode c16 -O $BC_EXE.$BC_SZ.00128 $BC_EXE -n $BC_SZ
+qsub --env $ENV_ARGS -t 10 -n 16 --mode c16 -O $BC_EXE.$BC_SZ.00256 $BC_EXE -n $BC_SZ
+qsub --env $ENV_ARGS -t 10 -n 32 --mode c16 -O $BC_EXE.$BC_SZ.00512 $BC_EXE -n $BC_SZ
+qsub --env $ENV_ARGS -t 10 -n 64 --mode c16 -O $BC_EXE.$BC_SZ.01024 $BC_EXE -n $BC_SZ
+qsub --env $ENV_ARGS -t 10 -n 128 --mode c16 -O $BC_EXE.$BC_SZ.02048 $BC_EXE -n $BC_SZ
+qsub --env $ENV_ARGS -t 10 -n 256 --mode c16 -O $BC_EXE.$BC_SZ.04096 $BC_EXE -n $BC_SZ
+qsub --env $ENV_ARGS -t 10 -n 512 --mode c16 -O $BC_EXE.$BC_SZ.08192 $BC_EXE -n $BC_SZ
+
+exit
+
+qsub --env $ENV_ARGS -t 120 -n 1 --mode c1 -O $BC_EXE.$BC_SZ.00001 $BC_EXE -n $BC_SZ
+qsub --env $ENV_ARGS -t 120 -n 1 --mode c2 -O $BC_EXE.$BC_SZ.00002 $BC_EXE -n $BC_SZ
+qsub --env $ENV_ARGS -t 60 -n 1 --mode c4 -O $BC_EXE.$BC_SZ.00004 $BC_EXE -n $BC_SZ
+qsub --env $ENV_ARGS -t 60 -n 1 --mode c8 -O $BC_EXE.$BC_SZ.00008 $BC_EXE -n $BC_SZ
+qsub --env $ENV_ARGS -t 30 -n 1 --mode c16 -O $BC_EXE.$BC_SZ.00016 $BC_EXE -n $BC_SZ
+qsub --env $ENV_ARGS -t 30 -n 2 --mode c16 -O $BC_EXE.$BC_SZ.00032 $BC_EXE -n $BC_SZ
+qsub --env $ENV_ARGS -t 15 -n 4 --mode c16 -O $BC_EXE.$BC_SZ.00064 $BC_EXE -n $BC_SZ
+qsub --env $ENV_ARGS -t 15 -n 8 --mode c16 -O $BC_EXE.$BC_SZ.00128 $BC_EXE -n $BC_SZ
+qsub --env $ENV_ARGS -t 10 -n 16 --mode c16 -O $BC_EXE.$BC_SZ.00256 $BC_EXE -n $BC_SZ
+qsub --env $ENV_ARGS -t 10 -n 32 --mode c16 -O $BC_EXE.$BC_SZ.00512 $BC_EXE -n $BC_SZ
+qsub --env $ENV_ARGS -t 10 -n 64 --mode c16 -O $BC_EXE.$BC_SZ.01024 $BC_EXE -n $BC_SZ
+qsub --env $ENV_ARGS -t 10 -n 128 --mode c16 -O $BC_EXE.$BC_SZ.02048 $BC_EXE -n $BC_SZ
+qsub --env $ENV_ARGS -t 10 -n 256 --mode c16 -O $BC_EXE.$BC_SZ.04096 $BC_EXE -n $BC_SZ
+qsub --env $ENV_ARGS -t 10 -n 512 --mode c16 -O $BC_EXE.$BC_SZ.08192 $BC_EXE -n $BC_SZ
+qsub --env $ENV_ARGS -t 10 -n 1024 --mode c16 -O $BC_EXE.$BC_SZ.16384 $BC_EXE -n $BC_SZ
