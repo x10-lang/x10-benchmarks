@@ -7,8 +7,8 @@ import x10.util.Random;
 
 import util.*;
 
-final class Worker {
-    val queue:TaskQueue;
+final class Worker[Queue]{Queue<:TaskQueue} {
+    val queue:Queue;
     val lifelineThieves:FixedSizeStack[Long];
     val thieves:FixedSizeStack[Long];
     val lifelines:Rail[Long];
@@ -28,7 +28,7 @@ final class Worker {
     
     val P = Place.MAX_PLACES;
     
-    public def this(init:()=>TaskQueue, n:Int, w:Int, l:Int, z:Int, m:Int) {
+    public def this(init:()=>Queue, n:Int, w:Int, l:Int, z:Int, m:Int) {
         this.n = n;
         this.w = w;
         this.m = m;
@@ -70,7 +70,7 @@ final class Worker {
         logger = new Logger(true);
     }
     
-    final def processStack(st:PlaceLocalHandle[Worker]) {
+    final def processStack(st:PlaceLocalHandle[Worker[Queue]]) {
         do {
             while (queue.process(n)) {
                 Runtime.probe();
@@ -81,7 +81,7 @@ final class Worker {
         } while (steal(st));
     }
     
-    @Inline def give(st:PlaceLocalHandle[Worker], loot:TaskBag) {
+    @Inline def give(st:PlaceLocalHandle[Worker[Queue]], loot:TaskBag) {
         val victim = Runtime.hereLong();
         logger.nodesGiven += loot.size();
         if (thieves.size() > 0) {
@@ -100,14 +100,14 @@ final class Worker {
         }
     }
     
-    @Inline def distribute(st:PlaceLocalHandle[Worker]) {
+    @Inline def distribute(st:PlaceLocalHandle[Worker[Queue]]) {
         var loot:TaskBag;
         while (((thieves.size() > 0) || (lifelineThieves.size() > 0)) && (loot = queue.split()) != null) {
             give(st, loot);
         }
     }
     
-    @Inline def reject(st:PlaceLocalHandle[Worker]) {
+    @Inline def reject(st:PlaceLocalHandle[Worker[Queue]]) {
         while (thieves.size() > 0) {
             val thief = thieves.pop();
             if (thief >= 0) {
@@ -119,7 +119,7 @@ final class Worker {
         }
     }
     
-    def steal(st:PlaceLocalHandle[Worker]) {
+    def steal(st:PlaceLocalHandle[Worker[Queue]]) {
         if (P == 1) return false;
         val p = Runtime.hereLong();
         empty = true;
@@ -147,7 +147,7 @@ final class Worker {
         return !empty;
     }
     
-    def request(st:PlaceLocalHandle[Worker], thief:Long, lifeline:Boolean) {
+    def request(st:PlaceLocalHandle[Worker[Queue]], thief:Long, lifeline:Boolean) {
         try {
             if (lifeline) ++logger.lifelineStealsReceived; else ++logger.stealsReceived;
             if (empty || waiting) {
@@ -173,7 +173,7 @@ final class Worker {
         queue.merge(loot);
     }
     
-    def deal(st:PlaceLocalHandle[Worker], loot:TaskBag, source:Long) {
+    def deal(st:PlaceLocalHandle[Worker[Queue]], loot:TaskBag, source:Long) {
         try {
             val lifeline = source >= 0;
             if (lifeline) lifelinesActivated(source) = false;
@@ -195,7 +195,7 @@ final class Worker {
         }
     }
     
-    def main(st:PlaceLocalHandle[Worker], start:()=>void) {
+    def main(st:PlaceLocalHandle[Worker[Queue]], start:()=>void) {
         @Pragma(Pragma.FINISH_DENSE) finish {
             try {
                 empty = false;
@@ -219,7 +219,7 @@ final class Worker {
     
     @Inline static def min(i:Long, j:Long) = i < j ? i : j;
     
-    static def collect(st:PlaceLocalHandle[Worker], verbose:Boolean) {
+    static def collect[Queue](st:PlaceLocalHandle[Worker[Queue]], verbose:Boolean){Queue<:TaskQueue} {
         val P = Place.MAX_PLACES;
         val logs:Rail[Logger];
         if (P >= 1024) {
