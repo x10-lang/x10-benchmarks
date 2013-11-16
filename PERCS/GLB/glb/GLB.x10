@@ -13,5 +13,5 @@ public final class GLB[Queue]{Queue<:TaskQueue} {
         plh().main(plh, start);
     }
 
-    public def stats(verbose:Boolean):Long = Worker.collect[Queue](plh, verbose);
+    public def stats(verbose:Boolean):Long = Worker.stats[Queue](plh, verbose);
 }

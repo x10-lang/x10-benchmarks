@@ -53,7 +53,7 @@ public final class UTSG {
         
         Console.OUT.println("Starting...");
         var time:Long = System.nanoTime();
-        val start = ()=>{ (glb.taskQueue() as Queue).init(r, d); };
+        val start = ()=>{ (glb.taskQueue()).init(r, d); };
         glb.run(start);
         time = System.nanoTime() - time;
         Console.OUT.println("Finished.");

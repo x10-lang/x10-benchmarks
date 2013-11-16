@@ -219,7 +219,7 @@ final class Worker[Queue]{Queue<:TaskQueue} {
     
     @Inline static def min(i:Long, j:Long) = i < j ? i : j;
     
-    static def collect[Queue](st:PlaceLocalHandle[Worker[Queue]], verbose:Boolean){Queue<:TaskQueue} {
+    static def stats[Queue](st:PlaceLocalHandle[Worker[Queue]], verbose:Boolean){Queue<:TaskQueue} {
         val P = Place.MAX_PLACES;
         val logs:Rail[Logger];
         if (P >= 1024) {
