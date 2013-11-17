@@ -43,6 +43,7 @@ public final class Queue extends bc.BC implements glb.TaskQueue {
             val u = upper(top) - 1n;
             
             if(u == l) --size; else upper(top) = u;
+            refTime = System.nanoTime();
             s = verticesToWorkOn(u);
             state = 1n;
         case 1n:

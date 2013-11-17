@@ -67,8 +67,6 @@ public class BC {
     }
 
     @Inline protected final def bfsShortestPath1(s:Int) {
-        refTime = System.nanoTime();
-
         // Put the values for source vertex
         distanceMap(s) = 0L;
         sigmaMap(s) = 1L;
@@ -127,6 +125,7 @@ public class BC {
     }
 
     @Inline protected final def bfsShortestPath(val vertexIndex:Int) {
+        refTime = System.nanoTime();
         val s = verticesToWorkOn(vertexIndex);
         bfsShortestPath1(s);
         while(!regularQueue.isEmpty()) {
