@@ -28,7 +28,7 @@ final class Worker[Queue]{Queue<:TaskQueue} {
     
     val P = Place.MAX_PLACES;
     
-    public def this(init:()=>Queue, n:Int, w:Int, l:Int, z:Int, m:Int) {
+    public def this(init:()=>Queue, n:Int, w:Int, l:Int, z:Int, m:Int, tree:Boolean) {
         this.n = n;
         this.w = w;
         this.m = m;
@@ -61,11 +61,13 @@ final class Worker[Queue]{Queue<:TaskQueue} {
         thieves = new FixedSizeStack[Long](P);
         lifelinesActivated = new Rail[Boolean](P);
         
-        // 1st wave
-        if (3*h+1 < P) lifelineThieves.push(3*h+1);
-        if (3*h+2 < P) lifelineThieves.push(3*h+2);
-        if (3*h+3 < P) lifelineThieves.push(3*h+3);
-        if (h > 0) lifelinesActivated((h-1)/3) = true;
+        if (tree) {
+            // 1st wave
+            if (3*h+1 < P) lifelineThieves.push(3*h+1);
+            if (3*h+2 < P) lifelineThieves.push(3*h+2);
+            if (3*h+3 < P) lifelineThieves.push(3*h+3);
+            if (h > 0) lifelinesActivated((h-1)/3) = true;
+        }
         
         logger = new Logger(true);
     }
@@ -196,20 +198,32 @@ final class Worker[Queue]{Queue<:TaskQueue} {
     }
     
     def main(st:PlaceLocalHandle[Worker[Queue]], start:()=>void) {
-        @Pragma(Pragma.FINISH_DENSE) finish {
-            try {
-                empty = false;
-                active = true;
-                logger.startLive();
-                start();
-                processStack(st);
-                logger.stopLive();
-                active = false;
-                logger.nodesCount = queue.count();
-            } catch (v:CheckedThrowable) {
-                error(v);
-            }
-        } 
+        try {
+            empty = false;
+            active = true;
+            logger.startLive();
+            start();
+            processStack(st);
+            logger.stopLive();
+            active = false;
+            logger.nodesCount = queue.count();
+        } catch (v:CheckedThrowable) {
+            error(v);
+        }
+    }
+    
+    def main(st:PlaceLocalHandle[Worker[Queue]]) {
+        try {
+            empty = false;
+            active = true;
+            logger.startLive();
+            processStack(st);
+            logger.stopLive();
+            active = false;
+            logger.nodesCount = queue.count();
+        } catch (v:CheckedThrowable) {
+            error(v);
+        }
     }
     
     static def error(v:CheckedThrowable) {
@@ -238,5 +252,24 @@ final class Worker[Queue]{Queue<:TaskQueue} {
         log.collect(logs);
         log.stats();
         return log.nodesCount;
+    }
+
+    static def broadcast[Queue](st:PlaceLocalHandle[Worker[Queue]]){Queue<:TaskQueue} {
+        val P = Place.MAX_PLACES;
+        if (P < 1024) {
+            for(var i:Long=P-1; i>=0; i-=32) {
+                at (Place(i)) async {
+                    val max = Runtime.hereLong();
+                    val min = Math.max(max-31, 0);
+                    for (var j:Long=min; j<=max; ++j) {
+                        at (Place(j)) async st().main(st);
+                    }
+                }
+            }
+        } else {
+            for(var i:Long=0; i<P; i++) {
+                at (Place(i)) async st().main(st);
+            }
+        }
     }
 }

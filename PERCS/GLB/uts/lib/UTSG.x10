@@ -49,7 +49,7 @@ public final class UTSG {
                                                                 "   m=" + m + 
                                                                         "   z=" + z);
         val init = ()=>{ return new Queue(b); };
-        val glb = new GLB[Queue](init, n, w, l, z, m);
+        val glb = new GLB[Queue](init, n, w, l, z, m, true);
         
         Console.OUT.println("Starting...");
         var time:Long = System.nanoTime();
