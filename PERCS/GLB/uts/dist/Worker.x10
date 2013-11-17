@@ -18,7 +18,7 @@ final class Worker {
     val w:Int;
     val m:Int;
     
-    val random = new Random();
+    val random = new Random(Runtime.hereInt());
     val victims:Rail[Long];
     val logger:Logger;
     
