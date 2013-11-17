@@ -12,6 +12,7 @@ public class BC {
     val verticesToWorkOn:Rail[Int];
     public val betweennessMap:Rail[Double];
     public var count:Long = 0;
+    public var accTime:Double = 0;
 
     // These are the per-vertex data structures.
     var predecessorMap:Rail[Int];
@@ -65,6 +66,7 @@ public class BC {
     }
 
     @Inline protected final def bfsShortestPath(val vertexIndex:Int) {
+        val time = System.nanoTime();
         val s:Int = verticesToWorkOn(vertexIndex);
 
         // Put the values for source vertex
@@ -123,6 +125,7 @@ public class BC {
             deltaMap(w) = 0.0;
 
         } // queue not empty
+        accTime += (System.nanoTime()-time)/1e9;
     }
 
     /**
@@ -169,6 +172,7 @@ public class BC {
 
         if(verbose > 0) {
             Console.OUT.println("[" + here.id + "]"
+                    + " Time = " + bc.accTime
                     + " Count = " + bc.count);
         }
 

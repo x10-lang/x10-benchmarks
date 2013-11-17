@@ -77,10 +77,14 @@ public final class BCD extends bc.BC {
         });
         val procTime = (System.nanoTime()-time)/1e9;
 
+        PlaceGroup.WORLD.broadcastFlat(()=>{
+            plh().allreduce();
+        });
+        
         if(verbose > 0) {
             PlaceGroup.WORLD.broadcastFlat(()=>{
-                plh().allreduce();
                 Console.OUT.println("[" + here.id + "]"
+                        + " Time = " + plh().accTime
                         + " Count = " + plh().count);
             });
         }

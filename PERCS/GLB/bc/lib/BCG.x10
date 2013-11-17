@@ -77,10 +77,14 @@ public final class BCG {
         val procTime = (System.nanoTime()-time)/1e9;
         Console.OUT.println("Finished.");
 
+        PlaceGroup.WORLD.broadcastFlat(()=>{
+            (glb.taskQueue()).allreduce();
+        });
+        
         if(verbose > 0) {
             PlaceGroup.WORLD.broadcastFlat(()=>{
-                (glb.taskQueue()).allreduce();
                 Console.OUT.println("[" + here.id + "]"
+                        + " Time = " + (glb.taskQueue()).accTime
                         + " Count = " + (glb.taskQueue()).count);
             });
         }

@@ -18,7 +18,7 @@ final class Worker[Queue]{Queue<:TaskQueue} {
     val w:Int;
     val m:Int;
     
-    val random = new Random();
+    val random = new Random(Runtime.hereInt());
     val victims:Rail[Long];
     val logger:Logger;
     
@@ -256,7 +256,11 @@ final class Worker[Queue]{Queue<:TaskQueue} {
 
     static def broadcast[Queue](st:PlaceLocalHandle[Worker[Queue]]){Queue<:TaskQueue} {
         val P = Place.MAX_PLACES;
-        if (P < 1024) {
+        if (P < 256) {
+            for(var i:Long=0; i<P; i++) {
+                at (Place(i)) async st().main(st);
+            }
+        } else {
             for(var i:Long=P-1; i>=0; i-=32) {
                 at (Place(i)) async {
                     val max = Runtime.hereLong();
@@ -265,10 +269,6 @@ final class Worker[Queue]{Queue<:TaskQueue} {
                         at (Place(j)) async st().main(st);
                     }
                 }
-            }
-        } else {
-            for(var i:Long=0; i<P; i++) {
-                at (Place(i)) async st().main(st);
             }
         }
     }
