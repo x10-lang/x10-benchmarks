@@ -10,6 +10,8 @@ public final class Queue extends bc.BC implements glb.TaskQueue {
     public var lower:Rail[Int];
     public var upper:Rail[Int];
     protected var size:Long;
+    public var state:Int = 0n;
+    public var s:Int;
 
     public def this(rmat:Rmat, permute:Int) {
         super(rmat, permute);
@@ -33,12 +35,36 @@ public final class Queue extends bc.BC implements glb.TaskQueue {
     }
 
     @Inline public def process(n:Long) {
-        val top = size - 1;
-        val l = lower(top);
-        val u = upper(top) - 1n;
-        
-        if(u == l) --size; else upper(top) = u;
-        bfsShortestPath(u);
+        var i:Long = 0;
+        switch (state) {
+        case 0n:
+            val top = size - 1;
+            val l = lower(top);
+            val u = upper(top) - 1n;
+            
+            if(u == l) --size; else upper(top) = u;
+            s = verticesToWorkOn(u);
+            state = 1n;
+        case 1n:
+            bfsShortestPath1(s);
+            state = 2n;
+        case 2n:
+            while(!regularQueue.isEmpty()) {
+                if (i++ > n) return true;
+                bfsShortestPath2();
+            }
+            state = 3n;
+        case 3n:
+            bfsShortestPath3();
+            state = 4n;
+        case 4n:
+            while(!regularQueue.isEmpty()) {
+                if (i++ > n) return true;
+                bfsShortestPath4(s);
+            }
+            accTime += (System.nanoTime()-refTime)/1e9;
+            state = 0n;
+        }
         return size > 0;
     }
 

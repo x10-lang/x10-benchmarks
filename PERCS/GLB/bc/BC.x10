@@ -9,9 +9,10 @@ public class BC {
     val graph:Graph;
     public val N:Int;
     public val M:Int;
-    val verticesToWorkOn:Rail[Int];
+    public val verticesToWorkOn:Rail[Int];
     public val betweennessMap:Rail[Double];
     public var count:Long = 0;
+    public var refTime:Long = 0;
     public var accTime:Double = 0;
 
     // These are the per-vertex data structures.
@@ -19,7 +20,7 @@ public class BC {
     val predecessorCount:Rail[Int];
     val distanceMap:Rail[Long];
     val sigmaMap:Rail[Long];
-    val regularQueue:FixedRailQueue[Int];
+    public val regularQueue:FixedRailQueue[Int];
     val deltaMap:Rail[Double];
 
     /**
@@ -65,67 +66,77 @@ public class BC {
         deltaMap = new Rail[Double](N);
     }
 
-    @Inline protected final def bfsShortestPath(val vertexIndex:Int) {
-        val time = System.nanoTime();
-        val s:Int = verticesToWorkOn(vertexIndex);
+    @Inline protected final def bfsShortestPath1(s:Int) {
+        refTime = System.nanoTime();
 
         // Put the values for source vertex
         distanceMap(s) = 0L;
         sigmaMap(s) = 1L;
         regularQueue.push(s);
+    }
 
-        // Loop until there are no elements left in the queue
-        while(!regularQueue.isEmpty()) {
-            count++;
-            // Pop the node with the least distance
-            val v = regularQueue.pop();
+    @Inline protected final def bfsShortestPath2() {
+        count++;
+        // Pop the node with the least distance
+        val v = regularQueue.pop();
 
-            // Get the start and the end points for the edge list for "v"
-            val edgeStart:Int = graph.begin(v);
-            val edgeEnd:Int = graph.end(v);
+        // Get the start and the end points for the edge list for "v"
+        val edgeStart:Int = graph.begin(v);
+        val edgeEnd:Int = graph.end(v);
 
-            // Iterate over all its neighbors
-            for(var wIndex:Int=edgeStart; wIndex<edgeEnd; ++wIndex) {
-                // Get the target of the current edge.
-                val w:Int = graph.getAdjacentVertexFromIndex(wIndex);
-                val distanceThroughV:Long = distanceMap(v) + 1L;
-                
-                // In BFS, the minimum distance will only be found once --- the 
-                // first time that a node is discovered. So, add it to the queue.
-                if(distanceMap(w) == Long.MAX_VALUE) {
-                    regularQueue.push(w);
-                    distanceMap(w) = distanceThroughV;
-                }
-
-                // If the distance through "v" for "w" from "s" was the same as its 
-                // current distance, we found another shortest path. So, add 
-                // "v" to predecessorMap of "w" and update other maps.
-                if(distanceThroughV == distanceMap(w)) {
-                    sigmaMap(w) = sigmaMap(w) + sigmaMap(v);// XTENLANG-2027
-                    predecessorMap(graph.rev(w)+predecessorCount(w)++) = v;
-                }
+        // Iterate over all its neighbors
+        for(var wIndex:Int=edgeStart; wIndex<edgeEnd; ++wIndex) {
+            // Get the target of the current edge.
+            val w:Int = graph.getAdjacentVertexFromIndex(wIndex);
+            val distanceThroughV:Long = distanceMap(v) + 1L;
+            
+            // In BFS, the minimum distance will only be found once --- the 
+            // first time that a node is discovered. So, add it to the queue.
+            if(distanceMap(w) == Long.MAX_VALUE) {
+                regularQueue.push(w);
+                distanceMap(w) = distanceThroughV;
             }
-        } // while queue not empty
 
+            // If the distance through "v" for "w" from "s" was the same as its 
+            // current distance, we found another shortest path. So, add 
+            // "v" to predecessorMap of "w" and update other maps.
+            if(distanceThroughV == distanceMap(w)) {
+                sigmaMap(w) = sigmaMap(w) + sigmaMap(v);// XTENLANG-2027
+                predecessorMap(graph.rev(w)+predecessorCount(w)++) = v;
+            }
+        }
+    }
+    
+    @Inline protected final def bfsShortestPath3() {
         regularQueue.rewind();
+    }
 
-        // Return vertices in order of non-increasing distances from "s"
+    @Inline protected final def bfsShortestPath4(s:Int) {
+        val w = regularQueue.top();
+        val rev = graph.rev(w);
+        while(predecessorCount(w) > 0) {
+            val v = predecessorMap(rev+--predecessorCount(w));
+            deltaMap(v) += (sigmaMap(v) as Double/sigmaMap(w) as Double)*(1.0 + deltaMap(w));
+        }
+
+        // Accumulate updates locally 
+        if(w != s) betweennessMap(w) += deltaMap(w); 
+        distanceMap(w) = Long.MAX_VALUE;
+        sigmaMap(w) = 0L;
+        deltaMap(w) = 0.0;
+    }
+
+    @Inline protected final def bfsShortestPath(val vertexIndex:Int) {
+        val s = verticesToWorkOn(vertexIndex);
+        bfsShortestPath1(s);
         while(!regularQueue.isEmpty()) {
-            val w = regularQueue.top();
-            val rev = graph.rev(w);
-            while(predecessorCount(w) > 0) {
-                val v = predecessorMap(rev+--predecessorCount(w));
-                deltaMap(v) += (sigmaMap(v) as Double/sigmaMap(w) as Double)*(1.0 + deltaMap(w));
-            }
-
-            // Accumulate updates locally 
-            if(w != s) betweennessMap(w) += deltaMap(w); 
-            distanceMap(w) = Long.MAX_VALUE;
-            sigmaMap(w) = 0L;
-            deltaMap(w) = 0.0;
-
-        } // queue not empty
-        accTime += (System.nanoTime()-time)/1e9;
+            bfsShortestPath2();
+        }
+        bfsShortestPath3();
+        while(!regularQueue.isEmpty()) {
+            bfsShortestPath4(s);
+        }
+        accTime += (System.nanoTime()-refTime)/1e9;
     }
 
     /**
