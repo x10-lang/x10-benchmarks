@@ -198,18 +198,20 @@ final class Worker[Queue]{Queue<:TaskQueue} {
     }
     
     def main(st:PlaceLocalHandle[Worker[Queue]], start:()=>void) {
-        try {
-            empty = false;
-            active = true;
-            logger.startLive();
-            start();
-            processStack(st);
-            logger.stopLive();
-            active = false;
-            logger.nodesCount = queue.count();
-        } catch (v:CheckedThrowable) {
-            error(v);
-        }
+        @Pragma(Pragma.FINISH_DENSE) finish {
+            try {
+                empty = false;
+                active = true;
+                logger.startLive();
+                start();
+                processStack(st);
+                logger.stopLive();
+                active = false;
+                logger.nodesCount = queue.count();
+            } catch (v:CheckedThrowable) {
+                error(v);
+            }
+        } 
     }
     
     def main(st:PlaceLocalHandle[Worker[Queue]]) {
@@ -256,17 +258,19 @@ final class Worker[Queue]{Queue<:TaskQueue} {
 
     static def broadcast[Queue](st:PlaceLocalHandle[Worker[Queue]]){Queue<:TaskQueue} {
         val P = Place.MAX_PLACES;
-        if (P < 256) {
-            for(var i:Long=0; i<P; i++) {
-                at (Place(i)) async st().main(st);
-            }
-        } else {
-            for(var i:Long=P-1; i>=0; i-=32) {
-                at (Place(i)) async {
-                    val max = Runtime.hereLong();
-                    val min = Math.max(max-31, 0);
-                    for (var j:Long=min; j<=max; ++j) {
-                        at (Place(j)) async st().main(st);
+        @Pragma(Pragma.FINISH_DENSE) finish {
+            if (P < 256) {
+                for(var i:Long=0; i<P; i++) {
+                    at (Place(i)) async st().main(st);
+                }
+            } else {
+                for(var i:Long=P-1; i>=0; i-=32) {
+                    at (Place(i)) async {
+                        val max = Runtime.hereLong();
+                        val min = Math.max(max-31, 0);
+                        for (var j:Long=min; j<=max; ++j) {
+                            at (Place(j)) async st().main(st);
+                        }
                     }
                 }
             }
