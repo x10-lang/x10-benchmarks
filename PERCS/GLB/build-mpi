@@ -1,0 +1,6 @@
+x10c++ -x10rt mpi -d /tmp -O -NO_CHECKS uts/UTS.x10 -o uts-seq
+x10c++ -x10rt mpi -d /tmp -O -NO_CHECKS uts/dist/UTSD.x10 -o uts-dist
+x10c++ -x10rt mpi -d /tmp -O -NO_CHECKS uts/lib/UTSG.x10 -o uts-glb
+x10c++ -x10rt mpi -d /tmp -O -NO_CHECKS bc/BC.x10 -o bc-seq
+x10c++ -x10rt mpi -d /tmp -O -NO_CHECKS bc/dist/BCD.x10 -o bc-dist
+x10c++ -x10rt mpi -d /tmp -O -NO_CHECKS bc/lib/BCG.x10 -o bc-glb
