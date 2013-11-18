@@ -1,0 +1,11 @@
+export ENV_ARGS='GC_MARKERS=1:X10_STATIC_THREADS=1:X10_NTHREADS=1:X10RT_MPI_ENABLE_COLLECTIVES=true:X10RT_MPI_FORCE_COLLECTIVES=true'
+
+export PROG=bc-dist
+export SIZE=19
+export G=5000
+
+#qsub --env $ENV_ARGS -t 30 -n 64 --mode c16 -O $PROG.$SIZE.01024.g$G $PROG -n $SIZE -l 16 -v 2 -m 1024 -g $G
+#qsub --env $ENV_ARGS -t 15 -n 128 --mode c16 -O $PROG.$SIZE.02048.g$G $PROG -n $SIZE -l 16 -v 2 -m 2048 -g $G
+qsub --env $ENV_ARGS -t 10 -n 256 --mode c16 -O $PROG.$SIZE.04096.g$G $PROG -n $SIZE -l 16 -v 2 -m 4096 -g $G
+qsub --env $ENV_ARGS -t 5 -n 512 --mode c16 -O $PROG.$SIZE.08192.g$G $PROG -n $SIZE -l 16 -v 2 -m 8192 -g $G
+qsub --env $ENV_ARGS -t 5 -n 1024 --mode c16 -O $PROG.$SIZE.16384.g$G $PROG -n $SIZE -l 16 -v 2 -m 16384 -g $G

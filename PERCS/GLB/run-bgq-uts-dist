@@ -1,0 +1,23 @@
+export ENV_ARGS='GC_MARKERS=1:X10_STATIC_THREADS=1:X10_NTHREADS=1:X10RT_MPI_ENABLE_COLLECTIVES=true:X10RT_MPI_FORCE_COLLECTIVES=true'
+
+export PROG=uts-dist
+
+qsub --env $ENV_ARGS -t 15 -n 1 --mode c1 -O uts-seq.00001 uts-seq
+
+qsub --env $ENV_ARGS -t 15 -n 1 --mode c1 -O $PROG.00001 $PROG -d 14 -l 16 -v 1
+qsub --env $ENV_ARGS -t 20 -n 1 --mode c2 -O $PROG.00002 $PROG -d 15 -l 16 -v 1
+qsub --env $ENV_ARGS -t 15 -n 1 --mode c4 -O $PROG.00004 $PROG -d 15 -l 16 -v 1
+qsub --env $ENV_ARGS -t 20 -n 1 --mode c8 -O $PROG.00008 $PROG -d 16 -l 16 -v 1
+qsub --env $ENV_ARGS -t 15 -n 1 --mode c16 -O $PROG.00016 $PROG -d 16 -l 16 -v 1
+qsub --env $ENV_ARGS -t 20 -n 2 --mode c16 -O $PROG.00032 $PROG -d 17 -l 16 -v 1
+qsub --env $ENV_ARGS -t 15 -n 4 --mode c16 -O $PROG.00064 $PROG -d 17 -l 16 -v 1
+qsub --env $ENV_ARGS -t 20 -n 8 --mode c16 -O $PROG.00128 $PROG -d 18 -l 16 -v 1
+qsub --env $ENV_ARGS -t 15 -n 16 --mode c16 -O $PROG.00256 $PROG -d 18 -l 16 -v 1
+qsub --env $ENV_ARGS -t 20 -n 32 --mode c16 -O $PROG.00512 $PROG -d 19 -l 16 -v 1
+qsub --env $ENV_ARGS -t 15 -n 64 --mode c16 -O $PROG.01024 $PROG -d 19 -l 16 -v 1
+qsub --env $ENV_ARGS -t 20 -n 128 --mode c16 -O $PROG.02048 $PROG -d 20 -l 16 -v 1 -m 2048
+qsub --env $ENV_ARGS -t 15 -n 256 --mode c16 -O $PROG.04096 $PROG -d 20 -l 16 -v 1 -m 4096
+#qsub --env $ENV_ARGS -t 20 -n 512 --mode c16 -O $PROG.08192 $PROG -d 21 -l 16 -v 1 -m 8192
+#qsub --env $ENV_ARGS -t 15 -n 1024 --mode c16 -O $PROG.16384 $PROG -d 21 -l 16 -v 1 -m 16384
+qsub --env $ENV_ARGS -t 20 -n 512 --mode c16 -O $PROG.08192.w5 $PROG -d 21 -l 16 -v 1 -m 8192 -w 5
+qsub --env $ENV_ARGS -t 15 -n 1024 --mode c16 -O $PROG.16384.w5 $PROG -d 21 -l 16 -v 1 -m 16384 -w 5
