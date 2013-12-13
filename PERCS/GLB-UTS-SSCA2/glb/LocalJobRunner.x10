@@ -131,6 +131,16 @@ class LocalJobRunner[Z] {
 		Runtime.probe();
 	}
 	
+
+
+    
+	/**
+	 * added on Dec 13, 2013 yield points
+	 */
+    public def getYieldPoint(){
+        return (st:PlaceLocalHandle[LocalJobRunner[Z]])=>{probe(9999999);distribute(st);reject(st);};
+    }
+
 	/**
 	 * Main process function of LocalJobRunner. It does 4 things:
 	 * (1) execute at most n tasks 

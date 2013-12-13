@@ -52,7 +52,7 @@ public final class BC(N:Int) {
 	 * the single souce shortest path for all destinations and updates the 
 	 * betweenness for all the vertices based on this calculation.
 	 */
-	public def bfsShortestPaths(val startVertex:Int, val endVertex:Int) {
+	public def bfsShortestPaths(val startVertex:Int, val endVertex:Int,yield:()=>void) {
 		
 		
 		//var processingTime:Long = 0;
@@ -103,7 +103,7 @@ public final class BC(N:Int) {
 			} // while priorityQueue not empty
 			
 			regularQueue.rewind();
-			
+			yield(); // added on 12/13/2013
 			// Return vertices in order of non-increasing distances from "s"
 			while(!regularQueue.isEmpty()) {
 				val w = regularQueue.top();

@@ -58,7 +58,7 @@ public class BCTaskFrame extends TaskFrame[BCResult]{
 			val vRange = tb.pop();
 			val vStartIdx = vRange.startVertexIdx;
 			val eStartIdx = vRange.endVertexIdx;
-			bc_.bfsShortestPaths(vStartIdx, eStartIdx+1n); // NOTE: the +1n in the end, that is [start, end) is the region that SSCA2 works on when calling bfsShortestPaths
+			bc_.bfsShortestPaths(vStartIdx, eStartIdx+1n, ()=>{this.yield();}); // NOTE: the +1n in the end, that is [start, end) is the region that SSCA2 works on when calling bfsShortestPaths
 			tasksRun++;
 		}
 		return (tasksRun==n);

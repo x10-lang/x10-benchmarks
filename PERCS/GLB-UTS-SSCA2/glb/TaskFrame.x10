@@ -51,4 +51,13 @@ public abstract class TaskFrame[Z] {
 	  * and results reduction are done.
 	  */
 	 protected def printLog():void{}
+	 
+	 var st:PlaceLocalHandle[LocalJobRunner[Z]];
+	 def setPLH(st:PlaceLocalHandle[LocalJobRunner[Z]]): void{
+		 this.st = st;
+	 }
+	 
+	 public def yield():void{
+		 this.st().getYieldPoint()(this.st); // gee, this is not pretty
+	 }
 }

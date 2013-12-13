@@ -28,6 +28,11 @@ public class GlobalLoadBalancer[Z](glbParam:GLBParameters, balancedLevel:Int) {
 		val st = PlaceLocalHandle.makeFlat[LocalJobRunner[Z]](PlaceGroup.WORLD, 
 				()=>new LocalJobRunner(init, this.glbParam, balancedLevel));
 		
+		// added on 12/13/2013, to support yield points
+		PlaceGroup.WORLD.broadcastFlat(()=>{
+			st().getTF().setPLH(st);
+		});
+		
 		setupTime = System.nanoTime() - setupTime;
 		if(st().verbose >= 1n){
 			Console.OUT.println("Setup time S (s): " + (setupTime / 1E9));
