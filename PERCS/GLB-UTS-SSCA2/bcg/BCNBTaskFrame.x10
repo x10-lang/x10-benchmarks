@@ -83,8 +83,9 @@ public class BCNBTaskFrame extends TaskFrame[BCResult]{
 	 */
 	public def printLog():void{
 		Console.OUT.println("Place " + Runtime.hereLong()+ " Alloc time: " + bc_.allocTime/(1E9));
-		Console.OUT.println("Place " + Runtime.hereLong()+ " processing time: " + bc_.processingTime/(1E9));
-		
+		Console.OUT.println("Place " + Runtime.hereLong()+ " processing time: " + (bc_.processingTime - bc_.yieldTime)/(1E9));
+	        Console.OUT.println("Place " + Runtime.hereLong()+ " yielding time: " + (bc_.yieldTime)/(1E9));
+
 	}
 	
 	

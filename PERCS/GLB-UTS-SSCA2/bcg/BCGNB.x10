@@ -35,7 +35,7 @@ public class BCGNB{
 		val d:Double = opts("-d", 0.25);
 		val permute:Int = opts("-p", 1n); // on by default
 		val verbose:Int = opts("-v", 1n); // off by default
-		val i:Int = opts("-i", 4n); // default is 4 to get better performance
+		val i:Int = opts("-i", 1n); // default is set to 1 to get better performance
 		val t:Int = opts("-t", 1n);
 		val g = opts("-g", 1n);		
 		val l = opts("-l", 2n); // default is 2 to distribute workload fast

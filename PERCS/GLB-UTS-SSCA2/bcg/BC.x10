@@ -12,7 +12,7 @@ public final class BC(N:Int) {
 	val betweennessMap = new Rail[Double](N);
 	var allocTime:Long = 0L;
 	var processingTime:Long = 0L;
-	
+	var yieldTime:Long = 0L;//added on Jan 6, 2014
 	
 	
 	// These are the per-vertex data structures.
@@ -57,7 +57,7 @@ public final class BC(N:Int) {
 		
 		//var processingTime:Long = 0;
 		var resetTime:Long = 0;
-		
+		var yieldIdx:Long = 0; // added on Jan 6, 2014
 		// Iterate over each of the vertices in my portion.
 		for(var vertexIndex:Int=startVertex; vertexIndex<endVertex; ++vertexIndex) { 
 			val s:Int = verticesToWorkOn(vertexIndex);
@@ -68,9 +68,16 @@ public final class BC(N:Int) {
 			distanceMap(s) = 0L;
 			sigmaMap(s) = 1L;
 			regularQueue.push(s);
-			
+			yieldIdx = 0L;
 			// Loop until there are no elements left in the priority queue
 			while(!regularQueue.isEmpty()) {
+				if(yieldIdx++ == 512){
+					yieldIdx=0L;
+					var beforeYieldTime:Long = System.nanoTime(); 
+					yield();
+					yieldTime += (System.nanoTime() - beforeYieldTime);
+					
+				} // added on Jan 6, 2014
 				count++;
 				// Pop the node with the least distance
 				val v = regularQueue.pop();
@@ -103,9 +110,19 @@ public final class BC(N:Int) {
 			} // while priorityQueue not empty
 			
 			regularQueue.rewind();
-			yield(); // added on 12/13/2013
+			//yield(); // added on 12/13/2013
 			// Return vertices in order of non-increasing distances from "s"
+			yieldIdx=0L;
 			while(!regularQueue.isEmpty()) {
+				if(yieldIdx++ == 512){
+					yieldIdx=0L;
+					var beforeYieldTime:Long = System.nanoTime(); 
+					yield();
+					yieldTime += (System.nanoTime() - beforeYieldTime);
+					
+				} // added on Jan 6, 2014
+				
+				
 				val w = regularQueue.top();
 				val rev = graph.rev(w);
 				while(predecessorCount(w) > 0) {
