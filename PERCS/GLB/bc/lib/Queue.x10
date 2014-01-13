@@ -5,8 +5,10 @@ import x10.util.Team;
 
 import bc.Graph;
 import bc.Rmat;
+import glb.Context;
+import glb.TaskQueue;
 
-public final class Queue extends bc.BC implements glb.TaskQueue {
+public final class Queue extends bc.BC implements glb.TaskQueue[Queue] {
     public var lower:Rail[Int];
     public var upper:Rail[Int];
     protected var size:Long;
@@ -34,7 +36,7 @@ public final class Queue extends bc.BC implements glb.TaskQueue {
         upper = u;
     }
 
-    @Inline public def process(n:Long) {
+    @Inline public def process(n:Long, context:Context[Queue]) {
         var i:Long = 0;
         switch (state) {
         case 0n:

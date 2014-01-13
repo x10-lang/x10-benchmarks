@@ -1,11 +1,14 @@
 package glb;
 
-public interface TaskQueue {
-    public def process(n:Long):Boolean;
-
-    public def split():TaskBag;
-
-    public def merge(TaskBag):void;
-
-    public def count():Long;
+public interface TaskQueue[Queue]{
+	public abstract def process(n:Long, context:Context[Queue]){Queue<:TaskQueue[Queue]}:Boolean;
+	
+	public abstract def split():TaskBag;
+	
+	public abstract def merge(TaskBag):void;
+	
+	public abstract def count():Long;
+	
+	
+	
 }

@@ -1,14 +1,41 @@
-package bc.lib;
+package bcy.dist;
 
 import x10.compiler.*;
 import x10.util.Option;
 import x10.util.OptionsParser;
 import x10.util.Random;
+import x10.util.Team;
 
 import bc.Rmat;
-import glb.GLB;
 
-public final class BCG {
+public final class BCD extends bcy.BC {
+    val startVertex:Int;
+    val endVertex:Int;
+
+    public def this(rmat:Rmat, permute:Int) {
+        super(rmat, permute);
+        val h = Runtime.hereInt();
+        val max = Place.MAX_PLACES;
+        startVertex = (N as Long*h/max) as Int;
+        endVertex = (N as Long*(h+1)/max) as Int;
+    }
+
+    def bfsShortestPaths() {
+        for(var vertexIndex:Int=startVertex; vertexIndex<endVertex; ++vertexIndex) { 
+            bfsShortestPath(vertexIndex, ()=>{;});
+        }
+    
+    }
+
+    def allreduce() {
+        Team.WORLD.allreduce(betweennessMap, // Source buffer.
+                0, // Offset into the source buffer.
+                betweennessMap, // Destination buffer.
+                0, // Offset into the destination buffer.
+                N as long, // Number of elements.
+                Team.ADD); // Operation to be performed.
+    }
+
     public static def main(args:Rail[String]):void {
         val cmdLineParams = new OptionsParser(args, new Rail[Option](0L), [
                                                                            Option("s", "", "Seed for the random number"),
@@ -18,10 +45,6 @@ public final class BCG {
                                                                            Option("c", "", "Probability c"),
                                                                            Option("d", "", "Probability d"),
                                                                            Option("p", "", "Permutation"),
-                                                                           Option("g", "", "Number of nodes to process before probing. Default 200."),
-                                                                           Option("w", "", "Number of thieves to send out. Default 1."),
-                                                                           Option("l", "", "Base of the lifeline"),
-                                                                           Option("m", "", "Max potential victims"),
                                                                            Option("v", "", "Verbose")]);
 
         val seed:Long = cmdLineParams("-s", 2);
@@ -33,28 +56,7 @@ public final class BCG {
         val permute:Int = cmdLineParams("-p", 1n); // on by default
         val verbose:Int = cmdLineParams("-v", 0n); // off by default
 
-        val g = cmdLineParams("-g", 511n);
-        val l = cmdLineParams("-l", 32n);
-        val m = cmdLineParams("-m", 1024n);
-
-        val P = Place.MAX_PLACES;
-
-        var z0:Int = 1n;
-        var zz:Int = l;
-        while (zz < P) {
-            z0++;
-            zz *= l;
-        }
-        val z = z0;
-
-        val w = cmdLineParams("-w", z);
-
-        Console.OUT.println("places=" + P +
-                "   w=" + w +
-                        "   g=" + g +
-                                "   l=" + l + 
-                                        "   m=" + m + 
-                                                "   z=" + z);
+        val max = Place.MAX_PLACES;
 
         Console.OUT.println("Running BC with the following parameters:");
         Console.OUT.println("seed = " + seed);
@@ -63,38 +65,33 @@ public final class BCG {
         Console.OUT.println("b = " + b);
         Console.OUT.println("c = " + c);
         Console.OUT.println("d = " + d);
-        Console.OUT.println("places = " + P);
+        Console.OUT.println("places = " + max);
 
         var time:Long = System.nanoTime();
-        val init = ()=>{ return new Queue(Rmat(seed, n, a, b, c, d), permute); };
-        val glb = new GLB[Queue](init, g, w, l, z, m, false);
+        val plh = PlaceLocalHandle.makeFlat[BCD](PlaceGroup.WORLD, ()=>new BCD(Rmat(seed, n, a, b, c, d), permute));
         val setupTime = (System.nanoTime()-time)/1e9;
 
-        
-        Console.OUT.println("Starting...");
+
         time = System.nanoTime();
-        glb.runParallel();
+        PlaceGroup.WORLD.broadcastFlat(()=>{
+            plh().bfsShortestPaths();
+        });
         val procTime = (System.nanoTime()-time)/1e9;
-        Console.OUT.println("Finished.");
 
         PlaceGroup.WORLD.broadcastFlat(()=>{
-            (glb.taskQueue()).allreduce();
+            plh().allreduce();
         });
         
         if(verbose > 0) {
             PlaceGroup.WORLD.broadcastFlat(()=>{
                 Console.OUT.println("[" + here.id + "]"
-                        + " Time = " + (glb.taskQueue()).accTime
-                        + " Count = " + (glb.taskQueue()).count);
+                        + " Time = " + plh().accTime
+                        + " Count = " + plh().count);
             });
         }
 
-        if(verbose > 2) (glb.taskQueue()).printBetweennessMap(6n);
+        if(verbose > 2) plh().printBetweennessMap();
 
-        val bc = glb.taskQueue();
-
-        glb.stats(verbose > 1);
-
-        Console.OUT.println("Places: " + P + " N: " + bc.N + "  Setup: " + setupTime + "s  Processing: " + procTime + "s");
+        Console.OUT.println("Places: " + max + " N: " + plh().N + "  Setup: " + setupTime + "s  Processing: " + procTime + "s");
     }
 }

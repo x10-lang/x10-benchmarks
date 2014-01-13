@@ -1,4 +1,4 @@
-package bc.lib;
+package bcy.lib;
 
 import x10.compiler.*;
 import x10.util.Option;
@@ -22,7 +22,8 @@ public final class BCG {
                                                                            Option("w", "", "Number of thieves to send out. Default 1."),
                                                                            Option("l", "", "Base of the lifeline"),
                                                                            Option("m", "", "Max potential victims"),
-                                                                           Option("v", "", "Verbose")]);
+                                                                           Option("v", "", "Verbose"),
+                                                                           Option("yf","", "Yield frequency")]);
 
         val seed:Long = cmdLineParams("-s", 2);
         val n:Int = cmdLineParams("-n", 2n);
@@ -33,10 +34,10 @@ public final class BCG {
         val permute:Int = cmdLineParams("-p", 1n); // on by default
         val verbose:Int = cmdLineParams("-v", 0n); // off by default
 
-        val g = cmdLineParams("-g", 511n);
+        val g = cmdLineParams("-g", 1n); // used to be 511
         val l = cmdLineParams("-l", 32n);
         val m = cmdLineParams("-m", 1024n);
-
+        val yfStr:String = cmdLineParams("-yf", "512:512"); // by default is 512 512
         val P = Place.MAX_PLACES;
 
         var z0:Int = 1n;
@@ -66,7 +67,7 @@ public final class BCG {
         Console.OUT.println("places = " + P);
 
         var time:Long = System.nanoTime();
-        val init = ()=>{ return new Queue(Rmat(seed, n, a, b, c, d), permute); };
+        val init = ()=>{ return new Queue(Rmat(seed, n, a, b, c, d), permute, yfStr); };
         val glb = new GLB[Queue](init, g, w, l, z, m, false);
         val setupTime = (System.nanoTime()-time)/1e9;
 
@@ -85,6 +86,7 @@ public final class BCG {
             PlaceGroup.WORLD.broadcastFlat(()=>{
                 Console.OUT.println("[" + here.id + "]"
                         + " Time = " + (glb.taskQueue()).accTime
+                        + " Yield Time = " + ((glb.taskQueue()).accYTime/1e9)
                         + " Count = " + (glb.taskQueue()).count);
             });
         }

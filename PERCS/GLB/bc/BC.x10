@@ -47,6 +47,24 @@ public class BC {
             }
         }
     }
+    
+  
+    /**
+     * substring helper function
+     */
+    private static def sub(str:String, start:Int, end:Int) = str.substring(start, Math.min(end, str.length()));
+    
+    /**
+     * Dump the betweenness map.
+     * @param numDigit number of digits to print
+     */
+    public final def printBetweennessMap(val numDigit:Int) {
+    	for(var i:Int=0n; i<N; ++i) {
+    		if(betweennessMap(i) != 0.0) {
+    			Console.OUT.println("(" + i + ") -> " + sub(""+betweennessMap(i), 0n, numDigit));
+    		}
+    	}
+    }
 
     // Constructor
     public def this(rmat:Rmat, permute:Int) {
@@ -186,7 +204,7 @@ public class BC {
                     + " Count = " + bc.count);
         }
 
-        if(verbose > 2) bc.printBetweennessMap();
+        if(verbose > 2) bc.printBetweennessMap(6n);
 
         Console.OUT.println("Seq N: " + bc.N + "  Setup: " + setupTime + "s  Processing: " + procTime + "s");
     }

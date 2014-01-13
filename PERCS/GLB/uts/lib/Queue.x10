@@ -1,13 +1,14 @@
 package uts.lib;
 
 import x10.compiler.*;
+import glb.Context;
 
-public final class Queue extends uts.UTS implements glb.TaskQueue {
+public final class Queue extends uts.UTS implements glb.TaskQueue[Queue] {
     public def this(factor:Int) {
         super(factor);
     }
 
-    @Inline public def process(n:Long) {
+    @Inline public def process(n:Long, context:Context[Queue]) {
         var i:Long=0;
         for (; (i<n) && (size>0); ++i) {
             expand();

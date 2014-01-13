@@ -7,7 +7,7 @@ import x10.util.Random;
 
 import util.*;
 
-final class Worker[Queue]{Queue<:TaskQueue} {
+final class Worker[Queue]{Queue<:TaskQueue[Queue]} {
     val queue:Queue;
     val lifelineThieves:FixedSizeStack[Long];
     val thieves:FixedSizeStack[Long];
@@ -27,7 +27,7 @@ final class Worker[Queue]{Queue<:TaskQueue} {
     @x10.compiler.Volatile transient var waiting:Boolean = false;
     
     val P = Place.MAX_PLACES;
-    
+    var context:Context[Queue];
     public def this(init:()=>Queue, n:Int, w:Int, l:Int, z:Int, m:Int, tree:Boolean) {
         this.n = n;
         this.w = w;
@@ -72,9 +72,9 @@ final class Worker[Queue]{Queue<:TaskQueue} {
         logger = new Logger(true);
     }
     
-    final def processStack(st:PlaceLocalHandle[Worker[Queue]]) {
+    final def processStack(st:PlaceLocalHandle[Worker[Queue]]){Queue<:TaskQueue[Queue]} {
         do {
-            while (queue.process(n)) {
+            while (queue.process(n, context)) {
                 Runtime.probe();
                 distribute(st);
                 reject(st);
@@ -235,7 +235,7 @@ final class Worker[Queue]{Queue<:TaskQueue} {
     
     @Inline static def min(i:Long, j:Long) = i < j ? i : j;
     
-    static def stats[Queue](st:PlaceLocalHandle[Worker[Queue]], verbose:Boolean){Queue<:TaskQueue} {
+    static def stats[Queue](st:PlaceLocalHandle[Worker[Queue]], verbose:Boolean){Queue<:TaskQueue[Queue]} {
         val P = Place.MAX_PLACES;
         val logs:Rail[Logger];
         if (P >= 1024) {
@@ -256,7 +256,7 @@ final class Worker[Queue]{Queue<:TaskQueue} {
         return log.nodesCount;
     }
 
-    static def broadcast[Queue](st:PlaceLocalHandle[Worker[Queue]]){Queue<:TaskQueue} {
+    static def broadcast[Queue](st:PlaceLocalHandle[Worker[Queue]]){Queue<:TaskQueue[Queue]} {
         val P = Place.MAX_PLACES;
         @Pragma(Pragma.FINISH_DENSE) finish {
             if (P < 256) {
@@ -275,5 +275,40 @@ final class Worker[Queue]{Queue<:TaskQueue} {
                 }
             }
         }
+    }
+    /**
+     * added on Jan 8,2014 to merge yield points
+     */
+    static def initContexts[Queue](st:PlaceLocalHandle[Worker[Queue]]){Queue<:TaskQueue[Queue]}{
+    	val P = Place.MAX_PLACES;
+    	@Pragma(Pragma.FINISH_DENSE) finish {
+    		if (P < 256) {
+    			for(var i:Long=0; i<P; i++) {
+    				at (Place(i)) async st().setContext(st);
+    			}
+    		} else {
+    			for(var i:Long=P-1; i>=0; i-=32) {
+    				at (Place(i)) async {
+    					val max = Runtime.hereLong();
+    					val min = Math.max(max-31, 0);
+    					for (var j:Long=min; j<=max; ++j) {
+    						at (Place(j)) async st().setContext(st);
+    					}
+    				}
+    			}
+    		}
+    	}
+    }
+    
+    /**
+     * merged in on Jan 8, 2014 yield points
+     */
+    public def getYieldPoint(){
+    	return (st:PlaceLocalHandle[Worker[Queue]])=>{Runtime.probe();distribute(st);reject(st);};
+    }
+    
+    protected def setContext(st:PlaceLocalHandle[Worker[Queue]]){Queue<:TaskQueue[Queue]}{
+    
+    	this.context = new Context(st);
     }
 }
