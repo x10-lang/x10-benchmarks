@@ -303,7 +303,7 @@ final class Worker[Queue]{Queue<:TaskQueue[Queue]} {
     /**
      * merged in on Jan 8, 2014 yield points
      */
-    public def getYieldPoint(){
+    @Inline public def getYieldPoint(){
     	return (st:PlaceLocalHandle[Worker[Queue]])=>{Runtime.probe();distribute(st);reject(st);};
     }
     

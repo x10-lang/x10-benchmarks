@@ -1,4 +1,5 @@
 package glb;
+import x10.compiler.Inline;
 
 public class Context[Queue]{Queue<:TaskQueue[Queue]}{
 	/**
@@ -10,7 +11,7 @@ public class Context[Queue]{Queue<:TaskQueue[Queue]}{
 		this.st = st;
 	}
 	
-	public def yield():void{
+	@Inline public def yield():void{
 		this.st().getYieldPoint()(this.st); 
 	}
 	
