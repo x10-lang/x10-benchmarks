@@ -89,7 +89,7 @@ public final class BCD extends bc.BC {
             });
         }
 
-        if(verbose > 2) plh().printBetweennessMap();
+        if(verbose > 2) plh().printBetweennessMap(6n);
 
         Console.OUT.println("Places: " + max + " N: " + plh().N + "  Setup: " + setupTime + "s  Processing: " + procTime + "s");
     }
