@@ -77,11 +77,11 @@ public final class BCG {
         glb.runParallel();
         val procTime = (System.nanoTime()-time)/1e9;
         Console.OUT.println("Finished.");
-
+        time = System.nanoTime();
         PlaceGroup.WORLD.broadcastFlat(()=>{
             (glb.taskQueue()).allreduce();
         });
-        
+        val reduceTime = (System.nanoTime()-time)/1e9;
         if(verbose > 0) {
             PlaceGroup.WORLD.broadcastFlat(()=>{
                 Console.OUT.println("[" + here.id + "]"
@@ -97,6 +97,7 @@ public final class BCG {
 
         glb.stats(verbose > 1);
 
-        Console.OUT.println("Places: " + P + " N: " + bc.N + "  Setup: " + setupTime + "s  Processing: " + procTime + "s");
+        Console.OUT.println("Places: " + P + " N: " + bc.N + "  Setup: " + 
+        		setupTime + "s  Processing: " + procTime + "s" + " Reduce: " + reduceTime + "s");
     }
 }

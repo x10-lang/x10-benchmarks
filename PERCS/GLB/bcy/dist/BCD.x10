@@ -78,9 +78,11 @@ public final class BCD extends bcy.BC {
         });
         val procTime = (System.nanoTime()-time)/1e9;
 
+        time = System.nanoTime();
         PlaceGroup.WORLD.broadcastFlat(()=>{
             plh().allreduce();
         });
+        val reduceTime = System.nanoTime() - time;
         
         if(verbose > 0) {
             PlaceGroup.WORLD.broadcastFlat(()=>{
@@ -92,6 +94,7 @@ public final class BCD extends bcy.BC {
 
         if(verbose > 2) plh().printBetweennessMap();
 
-        Console.OUT.println("Places: " + max + " N: " + plh().N + "  Setup: " + setupTime + "s  Processing: " + procTime + "s");
+        Console.OUT.println("Places: " + max + " N: " + plh().N + "  Setup: " + 
+        		setupTime + "s  Processing: " + procTime + "s" + "Reduce: " + reduceTime + "s");
     }
 }
