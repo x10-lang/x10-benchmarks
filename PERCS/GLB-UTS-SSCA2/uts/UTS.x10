@@ -26,7 +26,7 @@ public class UTS{
 		val n = opts("-n", 511n);
 		val l = opts("-l", 32n);
 		val m = opts("-m", 1024n);
-		val verbose = opts("-v", 0n);
+		val verbose = opts("-v", 1n);
 		val P=Place.MAX_PLACES;
 		val w = opts("-w", GLBParameters.computeZ(P,l));
 		val z=w;
@@ -40,13 +40,16 @@ public class UTS{
 				                                                "   m=" + m + 
 				                                                        "   z=" + z);
 		val myuts_ = new GlobalLoadBalancer[Long](GLBParameters(n, w, l, z, m,verbose),
-				GlobalLoadBalancer.BALANCED_LEVEL_NUB);
+				GlobalLoadBalancer.BALANCED_LEVEL_NUB, true);
 		var time:Long = System.nanoTime();
 		result:Long = myuts_.run(()=>new UTSTaskFrame(b,r,d));
 		time = System.nanoTime() - time;
-		Console.OUT.println("Time spent: " + (time/1E9));
-		Console.OUT.println("Result: "+ result);
-		Console.OUT.println("Throughput: "+result/(time/1E3)+ " M nodes/s");
+		
+		if( (verbose & GLBParameters.SHOW_RESULT_FLAG) != 0n){
+			Console.OUT.println("Time spent: " + (time/1E9));
+			Console.OUT.println("Result: "+ result);
+			Console.OUT.println("Throughput: "+result/(time/1E3)+ " M nodes/s");
+		}
 		
 	}
 	

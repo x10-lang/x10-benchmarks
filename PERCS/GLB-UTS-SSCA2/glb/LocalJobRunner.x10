@@ -10,6 +10,7 @@ import x10.compiler.Pragma;
  * The local runner for the GLB framework. An instance of this class runs at each
  * place and provides the context within which user-specified tasks execute and
  * are load balanced across all places.
+ * @param <Z> result type
  */
 class LocalJobRunner[Z] {
 	
@@ -47,7 +48,8 @@ class LocalJobRunner[Z] {
 	private val P = Place.MAX_PLACES;
 	
 	/** Random number, used when picking a non-lifeline victim/buddy */
-	private val random = new Random();
+	private val random = new Random(Runtime.hereInt()); // on Jan 22,2014, was an issue if using the default seed, appears
+                  // everyplace has the same random number sequence
 	
 	/** Number of random victims to probe before sending requests to lifeline buddy*/
 	private val w:Int; 

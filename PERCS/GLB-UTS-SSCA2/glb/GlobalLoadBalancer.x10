@@ -9,9 +9,11 @@ import x10.compiler.Inline;
  *        2 is deliberately left out for other type, the higher it goes, the more 
  *        naturally balanced
  */
-public class GlobalLoadBalancer[Z](glbParam:GLBParameters, balancedLevel:Int) {
+public class GlobalLoadBalancer[Z](glbParam:GLBParameters, balancedLevel:Int, fastReduce:Boolean) {
 	public static val BALANCED_LEVEL_NB:Int =  3n;
 	public static val BALANCED_LEVEL_NUB:Int = 1n;
+	
+	
 	
 	@Inline static def min(i:Long, j:Long) = i < j ? i : j;
 	private val P = Place.MAX_PLACES;
@@ -45,19 +47,38 @@ public class GlobalLoadBalancer[Z](glbParam:GLBParameters, balancedLevel:Int) {
 		if(st().verbose >= 1n) Console.OUT.println("Processing time P (s): " + (crunchNumberTime / 1E9));
 		
 		/*result calculation phase*/
+		
 		var collectResultTime:Long = System.nanoTime();
-		results: Rail[Z] = collectResults(st);
-		result:Z = reduce(results, st().getTF().getReducer());
+		var result:Z;
+		if(!fastReduce){
+			results: Rail[Z] = collectResults(st);
+			 result = reduce(results, st().getTF().getReducer());
+		}else{
+			// if the user already provide the 
+			PlaceGroup.WORLD.broadcastFlat(()=>{
+				st().getTF().reduce();
+			});
+			result = st().getTF().getResult();
+		}
 		collectResultTime = System.nanoTime() - collectResultTime;
-		if(st().verbose >= 1n){
+		if((glbParam.v & GLBParameters.SHOW_TIMING_FLAG) != 0n ){ // print overall timing information
 			Console.OUT.println("Reap time R (s):" + (collectResultTime / 1E9));
 			Console.OUT.println("Process time(P+R) (s):" + ((crunchNumberTime+collectResultTime) / 1E9));
 			Console.OUT.println("Process rate(P+R)/(P+R+S) (s): " 
 					+ ((crunchNumberTime+collectResultTime)/1E9)*100.0/
 					((crunchNumberTime+collectResultTime+setupTime)/1E9)+"%");
 		}
-		if(st().verbose >= 2n) printLog(st);		
-		if(st().verbose == GLBParameters.VERBOSE_MAX) collectLifelineStatus(st);
+		
+		
+		
+		if((glbParam.v & GLBParameters.SHOW_TASKFRAME_LOG_FLAG) != 0n){ // print log
+			if(st().verbose >= 2n) printLog(st);	
+		}
+		if((glbParam.v & GLBParameters.SHOW_GLB_FLAG) != 0n){ // collect glb statistics and print it out
+			collectLifelineStatus(st);	
+		}
+			
+	
 		return result;
 	}
 	
@@ -102,13 +123,13 @@ public class GlobalLoadBalancer[Z](glbParam:GLBParameters, balancedLevel:Int) {
 			logs = new Rail[Logger](P/32, (i:Long)=>at (Place(i*32)) {
 				val h = Runtime.hereLong();
 				val n = min(32, P-h);
-				val logs = new Rail[Logger](n, (i:Long)=>at (Place(h+i)) st().logger.get(this.glbParam.v==GLBParameters.VERBOSE_MAX));
+				val logs = new Rail[Logger](n, (i:Long)=>at (Place(h+i)) st().logger.get((this.glbParam.v & GLBParameters.SHOW_GLB_FLAG)!=0n));
 				val log = new Logger(false);
 				log.collect(logs);
 				return log;
 			});
 		} else {
-			logs = new Rail[Logger](P, (i:Long)=>at (Place(i)) st().logger.get(this.glbParam.v==GLBParameters.VERBOSE_MAX));
+			logs = new Rail[Logger](P, (i:Long)=>at (Place(i)) st().logger.get((this.glbParam.v & GLBParameters.SHOW_GLB_FLAG)!=0n));
 		}
 		val log = new Logger(false);
 		log.collect(logs);

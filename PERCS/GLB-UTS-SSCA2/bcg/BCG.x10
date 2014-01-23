@@ -65,7 +65,7 @@ public class BCG{
 		Console.OUT.println("l = " + l);
 		Console.OUT.println("permute = " + permute);
 		val myssca2 = new GlobalLoadBalancer[BCResult]( GLBParameters(g, w, l, z, m,verbose),
-				GlobalLoadBalancer.BALANCED_LEVEL_NUB);
+				GlobalLoadBalancer.BALANCED_LEVEL_NUB, true);
 			
 		val result = myssca2.run( ()=>(new BCTaskFrame(Rmat(seed, n, a, b, c, d),i,t, permute)));
 		

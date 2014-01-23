@@ -2,7 +2,7 @@ package bcg;
 
 import glb.TaskFrame;
 import glb.TaskBag;
-
+import x10.util.Team;
 
 /*implemented on nov 08, 2013, modify on top of BCTaskFrame */
 public class BCNBTaskFrame extends TaskFrame[BCResult]{
@@ -88,6 +88,15 @@ public class BCNBTaskFrame extends TaskFrame[BCResult]{
 
 	}
 	
+	
+	public def reduce() {
+		Team.WORLD.allreduce(bc_.betweennessMap, // Source buffer.
+				0, // Offset into the source buffer.
+				bc_.betweennessMap, // Destination buffer.
+				0, // Offset into the destination buffer.
+				bc_.N as long, // Number of elements.
+				Team.ADD); // Operation to be performed.
+	}
 	
 	
 	

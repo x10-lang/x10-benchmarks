@@ -23,8 +23,9 @@ public final class BC(N:Int) {
 	var regularQueue:FixedRailQueue[Int];
 	var deltaMap:Rail[Double];
 	var count:Int = 0n;
-	
-	
+	var yFs:Rail[Long] = new Rail[Long](10); // insert at most 10 yield points.
+	var toYield:Boolean = false; // by default, no yielding
+	public static NO_YIELD:String = "No";
 	/**
 	 * Constructor
 	 * @param graph random graph to work on, inside the constructor, various helper data structured
@@ -43,6 +44,34 @@ public final class BC(N:Int) {
 		deltaMap = new Rail[Double](N);
 		count:Int = 0n;
 		allocTime += System.nanoTime();
+	}
+	
+	
+	/**
+	 * Constructor
+	 * @param graph random graph to work on, inside the constructor, various helper data structured
+	 * will be allocated.
+	 */
+	public def this(graph:Graph, yf:String) {
+		property(graph.numVertices());
+		this.graph = graph;
+		
+		allocTime  -= System.nanoTime();
+		predecessorMap = new Rail[Int](graph.numEdges());
+		predecessorCount = new Rail[Int](N);
+		distanceMap = new Rail[Long](N, Long.MAX_VALUE);
+		sigmaMap = new Rail[Long](N);
+		regularQueue = new FixedRailQueue[Int](N);
+		deltaMap = new Rail[Double](N);
+		count:Int = 0n;
+		allocTime += System.nanoTime();
+		if(!yf.equals(NO_YIELD)){
+			this.toYield = true;
+			val yfs:Rail[String] = yf.split(":");
+			for(var idx:Long = 0L; idx < yfs.size; idx++){
+				this.yFs(idx) = Long.parseLong(yfs(idx));
+			}
+		}
 	}
 	
 	
@@ -71,13 +100,15 @@ public final class BC(N:Int) {
 			yieldIdx = 0L;
 			// Loop until there are no elements left in the priority queue
 			while(!regularQueue.isEmpty()) {
-				if(yieldIdx++ == 512){
-					yieldIdx=0L;
-					var beforeYieldTime:Long = System.nanoTime(); 
-					yield();
-					yieldTime += (System.nanoTime() - beforeYieldTime);
-					
-				} // added on Jan 6, 2014
+				if(this.toYield){
+					if(yieldIdx++ == this.yFs(0)){
+						yieldIdx=0L;
+						var beforeYieldTime:Long = System.nanoTime(); 
+						yield();
+						yieldTime += (System.nanoTime() - beforeYieldTime);
+						
+					} // added on Jan 6, 2014
+				}
 				count++;
 				// Pop the node with the least distance
 				val v = regularQueue.pop();
@@ -114,14 +145,15 @@ public final class BC(N:Int) {
 			// Return vertices in order of non-increasing distances from "s"
 			yieldIdx=0L;
 			while(!regularQueue.isEmpty()) {
-				if(yieldIdx++ == 512){
-					yieldIdx=0L;
-					var beforeYieldTime:Long = System.nanoTime(); 
-					yield();
-					yieldTime += (System.nanoTime() - beforeYieldTime);
-					
-				} // added on Jan 6, 2014
-				
+				if(this.toYield){
+					if(yieldIdx++ == this.yFs(1)){
+						yieldIdx=0L;
+						var beforeYieldTime:Long = System.nanoTime(); 
+						yield();
+						yieldTime += (System.nanoTime() - beforeYieldTime);
+						
+					} // added on Jan 6, 2014
+				}
 				
 				val w = regularQueue.top();
 				val rev = graph.rev(w);

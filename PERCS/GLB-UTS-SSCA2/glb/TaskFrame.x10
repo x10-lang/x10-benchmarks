@@ -60,4 +60,6 @@ public abstract class TaskFrame[Z] {
 	 public def yield():void{
 		 this.st().getYieldPoint()(this.st); // gee, this is not pretty
 	 }
+	 
+	 public def reduce(){;} // on Jan 23, 2014, added for better use of x10 Team reduce functionality 
 }

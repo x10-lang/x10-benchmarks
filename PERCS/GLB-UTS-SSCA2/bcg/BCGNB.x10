@@ -26,7 +26,8 @@ public class BCGNB{
 		    Option("g", "", "granularity, i.e., N in the atMostN"),
 		    Option("w", "", "Number of thieves to send out. Default 1."),
 		    Option("l", "", "Base of the lifeline"),
-		    Option("m", "", "Max potential victims")]);
+		    Option("m", "", "Max potential victims"),
+		    Option("yf","", "Yield frequency")]);
 		val seed:Long = opts("-s", 2);
 		val n:Int = opts("-n", 2n);
 		val a:Double = opts("-a", 0.55);
@@ -40,7 +41,7 @@ public class BCGNB{
 		val g = opts("-g", 1n);		
 		val l = opts("-l", 2n); // default is 2 to distribute workload fast
 		val m = opts("-m", 1024n);
-	
+		val yfStr:String = opts("-yf", "512:512"); // by default is 512 512
 
 		val P = Place.MAX_PLACES;
 
@@ -54,6 +55,12 @@ public class BCGNB{
 
 		val w = opts("-w", z);
 
+		Console.OUT.println("places=" + P +
+				"   w=" + w +
+				        "   g=" + g +
+				                "   l=" + l + 
+				                        "   m=" + m + 
+				                                "   z=" + z);
 		
 		Console.OUT.println("Running BC with the following parameters:");
 		Console.OUT.println("seed = " + seed);
@@ -67,11 +74,11 @@ public class BCGNB{
 		Console.OUT.println("l = " + l);
 		Console.OUT.println("permute = " + permute);
 		val myssca2 = new GlobalLoadBalancer[BCResult]( GLBParameters(g, w, l, z, m,verbose), 
-				GlobalLoadBalancer.BALANCED_LEVEL_NB);
+				GlobalLoadBalancer.BALANCED_LEVEL_NB, true);
 			
 		val result = myssca2.run( ()=>(new BCNBTaskFrame(Rmat(seed, n, a, b, c, d),i,t, permute)));// CHANGE, nov 8, 2013
 		
-		if (verbose >=2n) printBetweennessMap(result.betweennessMap, (1<<n) as Int);
+		if ((verbose & GLBParameters.SHOW_RESULT_FLAG) != 0n) printBetweennessMap(result.betweennessMap, (1<<n) as Int);
 	}
 	
 	/**
