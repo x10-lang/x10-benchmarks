@@ -1,4 +1,3 @@
 X10CPPFLAGS="-report postcompile=5"
 x10c++ $X10RTTRANSPORT $X10CPPFLAGS -O -STATIC_CHECKS FT.x10 -d tmp.ft -o ft
 #x10c++ $X10RTTRANSPORT $X10CPPFLAGS -O -STATIC_CHECKS FT2DRep.x10 -d tmp.ft2drep -o ft2drep
-x10c++ $X10RTTRANSPORT $X10CPPFLAGS -O -STATIC_CHECKS FTNew.x10 -d tmp.ftnew -o ftnew

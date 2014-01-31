@@ -11,7 +11,7 @@ import x10.util.OptionsParser;
 import x10.util.Team;
 import x10.array.Array_2;
 import x10.compiler.Inline;
-import FTNew;
+import FT;
 
 /**
  * Implementation of a 1-D Discrete FFT on Complex inputs of size N=2^M, using the transpose
@@ -27,7 +27,7 @@ import FTNew;
  * the identity transformation. (Reverse FFT is the same as a forward fft with the sign changed
  * for the bytwiddle operation.)
  */
-class FT2Level(workers:Rail[FTNew]) {
+class FT2Level(workers:Rail[FT]) {
     val I = here.id;
     def twoLevelBarrier(j:Long, phase:Int) {
 	Logger.debug(()=> I + "/" + j + " in advanceAll " + phase + "a.");
@@ -107,7 +107,7 @@ class FT2Level(workers:Rail[FTNew]) {
             return;
         }
         val plh = PlaceLocalHandle.makeFlat[FT2Level](PlaceGroup.WORLD, 
-                ()=>new FT2Level(new Rail[FTNew](W, (i:Long)=> new FTNew(M,verify))));
+                ()=>new FT2Level(new Rail[FT](W, (i:Long)=> new FT(M,verify))));
         val o=plh();
         val mbytes = N*2.0*8.0*2/(1024*1024);
         Logger.info(()=>"M=" + M + " SQRTN=" + SQRTN + " N=" + N + " nRows=" + nRows +
