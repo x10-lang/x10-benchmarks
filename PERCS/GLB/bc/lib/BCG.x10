@@ -7,7 +7,8 @@ import x10.util.Random;
 
 import bc.Rmat;
 import glb.GLB;
-
+import glb.GLBResult;
+import glb.GLBParameters;
 public final class BCG {
     public static def main(args:Rail[String]):void {
         val cmdLineParams = new OptionsParser(args, new Rail[Option](0L), [
@@ -67,37 +68,39 @@ public final class BCG {
 
         var time:Long = System.nanoTime();
         val init = ()=>{ return new Queue(Rmat(seed, n, a, b, c, d), permute); };
-        val glb = new GLB[Queue](init, g, w, l, z, m, false);
+        val glb = new GLB[Queue](init, GLBParameters(g, w, l, z, m, verbose), false);
         val setupTime = (System.nanoTime()-time)/1e9;
 
         
-        Console.OUT.println("Starting...");
-        time = System.nanoTime();
-        glb.runParallel();
-        val procTime = (System.nanoTime()-time)/1e9;
-        Console.OUT.println("Finished.");
+        //Console.OUT.println("Starting...");
+       
+        result:GLBResult = glb.runParallel();
+       
+       // Console.OUT.println("Finished.");
 
-        time = System.nanoTime();
-        PlaceGroup.WORLD.broadcastFlat(()=>{
-            (glb.taskQueue()).allreduce();
-        });
-        val reduceTime = (System.nanoTime()-time)/1e9;
         
-        if(verbose > 0) {
-            PlaceGroup.WORLD.broadcastFlat(()=>{
-                Console.OUT.println("[" + here.id + "]"
-                        + " Time = " + (glb.taskQueue()).accTime
-                        + " Count = " + (glb.taskQueue()).count);
-            });
-        }
+        // PlaceGroup.WORLD.broadcastFlat(()=>{
+        //     (glb.taskQueue()).allreduce();
+        // });
+        
+        //result.display();
+      
+        
+        // if(verbose > 0) {
+        //     PlaceGroup.WORLD.broadcastFlat(()=>{
+        //         Console.OUT.println("[" + here.id + "]"
+        //                 + " Time = " + (glb.taskQueue()).accTime
+        //                 + " Count = " + (glb.taskQueue()).count);
+        //     });
+        // }
 
-        if(verbose > 2) (glb.taskQueue()).printBetweennessMap(6n);
+       // if(verbose > 2) (glb.taskQueue()).printBetweennessMap(6n);
 
-        val bc = glb.taskQueue();
+        //val bc = glb.taskQueue();
 
-        glb.stats(verbose > 1);
+        //glb.stats(verbose > 1);
 
-        Console.OUT.println("Places: " + P + " N: " + bc.N + "  Setup: " + setupTime + "s  Processing: " + procTime + "s"
-        					+ " Reduce: " + reduceTime);
+        // Console.OUT.println("Places: " + P + " N: " + bc.N + "  Setup: " + setupTime + "s  Processing: " + procTime + "s"
+        // 					+ " Reduce: " + reduceTime);
     }
 }

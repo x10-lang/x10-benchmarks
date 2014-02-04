@@ -6,7 +6,8 @@ import x10.util.OptionsParser;
 import x10.util.Random;
 
 import glb.GLB;
-
+import glb.GLBResult;
+import glb.GLBParameters;
 public final class UTSG {
     public static def main(args:Rail[String]) {
         val opts = new OptionsParser(args, new Rail[Option](), [
@@ -25,7 +26,7 @@ public final class UTSG {
         val n = opts("-n", 511n);
         val l = opts("-l", 32n);
         val m = opts("-m", 1024n);
-        val verbose = opts("-v", 0) != 0;
+        val verbose = opts("-v", GLBParameters.SHOW_RESULT_FLAG);
 
         val P = Place.MAX_PLACES;
 
@@ -49,17 +50,15 @@ public final class UTSG {
                                                                 "   m=" + m + 
                                                                         "   z=" + z);
         val init = ()=>{ return new Queue(b); };
-        val glb = new GLB[Queue](init, n, w, l, z, m, true);
-        
+        //val glb = new GLB[Queue](init, n, w, l, z, m, true);
+        val glb = new GLB[Queue](init, GLBParameters(n, w, l, z, m,verbose), true);
         Console.OUT.println("Starting...");
-        var time:Long = System.nanoTime();
+       
         val start = ()=>{ (glb.taskQueue()).init(r, d); };
         glb.run(start);
-        time = System.nanoTime() - time;
+       
         Console.OUT.println("Finished.");
-
-        val count = glb.stats(verbose);
-
-        Queue.print(time, count);
+        result:GLBResult = glb.collectResults();
+       
     }
 }

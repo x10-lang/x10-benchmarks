@@ -33,4 +33,9 @@ public struct GLBParameters(
     /** when verbose level is VERBOSE_MAX it will output workstealing status, used for users who are interested in
      * understanding what kind of traffic is going on in GLB */
     public static val VERBOSE_MAX:Int =1024n;
+    public static val SHOW_RESULT_FLAG:Int = 1n; // show result
+    public static val SHOW_TIMING_FLAG:Int = 2n; // show work initialization, computation, result collection 
+    public static val SHOW_TASKFRAME_LOG_FLAG:Int = 4n; // show logs produced by each task frame, i.e., each
+    // task frame's computation time, yield time etc
+    public static val SHOW_GLB_FLAG:Int = 8n; // show GLB statistics 
 }

@@ -52,7 +52,7 @@ public class BC {
     /**
      * substring helper function
      */
-    private static def sub(str:String, start:Int, end:Int) = str.substring(start, Math.min(end, str.length()));
+    public static def sub(str:String, start:Int, end:Int) = str.substring(start, Math.min(end, str.length()));
     
     /**
      * Dump the betweenness map.

@@ -7,6 +7,7 @@ import bc.Graph;
 import bc.Rmat;
 import glb.Context;
 import glb.TaskQueue;
+import glb.GLBResult;
 
 public final class Queue extends bc.BC implements glb.TaskQueue[Queue] {
     public var lower:Rail[Int];
@@ -105,12 +106,57 @@ public final class Queue extends bc.BC implements glb.TaskQueue[Queue] {
 
     @Inline public def count() = count;
 
-    def allreduce() {
-        Team.WORLD.allreduce(betweennessMap, // Source buffer.
-                0, // Offset into the source buffer.
-                betweennessMap, // Destination buffer.
-                0, // Offset into the destination buffer.
-                N as long, // Number of elements.
-                Team.ADD); // Operation to be performed.
+    // def allreduce() {
+    //     Team.WORLD.allreduce(betweennessMap, // Source buffer.
+    //             0, // Offset into the source buffer.
+    //             betweennessMap, // Destination buffer.
+    //             0, // Offset into the destination buffer.
+    //             N as long, // Number of elements.
+    //             Team.ADD); // Operation to be performed.
+    // }
+    
+    var result:BCGLBResult = null;
+    public def getResult():GLBResult{
+    	if(result == null){
+    		result = new BCGLBResult();
+    	}
+    	return result;
     }
+    
+    public class BCGLBResult implements GLBResult{
+    	
+    public def this(){
+    	
+    }
+    public  def getDoubleResult(): Rail[Double]{
+    	return betweennessMap;
+    }
+    public  def getLongResult(): Rail[Long]{
+    	return null;
+    }
+    public  def getReduceOperator():Int{
+    	return Team.ADD;
+    }
+    public def getType():Int{
+    	return glb.GLBResult.RESULT_DOUBLE_TYPE;
+    }
+    public def display():void{
+    	for(var i:Int=0n; i<N; ++i) {
+    		if(betweennessMap(i) != 0.0) {
+    			Console.OUT.println("(" + i + ") -> " + sub(""+betweennessMap(i), 0n, 6n));
+    		}
+    	}
+    }
+    }
+    /**
+     * Override parent class method to print allocation and processing time
+     */
+    public def printLog():void{
+    	Console.OUT.println("[" + here.id + "]"
+    			                + " Time = " + accTime
+    			                 + " Count = " + count);
+    	
+
+    }
+    
 }
