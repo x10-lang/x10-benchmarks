@@ -1,73 +1,130 @@
 package glb;
 import x10.util.Team;
-import util.Logger;
 import x10.compiler.Inline;
-public final class GLB[Queue]{Queue<:TaskQueue[Queue]} {
+
+/**
+ * <p>The top level class of the Global Load Balancing (GLB) framework.
+ * </p>
+ */
+public final class GLB[Queue, R]{Queue<:TaskQueue[Queue, R]} {
+	/**
+	 * Number of places.
+	 */
 	private val P = Place.MAX_PLACES;
-	private val plh:PlaceLocalHandle[Worker[Queue]];
+	/**
+	 * Home PlaceLocalHandle of {@link Worker}
+	 */
+	private val plh:PlaceLocalHandle[Worker[Queue, R]];
+	
+	/**
+	 * Workload initialization time.
+	 */
 	var setupTime:Long;
+	/**
+	 * Computation time.
+	 */
 	var crunchNumberTime:Long;
+	/**
+	 * Result collection time.
+	 */
 	var collectResultTime:Long;
 	
+	/**
+	 * {@link GLBResult at root. Used as a vehicle to collect results.}
+	 */
+	var rootGlbR: GLBResult[R] = null; // root glb result collector 
+	
+	/**
+	 * Min helper method.
+	 */
 	@Inline static def min(i:Long, j:Long) = i < j ? i : j;
-	// public def this(init:()=>Queue, n:Int, w:Int, l:Int, z:Int, m:Int, tree:Boolean) {
-	// 	plh = PlaceLocalHandle.makeFlat[Worker[Queue]](PlaceGroup.WORLD, ()=>new Worker[Queue](init, n, w, l, z, m, tree));
-	// 	Worker.initContexts[Queue](plh);
-	// }
+	
+	/**
+	 * GLB Parameters. {@link GLBParameters}
+	 */
 	var glbParams:GLBParameters;
+	
+	/**
+	 * Constructor
+	 * @param init function closure that can initialize {@link TaskQueue}
+	 * @param glbParams GLB parameters
+	 * @tree true if workload is dynamically generated, false if workload can be known upfront. 
+	 */
 	public def this(init:()=>Queue, glbParams:GLBParameters, tree:Boolean) {
 		this.glbParams = glbParams;
 		setupTime = System.nanoTime();
-		plh = PlaceLocalHandle.makeFlat[Worker[Queue]](PlaceGroup.WORLD, 
-				()=>new Worker[Queue](init, glbParams.n, glbParams.w, glbParams.l, glbParams.z, glbParams.m, tree));
-		Worker.initContexts[Queue](plh);
+		plh = PlaceLocalHandle.makeFlat[Worker[Queue, R]](PlaceGroup.WORLD, 
+				()=>new Worker[Queue, R](init, glbParams.n, glbParams.w, glbParams.l, glbParams.z, glbParams.m, tree));
+		Worker.initContexts[Queue, R](plh);
 		setupTime = System.nanoTime() - setupTime;
 	}
 	
-	
+	/**
+	 * Returns Home {@link TaskQueue}
+	 */
 	public def taskQueue() = plh().queue;
 	
-	public def run(start:()=>void):GLBResult {
+	/**
+	 * Run method. This method is called when users does not know the workload upfront.
+	 * @param start The method that (Root) initializes the workload that can start computation.
+	 * Other places first get their workload by stealing.
+	 */
+	public def run(start:()=>void):Rail[R] {
 		crunchNumberTime = System.nanoTime();
 		plh().main(plh, start);
 		crunchNumberTime = System.nanoTime() - crunchNumberTime;
-		r:GLBResult = collectResults();
+		r:Rail[R] = collectResults();
+		//Console.OUT.println("Hello there!");
 		end(r);
 		return r;
 	}
 	
-	public def runParallel() : GLBResult{
+	/**
+	 * Run method. This method is called when users can know the workload upfront and initialize the
+	 * workload in {@link TaskQueue}
+	 */
+	public def runParallel() : Rail[R]{
 		crunchNumberTime = System.nanoTime();
-		Worker.broadcast[Queue](plh);
+		Worker.broadcast[Queue,R](plh);
 		crunchNumberTime = System.nanoTime() - crunchNumberTime;
-		r:GLBResult = collectResults();
+		r:Rail[R] = collectResults();
 		end(r);
 		return r;
 	}
 	
-	private def end(r:GLBResult):void{
+	
+	/**
+	 * Print various GLB-related information, including result; time spent in initialization, computation 
+	 * and result collection; any user specified log information (per place); and GLB statistics.
+	 * @param r result to print
+	 */
+	private def end(r:Rail[R]):void{
 		if((glbParams.v & GLBParameters.SHOW_RESULT_FLAG) != 0n){ // print result
-			r.display();
+			Console.OUT.println("r is " + r);
+			rootGlbR.display(r);
 		}
 		if((glbParams.v & GLBParameters.SHOW_TIMING_FLAG) != 0n ){ // print overall timing information
-			Console.OUT.println("Reap time R (s):" + (collectResultTime / 1E9));
-			Console.OUT.println("Process time(P+R) (s):" + ((crunchNumberTime+collectResultTime) / 1E9));
-			Console.OUT.println("Process rate(P+R)/(P+R+S) (s): " 
-					+ ((crunchNumberTime+collectResultTime)/1E9)*100.0/
-					((crunchNumberTime+collectResultTime+setupTime)/1E9)+"%");
+			Console.OUT.println("Setup time(s):" + ((setupTime) / 1E9));
+			Console.OUT.println("Process time(s):" + ((crunchNumberTime) / 1E9));
+			Console.OUT.println("Result reduce time(s):" + (collectResultTime / 1E9));
+			
 		}
 		
 		
 		
 		if((glbParams.v & GLBParameters.SHOW_TASKFRAME_LOG_FLAG) != 0n){ // print log
-			 printLog(plh);	
+			printLog(plh);	
 		}
 		if((glbParams.v & GLBParameters.SHOW_GLB_FLAG) != 0n){ // collect glb statistics and print it out
 			collectLifelineStatus(plh);	
 		}
 	}
 	
-	private def collectLifelineStatus(st:PlaceLocalHandle[Worker[Queue]]):void{
+	/**
+	 * Collect GLB statistics
+	 * @param st PlaceLocalHandle for {@link Worker}
+	 */
+	private def collectLifelineStatus(st:PlaceLocalHandle[Worker[Queue, R]]):void{
 		val logs:Rail[Logger];
 		//val groupSize:Long = 128l;
 		if (P >= 1024) {
@@ -88,48 +145,51 @@ public final class GLB[Queue]{Queue<:TaskQueue[Queue]} {
 	}
 	
 	/**
-	 * Feb 3, 2014
+	 * Collect results from all places and reduce them to the final result.
+	 * @return Final result.
 	 */
-	public def collectResults():GLBResult{
+	protected def collectResults():Rail[R]{
 		collectResultTime = System.nanoTime();
+      
+		
+		rootGlbR = plh().queue.getResult();
+		val resultGlobal = GlobalRef[GLBResult[R]](rootGlbR);
+		tmpRail:Rail[R] = rootGlbR.submitResult();
+	
 		PlaceGroup.WORLD.broadcastFlat(()=>{
-			glbR: GLBResult = plh().queue.getResult(); 
-		    switch(glbR.getType()){
-		    case GLBResult.RESULT_LONG_TYPE:
-		    	Team.WORLD.allreduce(glbR.getLongResult(), // Source buffer.
-		    			0, // Offset into the source buffer.
-		    			glbR.getLongResult(), // Destination buffer.
-		    			0, // Offset into the destination buffer.
-		    			glbR.getLongResult().size, // Number of elements.
-		    			glbR.getReduceOperator()); // Operation to be performed.
-		    	
-		    	break;
-		    case GLBResult.RESULT_DOUBLE_TYPE:
-		    	Team.WORLD.allreduce(glbR.getDoubleResult(), // Source buffer.
-		    			0, // Offset into the source buffer.
-		    			glbR.getDoubleResult(), // Destination buffer.
-		    			0, // Offset into the destination buffer.
-		    			glbR.getDoubleResult().size, // Number of elements.
-		    			glbR.getReduceOperator()); // Operation to be performed.
-		    	break;
-		    default:
-		    	Console.OUT.println("Result Reduction is not implemented.!");
-		    	break;
-		    }
-		
-		
+			if(here.id == 0){
+				Team.WORLD.allreduce(resultGlobal().submitResult(), // Source buffer.
+						0, // Offset into the source buffer.
+						resultGlobal().submitResult(), // Destination buffer.
+						0, // Offset into the destination buffer.
+						resultGlobal().submitResult().size, // Number of elements.
+						resultGlobal().getReduceOperator()); // Operation to be performed.
+			}else{
+				glbR: GLBResult[R] = plh().queue.getResult();
+				Team.WORLD.allreduce(glbR.submitResult(), // Source buffer.
+						0, // Offset into the source buffer.
+						glbR.submitResult(), // Destination buffer.
+						0, // Offset into the destination buffer.
+						glbR.submitResult().size, // Number of elements.
+						glbR.getReduceOperator()); // Operation to be performed.
+			}
+						
 		});
 		collectResultTime = System.nanoTime() - collectResultTime;
-		return plh().queue.getResult();
+		return tmpRail;
 	}
 	
-	public def stats(verbose:Boolean):Long = Worker.stats[Queue](plh, verbose);
+	/**
+	 * Collect  
+	 */
+	// def stats(verbose:Boolean):Long = Worker.stats[Queue, R](plh, verbose);
 	
 	/**
-	 * Print logging information on each place if user is interested in collecting computation numbers
-	 * @param st PLH for LJR
+	 * Print logging information on each place if user is interested in collecting per place
+	 * information, i.e., statistics instrumented.
+	 * @param st PLH for {@link Worker}
 	 */
-	private def printLog(st:PlaceLocalHandle[Worker[Queue]]):void{
+	private def printLog(st:PlaceLocalHandle[Worker[Queue, R]]):void{
 		val P = Place.MAX_PLACES;
 		for(var i:Long =0L; i < P; ++i){
 			at(Place(i)){

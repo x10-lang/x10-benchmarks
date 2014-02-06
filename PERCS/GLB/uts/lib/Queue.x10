@@ -4,12 +4,12 @@ import x10.compiler.*;
 import glb.Context;
 import x10.util.Team;
 import glb.GLBResult;
-public final class Queue extends uts.UTS implements glb.TaskQueue[Queue] {
+public final class Queue extends uts.UTS implements glb.TaskQueue[Queue, Long] {
 	public def this(factor:Int) {
 		super(factor);
 	}
 	
-	@Inline public def process(n:Long, context:Context[Queue]) {
+	@Inline public def process(n:Long, context:Context[Queue, Long]) {
 		var i:Long=0;
 		for (; (i<n) && (size>0); ++i) {
 			expand();
@@ -62,36 +62,25 @@ public final class Queue extends uts.UTS implements glb.TaskQueue[Queue] {
 	
 	
 	var result:UTSResult = null;
-	public def getResult(): GLBResult {
-		if(result == null){
-			result = new UTSResult();
-			
-		}
+	public def getResult(): UTSResult {
+		val result = new UTSResult();
 		return result;
 		
 		
 			
 	}
 		
-	public class UTSResult implements GLBResult{
-		r:Rail[Long] = new Rail[Long](1l);
-	    public def this(){
-	    	
-	    }
-		public  def getDoubleResult(): Rail[Double]{
-			return null;
-		}
-		public  def getLongResult(): Rail[Long]{
+	public class UTSResult extends GLBResult[Long]{
+		r:Rail[Long] = new Rail[Long](1l);		
+		public  def getResult(): Rail[Long]{
 			r(0) = count;
 			return r;
 		}
 		public  def getReduceOperator():Int{
 			return Team.ADD;
 		}
-		public def getType():Int{
-			return glb.GLBResult.RESULT_LONG_TYPE;
-		}
-		public def display():void{
+		
+		public def display(r:Rail[Long]):void{
 			Console.OUT.println("Myresult: "+r(0));
 		}
 	}

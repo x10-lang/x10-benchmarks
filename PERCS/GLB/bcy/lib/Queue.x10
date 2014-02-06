@@ -8,7 +8,7 @@ import bc.Rmat;
 import glb.Context;
 import glb.TaskQueue;
 import glb.GLBResult;
-public final class Queue extends bcy.BC implements glb.TaskQueue[Queue] {
+public final class Queue extends bcy.BC implements glb.TaskQueue[Queue, Double] {
 	public var lower:Rail[Int];
 	public var upper:Rail[Int];
 	protected var size:Long;
@@ -39,7 +39,7 @@ public final class Queue extends bcy.BC implements glb.TaskQueue[Queue] {
 	/**
 	 * @param n number of vertices
 	 */
-	@Inline public def process(n:Long, context:Context[Queue]):Boolean{
+	@Inline public def process(n:Long, context:Context[Queue, Double]):Boolean{
 		if(size == 0) return false;
 		var processedItemNum:Int = 0n;
 		while((processedItemNum < n) && (size > 0)){
@@ -59,40 +59,7 @@ public final class Queue extends bcy.BC implements glb.TaskQueue[Queue] {
 	}
 	
 	
-	// @Inline public def oldProcess(n:Long, context:Context[Queue]) {
-	// 	var i:Long = 0;
-	// 	switch (state) {
-	// 	case 0n:
-	// 		val top = size - 1;
-	// 		val l = lower(top);
-	// 		val u = upper(top) - 1n;
-	// 		
-	// 		if(u == l) --size; else upper(top) = u;
-	// 		refTime = System.nanoTime();
-	// 		s = verticesToWorkOn(u);
-	// 		state = 1n;
-	// 	case 1n:
-	// 		bfsShortestPath1(s);
-	// 		state = 2n;
-	// 	case 2n:
-	// 		while(!regularQueue.isEmpty()) {
-	// 			if (i++ > n) return true;
-	// 			bfsShortestPath2();
-	// 		}
-	// 		state = 3n;
-	// 	case 3n:
-	// 		bfsShortestPath3();
-	// 		state = 4n;
-	// 	case 4n:
-	// 		while(!regularQueue.isEmpty()) {
-	// 			if (i++ > n) return true;
-	// 			bfsShortestPath4(s);
-	// 		}
-	// 		accTime += (System.nanoTime()-refTime)/1e9;
-	// 		state = 0n;
-	// 	}
-	// 	return size > 0;
-	// }
+	
 	
 	@Inline public def split() {
 		var s:Long = 0;
@@ -128,14 +95,7 @@ public final class Queue extends bcy.BC implements glb.TaskQueue[Queue] {
 	
 	@Inline public def count() = count;
 	
-	def allreduce() {
-		Team.WORLD.allreduce(betweennessMap, // Source buffer.
-				0, // Offset into the source buffer.
-				betweennessMap, // Destination buffer.
-				0, // Offset into the destination buffer.
-				N as long, // Number of elements.
-				Team.ADD); // Operation to be performed.
-	}
+	
 	
 	// override
 	public def printLog():void {
@@ -146,37 +106,37 @@ public final class Queue extends bcy.BC implements glb.TaskQueue[Queue] {
 		
 	}
 	
-	var result:BCGLBResult = null;
-	public def getResult():GLBResult{
-		if(result == null){
-			result = new BCGLBResult();
-		}
+	
+	// @override
+	public def getResult():BCGLBResult{
+		
+		val result = new BCGLBResult();
+		
 		return result;
 	}
 	
-	public class BCGLBResult implements GLBResult{
+	public class BCGLBResult extends GLBResult[Double]{
 		
 		public def this(){
 			
 		}
-		public  def getDoubleResult(): Rail[Double]{
+		public  def getResult(): Rail[Double]{
 			return betweennessMap;
 		}
-		public  def getLongResult(): Rail[Long]{
-			return null;
-		}
+		
 		public  def getReduceOperator():Int{
 			return Team.ADD;
 		}
-		public def getType():Int{
-			return glb.GLBResult.RESULT_DOUBLE_TYPE;
-		}
-		public def display():void{
+		
+		public def display(r:Rail[Double]):void{
 			for(var i:Int=0n; i<N; ++i) {
-				if(betweennessMap(i) != 0.0) {
-					Console.OUT.println("(" + i + ") -> " + sub(""+betweennessMap(i), 0n, 6n));
+				if(r(i) != 0.0) {
+					Console.OUT.println("(" + i + ") -> " + sub(""+r(i), 0n, 6n));
 				}
 			}
 		}
 	}
+	
+	
+	
 }

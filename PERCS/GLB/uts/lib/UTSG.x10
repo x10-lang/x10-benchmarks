@@ -51,14 +51,13 @@ public final class UTSG {
                                                                         "   z=" + z);
         val init = ()=>{ return new Queue(b); };
         //val glb = new GLB[Queue](init, n, w, l, z, m, true);
-        val glb = new GLB[Queue](init, GLBParameters(n, w, l, z, m,verbose), true);
-        Console.OUT.println("Starting...");
+        val glb = new GLB[Queue,Long](init, GLBParameters(n, w, l, z, m,verbose), true);
+       
        
         val start = ()=>{ (glb.taskQueue()).init(r, d); };
         glb.run(start);
        
-        Console.OUT.println("Finished.");
-        result:GLBResult = glb.collectResults();
+       
        
     }
 }

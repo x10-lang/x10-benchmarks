@@ -68,7 +68,7 @@ public final class BCG {
 
         //var time:Long = System.nanoTime();
         val init = ()=>{ return new Queue(Rmat(seed, n, a, b, c, d), permute, yfStr); };
-        val glb = new GLB[Queue](init, GLBParameters(g, w, l, z, m, verbose), false);
+        val glb = new GLB[Queue, Double](init, GLBParameters(g, w, l, z, m, verbose), false);
         //val setupTime = (System.nanoTime()-time)/1e9;
 
         

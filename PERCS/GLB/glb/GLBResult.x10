@@ -1,12 +1,45 @@
 package glb;
 
-public interface GLBResult {
+public abstract class GLBResult[R] {
 	
-	public static RESULT_LONG_TYPE:Int = 1n;
-	public static RESULT_DOUBLE_TYPE:Int = 2n;
-	public abstract def getDoubleResult(): Rail[Double]; // I'd like to use Z to replace Any here, but seems to be difficult
-	public abstract def getLongResult(): Rail[Long];
+	/**
+	 * Backing storage of result.
+	 */
+	var result: Rail[R] = null;
+	
+	/**
+	 * Reduction operator. Numbered the same as the operator defined in {@link x10.util.Team}
+	 */
+	var op:Int = -1n;
+	
+	/**
+	 * Return the operator. See {@link x10.util.Team}
+	 */
 	public abstract def getReduceOperator():Int;
-	public abstract def getType():Int;
-	public abstract def display():void;
+	
+	/**
+	 * Returns the result from local {@link TaskQueue}. User must not reclaim the Rail returned by this method
+	 * @return Local computation result
+	 */
+	public abstract def getResult():Rail[R];
+	
+	/**
+	 * User-defined display method for the result.
+	 * @param result to display
+	 */
+	public abstract def display(Rail[R]):void;
+	
+	/**
+	 * Internal method used by {@link GLB}, it only retrieves the result from user once,
+	 * and the following references are all via the backing Rail.
+	 */
+	def submitResult():Rail[R]{
+		if(this.result == null){
+			this.result = getResult();
+		}
+		return this.result;
+	}
+	
+
+	
 }
