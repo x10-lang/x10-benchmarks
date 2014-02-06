@@ -100,7 +100,6 @@ public final class GLB[Queue, R]{Queue<:TaskQueue[Queue, R]} {
 	 */
 	private def end(r:Rail[R]):void{
 		if((glbParams.v & GLBParameters.SHOW_RESULT_FLAG) != 0n){ // print result
-			Console.OUT.println("r is " + r);
 			rootGlbR.display(r);
 		}
 		if((glbParams.v & GLBParameters.SHOW_TIMING_FLAG) != 0n ){ // print overall timing information
@@ -152,10 +151,12 @@ public final class GLB[Queue, R]{Queue<:TaskQueue[Queue, R]} {
 		collectResultTime = System.nanoTime();
       
 		
-		rootGlbR = plh().queue.getResult();
+		this.rootGlbR = plh().queue.getResult();
 		val resultGlobal = GlobalRef[GLBResult[R]](rootGlbR);
-		tmpRail:Rail[R] = rootGlbR.submitResult();
-	
+		val tmpRail:Rail[R] = rootGlbR.submitResult();
+        val tmpPlh = plh; // trick taught by Dave, caputure this.plh (as a pointer) instead
+                          // of calling plh() directly inside the closure, which will encapsulate
+                          // this (i.e. the whole rail of 
 		PlaceGroup.WORLD.broadcastFlat(()=>{
 			if(here.id == 0){
 				Team.WORLD.allreduce(resultGlobal().submitResult(), // Source buffer.
@@ -165,7 +166,7 @@ public final class GLB[Queue, R]{Queue<:TaskQueue[Queue, R]} {
 						resultGlobal().submitResult().size, // Number of elements.
 						resultGlobal().getReduceOperator()); // Operation to be performed.
 			}else{
-				glbR: GLBResult[R] = plh().queue.getResult();
+				glbR: GLBResult[R] = tmpPlh().queue.getResult();
 				Team.WORLD.allreduce(glbR.submitResult(), // Source buffer.
 						0, // Offset into the source buffer.
 						glbR.submitResult(), // Destination buffer.
@@ -176,13 +177,10 @@ public final class GLB[Queue, R]{Queue<:TaskQueue[Queue, R]} {
 						
 		});
 		collectResultTime = System.nanoTime() - collectResultTime;
+		
 		return tmpRail;
 	}
 	
-	/**
-	 * Collect  
-	 */
-	// def stats(verbose:Boolean):Long = Worker.stats[Queue, R](plh, verbose);
 	
 	/**
 	 * Print logging information on each place if user is interested in collecting per place

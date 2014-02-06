@@ -23,6 +23,8 @@ public abstract class GLBResult[R] {
 	 */
 	public abstract def getResult():Rail[R];
 	
+	//public abstract def setResult(result):void;
+	
 	/**
 	 * User-defined display method for the result.
 	 * @param result to display
