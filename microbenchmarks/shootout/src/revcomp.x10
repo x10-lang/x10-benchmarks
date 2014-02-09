@@ -19,7 +19,7 @@ import x10.io.Reader;
 
 public class revcomp {
 
-    val cmp = new Array[byte](128, (i:int)=>i as byte);
+    val cmp = new Rail[byte](128, (i:long)=>i as byte);
 
     static val NEWLINE = '\n'.ord() as byte;
 
@@ -50,8 +50,8 @@ public class revcomp {
 
         def reverse() {
             if (r.size() > 0) {
-                var begin:int = 0;
-                var end:int = r.size() - 1;
+                var begin:int = 0n;
+                var end:int = (r.size() - 1) as int;
                 	while (begin <= end) {
 	                    if (r(begin) == NEWLINE)begin++;
 	                    if (r(end) == NEWLINE)end--;
@@ -62,7 +62,7 @@ public class revcomp {
 	                    }
 	                    
 	                }
-                	Console.OUT.write(r.toArray(),0,r.toArray().size);
+                	Console.OUT.write(r.toRail(),0,r.toRail().size);
 	             	//Console.OUT.println();
             }
         }
@@ -74,14 +74,14 @@ public class revcomp {
         }   
     }
 
-    public static def main(args: Array[String](1){rail}) {
+    public static def main(args:Rail[String]) {
         val rc = new revcomp();
         Console.OUT.println(NEWLINE);
         rc.go(args(0));
     }
 
     def go(temp:String) {
-    	val f = new File("/Users/emontal/Desktop/inputs/input" + temp + ".txt");
+    	val f = new File("./" + temp + ".txt");
     	assert f.exists();
         val input = new FileReader(f);
         val buf = new ReversibleByteArray();
@@ -89,8 +89,8 @@ public class revcomp {
             while (true) {
                 val line = input.readLine();
                 val read = line.length();
-                var i:int = 0;
-                var last:int = 0;
+                var i:int = 0n;
+                var last:int = 0n;
                 while (i < read) {
                     if (line.charAt(i) == '>') {
                         buf.write(line, last, i - last);

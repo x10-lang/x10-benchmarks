@@ -10,28 +10,28 @@ Based on Java-6 entry by Isaac Gouy, Jarkko Miettinen, The Anh Tran
 import x10.io.Console;
 public class spectralnorm {
 
-    public static def main(args: Array[String](1){rail}) {
+    public static def main(args:Rail[String]) {
     	val start = System.nanoTime();
-    	val n = args.size> 0 ? Int.parse(args(0)) : 1000; 
+    	val n = args.size>0 ? Int.parse(args(0)) : 1000n; 
         Console.OUT.printf("%.9f\n", spectralnormGame(n));	
         val end = System.nanoTime();
         Console.OUT.println("Program runtime: " + (end - start));
     }
 
 
-    private static def spectralnormGame(n:int) {
+    private static def spectralnormGame(n:long) {
         // create unit vector
-        val u = new Array[double](n, (Int)=>1.0);
-        val v = new Array[double](n);
-        val tmp = new Array[double](n);
+        val u = new Rail[double](n, 1.0);
+        val v = new Rail[double](n);
+        val tmp = new Rail[double](n);
 
         val nthread = 2;  // TODO: need a way to query nProcessors
         val chunk = n / nthread;
 
 
-        val reduced = finish(Adder()) { /* todo: syntax issue XTENLANG-1549 */ async { 
+        val reduced = finish(Adder()) { async { 
             val c1 = Clock.make();
-            for ([i] in 0..(nthread-1)) { 
+            for (i in 0..(nthread-1)) { 
                 val rbegin = i * chunk; 
                 val rend = (i < (nthread -1)) ? rbegin + chunk : n;
                 val myRegion = rbegin..(rend-1);
@@ -39,11 +39,11 @@ public class spectralnorm {
                     var m_vBv:double = 0;
                     var m_vv:double = 0;
                     // 20 steps of the power method
-                    for ([j] in 1..10) {
+                    for (j in 1..10) {
                         MultiplyAtAv (u, tmp, v, myRegion);
                         MultiplyAtAv (v, tmp, u, myRegion);
                     }
-                    for ([j] in myRegion) {
+                    for (j in myRegion) {
                         offer Accum(u(j) * v(j), v(j) * v(j));
                     }
                 }
@@ -61,7 +61,7 @@ public class spectralnorm {
     }
 
     /* multiply vector v by matrix A and then by matrix A transposed */
-    private static def MultiplyAtAv (v:Array[double](1){rail}, tmp:Array[double](1){rail}, AtAv:Array[double](1){rail}, r:Region(1)) {
+    private static def MultiplyAtAv (v:Rail[double], tmp:Rail[double], AtAv:Rail[double], r:LongRange) {
         MultiplyAv (v, tmp, r);
         Clock.advanceAll();
         MultiplyAtv (tmp, AtAv, r);
@@ -69,10 +69,10 @@ public class spectralnorm {
     }
 
     /* multiply vector v by matrix A, each thread evaluate its range only */
-    private static def MultiplyAv (v:Array[double](1){rail}, Av:Array[double](1){rail}, r:Region(1))  {
-        for ([i] in r) {
+    private static def MultiplyAv (v:Rail[double], Av:Rail[double], r:LongRange)  {
+        for (i in r) {
             var sum:double = 0;
-            for ([j] in v.region) {
+            for (j in v.range()) {
                 sum += eval_A(i,j) * v(j); 
             }
             Av(i) = sum;
@@ -80,11 +80,10 @@ public class spectralnorm {
     }
 
     /* multiply vector v by matrix A transposed */
-    private static def MultiplyAtv (v:Array[double](1){rail}, Atv:Array[double](1){rail}, r:Region(1))
-    {
-        for ([i] in r) {
+    private static def MultiplyAtv (v:Rail[double], Atv:Rail[double], r:LongRange) {
+        for (i in r) {
             var sum:double = 0;
-            for ([j] in v.region)
+            for (j in v.range())
                 sum += eval_A (j, i) * v(j); 
 
             Atv(i) = sum;
@@ -92,7 +91,7 @@ public class spectralnorm {
     }
 
     /* return element i,j of infinite matrix A */
-    private static def eval_A (i:int, j:int) {
+    private static def eval_A (i:long, j:long) {
         val div = ( ((i+j) * (i+j+1) >>> 1) +i+1 );
         return 1.0 / div;
     }
