@@ -13,7 +13,7 @@ extern "C" {
  * Signature: (III)J
  */
 JNIEXPORT jlong JNICALL Java_FTNatives_create_1plan
-  (JNIEnv *, jclass, jint, jint, jint);
+(JNIEnv *, jclass, jlong, jint, jint);
 
 /*
  * Class:     FTNatives
@@ -21,7 +21,7 @@ JNIEXPORT jlong JNICALL Java_FTNatives_create_1plan
  * Signature: (J[D[DIII)V
  */
 JNIEXPORT void JNICALL Java_FTNatives_execute_1plan
-  (JNIEnv *, jclass, jlong, jdoubleArray, jdoubleArray, jint, jint, jint);
+  (JNIEnv *, jclass, jlong, jdoubleArray, jdoubleArray, jlong, jlong, jlong);
 
 #ifdef __cplusplus
 }

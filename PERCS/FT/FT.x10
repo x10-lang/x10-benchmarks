@@ -41,7 +41,7 @@ import x10.compiler.Inline;
 class FT(M:Long, verify:Boolean) {
     // TODO: pass through as complex** to native code
     @Native("c++", "execute_plan(#1, (x10_double*)(&((#2)->raw[0])), (x10_double*)(&((#3)->raw[0])), #4, #5, #6)")
-    @Native("java", "FTNatives.execute_plan(#plan, #A.getDoubleArray(), #B.getDoubleArray(), #SQRTN, #i0, #i1)")
+    @Native("java", "FTNatives.execute_plan(#plan, #A, #B, #SQRTN, #i0, #i1)")
     native static def execute_plan(plan:Long, A:Rail[Complex], B:Rail[Complex], SQRTN:Long, i0:Long, i1:Long):void;
 
     @Native("c++", "create_plan(#1, #2, #3)")
