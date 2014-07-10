@@ -42,7 +42,7 @@ public class MyUTS extends GlobalJobRunner[UTSTreeNode, Long]{
 		val m = opts("-m", 1024n);
 		val verbose = opts("-v", 0) != 0;
 
-		val P = Place.MAX_PLACES;
+		val P = Place.numPlaces();
 
 		var z0:Int = 1n;
 		var zz:Int = l; 

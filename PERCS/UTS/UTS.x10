@@ -35,7 +35,7 @@ public final class UTS {
         Runtime.probe();
     }
     
-    val P = Place.MAX_PLACES;
+    val P = Place.numPlaces();
     
     public def this(b:Int, d:Int, n:Int, w:Int, l:Int, z:Int, m:Int) {
         this.n = n;
@@ -268,7 +268,7 @@ public final class UTS {
         val m = opts("-m", 1024n);
         val verbose = opts("-v", 0) != 0;
 
-        val P = Place.MAX_PLACES;
+        val P = Place.numPlaces();
 
         var z0:Int = 1n;
         var zz:Int = l;

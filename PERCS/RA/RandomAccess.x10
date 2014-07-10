@@ -53,10 +53,10 @@ public class RandomAccess {
     static def runBenchmark(dr:DistRail, logLocalTableSize:Long, numUpdates:Long) {
         dr.pg.broadcastFlat(()=>{
           finish {
-            val numLocalUpdates = numUpdates / Place.MAX_PLACES;
+            val numLocalUpdates = numUpdates / Place.numPlaces();
             var ran:Long = HPCC_starts(here.id*numLocalUpdates);
             val mask1 = (1<<logLocalTableSize)-1;
-            val mask2 = Place.MAX_PLACES - 1;
+            val mask2 = Place.numPlaces() - 1;
             for (1..numLocalUpdates) {
                 val placeId = (ran >> logLocalTableSize) & mask2;
                 val index = ran & mask1;
@@ -70,7 +70,7 @@ public class RandomAccess {
     }
 
     public static def main (args:Rail[String]) {
-        if (!Math.powerOf2(Place.MAX_PLACES)) {
+        if (!Math.powerOf2(Place.numPlaces())) {
             Console.ERR.println("The number of places must be a power of 2.");
             return;
         }
@@ -102,7 +102,7 @@ public class RandomAccess {
 
         // calculate the size of update array
         val localTableSize = 1<<logLocalTableSize;
-        val tableSize = localTableSize * Place.MAX_PLACES;
+        val tableSize = localTableSize * Place.numPlaces();
         val numUpdates = (updates * tableSize) as Long;
 
         // create distributed rail 
@@ -111,13 +111,13 @@ public class RandomAccess {
 	if (dumpTable) dr.printAll();
 
         // print some info
-        Console.OUT.println("Main table size:         2^"+logLocalTableSize+"*"+Place.MAX_PLACES
+        Console.OUT.println("Main table size:         2^"+logLocalTableSize+"*"+Place.numPlaces()
                                        +" == "+tableSize+" words"
                                        +" ("+tableSize*8.0/1024/1024+" MB)");
         Console.OUT.println("Per-process table size:  2^"+logLocalTableSize
                                        +" == "+localTableSize+" words"
                                        +" ("+localTableSize*8.0/1024/1024+" MB)");
-        Console.OUT.println("Number of places:        " + Place.MAX_PLACES);
+        Console.OUT.println("Number of places:        " + Place.numPlaces());
         Console.OUT.println("Number of updates:       " + numUpdates);
 
         // time it

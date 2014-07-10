@@ -26,7 +26,7 @@ public final class UTS {
     @x10.compiler.Volatile transient var empty:Boolean;
     @x10.compiler.Volatile transient var waiting:Boolean;
     
-    val P = Place.MAX_PLACES;
+    val P = Place.numPlaces();
     
     public def this(b:Int, d:Int, n:Int, w:Int, l:Int, z:Int, m:Int) {
         this.n = n;
@@ -264,7 +264,7 @@ public final class UTS {
         val m = opts("-m", 1024);
         val verbose = opts("-v", 0) != 0;
         
-        val P = Place.MAX_PLACES;
+        val P = Place.numPlaces();
         
         var z0:Int = 1;
         var zz:Int = l;

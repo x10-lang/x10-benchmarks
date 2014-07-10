@@ -20,7 +20,7 @@ public class LocalJobRunner[T,Z] {
 	val lifelineThieves:FixedSizeStack[Long]; // read as I am the lifeline of the thieves
 	val thieves:FixedSizeStack[Long];
 	val lifelinesActivated:Rail[Boolean];
-	val P = Place.MAX_PLACES;
+	val P = Place.numPlaces();
 	val random = new Random();// two places use random: (1) pick a random thief to steal from
 	val w:Int; // random thieves
 	val m:Int; // maximal thieves number

@@ -20,7 +20,7 @@ public final class MyBCD{
 	public def this(rmat:Rmat, permute:Int) {
 		this.bc_ = new BC(rmat, permute);
 		val h = Runtime.hereInt();
-		val max = Place.MAX_PLACES;
+		val max = Place.numPlaces();
 		startVertex = (this.bc_.N as Long*h/max) as Int;
 		endVertex = (this.bc_.N as Long*(h+1)/max) as Int;
 	}
@@ -61,7 +61,7 @@ public final class MyBCD{
 		val permute:Int = cmdLineParams("-p", 1n); // on by default
 		val verbose:Int = cmdLineParams("-v", 0n); // off by default
 		
-		val max = Place.MAX_PLACES;
+		val max = Place.numPlaces();
 		
 		Console.OUT.println("Running BC with the following parameters:");
 		Console.OUT.println("seed = " + seed);

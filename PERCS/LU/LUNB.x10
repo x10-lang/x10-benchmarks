@@ -21,7 +21,7 @@ struct MyTeam {
     // only supports two teams: WORLD and COLUMN
     static state = new Rail[AtomicLong](2, (Long)=>new AtomicLong(1));
     static master = new Rail[Long](2);
-    static count = new Rail[Long](2, Place.MAX_PLACES);
+    static count = new Rail[Long](2, Place.numPlaces());
     static cl10 = ()=> @x10.compiler.RemoteInvocation("CL10") { state(0).set(0); };
     static cl20 = ()=> @x10.compiler.RemoteInvocation("CL20") { state(0).getAndIncrement(); };
     static cl11 = ()=> @x10.compiler.RemoteInvocation("CL11") { state(1).set(0); };

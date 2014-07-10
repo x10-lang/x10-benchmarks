@@ -28,7 +28,7 @@ public struct GLBParameters(
     /**
      * Returns a default glb parameter
      */
-    public static Default = GLBParameters(100n,4n,4n,computeZ(Place.MAX_PLACES,4n),1024n,1n);
+    public static Default = GLBParameters(100n,4n,4n,computeZ(Place.numPlaces(),4n),1024n,1n);
     
     /** when verbose level is VERBOSE_MAX it will output workstealing status, used for users who are interested in
      * understanding what kind of traffic is going on in GLB */

@@ -16,7 +16,7 @@ public class GlobalLoadBalancer[Z](glbParam:GLBParameters, balancedLevel:Int, fa
 	
 	
 	@Inline static def min(i:Long, j:Long) = i < j ? i : j;
-	private val P = Place.MAX_PLACES;
+	private val P = Place.numPlaces();
 	/**
 	 * Entry point for user to run GlobalLoadBalancer 
 	 * It has three phases (1) setup phase (2) calculation phase (3) result collection phase
@@ -142,7 +142,7 @@ public class GlobalLoadBalancer[Z](glbParam:GLBParameters, balancedLevel:Int, fa
 	 * @param init function closure to create a task frame
 	 */
 	private def dryRun(init:()=>TaskFrame[Z]):void{
-		val P = Place.MAX_PLACES;
+		val P = Place.numPlaces();
 		val st = PlaceLocalHandle.makeFlat[LocalJobRunner[Z]](PlaceGroup.WORLD, 
 				()=>new LocalJobRunner(init, this.glbParam, BALANCED_LEVEL_NUB));
 		for(var ii:Long=0L; ii < P; ii++){
@@ -155,7 +155,7 @@ public class GlobalLoadBalancer[Z](glbParam:GLBParameters, balancedLevel:Int, fa
 	 * @param st PLH for LJR
 	 */
 	private def printLog(st:PlaceLocalHandle[LocalJobRunner[Z]]):void{
-		val P = Place.MAX_PLACES;
+		val P = Place.numPlaces();
 		for(var i:Long =0L; i < P; ++i){
 			at(Place(i)){
 				st().getTF().printLog();

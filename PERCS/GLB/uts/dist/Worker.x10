@@ -26,7 +26,7 @@ final class Worker {
     @x10.compiler.Volatile transient var empty:Boolean = true;
     @x10.compiler.Volatile transient var waiting:Boolean = false;
     
-    val P = Place.MAX_PLACES;
+    val P = Place.numPlaces();
     
     public def this(b:Int, d:Int, n:Int, w:Int, l:Int, z:Int, m:Int) {
         this.n = n;
@@ -220,7 +220,7 @@ final class Worker {
     @Inline static def min(i:Long, j:Long) = i < j ? i : j;
     
     static def stats(st:PlaceLocalHandle[Worker], verbose:Boolean) {
-        val P = Place.MAX_PLACES;
+        val P = Place.numPlaces();
         val logs:Rail[Logger];
         if (P >= 1024) {
             logs = new Rail[Logger](P/32, (i:Long)=>at (Place(i*32)) {

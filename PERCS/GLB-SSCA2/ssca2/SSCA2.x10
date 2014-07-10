@@ -201,7 +201,7 @@ public final class SSCA2(N:Int) {
         val M = myGraph.numEdges();
         Console.OUT.println("Graph details: N=" + N + ", M=" + M);
 
-        val max = Place.MAX_PLACES;
+        val max = Place.numPlaces();
 
         // Loop over all the places and crunch the numbers.
         PlaceGroup.WORLD.broadcastFlat(()=>{
@@ -249,7 +249,7 @@ public final class SSCA2(N:Int) {
         Console.OUT.println("b = " + b);
         Console.OUT.println("c = " + c);
         Console.OUT.println("d = " + d);
-        Console.OUT.println("places = " + Place.MAX_PLACES);
+        Console.OUT.println("places = " + Place.numPlaces());
 
         crunchNumbers(Rmat(seed, n, a, b, c, d), permute, verbose);
     }

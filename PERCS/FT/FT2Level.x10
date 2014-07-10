@@ -101,9 +101,9 @@ class FT2Level(workers:Rail[FT]) {
         val W = opts("-w", 1n);
         val verify = opts("-v", false);
         val SQRTN = 1 << M, N = SQRTN * SQRTN;
-        val nRows = SQRTN / Place.MAX_PLACES;
-        if (nRows * Place.MAX_PLACES != SQRTN) {
-            Console.ERR.println("SQRTN must be divisible by Place.MAX_PLACES!");
+        val nRows = SQRTN / Place.numPlaces();
+        if (nRows * Place.numPlaces() != SQRTN) {
+            Console.ERR.println("SQRTN must be divisible by Place.numPlaces()!");
             return;
         }
         val plh = PlaceLocalHandle.makeFlat[FT2Level](PlaceGroup.WORLD, 
@@ -111,8 +111,8 @@ class FT2Level(workers:Rail[FT]) {
         val o=plh();
         val mbytes = N*2.0*8.0*2/(1024*1024);
         Logger.info(()=>"M=" + M + " SQRTN=" + SQRTN + " N=" + N + " nRows=" + nRows +
-                " localSize=" + plh().workers(0).localSize + " MAX_PLACES=" + Place.MAX_PLACES + " workers/place=" + W +
-                              " Mem=" + mbytes + " mem/MAX_PLACES=" + mbytes/Place.MAX_PLACES);
+                " localSize=" + plh().workers(0).localSize + " MAX_PLACES=" + Place.numPlaces() + " workers/place=" + W +
+                              " Mem=" + mbytes + " mem/MAX_PLACES=" + mbytes/Place.numPlaces());
         
         PlaceGroup.WORLD.broadcastFlat(()=>{plh().run();});
     }

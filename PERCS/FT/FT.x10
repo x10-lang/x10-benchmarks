@@ -54,7 +54,7 @@ class FT(M:Long, verify:Boolean) {
     val SQRTN = 1<<M;
     val N = SQRTN*SQRTN;
     
-    val nRows = SQRTN/Place.MAX_PLACES;
+    val nRows = SQRTN/Place.numPlaces();
     val nCols = SQRTN;
     val localSize = nRows*nCols;
     val chunkSize = nRows*nRows;
@@ -107,9 +107,9 @@ class FT(M:Long, verify:Boolean) {
      * Tiled version of loop: for ([i,j] in (0..(nRows-1)*(0..(nCols-1)))) B(j,i)=A(i,j)
      */
     def transpose() {
-        val n1 = Place.MAX_PLACES;
+        val n1 = Place.numPlaces();
         val n2 = nRows;
-        for (p in 0..(Place.MAX_PLACES-1)) 
+        for (p in 0..(Place.numPlaces()-1)) 
             for (var ii:Long=0; ii<n2; ii+=16) 
                 for (var jj:Long=p*n2; jj<(p+1)*n2; jj+=16) 
                     for (i in ii..(Math.min(ii+16,n2)-1)) 
@@ -134,7 +134,7 @@ class FT(M:Long, verify:Boolean) {
         for ([i,p,j] in (0..(n2-1))*(0..(n1-1))*(0..(n2-1)) A(i,n2*p+j)=B(n2*p+i,j);
      */
     def scatter() {
-        val n1 = Place.MAX_PLACES;
+        val n1 = Place.numPlaces();
         for (i in 0..(nRows-1)) 
             for (var ii:Long=0; ii<n1; ii += 16) 
                 for (var jj:Long=0; jj<nRows; jj += 16) 
@@ -223,17 +223,17 @@ class FT(M:Long, verify:Boolean) {
         val M = opts("-m", 10n);
         val verify = opts("-v", false);
         val SQRTN = 1 << M;
-        val nRows = SQRTN / Place.MAX_PLACES;
-        if (nRows * Place.MAX_PLACES != SQRTN) {
-            Console.ERR.println("SQRTN must be divisible by Place.MAX_PLACES!");
+        val nRows = SQRTN / Place.numPlaces();
+        if (nRows * Place.numPlaces() != SQRTN) {
+            Console.ERR.println("SQRTN must be divisible by Place.numPlaces()!");
             return;
         }
         val plh = PlaceLocalHandle.makeFlat[FT](PlaceGroup.WORLD, ()=>new FT(M, verify));
         val o=plh();
         val mbytes = o.N*2.0*8.0*2/(1024*1024);
         Logger.info(()=>"M=" + o.M + " SQRTN=" + o.SQRTN + " N=" + o.N + " nRows=" + o.nRows +
-                " localSize=" + o.localSize + " MAX_PLACES=" + Place.MAX_PLACES +
-                              " Mem=" + mbytes + " mem/MAX_PLACES=" + mbytes/Place.MAX_PLACES);
+                " localSize=" + o.localSize + " MAX_PLACES=" + Place.numPlaces() +
+                              " Mem=" + mbytes + " mem/MAX_PLACES=" + mbytes/Place.numPlaces());
         
         PlaceGroup.WORLD.broadcastFlat(()=>{plh().run();});
     }

@@ -59,11 +59,11 @@ final class Parameters {
                     shortLength + (maxScoreOnMatch-openGapPenalty)/extendGapPenalty;
         overlap = maxAlignedLength - 1n;
         val mostWeCanUse = (2n*overlap>=longLength) ? 1n : (longLength-overlap)/overlap;
-        segmentCount = (mostWeCanUse>Place.MAX_PLACES) ? Place.MAX_PLACES as Int : mostWeCanUse;
+        segmentCount = (mostWeCanUse>Place.numPlaces()) ? Place.numPlaces() as Int : mostWeCanUse;
         baseSegmentLength = overlap + (longLength-overlap)/segmentCount;
         shortfall = (longLength-overlap) % segmentCount;
 
-        Console.OUT.println("places: " + segmentCount + "/" + Place.MAX_PLACES + " short: " + shortLength + " long: " + longLength + " seed: " + seed + " stride: " + stride + " overlap: " + overlap);
+        Console.OUT.println("places: " + segmentCount + "/" + Place.numPlaces() + " short: " + shortLength + " long: " + longLength + " seed: " + seed + " stride: " + stride + " overlap: " + overlap);
     }
 }
 
@@ -292,7 +292,7 @@ final class SSCA1 {
         val seed = args.size>2 ? Int.parseInt(args(2)) : 1n;
         val iterations = args.size>3 ? Int.parseInt(args(3)) : 6n;
         val s = args.size>4n ? Int.parseInt(args(4)) : 0n;
-        val stride = s==0n ? sqrt(Place.MAX_PLACES as int) : s;
+        val stride = s==0n ? sqrt(Place.numPlaces() as int) : s;
         val verbose = args.size>5 ? Boolean.parseBoolean(args(5)) : false;
         val verify = args.size>6 ? Boolean.parseBoolean(args(6)) : false;
         val params = new Parameters(shortLength, longLength, seed, stride);

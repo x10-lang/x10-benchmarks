@@ -26,7 +26,7 @@ public class GlobalJobRunner[T,Z] {
 	}
 	
 	public def main(init:()=>TaskFrame[T,Z]):Z{
-		val P = Place.MAX_PLACES;
+		val P = Place.numPlaces();
 		var setupTime:Long = System.nanoTime();
 		val st = PlaceLocalHandle.makeFlat[LocalJobRunner[T, Z]](PlaceGroup.WORLD, ()=>new LocalJobRunner(init, this.glbParam));
 		
@@ -63,7 +63,7 @@ public class GlobalJobRunner[T,Z] {
 	 */
 	public def collectResults(st:PlaceLocalHandle[LocalJobRunner[T, Z]]):Rail[Z]
 	{
-		val P = Place.MAX_PLACES;
+		val P = Place.numPlaces();
 		if (P >= 1024) {
 			collectedResults:Rail[Z] = new Rail[Z](P/32, (i:Long)=>at (Place(i*32)) {
 				val h = Runtime.hereLong();
@@ -91,7 +91,7 @@ public class GlobalJobRunner[T,Z] {
 	
 	// added on Oct 22, for debugging purpose
 	public def dryRun(init:()=>LocalJobRunner[T,Z]):void{
-		val P = Place.MAX_PLACES;
+		val P = Place.numPlaces();
 		val st = PlaceLocalHandle.makeFlat[LocalJobRunner[T, Z]](PlaceGroup.WORLD, init);
 		for(var ii:Long=0L; ii < P; ii++){
 			at(Place(ii)) st().printLifelines();
@@ -102,7 +102,7 @@ public class GlobalJobRunner[T,Z] {
 	 * added on Oct 27 to print the log
 	 */
 	public def printLog(st:PlaceLocalHandle[LocalJobRunner[T, Z]]):void{
-		val P = Place.MAX_PLACES;
+		val P = Place.numPlaces();
 		for(var i:Long =0L; i < P; ++i){
 			at(Place(i)){
 				st().getTF().printLog();

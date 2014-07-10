@@ -40,7 +40,7 @@ public class BCG{
 		val m = opts("-m", 1024n);
 	
 
-		val P = Place.MAX_PLACES;
+		val P = Place.numPlaces();
 
 		var z0:Int = 1n;
 		var zz:Int = l; 
@@ -60,7 +60,7 @@ public class BCG{
 		Console.OUT.println("b = " + b);
 		Console.OUT.println("c = " + c);
 		Console.OUT.println("d = " + d);
-		Console.OUT.println("places = " + Place.MAX_PLACES);
+		Console.OUT.println("places = " + Place.numPlaces());
 		Console.OUT.println("interval = " + i);
 		Console.OUT.println("l = " + l);
 		Console.OUT.println("permute = " + permute);

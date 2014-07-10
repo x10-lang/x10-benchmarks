@@ -65,7 +65,7 @@ class FT2DRep(M:Long, verify:Boolean) {
     }
     val SQRTNL=1<<M,SQRTN=SQRTNL as Int,N=SQRTNL*SQRTNL;
     val I=Runtime.hereInt();
-    val nRowsL=SQRTN/Place.MAX_PLACES, nRows=nRowsL as Int, nCols=SQRTN;
+    val nRowsL=SQRTN/Place.numPlaces(), nRows=nRowsL as Int, nCols=SQRTN;
     val localSize=SQRTN*nRows*2n;
     val allocator=Runtime.MemoryAllocator.requestAllocator(true, false);
     
@@ -81,8 +81,8 @@ class FT2DRep(M:Long, verify:Boolean) {
     	val mbytes = N*2.0*8.0*2/(1024*1024);
     	if (I==0n) 
     		Console.OUT.println("M=" + M + " SQRTN=" + SQRTN + " N=" + N + " nRows=" + nRows +
-    				" localSize=" + localSize + " MAX_PLACES=" + Place.MAX_PLACES +
-    				              " Mem=" + mbytes + " mem/MAX_PLACES=" + mbytes/Place.MAX_PLACES);
+    				" localSize=" + localSize + " MAX_PLACES=" + Place.numPlaces() +
+    				              " Mem=" + mbytes + " mem/MAX_PLACES=" + mbytes/Place.numPlaces());
 		val r = new Random(I);
 		for (i in 0..(A.M-1))
 			for (j in 0..(A.N-1)) 
@@ -133,7 +133,7 @@ class FT2DRep(M:Long, verify:Boolean) {
      * Tiled version of loop: for ([i,j] in (0..(nRows-1)*(0..(nCols-1)))) B(j,i)=A(i,j)
      */
     def transpose() {
-        val n1 = Place.MAX_PLACES as Int,n2=nRows as Int;
+        val n1 = Place.numPlaces() as Int,n2=nRows as Int;
         for (p in 0n..(n1-1n)) 
         	for (var ii:Int=0n; ii<n2; ii+=16n) 
         		for (var jj:Int=p*n2; jj<(p+1)*n2; jj+=16n) 
@@ -159,7 +159,7 @@ class FT2DRep(M:Long, verify:Boolean) {
         for ([i,p,j] in (0..(n2-1))*(0..(n1-1))*(0..(n2-1)) A(i,n2*p+j)=B(n2*p+i,j);
      */
     def scatter() {
-        val n1 = Place.MAX_PLACES as Int,n2=nRows;
+        val n1 = Place.numPlaces() as Int,n2=nRows;
         for (i in 0..(n2-1)) 
         	for (var ii:Int=0n; ii<n1; ii += 16n) 
         		for (var jj:Int=0n; jj<n2; jj += 16n) 
@@ -244,9 +244,9 @@ class FT2DRep(M:Long, verify:Boolean) {
         }
         val M = opts("-m", 10n);
         val verify = opts("-v", false);
-        val SQRTN = 1n << M, nRows = SQRTN / (Place.MAX_PLACES as Int);
-        if (nRows * (Place.MAX_PLACES as Int) != SQRTN) {
-            Console.ERR.println("SQRTN must be divisible by Place.MAX_PLACES!");
+        val SQRTN = 1n << M, nRows = SQRTN / (Place.numPlaces() as Int);
+        if (nRows * (Place.numPlaces() as Int) != SQRTN) {
+            Console.ERR.println("SQRTN must be divisible by Place.numPlaces()!");
             return;
         }
         val plh = PlaceLocalHandle.makeFlat[FT2DRep](PlaceGroup.WORLD, ()=>new FT2DRep(M, verify));

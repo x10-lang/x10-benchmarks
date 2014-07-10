@@ -15,7 +15,7 @@ public final class BCD extends bcy.BC {
     public def this(rmat:Rmat, permute:Int) {
         super(rmat, permute);
         val h = Runtime.hereInt();
-        val max = Place.MAX_PLACES;
+        val max = Place.numPlaces();
         startVertex = (N as Long*h/max) as Int;
         endVertex = (N as Long*(h+1)/max) as Int;
     }
@@ -56,7 +56,7 @@ public final class BCD extends bcy.BC {
         val permute:Int = cmdLineParams("-p", 1n); // on by default
         val verbose:Int = cmdLineParams("-v", 0n); // off by default
 
-        val max = Place.MAX_PLACES;
+        val max = Place.numPlaces();
 
         Console.OUT.println("Running BC with the following parameters:");
         Console.OUT.println("seed = " + seed);

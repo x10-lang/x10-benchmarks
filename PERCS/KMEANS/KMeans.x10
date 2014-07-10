@@ -31,10 +31,10 @@ final class KMeans {
         val dim = opts("-d", 3n);
         val verbose = opts("-v");
 
-        Console.OUT.println("places: " + Place.MAX_PLACES + " points: " + num_global_points + " clusters: " + num_clusters +
+        Console.OUT.println("places: " + Place.numPlaces() + " points: " + num_global_points + " clusters: " + num_clusters +
                 " dimensions: " + dim + " iterations: " + iterations);
 
-        val num_slice_points = num_global_points / (Place.MAX_PLACES as Int);
+        val num_slice_points = num_global_points / (Place.numPlaces() as Int);
 
         PlaceGroup.WORLD.broadcastFlat(()=>{
             val role = Runtime.hereInt();

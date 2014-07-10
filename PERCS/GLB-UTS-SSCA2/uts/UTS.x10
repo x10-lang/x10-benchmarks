@@ -27,7 +27,7 @@ public class UTS{
 		val l = opts("-l", 32n);
 		val m = opts("-m", 1024n);
 		val verbose = opts("-v", 1n);
-		val P=Place.MAX_PLACES;
+		val P=Place.numPlaces();
 		val w = opts("-w", GLBParameters.computeZ(P,l));
 		val z=w;
 		Console.OUT.println("places=" + P +

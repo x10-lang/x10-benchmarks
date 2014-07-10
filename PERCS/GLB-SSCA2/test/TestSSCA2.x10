@@ -153,7 +153,7 @@ public class TestSSCA2 {
 		Console.OUT.println("b = " + b);
 		Console.OUT.println("c = " + c);
 		Console.OUT.println("d = " + d);
-		Console.OUT.println("places = " + Place.MAX_PLACES);
+		Console.OUT.println("places = " + Place.numPlaces());
 
 		val mytask:TaskFrame[SSCA2TaskItem, SSCA2Result] = new SSCA2TaskFrame(Rmat(seed, n, a, b, c, d),i ,t, permute, verbose);
 		return mytask as SSCA2TaskFrame;

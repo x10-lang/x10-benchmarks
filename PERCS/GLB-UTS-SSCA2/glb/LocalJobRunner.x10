@@ -45,7 +45,7 @@ class LocalJobRunner[Z] {
 	private val lifelinesActivated:Rail[Boolean];
 	
 	/** Total number of places */
-	private val P = Place.MAX_PLACES;
+	private val P = Place.numPlaces();
 	
 	/** Random number, used when picking a non-lifeline victim/buddy */
 	private val random = new Random(Runtime.hereInt()); // on Jan 22,2014, was an issue if using the default seed, appears

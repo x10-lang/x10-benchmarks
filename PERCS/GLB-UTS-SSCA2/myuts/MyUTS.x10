@@ -43,7 +43,7 @@ public class MyUTS{
 		val m = opts("-m", 1024n);
 		val verbose = opts("-v", 0n);
 
-		val P = Place.MAX_PLACES;
+		val P = Place.numPlaces();
 
 		var z0:Int = 1n;
 		var zz:Int = l; 

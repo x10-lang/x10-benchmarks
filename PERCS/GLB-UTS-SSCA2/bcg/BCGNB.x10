@@ -43,7 +43,7 @@ public class BCGNB{
 		val m = opts("-m", 1024n);
 		val yfStr:String = opts("-yf", "512:512"); // by default is 512 512
 
-		val P = Place.MAX_PLACES;
+		val P = Place.numPlaces();
 
 		var z0:Int = 1n;
 		var zz:Int = l; 
@@ -69,7 +69,7 @@ public class BCGNB{
 		Console.OUT.println("b = " + b);
 		Console.OUT.println("c = " + c);
 		Console.OUT.println("d = " + d);
-		Console.OUT.println("places = " + Place.MAX_PLACES);
+		Console.OUT.println("places = " + Place.numPlaces());
 		Console.OUT.println("interval = " + i);
 		Console.OUT.println("l = " + l);
 		Console.OUT.println("permute = " + permute);
