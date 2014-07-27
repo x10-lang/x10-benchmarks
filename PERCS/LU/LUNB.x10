@@ -476,8 +476,8 @@ class LUNB {
         val py = Int.parse(args(3));
         val bk = Int.parse(args(4));
         val A = BlockedArray.make(M, N, B, B, px, py);
-        val buffers = PlaceLocalHandle.makeFlat[Rail[Double]](PlaceGroup.WORLD, ()=>new Rail[Double](N, Runtime.MemoryAllocator.requestAllocator(true, false)));
-        val lus = PlaceLocalHandle.makeFlat[LUNB](PlaceGroup.WORLD, ()=>new LUNB(M, N, B, px, py, bk, A, buffers));
+        val buffers = PlaceLocalHandle.makeFlat[Rail[Double]](Place.places(), ()=>new Rail[Double](N, Runtime.MemoryAllocator.requestAllocator(true, false)));
+        val lus = PlaceLocalHandle.makeFlat[LUNB](Place.places(), ()=>new LUNB(M, N, B, px, py, bk, A, buffers));
         Console.OUT.println ("LU: M " + M + " B " + B + " px " + px + " py " + py);
         start(lus);
     }
@@ -511,7 +511,7 @@ class LUNB {
 
         var t:Long = -System.nanoTime();
 
-        PlaceGroup.WORLD.broadcastFlat(()=>{
+        Place.places().broadcastFlat(()=>{
             val lu = lus();
             val timer = new Timer(17);
 
@@ -561,7 +561,7 @@ class LUNB {
 
         t += System.nanoTime();
 
-        PlaceGroup.WORLD.broadcastFlat(()=>{
+        Place.places().broadcastFlat(()=>{
             val r = lus().check();
             if (here.id == 0) {
                 Console.OUT.println("Worst difference of " + r + " is " + (r < 0.01? "" : "not ") + "ok");

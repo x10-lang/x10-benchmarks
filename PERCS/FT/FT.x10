@@ -228,13 +228,13 @@ class FT(M:Long, verify:Boolean) {
             Console.ERR.println("SQRTN must be divisible by Place.numPlaces()!");
             return;
         }
-        val plh = PlaceLocalHandle.makeFlat[FT](PlaceGroup.WORLD, ()=>new FT(M, verify));
+        val plh = PlaceLocalHandle.makeFlat[FT](Place.places(), ()=>new FT(M, verify));
         val o=plh();
         val mbytes = o.N*2.0*8.0*2/(1024*1024);
         Logger.info(()=>"M=" + o.M + " SQRTN=" + o.SQRTN + " N=" + o.N + " nRows=" + o.nRows +
                 " localSize=" + o.localSize + " MAX_PLACES=" + Place.numPlaces() +
                               " Mem=" + mbytes + " mem/MAX_PLACES=" + mbytes/Place.numPlaces());
         
-        PlaceGroup.WORLD.broadcastFlat(()=>{plh().run();});
+        Place.places().broadcastFlat(()=>{plh().run();});
     }
 }

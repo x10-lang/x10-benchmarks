@@ -106,7 +106,7 @@ class FT2Level(workers:Rail[FT]) {
             Console.ERR.println("SQRTN must be divisible by Place.numPlaces()!");
             return;
         }
-        val plh = PlaceLocalHandle.makeFlat[FT2Level](PlaceGroup.WORLD, 
+        val plh = PlaceLocalHandle.makeFlat[FT2Level](Place.places(), 
                 ()=>new FT2Level(new Rail[FT](W, (i:Long)=> new FT(M,verify))));
         val o=plh();
         val mbytes = N*2.0*8.0*2/(1024*1024);
@@ -114,6 +114,6 @@ class FT2Level(workers:Rail[FT]) {
                 " localSize=" + plh().workers(0).localSize + " MAX_PLACES=" + Place.numPlaces() + " workers/place=" + W +
                               " Mem=" + mbytes + " mem/MAX_PLACES=" + mbytes/Place.numPlaces());
         
-        PlaceGroup.WORLD.broadcastFlat(()=>{plh().run();});
+        Place.places().broadcastFlat(()=>{plh().run();});
     }
 }

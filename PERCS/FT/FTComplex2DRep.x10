@@ -216,8 +216,8 @@ class FTComplex2DRep(M:Long, verify:Boolean) {
             Console.ERR.println("SQRTN must be divisible by Place.numPlaces()!");
             return;
         }
-        val plh = PlaceLocalHandle.makeFlat[FTComplex2DRep](PlaceGroup.WORLD, 
+        val plh = PlaceLocalHandle.makeFlat[FTComplex2DRep](Place.places(), 
         		()=>new FTComplex2DRep(M, verify));
-        PlaceGroup.WORLD.broadcastFlat(()=>{plh().run();});
+        Place.places().broadcastFlat(()=>{plh().run();});
     }
 }

@@ -79,7 +79,7 @@ public final class BCG {
        // Console.OUT.println("Finished.");
 
         
-        // PlaceGroup.WORLD.broadcastFlat(()=>{
+        // Place.places().broadcastFlat(()=>{
         //     (glb.taskQueue()).allreduce();
         // });
         
@@ -87,7 +87,7 @@ public final class BCG {
       
         
         // if(verbose > 0) {
-        //     PlaceGroup.WORLD.broadcastFlat(()=>{
+        //     Place.places().broadcastFlat(()=>{
         //         Console.OUT.println("[" + here.id + "]"
         //                 + " Time = " + (glb.taskQueue()).accTime
         //                 + " Count = " + (glb.taskQueue()).count);

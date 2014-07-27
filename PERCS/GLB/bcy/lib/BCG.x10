@@ -81,7 +81,7 @@ public final class BCG {
        
         //val reduceTime = (System.nanoTime()-time)/1e9;
         // if(verbose > 0) {
-        //     PlaceGroup.WORLD.broadcastFlat(()=>{
+        //     Place.places().broadcastFlat(()=>{
         //         Console.OUT.println("[" + here.id + "]"
         //                 + " Time = " + (glb.taskQueue()).accTime
         //                 + " Yield Time = " + ((glb.taskQueue()).accYTime/1e9)

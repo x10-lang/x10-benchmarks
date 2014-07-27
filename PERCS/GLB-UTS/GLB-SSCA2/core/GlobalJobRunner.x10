@@ -23,7 +23,7 @@ public abstract class GlobalJobRunner[T,Z] {
 	public def main(init:()=>LocalJobRunner[T,Z]):Z{
 		val P = Place.numPlaces();
 		var setupTime:Long = System.nanoTime();
-		val st = PlaceLocalHandle.makeFlat[LocalJobRunner[T, Z]](PlaceGroup.WORLD, init);
+		val st = PlaceLocalHandle.makeFlat[LocalJobRunner[T, Z]](Place.places(), init);
 		setupTime = System.nanoTime() - setupTime;
 		
 		Console.OUT.println("Setup time(s): " + (setupTime / 1E9));
@@ -101,7 +101,7 @@ public abstract class GlobalJobRunner[T,Z] {
 	// added on Oct 22, for debugging purpose
 	public def dryRun(init:()=>LocalJobRunner[T,Z]):void{
 		val P = Place.numPlaces();
-		val st = PlaceLocalHandle.makeFlat[LocalJobRunner[T, Z]](PlaceGroup.WORLD, init);
+		val st = PlaceLocalHandle.makeFlat[LocalJobRunner[T, Z]](Place.places(), init);
 		for(var ii:Long=0L; ii < P; ii++){
 			at(Place(ii)) st().printLifelines();
 		}

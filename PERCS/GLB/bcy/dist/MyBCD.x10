@@ -73,22 +73,22 @@ public final class MyBCD{
 		Console.OUT.println("places = " + max);
 		
 		var time:Long = System.nanoTime();
-		val plh = PlaceLocalHandle.makeFlat[BCD](PlaceGroup.WORLD, ()=>new BCD(Rmat(seed, n, a, b, c, d), permute));
+		val plh = PlaceLocalHandle.makeFlat[BCD](Place.places(), ()=>new BCD(Rmat(seed, n, a, b, c, d), permute));
 		val setupTime = (System.nanoTime()-time)/1e9;
 		
 		
 		time = System.nanoTime();
-		PlaceGroup.WORLD.broadcastFlat(()=>{
+		Place.places().broadcastFlat(()=>{
 			plh().bfsShortestPaths();
 		});
 		val procTime = (System.nanoTime()-time)/1e9;
 		time = System.nanoTime();
-		PlaceGroup.WORLD.broadcastFlat(()=>{
+		Place.places().broadcastFlat(()=>{
 			plh().allreduce();
 		});
 		val reduceTime = (System.nanoTime()-time)/1e9;
 		if(verbose > 0) {
-			PlaceGroup.WORLD.broadcastFlat(()=>{
+			Place.places().broadcastFlat(()=>{
 				Console.OUT.println("[" + here.id + "]"
 						+ " Time = " + plh().accTime
 						+ " Count = " + plh().count);

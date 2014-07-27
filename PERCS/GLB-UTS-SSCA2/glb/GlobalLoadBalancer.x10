@@ -27,11 +27,11 @@ public class GlobalLoadBalancer[Z](glbParam:GLBParameters, balancedLevel:Int, fa
 		/*setup phase*/
 		
 		var setupTime:Long = System.nanoTime();
-		val st = PlaceLocalHandle.makeFlat[LocalJobRunner[Z]](PlaceGroup.WORLD, 
+		val st = PlaceLocalHandle.makeFlat[LocalJobRunner[Z]](Place.places(), 
 				()=>new LocalJobRunner(init, this.glbParam, balancedLevel));
 		
 		// added on 12/13/2013, to support yield points
-		PlaceGroup.WORLD.broadcastFlat(()=>{
+		Place.places().broadcastFlat(()=>{
 			st().getTF().setPLH(st);
 		});
 		
@@ -55,7 +55,7 @@ public class GlobalLoadBalancer[Z](glbParam:GLBParameters, balancedLevel:Int, fa
 			 result = reduce(results, st().getTF().getReducer());
 		}else{
 			// if the user already provide the 
-			PlaceGroup.WORLD.broadcastFlat(()=>{
+			Place.places().broadcastFlat(()=>{
 				st().getTF().reduce();
 			});
 			result = st().getTF().getResult();
@@ -143,7 +143,7 @@ public class GlobalLoadBalancer[Z](glbParam:GLBParameters, balancedLevel:Int, fa
 	 */
 	private def dryRun(init:()=>TaskFrame[Z]):void{
 		val P = Place.numPlaces();
-		val st = PlaceLocalHandle.makeFlat[LocalJobRunner[Z]](PlaceGroup.WORLD, 
+		val st = PlaceLocalHandle.makeFlat[LocalJobRunner[Z]](Place.places(), 
 				()=>new LocalJobRunner(init, this.glbParam, BALANCED_LEVEL_NUB));
 		for(var ii:Long=0L; ii < P; ii++){
 			at(Place(ii)) st().printLifelines();

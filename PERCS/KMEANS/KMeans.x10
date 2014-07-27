@@ -36,7 +36,7 @@ final class KMeans {
 
         val num_slice_points = num_global_points / (Place.numPlaces() as Int);
 
-        PlaceGroup.WORLD.broadcastFlat(()=>{
+        Place.places().broadcastFlat(()=>{
             val role = Runtime.hereInt();
             val random = new Random(role);
             val host_points = new Rail[Float](num_slice_points*dim, (Long)=>random.next());

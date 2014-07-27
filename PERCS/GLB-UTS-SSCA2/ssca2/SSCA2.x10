@@ -204,7 +204,7 @@ public final class SSCA2(N:Int) {
         val max = Place.numPlaces();
 
         // Loop over all the places and crunch the numbers.
-        PlaceGroup.WORLD.broadcastFlat(()=>{
+        Place.places().broadcastFlat(()=>{
                 val h = Runtime.hereInt();
                 plh().bfsShortestPaths((N as Long*h/max) as Int, (N as Long*(h+1)/max) as Int);
             });

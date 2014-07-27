@@ -32,7 +32,7 @@ public class Stream {
         val N = N0 * NUM_PLACES;
         Console.OUT.println("localSize=" + localSize);
 
-        PlaceGroup.WORLD.broadcastFlat(()=>{
+        Place.places().broadcastFlat(()=>{
             val p = here.id;
             val allocator = Runtime.MemoryAllocator.requestAllocator(true, false);
             val a = new Rail[Double](localSize, allocator);

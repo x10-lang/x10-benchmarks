@@ -270,8 +270,19 @@ class LU {
             timer.start(10);
             row.bcast(Place.place(J%py), diag, 0, diag, 0, diag.size);
             timer.stop(10);
+
+//@@@ahoaho
+	Console.OUT.println("===== check after bcast =====");
+	check();
+
             for (var cj:Int = J + 1n; cj <= NB; ++cj) if (A_here.hasCol(cj)) {
                 blockTriSolve(A_here.block(J, cj).raw, diag, B);
+
+//ZZZ
+//@@@ahoaho
+	Console.OUT.println("===== check after blockTriSolve =====");
+	check();
+
             }
         }
     }
@@ -321,15 +332,41 @@ class LU {
     }
 
     def solve(timer:Timer) {
+//@@@ahoaho
+	Console.OUT.println("===== check before computeSum =====");
+	check();
+
         timer.start(13); computeRowSum(); Team.WORLD.barrier(); timer.stop(13);
+
+//@@@ahoaho
+	Console.OUT.println("===== check after computeSum =====");
+	check();
 
         timer.start(9);
 
         for (var J:Int = 0n; J < NB; J++){
             timer.start(1); panel(J, timer);                   Team.WORLD.barrier(); timer.stop(1);
+//@@@ahoaho
+	Console.OUT.println("===== check after panel =====");
+	check();
+
             timer.start(2); swapRows(J, timer);                Team.WORLD.barrier(); timer.stop(2);
+
+//@@@ahoaho
+	Console.OUT.println("===== check after swapRows =====");
+	check();
+
             timer.start(3); triSolve(J, timer);                Team.WORLD.barrier(); timer.stop(3);
+
+//@@@ahoaho
+	Console.OUT.println("===== check after triSolve =====");
+	check();
+
             timer.start(4); if (J != NB - 1n) update(J, timer); Team.WORLD.barrier(); timer.stop(4);
+
+//@@@ahoaho
+	Console.OUT.println("===== check after update =====");
+	check();
 
             /* Progress meter */
             if(0 == here.id) {
@@ -388,6 +425,8 @@ class LU {
         if (!A_last_panel.empty()) {
             for (var I:Int = A_last_panel.min_x; I <= A_last_panel.max_x; I += px) {
                 for (var i:Int=0n; i < B; i++) {
+//@@@ahoaho
+                    assert !A_here.block(I, NB)(I*B+i, M).isNaN();
                     val v = 1.0 - A_here.block(I, NB)(I*B+i, M);
                     max = Math.max(max, v * v);
                 }
@@ -414,8 +453,8 @@ class LU {
         val py = Int.parse(args(3));
         val bk = Int.parse(args(4));
         val A = BlockedArray.make(M, N, B, B, px, py);
-        val buffers = PlaceLocalHandle.makeFlat[Rail[Double]](PlaceGroup.WORLD, ()=>new Rail[Double](N, Runtime.MemoryAllocator.requestAllocator(true, false)));
-        val lus = PlaceLocalHandle.makeFlat[LU](PlaceGroup.WORLD, ()=>new LU(M, N, B, px, py, bk, A, buffers));
+        val buffers = PlaceLocalHandle.makeFlat[Rail[Double]](Place.places(), ()=>new Rail[Double](N, Runtime.MemoryAllocator.requestAllocator(true, false)));
+        val lus = PlaceLocalHandle.makeFlat[LU](Place.places(), ()=>new LU(M, N, B, px, py, bk, A, buffers));
         Console.OUT.println ("LU: M " + M + " B " + B + " px " + px + " py " + py);
         start(lus);
     }
@@ -448,17 +487,29 @@ class LU {
 
         var t:Long = -System.nanoTime();
 
-        PlaceGroup.WORLD.broadcastFlat(()=>{
+        Place.places().broadcastFlat(()=>{
             val lu = lus();
             val timer = new Timer(17);
+
+//@@@ahoaho
+	Console.OUT.println("===== check before solve =====");
+	lu.check();
 
             timer.start(0);
             lu.solve(timer);
             timer.stop(0);
 
+//@@@ahoaho
+	Console.OUT.println("===== check after solve =====");
+	lu.check();
+
             timer.start(16);
             lu.backsolve(timer);
             timer.stop(16);
+
+//@@@ahoaho
+	Console.OUT.println("===== check after backsolve =====");
+	lu.check();
 
             if (here.id == 0) {
                 Console.OUT.println ("Timer(0)  SOLVE         #invocations=" + timer.count(0) +
@@ -498,7 +549,7 @@ class LU {
 
         t += System.nanoTime();
 
-        PlaceGroup.WORLD.broadcastFlat(()=>{
+        Place.places().broadcastFlat(()=>{
             val r = lus().check();
             if (here.id == 0) {
                 Console.OUT.println("Worst difference of " + r + " is " + (r < 0.01? "" : "not ") + "ok");

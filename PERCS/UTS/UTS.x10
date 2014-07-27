@@ -290,7 +290,7 @@ public final class UTS {
                                                                 "   m=" + m + 
                                                                         "   z=" + z);
         
-        val st = PlaceLocalHandle.makeFlat[UTS](PlaceGroup.WORLD, ()=>new UTS(b, d, n, w, l, z, m));
+        val st = PlaceLocalHandle.makeFlat[UTS](Place.places(), ()=>new UTS(b, d, n, w, l, z, m));
         
         Console.OUT.println("Starting...");
         var time:Long = System.nanoTime();

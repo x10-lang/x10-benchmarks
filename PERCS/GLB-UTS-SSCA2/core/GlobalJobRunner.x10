@@ -28,7 +28,7 @@ public class GlobalJobRunner[T,Z] {
 	public def main(init:()=>TaskFrame[T,Z]):Z{
 		val P = Place.numPlaces();
 		var setupTime:Long = System.nanoTime();
-		val st = PlaceLocalHandle.makeFlat[LocalJobRunner[T, Z]](PlaceGroup.WORLD, ()=>new LocalJobRunner(init, this.glbParam));
+		val st = PlaceLocalHandle.makeFlat[LocalJobRunner[T, Z]](Place.places(), ()=>new LocalJobRunner(init, this.glbParam));
 		
 		setupTime = System.nanoTime() - setupTime;
 		if(st().verbose >= 1n){
@@ -92,7 +92,7 @@ public class GlobalJobRunner[T,Z] {
 	// added on Oct 22, for debugging purpose
 	public def dryRun(init:()=>LocalJobRunner[T,Z]):void{
 		val P = Place.numPlaces();
-		val st = PlaceLocalHandle.makeFlat[LocalJobRunner[T, Z]](PlaceGroup.WORLD, init);
+		val st = PlaceLocalHandle.makeFlat[LocalJobRunner[T, Z]](Place.places(), init);
 		for(var ii:Long=0L; ii < P; ii++){
 			at(Place(ii)) st().printLifelines();
 		}

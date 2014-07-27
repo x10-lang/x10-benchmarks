@@ -47,7 +47,7 @@ public final class UTSD {
                                                                 "   m=" + m + 
                                                                         "   z=" + z);
 
-        val st = PlaceLocalHandle.makeFlat[Worker](PlaceGroup.WORLD, ()=>new Worker(b, d, n, w, l, z, m));
+        val st = PlaceLocalHandle.makeFlat[Worker](Place.places(), ()=>new Worker(b, d, n, w, l, z, m));
 
         Console.OUT.println("Starting...");
         var time:Long = System.nanoTime();

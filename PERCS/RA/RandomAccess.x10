@@ -106,7 +106,7 @@ public class RandomAccess {
         val numUpdates = (updates * tableSize) as Long;
 
         // create distributed rail 
-	val dr = new DistRail(PlaceGroup.WORLD, localTableSize, congruent, largePages, (i:long)=>i);
+	val dr = new DistRail(Place.places(), localTableSize, congruent, largePages, (i:long)=>i);
 
 	if (dumpTable) dr.printAll();
 
@@ -134,7 +134,7 @@ public class RandomAccess {
 
         // repeat for testing.
         runBenchmark(dr, logLocalTableSize, numUpdates);
-        PlaceGroup.WORLD.broadcastFlat(()=>{
+        Place.places().broadcastFlat(()=>{
             var err:Int = 0n;
             for (i in 0..(localTableSize-1)) 
                 if (dr(i) != (i as Long)) err++;

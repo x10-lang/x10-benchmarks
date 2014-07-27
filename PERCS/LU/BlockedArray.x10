@@ -140,7 +140,7 @@ public final class BlockedArray implements (Int,Int)=>Double {
     }
 
     public static def make(M:Int, N:Int, bx:Int, by:Int, px:Int, py:Int) {
-        return PlaceLocalHandle.makeFlat[BlockedArray](PlaceGroup.WORLD,
+        return PlaceLocalHandle.makeFlat[BlockedArray](Place.places(),
             ()=>new BlockedArray(M, N, bx, by, px ,py));
     }
 }
