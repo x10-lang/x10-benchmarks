@@ -2,8 +2,6 @@ package raytracer;
 
 import x10.io.Console;
 import x10.util.OptionsParser;
-import x10.util.IndexedMemoryChunk;
-import x10.util.RemoteIndexedMemoryChunk;
 
 import x10.compiler.CUDA;
 import x10.compiler.CUDADirectParams;
@@ -22,47 +20,47 @@ public class Engine {
     public vertSplits:Int;
     public horzBlocks:Int;
     public vertBlocks:Int;
-    public localFrame:Array[RGB](1){self!=null};
+    public localFrame:Rail[RGB]{self!=null};
     public verbose:Boolean;
     public quiet:Boolean;
     public dumpOctree:Boolean;
     public mipmapBias:Int;
     
 
-    val octree : SpatialDatastructure;
+    val octree:SpatialDatastructure;
 
-    val vertexes : Array[MeshVertex](1);
-    val skybox : Array[Texture2D](1);
+    val vertexes:Rail[MeshVertex];
+    val skybox:Rail[Texture2D];
 
-    static val heightFieldDimX = 128;
-    static val heightFieldDimY = 256;
-    val heightFieldHost : Array[Float](1){rail};
+    static val heightFieldDimX = 128n;
+    static val heightFieldDimY = 256n;
+    val heightFieldHost:Rail[Float];
 
-    val gpu : Place;
+    val gpu:Place;
 
-    val gpuHeightField : RemoteArray[Float]{rank==1, home==gpu};
-    val gpuVelocityField : RemoteArray[Float]{rank==1, home==gpu};
+    val gpuHeightField:GlobalRail[Float]{home==gpu};
+    val gpuVelocityField:GlobalRail[Float]{home==gpu};
 
-    static val RADIUS = 1;
-    static val BLOCK_DIMX = 16;
+    static val RADIUS = 1n;
+    static val BLOCK_DIMX = 16n;
     static val BLOCK_DIMY = BLOCK_DIMX;
     static val THREADS = BLOCK_DIMX*BLOCK_DIMY;
     static val BLOCKS_X = heightFieldDimX/BLOCK_DIMX;
     static val BLOCKS_Y = heightFieldDimY/BLOCK_DIMY;
-    static val S_DATA_STRIDE = BLOCK_DIMX+2*RADIUS;
-    static val S_DATA_SIZE = (BLOCK_DIMY+2*RADIUS)*S_DATA_STRIDE;
+    static val S_DATA_STRIDE = BLOCK_DIMX+2n*RADIUS;
+    static val S_DATA_SIZE = (BLOCK_DIMY+2n*RADIUS)*S_DATA_STRIDE;
 
-    var lastTime : Float;
+    var lastTime:Float;
 
-    private static def lerp (v1:Float, v2:Float, a:Float) = (1-a)*v1 + a*v2;
+    private static def lerp(v1:Float, v2:Float, a:Float) = (1-a)*v1 + a*v2;
 
     private final def heightFieldHeight(x:Int, y:Int) = heightFieldHost(y*heightFieldDimX + x);
 
     public final def heightFieldPerturb(xm:Int, ym:Int) {
-        val x = Math.max(0, xm-1);
-        val X = Math.min(heightFieldDimX, xm+1);
-        val y = Math.max(0, ym-1);
-        val Y = Math.min(heightFieldDimY, ym+1);
+        val x = Math.max(0n, xm-1n);
+        val X = Math.min(heightFieldDimX, xm+1n);
+        val y = Math.max(0n, ym-1n);
+        val Y = Math.min(heightFieldDimY, ym+1n);
 
         val hy = heightFieldHeight(xm, y);
         val hY = heightFieldHeight(xm, Y);
@@ -77,10 +75,10 @@ public class Engine {
         val x0 = coord2.x as Int;
         val y0 = coord2.y as Int;
         val coord_fract = coord2 - Vector2(x0,y0);
-        val n00 = heightFieldPerturb(x0+0,y0+0);
-        val n01 = heightFieldPerturb(x0+1,y0+0);
-        val n10 = heightFieldPerturb(x0+0,y0+1);
-        val n11 = heightFieldPerturb(x0+1,y0+1);
+        val n00 = heightFieldPerturb(x0+0n,y0+0n);
+        val n01 = heightFieldPerturb(x0+1n,y0+0n);
+        val n10 = heightFieldPerturb(x0+0n,y0+1n);
+        val n11 = heightFieldPerturb(x0+1n,y0+1n);
         val n0 = Vector3.lerp(n00, n01, coord_fract.x);
         val n1 = Vector3.lerp(n10, n11, coord_fract.x);
         val n = Vector3.lerp(n0, n1, coord_fract.y);
@@ -89,7 +87,7 @@ public class Engine {
         //return Vector3(n.x, n.y, Math.sqrtf(1 - n.x*n.x - n.y*n.y));
     }
 
-    public def this (opts:OptionsParser, global_width:Int, global_height:Int, prims:Array[Primitive](1), vertexes:Array[MeshVertex](1), skybox:Array[Texture2D](1)) {
+    public def this(opts:OptionsParser, global_width:Int, global_height:Int, prims:Rail[Primitive], vertexes:Rail[MeshVertex], skybox:Rail[Texture2D]) {
 
         verbose = opts("-v");
         quiet = opts("-q");
@@ -99,25 +97,25 @@ public class Engine {
         globalWidth = global_width;
         globalHeight = global_height;
 
-        var horz_splits:Int = 1;
-        switch (Place.MAX_PLACES) {
-            case 1: horz_splits = 1; break;
-            case 2: horz_splits = 2; break;
-            case 3: horz_splits = 3; break;
-            case 4: horz_splits = 2; break;
-            case 6: horz_splits = 3; break;
-            case 8: horz_splits = 4; break;
-            case 9: horz_splits = 3; break;
-            case 10: horz_splits = 5; break;
+        var horz_splits:Int = 1n;
+        switch (Place.numPlaces() as Int) {
+            case 1n: horz_splits = 1n; break;
+            case 2n: horz_splits = 2n; break;
+            case 3n: horz_splits = 3n; break;
+            case 4n: horz_splits = 2n; break;
+            case 6n: horz_splits = 3n; break;
+            case 8n: horz_splits = 4n; break;
+            case 9n: horz_splits = 3n; break;
+            case 10n: horz_splits = 5n; break;
             default:
         }
         horzSplits = opts("-w",horz_splits);
-        vertSplits = opts("-h",Place.MAX_PLACES / horz_splits);
-        if (horzSplits * vertSplits != Place.MAX_PLACES) {
+        vertSplits = opts("-h",Place.numPlaces() as Int / horz_splits);
+        if (horzSplits * vertSplits != Place.numPlaces() as Int) {
             throw new Error("Number of places not appropriate for given horizontal / vertical splits");
         }
-        horzBlocks = opts("-x",4);
-        vertBlocks = opts("-y",4);
+        horzBlocks = opts("-x",4n);
+        vertBlocks = opts("-y",4n);
 
         localWidth = global_width / horzSplits;
         localHeight = global_height / vertSplits;
@@ -138,18 +136,18 @@ public class Engine {
             Console.OUT.println();
         }
 
-        localFrame = new Array[RGB](localWidth * localHeight);
+        localFrame = new Rail[RGB](localWidth * localHeight);
 
-        octree = opts("-l") ? new LooseOctree(opts("-d",10), AABB(Vector3(-10,-10,-10),Vector3(10,10,10)), 20.0f)
-               : opts("-O") ? new      Octree(opts("-d",10), AABB(Vector3(-10,-10,-10),Vector3(10,10,10)))
+        octree = opts("-l") ? new LooseOctree(opts("-d",10n), AABB(Vector3(-10,-10,-10),Vector3(10,10,10)), 20.0f)
+               : opts("-O") ? new      Octree(opts("-d",10n), AABB(Vector3(-10,-10,-10),Vector3(10,10,10)))
                             : new   SimpleBVH();
 
-        mipmapBias = opts("-b",0);
+        mipmapBias = opts("-b",0n);
 
         this.vertexes = vertexes;
         this.skybox = skybox;
 
-        for (p in prims.values()) {
+        for (p in prims) {
             octree.insert(p);
         }
 
@@ -160,12 +158,12 @@ public class Engine {
         Console.OUT.println("Primitives: "+octree.countCargo());
         Console.OUT.println();
 
-        heightFieldHost = new Array[Float](heightFieldDimX * heightFieldDimY, 0.0f);
+        heightFieldHost = new Rail[Float](heightFieldDimX * heightFieldDimY);
 
-        gpu = here.children().size==0 ? here : here.child(0);
+        gpu = PlaceTopology.getTopology().numChildren(here)==0 ? here : PlaceTopology.getTopology().getChild(here,0);
 
-        gpuHeightField = CUDAUtilities.makeRemoteArray[Float](gpu, heightFieldDimX*heightFieldDimY, heightFieldHost);
-        gpuVelocityField = CUDAUtilities.makeRemoteArray[Float](gpu, heightFieldDimX*heightFieldDimY, 0.0f);
+        gpuHeightField = CUDAUtilities.makeGlobalRail[Float](gpu, heightFieldDimX*heightFieldDimY, heightFieldHost);
+        gpuVelocityField = CUDAUtilities.makeGlobalRail[Float](gpu, heightFieldDimX*heightFieldDimY, 0.0f);
 
     }
 
@@ -210,20 +208,19 @@ public class Engine {
         return (amb_comp + diff_comp + spec_comp);
     }
 
-
     public static def to_col(x:Vector3) {
         val scaled = x*0.5f + Vector3(0.5f,0.5f,0.5f);
         return RGB(scaled.x, scaled.y, scaled.z);
     }
 
-    public final def castRay (s:RayState) {
+    public final def castRay(s:RayState) {
         s.t = s.l;
         // use line below to bypass octree optimisation
         //octree.iterateCargo((p:Primitive) => { p.intersectRay(s); });
         octree.castRay(s);
     }
 
-    public final def skyboxRender(d:Vector3) : Vector3 {
+    public final def skyboxRender(d:Vector3):Vector3 {
         // <front> <back> <left> <right> <up> <down>
         if (d.y > 0 && Math.abs(d.x/d.y) <= 1 && Math.abs(d.z/d.y) <= 1) return skybox(0).clampedLookup(Vector2(d.x/d.y+1.0f,-d.z/d.y+1.0f)*0.5f,mipmapBias); 
         if (d.y < 0 && Math.abs(d.x/d.y) <= 1 && Math.abs(d.z/d.y) <= 1) return skybox(1).clampedLookup(Vector2(d.x/d.y+1.0f,  d.z/d.y+1.0f)*0.5f,mipmapBias);
@@ -233,7 +230,7 @@ public class Engine {
         return skybox(5).clampedLookup(Vector2(-d.x/d.z+1.0f,  d.y/d.z+1.0f)*0.5f,mipmapBias);
     }
 
-    public final def castRayAndRender (s:RayState) {
+    public final def castRayAndRender(s:RayState) {
         castRay(s);
         if (s.t >= s.l) {
             return skybox==null ? RGB.DARK_BLUE as Vector3 : skyboxRender(s.d);
@@ -242,7 +239,7 @@ public class Engine {
         }
     }
 
-    public def renderFrame (frameBuffer:RemoteIndexedMemoryChunk[RGB], denting_water:Boolean, pos:Vector3, orientation:Quat, time:Float) {
+    public def renderFrame(frameBuffer:GlobalRail[RGB], denting_water:Boolean, pos:Vector3, orientation:Quat, time:Float) {
         
         val horz_split = here.id % horzSplits;
         val vert_split = here.id / horzSplits;
@@ -253,7 +250,7 @@ public class Engine {
         if (verbose)
             Console.OUT.println(here+" rendering "+horz_split+","+vert_split+"    "+offset_x+","+offset_y);
 
-        val counter = new Cell[Int](0);
+        val counter = new Cell[Int](0n);
 
         finish {
 
@@ -263,12 +260,18 @@ public class Engine {
                 val vel = gpuVelocityField;
                 val dimx = heightFieldDimX;
                 val dimy = heightFieldDimY;
+		val RADIUS_ = RADIUS;
+		val BLOCK_DIMX_ = BLOCK_DIMX;
+		val BLOCK_DIMY_ = BLOCK_DIMY;
+		val THREADS_ = THREADS;
                 val BLOCKS_X_ = BLOCKS_X;
+		val S_DATA_STRIDE_ = S_DATA_STRIDE;
+		val S_DATA_SIZE_ = S_DATA_SIZE;
                 val interval = 0.2f;
                 val iters = ((time - lastTime) / interval) as Int;
                 lastTime += iters * interval;
-                val hit_pos_x : Int;
-                val hit_pos_y : Int;
+                val hit_pos_x:Int;
+                val hit_pos_y:Int;
                 if (denting_water) {
                     val dir = orientation * Vector3(0,1,0);
                     val t = - pos.z / dir.z;
@@ -277,48 +280,48 @@ public class Engine {
                     hit_pos_x = (hit_pos2.x * heightFieldDimX) as Int;
                     hit_pos_y = (hit_pos2.y * heightFieldDimY) as Int;
                 } else {
-                    hit_pos_x = -1;
-                    hit_pos_y = -1;
+                    hit_pos_x = -1n;
+                    hit_pos_y = -1n;
                 }
-                for (i in 1 .. iters) {
+                for (i in 1n .. iters) {
                     val g = gpu;
                     finish async at (g) @CUDA @CUDADirectParams {
-                        finish for (block in 0..(BLOCKS_X_*BLOCKS_Y-1)) async {
-                            val s_data_h = new Array[Float](S_DATA_SIZE, 0.0f);
-                            clocked finish for (thread in 0..(THREADS-1)) clocked async {
+                        finish for (block in 0n..(BLOCKS_X_*BLOCKS_Y-1n)) async {
+                            val s_data_h = new Rail[Float](S_DATA_SIZE_, 0.0f);
+                            clocked finish for (thread in 0n..(THREADS_-1n)) clocked async {
                                 val blockidx = block%BLOCKS_X_;
                                 val blockidy = block/BLOCKS_X_;
-                                val threadidx = thread%BLOCK_DIMX;
-                                val threadidy = thread/BLOCK_DIMX;
+                                val threadidx = thread%BLOCK_DIMX_;
+                                val threadidy = thread/BLOCK_DIMX_;
 
                                 // populate s_data_h
-                                for (sy in 0..(BLOCK_DIMY + 2*RADIUS - 1)) {
-                                    val gy = sy - RADIUS + blockidy*BLOCK_DIMY;
-                                    for (var sx:Int=thread ; sx<BLOCK_DIMX+2*RADIUS ; sx+=THREADS) {
-                                        val gx = sx - RADIUS + blockidx*BLOCK_DIMX;
+                                for (sy in 0n..(BLOCK_DIMY_ + 2n*RADIUS_ - 1n)) {
+                                    val gy = sy - RADIUS_ + blockidy*BLOCK_DIMY_;
+                                    for (var sx:Int=thread as Int; sx<BLOCK_DIMX_+2n*RADIUS_ ; sx+=THREADS_) {
+                                        val gx = sx - RADIUS_ + blockidx*BLOCK_DIMX_;
                                         if (gx==hit_pos_x && gy==hit_pos_y) {
-                                            s_data_h(sy*S_DATA_STRIDE + sx) = -1.0f;
+                                            s_data_h(sy*S_DATA_STRIDE_ + sx) = -1.0f;
                                         } else if (gx>=0 && gx< dimx && gy>=0 && gy<dimy) {
-                                            s_data_h(sy*S_DATA_STRIDE + sx) = heightField(gy*dimx + gx);
+                                            s_data_h(sy*S_DATA_STRIDE_ + sx) = heightField(gy*dimx + gx);
                                         } else {
-                                            s_data_h(sy*S_DATA_STRIDE + sx) = 0.0f;
+                                            s_data_h(sy*S_DATA_STRIDE_ + sx) = 0.0f;
                                         }
                                     }
                                 }
 
                                 Clock.advanceAll();
 
-                                val gtx = (blockidx*BLOCK_DIMX+threadidx);
-                                val gty = (blockidy*BLOCK_DIMY+threadidy);
+                                val gtx = (blockidx*BLOCK_DIMX_+threadidx);
+                                val gty = (blockidy*BLOCK_DIMY_+threadidy);
 
-                                val curr_h = s_data_h((threadidy+RADIUS)*S_DATA_STRIDE + threadidx+RADIUS);
+                                val curr_h = s_data_h((threadidy+RADIUS_)*S_DATA_STRIDE_ + threadidx+RADIUS_);
 
                                 val curr_v:Float = vel(gty*dimx + gtx);
                                 var disp:Float = 0.0f;
-                                disp += s_data_h((threadidy+RADIUS-1)*S_DATA_STRIDE + threadidx+RADIUS+0);
-                                disp += s_data_h((threadidy+RADIUS+0)*S_DATA_STRIDE + threadidx+RADIUS-1);
-                                disp += s_data_h((threadidy+RADIUS+0)*S_DATA_STRIDE + threadidx+RADIUS+1);
-                                disp += s_data_h((threadidy+RADIUS+1)*S_DATA_STRIDE + threadidx+RADIUS+0);
+                                disp += s_data_h((threadidy+RADIUS_-1)*S_DATA_STRIDE_ + threadidx+RADIUS_+0);
+                                disp += s_data_h((threadidy+RADIUS_+0)*S_DATA_STRIDE_ + threadidx+RADIUS_-1);
+                                disp += s_data_h((threadidy+RADIUS_+0)*S_DATA_STRIDE_ + threadidx+RADIUS_+1);
+                                disp += s_data_h((threadidy+RADIUS_+1)*S_DATA_STRIDE_ + threadidx+RADIUS_+0);
                                 disp = 0.25f*disp - curr_h;
                                 val accel = 5.0f * disp - 0.05f * curr_v;
                                 val new_v = curr_v + interval*accel;
@@ -329,7 +332,7 @@ public class Engine {
                         }
                     }
                 }
-                Array.asyncCopy(gpuHeightField, 0, heightFieldHost, 0, heightFieldHost.size);
+                Rail.asyncCopy(gpuHeightField, 0, heightFieldHost, 0, heightFieldHost.size);
             }
 
             val forwards = orientation * Vector3(0,1,0);
@@ -337,16 +340,16 @@ public class Engine {
             val up = orientation * Vector3(0,0,1);
             //Console.OUT.println("forwards: "+forwards);
 
-            for (by in 0..(vertBlocks-1)) async {
+            for (by in 0n..(vertBlocks-1n)) async {
                 val block_off_y = by * localBlockHeight;
-                finish for (bx in 0..(horzBlocks-1)) async {
+                finish for (bx in 0n..(horzBlocks-1n)) async {
                     val block_off_x = bx * localBlockWidth;
-                    val state = new RayState(this, time, 4);
+                    val state = new RayState(this, time, 4n);
                     state.o = pos;
-                    for (y_ in 0..(localBlockHeight-1)) {
+                    for (y_ in 0n..(localBlockHeight-1n)) {
                         val y = y_ + block_off_y;
                         val y_norm = -(y+0.5f+offset_y)/globalHeight*2.0f + 1.0f;
-                        for (x_ in 0..(localBlockWidth-1)) {
+                        for (x_ in 0n..(localBlockWidth-1n)) {
                             val x = x_ + block_off_x;
                             val x_norm = (x+0.5f+offset_x)/globalWidth*2.0f - 1.0f;
                             val ray = x_norm * globalWidth/globalHeight * right
@@ -361,9 +364,9 @@ public class Engine {
                     }
                     atomic { counter() = counter() + state.primTests; }
                 }
-                for (y_ in 0..(localBlockHeight-1)) {
+                for (y_ in 0n..(localBlockHeight-1n)) {
                     val y = y_ + block_off_y;
-                    IndexedMemoryChunk.asyncCopy(localFrame.raw(), y*localWidth, frameBuffer, offset_x + (offset_y+y)*globalWidth, localWidth);
+                    Rail.asyncCopy(localFrame, (y*localWidth) as Long, frameBuffer, offset_x + (offset_y+y)*globalWidth, localWidth as Long);
                 }
             }
 
@@ -373,8 +376,6 @@ public class Engine {
         //Console.OUT.println(here+" "+(System.nanoTime() - render_before)/1E9);
         //Console.OUT.println(here+" "+(Runtime.getX10RTStats() - before));
     }
-
 }
 
 // vim: shiftwidth=4:tabstop=4:expandtab
-

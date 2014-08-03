@@ -15,26 +15,26 @@ public class SceneLoader {
     public val matTable = new HashMap[String, Material]();
     public val prims = new ArrayList[Primitive]();
 
-    public var camPos : Vector3;
-    public var camYaw : Float;
-    public var camPitch : Float;
+    public var camPos:Vector3;
+    public var camYaw:Float;
+    public var camPitch:Float;
 
     val vertexes = new ArrayList[MeshVertex]();
-    var vertexCurrOffset:UShort = 0;
+    var vertexCurrOffset:UShort = 0us;
 
-    private static def isPowerOf2(x:Int) = 0 == (x & (x-1));
+    private static def isPowerOf2(x:Int) = 0n == (x & (x-1n));
 
-    public var skybox:Array[Texture2D](1) = null;
+    public var skybox:Rail[Texture2D] = null;
 
     public def loadScene(fileName:String) {
 
         val white = new SolidColour(RGB.WHITE as Vector3, RGB.WHITE as Vector3, RGB.BLACK as Vector3, 10);
         val metallic_grey = new SolidColour(RGB.GREY as Vector3, RGB.GREY as Vector3, RGB.GREY as Vector3, 20);
 
-        var mesh_vert_pos : Vector3 = Vector3(0,0,0);
-        var mesh_vert_normal : Vector3 = Vector3(0,0,1);
-        var mesh_vert_uv : Vector2 = Vector2(0,0);
-        var mesh_mat : Material = white;
+        var mesh_vert_pos:Vector3 = Vector3(0,0,0);
+        var mesh_vert_normal:Vector3 = Vector3(0,0,1);
+        var mesh_vert_uv:Vector2 = Vector2(0,0);
+        var mesh_mat:Material = white;
 
         val debug = new DebugMaterial();
         matTable.put("DEBUG", debug);
@@ -42,13 +42,13 @@ public class SceneLoader {
         val file = new File(fileName);
         for (line_ in file.lines()) {
             val line = line_.trim();
-            if (line.length()==0) continue;
+            if (line.length()==0n) continue;
             val splits_ = line.split("#")(0).split(" ");
             val splits__ = new ArrayList[String]();
-            for (s in splits_.values()) {
+            for (s in splits_) {
                 if (s.length() > 0) splits__.add(s);
             }
-            val splits = splits__.toArray();
+            val splits = splits__.toRail();
             if (splits.size==0) continue;
             if (splits(0).equalsIgnoreCase("MAT_SOLID")) {
                 if (splits.size == 12) {
@@ -281,7 +281,7 @@ public class SceneLoader {
                 if (splits.size == 8) {
                     val w = Int.parse(splits(1));
                     val h = w;
-                    val texname = new Array[String](6, (i:Int) => splits(i+2));
+                    val texname = new Rail[String](6, (i:Long) => splits(i+2));
                     if (w>512 || h>512) {
                         Console.ERR.println("Skybox file size error: \""+texname(0)+"\": textures cannot be larger than 512x512");
                         skybox = null;
@@ -289,7 +289,7 @@ public class SceneLoader {
                         Console.ERR.println("Skybox file size error: \""+texname(0)+"\": textures width/height must be power of 2");
                         skybox = null;
                     } else {
-                        skybox = new Array[Texture2D](6, (i:Int)=>new Texture2D(w,h));
+                        skybox = new Rail[Texture2D](6, (i:Long)=>new Texture2D(w,h));
                         for (i in 0..5) {
                             initTexFromFile(skybox(i), w, h, texname(i));
                         }
@@ -305,13 +305,13 @@ public class SceneLoader {
         }
 
     }
-    private static def initTexFromFile (tex:Texture2D, w:Int, h:Int, texname:String) {
+
+    private static def initTexFromFile(tex:Texture2D, w:Int, h:Int, texname:String) {
         val tex_file = new File(texname);
         val fr = tex_file.openRead();
         val num_file_texels = (tex_file.size() / 3) as Int;
         if (num_file_texels == w * h) {
-            val init_points = (int) => RGB(Marshal.UBYTE.read(fr), Marshal.UBYTE.read(fr), Marshal.UBYTE.read(fr));
-            val file_colours = new Array[RGB](num_file_texels, init_points);
+            val file_colours = new Rail[RGB](num_file_texels, (Long)=>RGB(Marshal.UBYTE.read(fr), Marshal.UBYTE.read(fr), Marshal.UBYTE.read(fr)));
             tex.init((x:Int, y:Int) => file_colours(y*w + x));
         } else {
             Console.ERR.println("Texture file size error: \""+texname+"\":"+w+" * "+h+" != "+num_file_texels);
@@ -320,6 +320,4 @@ public class SceneLoader {
     }
 }
 
-
 // vim: shiftwidth=4:tabstop=4:expandtab
-

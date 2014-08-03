@@ -3,9 +3,10 @@ package raytracer.primitives;
 import raytracer.*;
 
 public final class Sphere(worldPos:Vector3, radius:Float, m:Material) extends Primitive {
+
     public def getAABB() = AABB(worldPos-radius*Vector3(1,1,1), worldPos+radius*Vector3(1,1,1));
 
-    public static def intersectRay (worldPos:Vector3, radius:Float, m:Material, s:RayState) {
+    public static def intersectRay(worldPos:Vector3, radius:Float, m:Material, s:RayState) {
         // stolen from http://wiki.cgsociety.org/index.php/Ray_Sphere_Intersection#Example_Code
         val ray_origin_o = s.o - worldPos;
         //Compute A, B and C coefficients
@@ -45,9 +46,9 @@ public final class Sphere(worldPos:Vector3, radius:Float, m:Material) extends Pr
         return true;
     }
 
-
-    public def intersectRay (s:RayState) {
+    public def intersectRay(s:RayState) {
         intersectRay(worldPos, radius, m, s);
     }
 }
 
+// vim: shiftwidth=4:tabstop=4:expandtab

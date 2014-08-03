@@ -10,7 +10,7 @@ public final class MeshTriangle extends Primitive {
     val m:Material;
     val texSquash:Float;
 
-    public def this (v1:UShort, v2:UShort, v3:UShort, V1:MeshVertex, V2:MeshVertex, V3:MeshVertex, m:Material) {
+    public def this(v1:UShort, v2:UShort, v3:UShort, V1:MeshVertex, V2:MeshVertex, V3:MeshVertex, m:Material) {
         this.v1 = v1;
         this.v2 = v2;
         this.v3 = v3;
@@ -27,7 +27,7 @@ public final class MeshTriangle extends Primitive {
 
     public def getAABB() = AABB(Vector3.min(p1,Vector3.min(p1+e1, p1+e2)), Vector3.max(p1,Vector3.max(p1+e1, p1+e2)));
 
-    public def intersectRay (st:RayState) {
+    public def intersectRay(st:RayState) {
         // from http://www.cs.virginia.edu/~gfx/Courses/2003/ImageSynthesis/papers/Acceleration/Fast%20MinimumStorage%20RayTriangle%20Intersection.pdf
         val h = st.d.cross(e2);
         val a = e1.dot(h);
@@ -66,3 +66,5 @@ public final class MeshTriangle extends Primitive {
         st.texSquash = texSquash / (-st.d.dot(st.normal));
     }
 }
+
+// vim: shiftwidth=4:tabstop=4:expandtab

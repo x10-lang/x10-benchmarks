@@ -3,7 +3,8 @@ package raytracer.materials;
 import raytracer.*;
 
 public class RefractingWater(sub:Material, fresnel:Float, refractiveIndex:Float, refractMask:Vector3, reflectMask:Vector3) extends Material {
-    public def reflectRender (rt:Engine, s:RayState, hit_point:Vector3) {
+
+    public def reflectRender(rt:Engine, s:RayState, hit_point:Vector3) {
         val s2 = s.child;
         if (s2 == null) return RGB.DARK_BLUE as Vector3;
         s2.o = hit_point;
@@ -12,7 +13,8 @@ public class RefractingWater(sub:Material, fresnel:Float, refractiveIndex:Float,
         s2.hasShadow = false;
         return rt.castRayAndRender(s2);
     }
-    public def refractRender (rt:Engine, s:RayState, hit_point:Vector3) {
+
+    public def refractRender(rt:Engine, s:RayState, hit_point:Vector3) {
         val s2 = s.child;
         if (s2 == null) return RGB.DARK_BLUE as Vector3;
         s2.o = hit_point;
@@ -23,7 +25,7 @@ public class RefractingWater(sub:Material, fresnel:Float, refractiveIndex:Float,
         return rt.castRayAndRender(s2);
     }
 
-    public def render (rt:Engine, s:RayState) {
+    public def render(rt:Engine, s:RayState) {
         val hit_point = s.o + s.t*s.d;
         val perp = Math.powf(1 + s.normal.dot(s.d), fresnel);
         return sub.render(rt,s) + Vector3.lerp(refractMask*refractRender(rt,s,hit_point), reflectMask*reflectRender(rt,s,hit_point), perp);
@@ -31,4 +33,3 @@ public class RefractingWater(sub:Material, fresnel:Float, refractiveIndex:Float,
 }
 
 // vim: shiftwidth=4:tabstop=4:expandtab
-

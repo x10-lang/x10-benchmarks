@@ -20,7 +20,7 @@ public class Rectangle extends Primitive {
     // p1----p4
     // |      |
     // p2----p3
-    public def this (p1:Vector3, tc1:Vector2, p2:Vector3, tc2:Vector2, p3:Vector3, tc3:Vector2, p4:Vector3, tc4:Vector2, mat:Material) {
+    public def this(p1:Vector3, tc1:Vector2, p2:Vector3, tc2:Vector2, p3:Vector3, tc3:Vector2, p4:Vector3, tc4:Vector2, mat:Material) {
         this.p1 = p1;
         val e_x = p4 - p1;
         val e_y = p2 - p1;
@@ -46,7 +46,7 @@ public class Rectangle extends Primitive {
         return AABB(Vector3.min(Vector3.min(Vector3.min(p1, p2), p3), p4), Vector3.max(Vector3.max(Vector3.max(p1, p2), p3), p4));
     }
 
-    public def intersectRay (s:RayState) {
+    public def intersectRay(s:RayState) {
         val facing = n.dot(s.d);
         if (facing > 0) return; // quad is facing away from the camera
         val t = (d - n.dot(s.o)) / facing; // solve the plane equation
@@ -69,4 +69,3 @@ public class Rectangle extends Primitive {
 }
 
 // vim: shiftwidth=4:tabstop=4:expandtab
-

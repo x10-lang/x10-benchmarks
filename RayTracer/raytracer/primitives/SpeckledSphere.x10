@@ -3,10 +3,11 @@ package raytracer.primitives;
 import raytracer.*;
 
 public final class SpeckledSphere(worldPos:Vector3, radius:Float, m:Material) extends Primitive {
-    public def getAABB() = AABB(worldPos-radius*Vector3(1,1,1), worldPos+radius*Vector3(1,1,1));
-    public def intersectRay (s:RayState) {
-        if (Sphere.intersectRay(worldPos, radius, m, s)) {
 
+    public def getAABB() = AABB(worldPos-radius*Vector3(1,1,1), worldPos+radius*Vector3(1,1,1));
+
+    public def intersectRay(s:RayState) {
+        if (Sphere.intersectRay(worldPos, radius, m, s)) {
             val hit_pos_ws = s.o + s.t*s.d;
             val hit_pos_os = (hit_pos_ws - worldPos);
 
@@ -29,8 +30,8 @@ public final class SpeckledSphere(worldPos:Vector3, radius:Float, m:Material) ex
 
             s.normal -= dF - bump*Vector3(1,1,1);
             s.normal = s.normal.normalised();
-
         }
-
     }
 }
+
+// vim: shiftwidth=4:tabstop=4:expandtab

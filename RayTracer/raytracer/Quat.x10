@@ -1,10 +1,10 @@
 package raytracer;
 
-public struct Quat (w:Float, x:Float,y:Float,z:Float) {
+public struct Quat(w:Float, x:Float, y:Float, z:Float) {
 
     public static ID:Quat = Quat(1,0,0,0);
 
-    public static def angleAxis (a:Float, x:Float, y:Float, z:Float) {
+    public static def angleAxis(a:Float, x:Float, y:Float, z:Float) {
         val c = Math.cos(a*0.5f) as Float;
         val s = Math.sin(a*0.5f) as Float;
         return Quat(c, x*s, y*s, z*s);
@@ -37,11 +37,12 @@ public struct Quat (w:Float, x:Float,y:Float,z:Float) {
     public def length2() = w*w + x*x + y*y + z*z;
     public def length() = Math.sqrtf(length2());
     public def normalised() = this/length();
-    public def dot (v:Quat) = w*v.w + x*v.x + y*v.y + z*v.z;
-    public def unitInverse () = Quat(w,-x,-y,-z);
-    public def inverse () = normalised().unitInverse();
+    public def dot(v:Quat) = w*v.w + x*v.x + y*v.y + z*v.z;
+    public def unitInverse() = Quat(w,-x,-y,-z);
+    public def inverse() = normalised().unitInverse();
 
-    public def toString () = "Quat("+w+", "+x+", "+y+", "+z+")";
+    public def toString() = "Quat("+w+", "+x+", "+y+", "+z+")";
 
 }
 
+// vim: shiftwidth=4:tabstop=4:expandtab

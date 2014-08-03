@@ -5,8 +5,6 @@ import x10.util.OptionsParser;
 import x10.util.Option;
 import x10.util.Team;
 import x10.util.Pair;
-import x10.util.IndexedMemoryChunk;
-import x10.util.RemoteIndexedMemoryChunk;
 
 
 import x10.io.File;
@@ -15,17 +13,16 @@ public class Benchmark {
 
     public static final class DummyFrameBuffer extends FrameBuffer {
 
-        public def this (width:Int, height:Int) {
+        public def this(width:Int, height:Int) {
             super(width, height);
         }
         
-        public def update (write:()=>void) {
+        public def update(write:()=>void) {
             write();
         }
-
     }
 
-    public static def main (args : Array[String](1)) {here == Place.FIRST_PLACE} {
+    public static def main(args:Rail[String]) {
         try {
             val opts = new OptionsParser(args, [
                 Option("q","quiet","print out less"),
@@ -43,25 +40,25 @@ public class Benchmark {
                 Option("d","octree-depth","bottom out the octree at this depth")
             ]);
             if (opts("-?")) {
-                Console.OUT.println(opts.usage());
+                opts.showHELP();
                 return;
             }
 
             val verbose = opts("-v");
             val quiet = opts("-q");
-            val global_width = opts("-W",800);
-            val global_height = opts("-H",600);
+            val global_width = opts("-W",800n);
+            val global_height = opts("-H",600n);
             val output = opts("-o");
             val output_file = opts("-f","output.raw");
 
             val sl = new SceneLoader();
             
-            for (s in opts.filteredArgs().values()) {
+            for (s in opts.filteredArgs()) {
                 sl.loadScene(s);
             }
 
-            val prims = sl.prims.toArray();
-            val vertexes = sl.vertexes.toArray();
+            val prims = sl.prims.toRail();
+            val vertexes = sl.vertexes.toRail();
             val skybox = sl.skybox;
 
             val pos = sl.camPos;
@@ -73,23 +70,24 @@ public class Benchmark {
             val fb = new DummyFrameBuffer(global_width, global_height);
             val fbr = new GlobalRef[FrameBuffer](fb);
                     
-            val rts = PlaceLocalHandle.make[Engine](Dist.makeUnique(), ()=>new Engine(opts, global_width, global_height, prims, vertexes, skybox));
-            val iters = opts("-i",100);
+            val rts = PlaceLocalHandle.make[Engine](Place.places(), ()=>new Engine(opts, global_width, global_height, prims, vertexes, skybox));
+            val iters = opts("-i",100n);
 
             val before_all = System.nanoTime();
-            val raw_ = RemoteIndexedMemoryChunk.wrap[RGB](fb.raw());
+// FIXME fb.raw() could be null?
+            val raw_ = new GlobalRail[RGB](fb.raw() as Rail[RGB]{self!=null});
 
             finish for (p in Place.places()) async at (p) {
                 val rt = rts();
 
-                for ([iteration] in 1..iters) {
-                    Team.WORLD.barrier(here.id);
+                for (iteration in 1..iters) {
+                    Team.WORLD.barrier();
                     val before = System.nanoTime();
                     val time = (before-before_all)/1.0E9f;
-                    rt.renderFrame(raw_, pos, orientation, time);
-                    Team.WORLD.barrier(here.id);
+                    rt.renderFrame(raw_, false/*denting_water*/, pos, orientation, time);
+                    Team.WORLD.barrier();
                     val taken = (System.nanoTime()-before)/1E9;
-                    if (!quiet && here == Place.FIRST_PLACE) {
+                    if (!quiet && here.id == 0) {
                         Console.OUT.println("Frame time: "+taken+"    FPS: "+1/taken);
                     }
                 }
@@ -99,7 +97,7 @@ public class Benchmark {
                 // write to disk
                 val f = new File(output_file);
                 val fw = f.openWrite();
-                for ([i] in 0..(fb.length() - 1)) {
+                for (i in 0n..(fb.length()-1) as Int) {
                     fw.write(fb(i).r as Byte);
                     fw.write(fb(i).g as Byte);
                     fw.write(fb(i).b as Byte);
@@ -107,10 +105,8 @@ public class Benchmark {
                 fw.close();
 
             }
-
-        } catch (e:Throwable) { e.printStackTrace(); }
+        } catch (e:CheckedThrowable) { e.printStackTrace(); }
     }
 }
 
 // vim: shiftwidth=4:tabstop=4:expandtab
-

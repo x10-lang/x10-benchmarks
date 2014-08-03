@@ -5,12 +5,7 @@ import x10.util.OptionsParser;
 import x10.util.Option;
 import x10.util.Team;
 import x10.util.Pair;
-import x10.util.IndexedMemoryChunk;
-import x10.util.RemoteIndexedMemoryChunk;
-
-
 import x10.io.File;
-
 import x10.gl.GL;
 
 public class GLFrontend {
@@ -21,43 +16,45 @@ public class GLFrontend {
         var pboFront:Int;
         var pboBack:Int;
 
-        var h:Int = 0;
+        var h:Int = 0n;
 
         private val width:Int, height:Int, size:Int;
 
-        public def this (width:Int, height:Int, size:Int) {
+        public def this(width:Int, height:Int, size:Int) {
             super(width, height);
 
             this.width = width;
             this.height = height;
             this.size = size;
 
-            val ptr = new Array[Int](1);
+            val ptr = new Rail[Int](1);
 
-            GL.glGenBuffers(1, ptr, 0);
+            GL.glGenBuffers(1n, ptr, 0n);
             pboFront = ptr(0);
             GL.glBindBuffer(GL.GL_PIXEL_UNPACK_BUFFER, pboFront);
-            GL.glBufferData[Byte](GL.GL_PIXEL_UNPACK_BUFFER, size, null, 0, GL.GL_STREAM_DRAW);
-            GL.glBindBuffer(GL.GL_PIXEL_UNPACK_BUFFER, 0);
+            GL.glBufferData[Byte](GL.GL_PIXEL_UNPACK_BUFFER, size, null, 0n, GL.GL_STREAM_DRAW);
+            GL.glBindBuffer(GL.GL_PIXEL_UNPACK_BUFFER, 0n);
 
-            GL.glGenBuffers(1, ptr, 0);
+            GL.glGenBuffers(1n, ptr, 0n);
             pboBack = ptr(0);
             GL.glBindBuffer(GL.GL_PIXEL_UNPACK_BUFFER, pboBack);
-            GL.glBufferData[Byte](GL.GL_PIXEL_UNPACK_BUFFER, size, null, 0, GL.GL_STREAM_DRAW);
-            GL.glBindBuffer(GL.GL_PIXEL_UNPACK_BUFFER, 0);
+            GL.glBufferData[Byte](GL.GL_PIXEL_UNPACK_BUFFER, size, null, 0n, GL.GL_STREAM_DRAW);
+            GL.glBindBuffer(GL.GL_PIXEL_UNPACK_BUFFER, 0n);
         }
 
-        public def update (write:()=>void) {
+        public def update(write:()=>void) {
             // background dma
             GL.glBindBuffer(GL.GL_PIXEL_UNPACK_BUFFER, pboBack);
-            GL.glTexSubImage2D(GL.GL_TEXTURE_2D, 0, 0, 0, width, height, GL.GL_RGB, GL.GL_UNSIGNED_BYTE, 0);
+// FIXME : uncomment and fix caller in GL.x10.
+//            GL.glTexSubImage2D(GL.GL_TEXTURE_2D, 0n, 0n, 0n, width, height, GL.GL_RGB, GL.GL_UNSIGNED_BYTE, 0n);
             
             
             // update other pbo
             GL.glBindBuffer(GL.GL_PIXEL_UNPACK_BUFFER, pboFront);
-            GL.glBufferData[Byte](GL.GL_PIXEL_UNPACK_BUFFER, size, null, 0, GL.GL_STREAM_DRAW); // discard
+            GL.glBufferData[Byte](GL.GL_PIXEL_UNPACK_BUFFER, size, null, 0n, GL.GL_STREAM_DRAW); // discard
             try {
-                raw = GL.glMapBuffer[RGB](GL.GL_PIXEL_UNPACK_BUFFER, GL.GL_WRITE_ONLY, width*height);
+// FIXME : fix caller in GL.x10.
+//                raw = GL.glMapBuffer[RGB](GL.GL_PIXEL_UNPACK_BUFFER, GL.GL_WRITE_ONLY, width*height);
                 /*
                 for (y in 0..(height-1)) {
                     for (x in 0..(width-1)) {
@@ -73,7 +70,7 @@ public class GLFrontend {
             } finally {
                 GL.glUnmapBuffer(GL.GL_PIXEL_UNPACK_BUFFER);
             }
-            GL.glBindBuffer(GL.GL_PIXEL_UNPACK_BUFFER, 0);
+            GL.glBindBuffer(GL.GL_PIXEL_UNPACK_BUFFER, 0n);
             
             // swap pbos
             val tmp = pboFront;
@@ -81,41 +78,39 @@ public class GLFrontend {
             pboBack = tmp;
         }
 
-
     }
 
 
-    val tex : Int;
-    val fb : FrameBuffer;
-
-
-    val rts : PlaceLocalHandle[Engine];
-
+    val tex:Int;
+    val fb:FrameBuffer;
+    val rts:PlaceLocalHandle[Engine];
     
     val width:Int, height:Int;
     var winWidth:Int, winHeight:Int;
 
-    val keyDown = new Array[Boolean](256);
-    var currMouseX: Int;
-    var currMouseY: Int;
-    var lastMouseX: Int;
-    var lastMouseY: Int;
-    var mouseDown: Boolean;
-    var fastDown: Boolean;
-    var pos: Vector3;
-    var yaw: Float;
-    var pitch: Float;
-    var lastFrameTime : Long = System.nanoTime();
+    val keyDown = new Rail[Boolean](256);
+    var currMouseX:Int;
+    var currMouseY:Int;
+    var lastMouseX:Int;
+    var lastMouseY:Int;
+    var mouseDown:Boolean;
+    var fastDown:Boolean;
+    var pos:Vector3;
+    var yaw:Float;
+    var pitch:Float;
+    var lastFrameTime:Long = System.nanoTime();
+
     public def orientation() = Quat.angleAxis(yaw/180 * (Math.PI as Float),0,0,-1)
                              * Quat.angleAxis(pitch/180 * (Math.PI as Float),1,0,0);
-    public def updatePosOrientation () {
+
+    public def updatePosOrientation() {
         val thisFrameTime = System.nanoTime();
         val elapsed = (thisFrameTime - lastFrameTime)/1E9f;
         lastFrameTime = thisFrameTime;
         val mouse_move_x = currMouseX - lastMouseX;
         val mouse_move_y = currMouseY - lastMouseY;
-        currMouseX = GL.glutGet(GL.GLUT_WINDOW_WIDTH)/2;
-        currMouseY = GL.glutGet(GL.GLUT_WINDOW_HEIGHT)/2;
+        currMouseX = GL.glutGet(GL.GLUT_WINDOW_WIDTH)/2n;
+        currMouseY = GL.glutGet(GL.GLUT_WINDOW_HEIGHT)/2n;
         lastMouseX = currMouseX;
         lastMouseY = currMouseY;
         if (mouseDown)
@@ -140,40 +135,40 @@ public class GLFrontend {
         pos += pos_change;
     }
 
-    val startTime : Long;
+    val startTime:Long;
 
-    public def this (opts:OptionsParser, width:Int, height:Int, fb:FrameBuffer, sl:SceneLoader) {
+    public def this(opts:OptionsParser, width:Int, height:Int, fb:FrameBuffer, sl:SceneLoader) {
 
         this.startTime = System.nanoTime();
         this.width = this.winWidth = width;
         this.height = this.winHeight = height;
         this.fb = fb;
 
-        val ptr = new Array[Int](1);
+        val ptr = new Rail[Int](1);
         val pixel_format = GL.GL_RGB8;
 
-        GL.glGenTextures(1, ptr, 0);
+        GL.glGenTextures(1n, ptr, 0n);
         tex = ptr(0);
         GL.glBindTexture(GL.GL_TEXTURE_2D, tex);
         GL.glTexParameteri(GL.GL_TEXTURE_2D, GL.GL_TEXTURE_MIN_FILTER, GL.GL_LINEAR);
         GL.glTexParameteri(GL.GL_TEXTURE_2D, GL.GL_TEXTURE_MAG_FILTER, GL.GL_LINEAR);
-        GL.glTexImage2D[Byte](GL.GL_TEXTURE_2D, 0, pixel_format, width, height, 0, GL.GL_RGB, GL.GL_UNSIGNED_BYTE, null, 0);
-        GL.glBindTexture(GL.GL_TEXTURE_2D, 0);
+        GL.glTexImage2D[Byte](GL.GL_TEXTURE_2D, 0n, pixel_format, width, height, 0n, GL.GL_RGB, GL.GL_UNSIGNED_BYTE, null, 0n);
+        GL.glBindTexture(GL.GL_TEXTURE_2D, 0n);
 
-        val prims = sl.prims.toArray();
-        val vertexes = sl.vertexes.toArray();
+        val prims = sl.prims.toRail();
+        val vertexes = sl.vertexes.toRail();
         val skybox = sl.skybox;
 
         pos = sl.camPos;
         yaw = sl.camYaw;
         pitch = sl.camPitch;
 
-        rts = PlaceLocalHandle.make[Engine](Dist.makeUnique(), ()=>new Engine(opts, width, height, prims, vertexes, skybox));
-
+        rts = PlaceLocalHandle.make[Engine](Place.places(), ()=>new Engine(opts, width, height, prims, vertexes, skybox));
     }
 
     class FrameEventHandler extends GL.FrameEventHandler {
-        public def display () {
+
+        public def display() {
 
             val before = System.nanoTime();
 
@@ -183,7 +178,8 @@ public class GLFrontend {
                 val pos_ = pos;
                 updatePosOrientation();
                 val orientation_ = orientation();
-                val raw_ = RemoteIndexedMemoryChunk.wrap[RGB](fb.raw());
+// FIXME fb.raw() could be null?
+                val raw_ = new GlobalRail[RGB](fb.raw() as Rail[RGB]{self!=null});
                 val rts_ = rts;
                 val time = (before - startTime) / 1.0E9f;
                 val denting_water = keyDown('f'.ord());
@@ -205,7 +201,7 @@ public class GLFrontend {
             GL.glEnd();
             GL.glDisable(GL.GL_TEXTURE_2D);
 
-            GL.glBindTexture(GL.GL_TEXTURE_2D, 0);
+            GL.glBindTexture(GL.GL_TEXTURE_2D, 0n);
 
             GL.glutSwapBuffers();
 
@@ -217,12 +213,12 @@ public class GLFrontend {
 
         }
 
-        public def idle () {
+        public def idle() {
             GL.glutPostRedisplay();
         }
 
-        def setMatrixes ()
-        {
+        def setMatrixes() {
+
             GL.glMatrixMode(GL.GL_PROJECTION);
             GL.glLoadIdentity();
             // letterbox to keep aspect ratio correct
@@ -241,25 +237,25 @@ public class GLFrontend {
             GL.glLoadIdentity();
         }
 
-        public def reshape (var x:Int, var y:Int) {
-            if (x==0) x = 1;
-            if (y==0) y = 1;
+        public def reshape(var x:Int, var y:Int) {
+            if (x==0n) x = 1n;
+            if (y==0n) y = 1n;
             winWidth = x;
             winHeight = y;
-            GL.glViewport(0, 0, x, y);
+            GL.glViewport(0n, 0n, x, y);
             setMatrixes();
         }
 
-        public def motion (x:Int, y:Int) : void {
+        public def motion(x:Int, y:Int):void {
             if (mouseDown) {
                 currMouseX = x;
                 currMouseY = y;
             }
         }
 
-        public def mouse (button:Int, state:Int, x:Int, y:Int) {
-            if (button==0) {
-                if (state==0) {
+        public def mouse(button:Int, state:Int, x:Int, y:Int) {
+            if (button==0n) {
+                if (state==0n) {
                     lastMouseX = x;
                     lastMouseY = y;
                     currMouseX = x;
@@ -270,8 +266,8 @@ public class GLFrontend {
                     mouseDown = false;
                     GL.glutSetCursor(GL.GLUT_CURSOR_INHERIT);
                 }
-            } else if (button==2) {
-                if (state==0) {
+            } else if (button==2n) {
+                if (state==0n) {
                     fastDown = true;
                 } else {
                     fastDown = false;
@@ -279,27 +275,26 @@ public class GLFrontend {
             }
         }
 
-        public def keyboardUp (key_: Char, x:Int, y:Int) {
+        public def keyboardUp(key_:Char, x:Int, y:Int) {
             val key = key_.toLowerCase();
             keyDown(key.ord()) = false;
         }
 
-        public def keyboard (key_: Char, x:Int, y:Int) {
+        public def keyboard(key_:Char, x:Int, y:Int) {
             val key = key_.toLowerCase();
             keyDown(key.ord()) = true;
         }
 
-
     }
 
 
-    public def run () {
+    public def run() {
         finish {
             GL.glutMainLoop(new FrameEventHandler());
         }
     }
 
-    public static def main (args : Array[String]{rail,rank==1,rect}) {here == Place.FIRST_PLACE} {
+    public static def main(args:Rail[String]) {
         try {
             val opts = new OptionsParser(args, [
                 Option("q","quiet","print out less"),
@@ -319,15 +314,15 @@ public class GLFrontend {
                 Option("d","octree-depth","bottom out the octree at this depth")
             ]);
             if (opts("-?")) {
-                Console.OUT.println(opts.usage());
+                opts.showHELP();
                 return;
             }
 
             val verbose = opts("-v");
             val quiet = opts("-q");
-            val global_width = opts("-W",320);
-            val global_height = opts("-H",240);
-            val size = global_width * global_height * 3;
+            val global_width = opts("-W",320n);
+            val global_height = opts("-H",240n);
+            val size = global_width * global_height * 3n;
 
 
             GL.glutInit(args);
@@ -337,7 +332,7 @@ public class GLFrontend {
 
             val sl = new SceneLoader();
             
-            for (s in opts.filteredArgs().values()) {
+            for (s in opts.filteredArgs()) {
                 sl.loadScene(s);
             }
 
@@ -347,10 +342,8 @@ public class GLFrontend {
 
             fe.run();
 
-
-        } catch (e:Throwable) { e.printStackTrace(); }
+        } catch (e:CheckedThrowable) { e.printStackTrace(); }
     }
 }
 
 // vim: shiftwidth=4:tabstop=4:expandtab
-

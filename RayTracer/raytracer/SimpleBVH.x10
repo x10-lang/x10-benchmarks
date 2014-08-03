@@ -7,21 +7,21 @@ import x10.compiler.NonEscaping;
 public class SimpleBVH extends SpatialDatastructure {
 
     private static struct Node {
-        val parent : SimpleBVH;
-        val bounds : AABB;
-        val left : Int;
-        val right : Int;
-        val cargo : Primitive;
+        val parent:SimpleBVH;
+        val bounds:AABB;
+        val left:Int;
+        val right:Int;
+        val cargo:Primitive;
 
-        def this (parent:SimpleBVH, o:Primitive) {
+        def this(parent:SimpleBVH, o:Primitive) {
             this.parent = parent;
             this.bounds = o.getAABB();
-            this.left = 0;
-            this.right = 0;
+            this.left = 0n;
+            this.right = 0n;
             this.cargo = o;
         }
 
-        def this (parent:SimpleBVH, left:Int, right:Int) {
+        def this(parent:SimpleBVH, left:Int, right:Int) {
             this.parent = parent;
             this.left = left;
             this.right = right;
@@ -32,7 +32,7 @@ public class SimpleBVH extends SpatialDatastructure {
         @NonEscaping def left() = parent.nodes(left);
         @NonEscaping def right() = parent.nodes(right);
 
-        public def castRay (s:RayState) : void {
+        public def castRay(s:RayState):void {
             // in the equation P = o + t.d, the following t0 and t1 are such that...
             val t0 = (bounds.min - s.o) / s.d;
             val t1 = (bounds.max - s.o) / s.d;
@@ -66,14 +66,14 @@ public class SimpleBVH extends SpatialDatastructure {
 
     var root:Int;
 
-    public def insert (o:Primitive) : void {
+    public def insert(o:Primitive):void {
         leaves.add(Node(this, o));
     }
 
-    public def bake(from:Int, to:Int) : Int {
-        val count = to - from + 1;
-        if (count==1) {
-            val ni = nodes.size();
+    public def bake(from:Int, to:Int):Int {
+        val count = to - from + 1n;
+        if (count==1n) {
+            val ni = nodes.size() as Int;
             nodes.add(leaves(from));
             return ni;
         }
@@ -100,31 +100,31 @@ public class SimpleBVH extends SpatialDatastructure {
             }
         }
         if (middle > to) middle = to;
-        if (middle == from) middle = from+1;
+        if (middle == from) middle = from+1n;
 
         // recurse
-        val left = bake(from, middle-1);
+        val left = bake(from, middle-1n);
         val right = bake(middle, to);
         val n = Node(this, left, right);
 
-        val ni = nodes.size();
+        val ni = nodes.size() as Int;
         nodes.add(n);
         return ni;
     }
 
-    public def bake() : void {
+    public def bake():void {
         // build bvh
-        if (leaves.size()>0) root = bake(0, leaves.size() - 1);
+        if (leaves.size()>0) root = bake(0n, (leaves.size()-1) as Int);
         Console.OUT.println("root = "+root);
     }
 
-    public def countCargo() = leaves.size();
+    public def countCargo() = leaves.size() as Int;
 
     public def iterateCargo(cb:(Primitive)=>void) {
         for (l in leaves) cb(l.cargo);
     }
 
-    public def castRay (s:RayState) : void {
+    public def castRay(s:RayState):void {
         if (leaves.size()>0) nodes(root).castRay(s);
     }
 }

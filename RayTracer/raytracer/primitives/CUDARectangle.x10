@@ -12,7 +12,7 @@ public class CUDARectangle extends Primitive {
     // p1----p3
     // |      |
     // p2-----*
-    public def this (p1:Vector3, w:Float, h:Float, mat:Material) {
+    public def this(p1:Vector3, w:Float, h:Float, mat:Material) {
         this.p1 = p1;
         this.w = w;
         this.h = h;
@@ -25,8 +25,7 @@ public class CUDARectangle extends Primitive {
 
     public static def to_col(x:Vector3) = x*0.5f + Vector3(0.5f,0.5f,0.5f);
 
-
-    public def intersectRay (s:RayState) {
+    public def intersectRay(s:RayState) {
         val facing = s.d.z;
         if (facing > 0) return; // quad is facing away from the camera
         val t_ = (p1.z - s.o.z); // solve the plane equation
@@ -47,9 +46,7 @@ public class CUDARectangle extends Primitive {
 
         s.normal = s.engine.heightFieldNormal(s.texCoord);
         //s.colour = to_col(s.normal);
-
     }
 }
 
 // vim: shiftwidth=4:tabstop=4:expandtab
-
