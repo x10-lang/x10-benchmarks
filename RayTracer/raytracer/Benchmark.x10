@@ -12,11 +12,9 @@ import x10.io.File;
 public class Benchmark {
 
     public static final class DummyFrameBuffer extends FrameBuffer {
-
         public def this(width:Int, height:Int) {
             super(width, height);
         }
-        
         public def update(write:()=>void) {
             write();
         }
@@ -27,8 +25,10 @@ public class Benchmark {
             val opts = new OptionsParser(args, [
                 Option("q","quiet","print out less"),
                 Option("v","verbose","print out more"),
-                Option("o","octree","dump the octree of the scene"),
-                Option("?","help","this information")
+                Option("o","dump","dump the octree of the scene"),
+                Option("?","help","this information"),
+                Option("O","octree","use an octree"),
+                Option("l","loose","use a loose octree")
             ], [
                 Option("W","width","width of rendered output"),
                 Option("H","height","height of rendered output"),
@@ -37,7 +37,9 @@ public class Benchmark {
                 Option("x","horz-blocks","number of times to split width-ways within a place"),
                 Option("y","vert-blocks","number of times to split height-ways within a place"),
                 Option("b","mipmap-bias","skip this many mipmap levels"),
-                Option("d","octree-depth","bottom out the octree at this depth")
+                Option("d","octree-depth","bottom out the octree at this depth"),
+                Option("f","dump-file","dump file for the octree of the scene"),
+                Option("i","iteration","iteration count")
             ]);
             if (opts("-?")) {
                 opts.showHELP();
@@ -68,6 +70,7 @@ public class Benchmark {
                             * Quat.angleAxis(pitch/180 * (Math.PI as Float),1,0,0);
 
             val fb = new DummyFrameBuffer(global_width, global_height);
+// FIXME fbr not used?
             val fbr = new GlobalRef[FrameBuffer](fb);
                     
             val rts = PlaceLocalHandle.make[Engine](Place.places(), ()=>new Engine(opts, global_width, global_height, prims, vertexes, skybox));
@@ -86,8 +89,8 @@ public class Benchmark {
                     val time = (before-before_all)/1.0E9f;
                     rt.renderFrame(raw_, false/*denting_water*/, pos, orientation, time);
                     Team.WORLD.barrier();
-                    val taken = (System.nanoTime()-before)/1E9;
                     if (!quiet && here.id == 0) {
+                        val taken = (System.nanoTime()-before)/1E9;
                         Console.OUT.println("Frame time: "+taken+"    FPS: "+1/taken);
                     }
                 }
@@ -103,8 +106,8 @@ public class Benchmark {
                     fw.write(fb(i).b as Byte);
                 }
                 fw.close();
-
             }
+
         } catch (e:CheckedThrowable) { e.printStackTrace(); }
     }
 }

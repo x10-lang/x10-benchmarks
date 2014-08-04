@@ -148,7 +148,7 @@ public class GLFrontend {
         val pixel_format = GL.GL_RGB8;
 
         GL.glGenTextures(1n, ptr, 0n);
-        tex = ptr(0);
+        this.tex = ptr(0);
         GL.glBindTexture(GL.GL_TEXTURE_2D, tex);
         GL.glTexParameteri(GL.GL_TEXTURE_2D, GL.GL_TEXTURE_MIN_FILTER, GL.GL_LINEAR);
         GL.glTexParameteri(GL.GL_TEXTURE_2D, GL.GL_TEXTURE_MAG_FILTER, GL.GL_LINEAR);
@@ -159,11 +159,11 @@ public class GLFrontend {
         val vertexes = sl.vertexes.toRail();
         val skybox = sl.skybox;
 
-        pos = sl.camPos;
-        yaw = sl.camYaw;
-        pitch = sl.camPitch;
+        this.pos = sl.camPos;
+        this.yaw = sl.camYaw;
+        this.pitch = sl.camPitch;
 
-        rts = PlaceLocalHandle.make[Engine](Place.places(), ()=>new Engine(opts, width, height, prims, vertexes, skybox));
+        this.rts = PlaceLocalHandle.make[Engine](Place.places(), ()=>new Engine(opts, width, height, prims, vertexes, skybox));
     }
 
     class FrameEventHandler extends GL.FrameEventHandler {
@@ -205,12 +205,9 @@ public class GLFrontend {
 
             GL.glutSwapBuffers();
 
-
             val after = System.nanoTime();
             val seconds = (after-before)/1E9;
             Console.OUT.println("Frame time: " + seconds + "s " + 1/seconds + " FPS.");
-
-
         }
 
         public def idle() {
@@ -232,7 +229,6 @@ public class GLFrontend {
                 GL.glOrtho(-1, 1, -aspect/win_aspect, aspect/win_aspect, -1, 1);
             }
             
-
             GL.glMatrixMode(GL.GL_MODELVIEW);
             GL.glLoadIdentity();
         }
@@ -284,7 +280,6 @@ public class GLFrontend {
             val key = key_.toLowerCase();
             keyDown(key.ord()) = true;
         }
-
     }
 
 
@@ -311,7 +306,9 @@ public class GLFrontend {
                 Option("x","horz-blocks","number of times to split width-ways within a place"),
                 Option("y","vert-blocks","number of times to split height-ways within a place"),
                 Option("b","mipmap-bias","skip this many mipmap levels"),
-                Option("d","octree-depth","bottom out the octree at this depth")
+                Option("d","octree-depth","bottom out the octree at this depth"),
+                Option("f","dump-file","dump file for the octree of the scene"),
+                Option("i","iteration","iteration count")
             ]);
             if (opts("-?")) {
                 opts.showHELP();
@@ -337,7 +334,6 @@ public class GLFrontend {
             }
 
             val fb = new GLFrameBuffer(global_width, global_height, size);
-
             val fe = new GLFrontend(opts, global_width, global_height, fb, sl);
 
             fe.run();
