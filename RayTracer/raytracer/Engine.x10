@@ -164,11 +164,9 @@ public class Engine {
 
         gpuHeightField = CUDAUtilities.makeGlobalRail[Float](gpu, heightFieldDimX*heightFieldDimY, heightFieldHost);
         gpuVelocityField = CUDAUtilities.makeGlobalRail[Float](gpu, heightFieldDimX*heightFieldDimY, 0.0f);
-
     }
 
-    public static struct DirectionalLight(dir:Vector3, diff:Vector3, spec:Vector3) {
-    };
+    public static struct DirectionalLight(dir:Vector3, diff:Vector3, spec:Vector3) { }
 
     val sun = DirectionalLight(Vector3(0.4f,0.6f,1.0f).normalised(), Vector3(0.5f,0.5f,0.5f), Vector3(2,2,2));
 
@@ -240,9 +238,9 @@ public class Engine {
     }
 
     public def renderFrame(frameBuffer:GlobalRail[RGB], denting_water:Boolean, pos:Vector3, orientation:Quat, time:Float) {
-        
-        val horz_split = here.id % horzSplits;
-        val vert_split = here.id / horzSplits;
+
+        val horz_split = here.id as Int % horzSplits;
+        val vert_split = here.id as Int / horzSplits;
 
         val offset_x = horz_split * localWidth;
         val offset_y = vert_split * localHeight;
@@ -352,9 +350,7 @@ public class Engine {
                         for (x_ in 0n..(localBlockWidth-1n)) {
                             val x = x_ + block_off_x;
                             val x_norm = (x+0.5f+offset_x)/globalWidth*2.0f - 1.0f;
-                            val ray = x_norm * globalWidth/globalHeight * right
-                                    + forwards
-                                    + y_norm * up;
+                            val ray = x_norm * globalWidth/globalHeight * right + forwards + y_norm * up;
                             state.d = ray * 800;
                             state.l = state.d.length();
                             state.d /= state.l;
@@ -366,7 +362,7 @@ public class Engine {
                 }
                 for (y_ in 0n..(localBlockHeight-1n)) {
                     val y = y_ + block_off_y;
-                    Rail.asyncCopy(localFrame, (y*localWidth) as Long, frameBuffer, offset_x + (offset_y+y)*globalWidth, localWidth as Long);
+                    Rail.asyncCopy(localFrame, (y*localWidth) as Long, frameBuffer, (offset_x + (offset_y+y)*globalWidth) as Long, localWidth as Long);
                 }
             }
 

@@ -2,11 +2,10 @@
 X10CPP ?= x10c++
 X10GL ?= $(X10_DIST)/../x10.gl
 
-X10CPPDBG = -STATIC_CHECKS -DEBUG
-# compile with -O blocked by XTENLANG-3421 (FloatNatives)
-#X10CPPDBG = -STATIC_CHECKS -DEBUG -O -NO_CHECKS
+X10CPPFLG = -STATIC_CHECKS -DEBUG
+#X10CPPDBG = -O -NO_CHECKS
 
-X10CPPCOMP = time $(X10CPP) $(X10CPPDBG) -report postcompile=5
+X10CPPCOMP = time $(X10CPP) $(X10CPPFLG) $(X10CPPDBG) -report postcompile=5
 
 
 ALL_TARGETS = GLFrontend Benchmark QuatTest Texture2DTest Vector3Test
@@ -34,8 +33,8 @@ RAYTRACER_SRC = \
         raytracer/Quat.x10 \
         raytracer/RayState.x10 \
         raytracer/RGB.x10 \
-        raytracer/SimpleBVH.x10 \
         raytracer/SceneLoader.x10 \
+        raytracer/SimpleBVH.x10 \
         raytracer/Texture2D.x10 \
         raytracer/Vector2.x10 \
         raytracer/Vector3.x10 \
@@ -53,14 +52,11 @@ Benchmark: $(RAYTRACER_SRC) raytracer/Benchmark.x10
 QuatTest: raytracer/QuatTest.x10 raytracer/Quat.x10
 	$(X10CPPCOMP) -d out raytracer/QuatTest.x10 -o $@
 
-Vector3Test: raytracer/Vector3Test.x10 raytracer/Vector3.x10
-	$(X10CPPCOMP) -d out raytracer/Vector3Test.x10 -o $@
-
-OctreeTest: raytracer/OctreeTest.x10 raytracer/Octree.x10
-	$(X10CPPCOMP) -d out raytracer/OctreeTest.x10 -o $@
-
 Texture2DTest: raytracer/Texture2DTest.x10 raytracer/Texture2D.x10
 	$(X10CPPCOMP) -d out raytracer/Texture2DTest.x10 -o $@
+
+Vector3Test: raytracer/Vector3Test.x10 raytracer/Vector3.x10
+	$(X10CPPCOMP) -d out raytracer/Vector3Test.x10 -o $@
 
 clean:
 	rm -rfv $(ALL_TARGETS) out *.cubin *.dSYM
