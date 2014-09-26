@@ -173,7 +173,7 @@ class LU {
                 timer.stop(6);
                 timer.start(7);
                 timer.start(11);
-                col.bcast(Place.place(J%px), rowForBroadcast, 0, rowForBroadcast, 0, rowForBroadcast.size);
+                col.bcast(Place(J%px), rowForBroadcast, 0, rowForBroadcast, 0, rowForBroadcast.size);
                 timer.stop(11);
                 timer.stop(7);
                 if(!A_panel_j.empty()) {
@@ -212,7 +212,7 @@ class LU {
             val block = A_here.hasBlock(J, J) ? A_here.block(J, J).raw : colBuffer;
             timer.start(7);
             timer.start(11);
-            col.bcast(Place.place(J%px), block, (min*B as Long), block, (min*B as Long), (B*(max-min) as Long));
+            col.bcast(Place(J%px), block, (min*B as Long), block, (min*B as Long), (B*(max-min) as Long));
             timer.stop(11);
             timer.stop(7);
             if(!A_panel_j.empty()) {
@@ -233,7 +233,7 @@ class LU {
     
     def swapRows(J:Int, timer:Timer) {
         timer.start(10);
-        row.bcast(Place.place(J%py), pivot, 0, pivot, 0, pivot.size);
+        row.bcast(Place(J%py), pivot, 0, pivot, 0, pivot.size);
         timer.stop(10);
 
         val row_panel = A_here.blocks(J, J, J + 1n, NB);
@@ -268,7 +268,7 @@ class LU {
             if (A_here.hasCol(J)) tmp = A_here.block(J, J).raw; else tmp = colBuffer;
             val diag = tmp;
             timer.start(10);
-            row.bcast(Place.place(J%py), diag, 0, diag, 0, diag.size);
+            row.bcast(Place(J%py), diag, 0, diag, 0, diag.size);
             timer.stop(10);
 
 //@@@ahoaho
@@ -294,7 +294,7 @@ class LU {
                 val block = A_here.hasBlock(J, cj) ? A_U.block(J, cj).raw : colBuffers(cj/py);
                 timer.start(11);
                 timer.start(15);
-                col.bcast(Place.place(J%px), block, 0, block, 0, block.size);
+                col.bcast(Place(J%px), block, 0, block, 0, block.size);
                 timer.stop(15);
                 timer.stop(11);
             }
@@ -308,7 +308,7 @@ class LU {
                 val block = A_here.hasBlock(ci, J) ? A_L.block(ci, J).raw : rowBuffers(ci/px);
                 timer.start(10);
                 timer.start(14);
-                row.bcast(Place.place(J%py), block, 0, block, 0, block.size);
+                row.bcast(Place(J%py), block, 0, block, 0, block.size);
                 timer.stop(14);
                 timer.stop(10);
             }
@@ -408,7 +408,7 @@ class LU {
                 if (A_here.hasRow(I)) tmp = A_here.block(I, NB).raw; else tmp = colBuffer;
                 val bufferY = tmp;
                 timer.start(11);
-                col.bcast(Place.place(I%px), bufferY, 0, bufferY, 0, bufferY.size);
+                col.bcast(Place(I%px), bufferY, 0, bufferY, 0, bufferY.size);
                 timer.stop(11);
                 for (var ci:Int = 0n; ci < I; ++ci) if (A_here.hasRow(ci)) {
                     blockMulSub(A_here.block(ci, NB).raw, memget(ci, I), bufferY, B);
