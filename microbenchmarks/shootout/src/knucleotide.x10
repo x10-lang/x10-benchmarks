@@ -23,7 +23,7 @@ public class knucleotide {
         var count:int = 0n;
         for (future:Future[HashMap[ByteString, ByteString]]  in futures) {
             val temp = future().get(key);
-            if (temp != null) count += temp().count;
+            if (temp != null) count += temp.count;
         }
 
         return count + "\t" + nucleotideFragment.toUpperCase() + '\n';
@@ -32,7 +32,7 @@ public class knucleotide {
         for (entry:Map.Entry[ByteString, ByteString] in map2.entries()) {
             val sum = map1.get(entry.getKey());
             if (sum != null)
-                sum().count += entry.getValue().count;
+                sum.count += entry.getValue().count;
             else
                 map1.put(entry.getKey(), entry.getValue());
                 
@@ -49,7 +49,7 @@ public class knucleotide {
             key.calculateHash(sequence, index);
             val fragment = map.get(key);
             if (fragment != null) { // hmm.  is this possible?   do I have to say fragment() != null?  
-                fragment().count++;// weirdness to a java programmer.  make sure this is
+                fragment.count++;// weirdness to a java programmer.  make sure this is
                 // explained in a user's guide
             } else {
                 map.put(key,key);
@@ -67,7 +67,7 @@ public class knucleotide {
             for (k in frequencies.entries()){
                 if(k.getValue().count>count){
                     count = k.getValue().count;
-                    temp =frequencies.get(k.getKey())() as ByteString;
+                    temp = frequencies.get(k.getKey()) as ByteString;
                 }
             }
             sb.add(temp.toString().toUpperCase() + "  " + (temp.count as float) * 100.0f / totalCount);
