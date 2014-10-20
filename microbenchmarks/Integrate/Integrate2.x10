@@ -13,12 +13,12 @@ public final class Integrate2 {
 
     static errorTolerance:double = 1.0e-12;
 
-    static SERIAL:int = -1;
-    static DYNAMIC:int = 0;
-    static FUTURE:int = 1;
-    static ASYNC:int = 2;
+    static SERIAL:int = -1n;
+    static DYNAMIC:int = 0n;
+    static FUTURE:int = 1n;
+    static ASYNC:int = 2n;
 
-    static reps:int = 10;
+    static reps:int = 10n;
 
     public static def main(args:Rail[String]):void {
         val start:double = 0.0;
@@ -28,11 +28,11 @@ public final class Integrate2 {
 
         try {
             forkArg = args(0);
-            if (forkArg(0) == 's')
+            if (forkArg(0n) == 's')
                 forkPolicy = SERIAL;
-            else if (forkArg(0) == 'f')
+            else if (forkArg(0n) == 'f')
                 forkPolicy = FUTURE;
-            else if (forkArg(0) == 'a')
+            else if (forkArg(0n) == 'a')
                 forkPolicy = ASYNC;
         }
         catch (e:Exception) {
@@ -43,7 +43,7 @@ public final class Integrate2 {
         Console.OUT.println("Integrating from " + start + " to " + end + 
                             " forkPolicy = " + forkArg);
 
-        for (var i:int = 0; i < reps; ++i) {
+        for (var i:int = 0n; i < reps; ++i) {
             var a:double = 0;
 	    val startTime = System.nanoTime();
             if (forkPolicy == SERIAL) {
