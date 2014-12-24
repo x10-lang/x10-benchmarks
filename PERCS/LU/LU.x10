@@ -22,31 +22,31 @@ class LU {
 
     @NativeCPPExtern
     @Native("java", "ESSL.blockTriSolve(#me.getDoubleArray(), #diag.getDoubleArray(), #B)")
-        native static def blockTriSolve(me:Rail[Double], diag:Rail[Double], B:Int):void;
+    native static def blockTriSolve(me:Rail[Double], diag:Rail[Double], B:Int):void;
 
     @NativeCPPExtern
     @Native("java", "ESSL.blockTriSolveDiag(#diag.getDoubleArray(), #min, #max, #B)")
-        native static def blockTriSolveDiag(diag:Rail[Double], min:Int, max:Int, B:Int):void;
+    native static def blockTriSolveDiag(diag:Rail[Double], min:Int, max:Int, B:Int):void;
 
     @NativeCPPExtern
     @Native("java", "ESSL.blockBackSolve(#me.getDoubleArray(), #diag.getDoubleArray(), #B)")
-        native static def blockBackSolve(me:Rail[Double], diag:Rail[Double], B:Int):void;
+    native static def blockBackSolve(me:Rail[Double], diag:Rail[Double], B:Int):void;
 
     @NativeCPPExtern
     @Native("java", "ESSL.blockMulSub(#me.getDoubleArray(), #left.getDoubleArray(), #upper.getDoubleArray(), #B)")
-        native static def blockMulSub(me:Rail[Double], left:Rail[Double], upper:Rail[Double], B:Int):void;
+    native static def blockMulSub(me:Rail[Double], left:Rail[Double], upper:Rail[Double], B:Int):void;
 
     @NativeCPPExtern
     @Native("java", "ESSL.blockMulSubDiag(#diag.getDoubleArray(), #min, #max, #B)")
-        native static def blockMulSubDiag(diag:Rail[Double], min:Int, max:Int, B:Int):void;
+    native static def blockMulSubDiag(diag:Rail[Double], min:Int, max:Int, B:Int):void;
 
     @NativeCPPExtern
     @Native("java", "ESSL.blockMulSubPanel(#me.getDoubleArray(), #diag.getDoubleArray(), #min, #max, #B)")
-        native static def blockMulSubPanel(me:Rail[Double], diag:Rail[Double], min:Int, max:Int, B:Int):void;
+    native static def blockMulSubPanel(me:Rail[Double], diag:Rail[Double], min:Int, max:Int, B:Int):void;
 
     @NativeCPPExtern
     @Native("java", "ESSL.blockMulSubRow(#me.getDoubleArray(), #diag.getDoubleArray(), #B, #j, #cond)")
-        native static def blockMulSubRow(me:Rail[Double], diag:Rail[Double], B:Int, j:Int, cond:Boolean):void;
+    native static def blockMulSubRow(me:Rail[Double], diag:Rail[Double], B:Int, j:Int, cond:Boolean):void;
 
     val M:Int;
     val N:Int;
@@ -123,13 +123,13 @@ class LU {
         val _remoteBuffer = remoteBuffer;
         
         @Pragma(Pragma.FINISH_ASYNC_AND_BACK) finish{
-        	at (Place(dest)) async {
-        	    @Pragma(Pragma.FINISH_ASYNC) finish{
-        			Rail.asyncCopy[Double](_remoteBuffer, 0, _buffers(), 0, size);
-        		}
-        		val size2 = _A().swapRow(row2, min, max, _buffers());
-       			Rail.asyncCopy[Double](_buffers(), 0, _remoteBuffer, 0, size2);
-        	}        	
+            at (Place(dest)) async {
+                @Pragma(Pragma.FINISH_ASYNC) finish{
+                    Rail.asyncCopy[Double](_remoteBuffer, 0, _buffers(), 0, size);
+                }
+                val size2 = _A().swapRow(row2, min, max, _buffers());
+                Rail.asyncCopy[Double](_buffers(), 0, _remoteBuffer, 0, size2);
+            }
         }
         A_here.setRow(row1, min, max, buffer);
     }
@@ -271,18 +271,14 @@ class LU {
             row.bcast(Place(J%py), diag, 0, diag, 0, diag.size);
             timer.stop(10);
 
-//@@@ahoaho
-	Console.OUT.println("===== check after bcast =====");
-	check();
+            Console.OUT.println("===== check after bcast =====");
+            check();
 
             for (var cj:Int = J + 1n; cj <= NB; ++cj) if (A_here.hasCol(cj)) {
                 blockTriSolve(A_here.block(J, cj).raw, diag, B);
 
-//ZZZ
-//@@@ahoaho
-	Console.OUT.println("===== check after blockTriSolve =====");
-	check();
-
+                Console.OUT.println("===== check after blockTriSolve =====");
+                check();
             }
         }
     }
@@ -332,41 +328,36 @@ class LU {
     }
 
     def solve(timer:Timer) {
-//@@@ahoaho
-	Console.OUT.println("===== check before computeSum =====");
-	check();
+        Console.OUT.println("===== check before computeSum =====");
+        check();
 
         timer.start(13); computeRowSum(); Team.WORLD.barrier(); timer.stop(13);
 
-//@@@ahoaho
-	Console.OUT.println("===== check after computeSum =====");
-	check();
+        Console.OUT.println("===== check after computeSum =====");
+        check();
 
         timer.start(9);
 
         for (var J:Int = 0n; J < NB; J++){
             timer.start(1); panel(J, timer);                   Team.WORLD.barrier(); timer.stop(1);
-//@@@ahoaho
-	Console.OUT.println("===== check after panel =====");
-	check();
+
+            Console.OUT.println("===== check after panel =====");
+            check();
 
             timer.start(2); swapRows(J, timer);                Team.WORLD.barrier(); timer.stop(2);
 
-//@@@ahoaho
-	Console.OUT.println("===== check after swapRows =====");
-	check();
+            Console.OUT.println("===== check after swapRows =====");
+            check();
 
             timer.start(3); triSolve(J, timer);                Team.WORLD.barrier(); timer.stop(3);
 
-//@@@ahoaho
-	Console.OUT.println("===== check after triSolve =====");
-	check();
+            Console.OUT.println("===== check after triSolve =====");
+            check();
 
             timer.start(4); if (J != NB - 1n) update(J, timer); Team.WORLD.barrier(); timer.stop(4);
 
-//@@@ahoaho
-	Console.OUT.println("===== check after update =====");
-	check();
+            Console.OUT.println("===== check after update =====");
+            check();
 
             /* Progress meter */
             if(0 == here.id) {
@@ -389,10 +380,10 @@ class LU {
             val _B = B;
             val _remoteRowBuffer = remoteRowBuffer;
             @Pragma(Pragma.FINISH_ASYNC_AND_BACK) finish{
-				at(Place(A_here.placeOfBlock(I, J))) async {
-					Rail.asyncCopy(_A().block(I, J).raw, 0, _remoteRowBuffer, 0,(_B * _B) as Long);
-				}
-	    	} 
+                at(Place(A_here.placeOfBlock(I, J))) async {
+                    Rail.asyncCopy(_A().block(I, J).raw, 0, _remoteRowBuffer, 0,(_B * _B) as Long);
+                }
+            } 
             return rowBuffer;
         }
     }
@@ -425,7 +416,6 @@ class LU {
         if (!A_last_panel.empty()) {
             for (var I:Int = A_last_panel.min_x; I <= A_last_panel.max_x; I += px) {
                 for (var i:Int=0n; i < B; i++) {
-//@@@ahoaho
                     assert !A_here.block(I, NB)(I*B+i, M).isNaN();
                     val v = 1.0 - A_here.block(I, NB)(I*B+i, M);
                     max = Math.max(max, v * v);
@@ -491,25 +481,22 @@ class LU {
             val lu = lus();
             val timer = new Timer(17);
 
-//@@@ahoaho
-	Console.OUT.println("===== check before solve =====");
-	lu.check();
+            Console.OUT.println("===== check before solve =====");
+            lu.check();
 
             timer.start(0);
             lu.solve(timer);
             timer.stop(0);
 
-//@@@ahoaho
-	Console.OUT.println("===== check after solve =====");
-	lu.check();
+            Console.OUT.println("===== check after solve =====");
+            lu.check();
 
             timer.start(16);
             lu.backsolve(timer);
             timer.stop(16);
 
-//@@@ahoaho
-	Console.OUT.println("===== check after backsolve =====");
-	lu.check();
+            Console.OUT.println("===== check after backsolve =====");
+            lu.check();
 
             if (here.id == 0) {
                 Console.OUT.println ("Timer(0)  SOLVE         #invocations=" + timer.count(0) +
