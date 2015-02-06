@@ -1,0 +1,12 @@
+#PBS -q regular
+#PBS -l mppwidth=24
+#PBS -l walltime=00:15:00
+
+cd $PBS_O_WORKDIR
+
+export MPICH_MAX_THREAD_SAFETY=multiple
+
+aprun -e X10_STATIC_THREADS=1 -e X10_NTHREADS=1 -n 1 ./uts -d 12
+aprun -e X10_STATIC_THREADS=1 -e X10_NTHREADS=1 -n 2 -S 1 ./uts -d 13 
+aprun -e X10_STATIC_THREADS=1 -e X10_NTHREADS=1 -n 4 -S 1 ./uts -d 13 
+aprun -e X10_STATIC_THREADS=1 -e X10_NTHREADS=1 -n 8 -S 2 ./uts -d 14 
