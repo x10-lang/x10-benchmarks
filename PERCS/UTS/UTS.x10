@@ -5,6 +5,7 @@ import x10.compiler.Uncounted;
 import x10.util.Option;
 import x10.util.OptionsParser;
 import x10.util.Random;
+import x10.xrx.Runtime;
 
 public final class UTS {
     val queue:Queue;
