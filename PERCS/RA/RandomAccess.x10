@@ -11,6 +11,7 @@
 
 import x10.util.Option;
 import x10.util.OptionsParser;
+import x10.xrx.Runtime;
 
 // memory per place: 8*2^m
 // default: m = 12 -> 32K per place

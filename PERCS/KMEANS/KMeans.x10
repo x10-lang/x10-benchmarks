@@ -37,8 +37,8 @@ final class KMeans {
         val num_slice_points = num_global_points / (Place.numPlaces() as Int);
 
         Place.places().broadcastFlat(()=>{
-            val role = Runtime.hereInt();
-            val random = new Random(role);
+            val role = here.id;
+            val random = new Random(role as Int);
             val host_points = new Rail[Float](num_slice_points*dim, (Long)=>random.next());
 
             val host_clusters = new Rail[Float](num_clusters*dim);
@@ -46,7 +46,7 @@ final class KMeans {
 
             val team = Team.WORLD;
 
-            if (role == 0n) {
+            if (role == 0) {
                 for (var k:Int=0n; k<num_clusters; ++k) {
                     for (var d:Int=0n; d<dim; ++d) {
                         host_clusters(k*dim+d) = host_points(k+d*num_slice_points);
@@ -113,7 +113,7 @@ final class KMeans {
                     for (var d:Int=0n; d<dim; ++d) host_clusters(k*dim+d) /= host_cluster_counts(k);
                 }
 
-                if (role == 0n) {
+                if (role == 0) {
                     Console.OUT.println("Iteration: " + iter);
                     if (verbose) printClusters(host_clusters, dim);
                 }
@@ -121,12 +121,12 @@ final class KMeans {
 
             val stop_time = System.nanoTime();
 
-            if (role == 0n) Console.OUT.println("place: " + role + " computation time: "+compute_time/1E9 +
+            if (role == 0) Console.OUT.println("place: " + role + " computation time: "+compute_time/1E9 +
                     " communication time: " + comm_time/1E9);
 
             team.barrier();
 
-            if (role == 0n) {
+            if (role == 0) {
                 Console.OUT.println("Total time: " + (stop_time-start_time)/1E9);
             }
         });

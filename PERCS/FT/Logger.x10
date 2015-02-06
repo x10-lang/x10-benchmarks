@@ -6,7 +6,7 @@ public class Logger {
 	public static val LEVEL=INFO;
 	
 	static def out(s:String) { 
-		Console.OUT.println("[" + here + ", " + Runtime.workerId()+ System.nanoTime() + "] " + s);
+		Console.OUT.println("[" + here + ", " + x10.xrx.Runtime.workerId()+ System.nanoTime() + "] " + s);
 	}
 	public static def info(s:()=>String) { if (INFO >=LEVEL) out(s());}
 	public static def info(s:String) { if (INFO>=LEVEL) out(s);}

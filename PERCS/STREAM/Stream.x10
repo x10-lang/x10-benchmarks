@@ -34,7 +34,7 @@ public class Stream {
 
         Place.places().broadcastFlat(()=>{
             val p = here.id;
-            val allocator = Runtime.MemoryAllocator.requestAllocator(true, false);
+            val allocator = x10.xrx.Runtime.MemoryAllocator.requestAllocator(true, false);
             val a = new Rail[Double](localSize, allocator);
             val b = new Rail[Double](localSize, allocator);
             val c = new Rail[Double](localSize, allocator);

@@ -183,7 +183,7 @@ public final class SSCA2(N:Int) {
 
         // Loop over all the places and crunch the numbers.
         Place.places().broadcastFlat(()=>{
-                val h = Runtime.hereInt();
+                val h = here.id as Int;
                 plh().bfsShortestPaths((N as Long*h/max) as Int, (N as Long*(h+1)/max) as Int);
             });
 

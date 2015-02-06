@@ -15,6 +15,7 @@
 
 import x10.compiler.*;
 import x10.util.Team;
+import x10.xrx.Runtime;
 
 @NativeCPPInclude("essl_natives.h")
 @NativeCPPCompilationUnit("essl_natives.cc")

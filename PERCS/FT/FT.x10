@@ -48,8 +48,8 @@ class FT(M:Long, verify:Boolean) {
     @Native("java", "FTNatives.create_plan(#SQRTN, #direction, #flags)")
     native static def create_plan(SQRTN:Long, direction:Int, flags:Int):Long;
     
-    val I = Runtime.hereLong();
-    static val r = new Random(Runtime.hereLong());
+    val I = here.id;
+    static val r = new Random(here.id);
     
     val SQRTN = 1<<M;
     val N = SQRTN*SQRTN;

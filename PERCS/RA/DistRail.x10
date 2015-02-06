@@ -15,6 +15,8 @@ import x10.compiler.NonEscaping;
 import x10.compiler.NativeCPPInclude;
 import x10.compiler.Native;
 
+import x10.xrx.Runtime;
+
 /**
  * A specialized version of x10.array.DistArray_Block_1 that
  * <ul>

@@ -102,7 +102,7 @@ final class SSCA1 {
     val first:Int;
     val last:Int;
     val localSize:Int;
-    val placeId = Runtime.hereInt();
+    val placeId = here.id as Int;
 
     var winningScore:Int = 0n;
     var shortLast:Int = -1n;

@@ -1,4 +1,5 @@
 import x10.util.Random;
+import x10.xrx.Runtime;
 
 public final class BlockedArray implements (Int,Int)=>Double {
     public final static class Block implements (Int,Int)=>Double {
