@@ -11,14 +11,6 @@
 
 package uts;
 
-import com.hazelcast.core.Hazelcast;
-import com.hazelcast.core.HazelcastInstance;
-import com.hazelcast.core.IMap;
-import com.hazelcast.core.TransactionalMap;
-import com.hazelcast.transaction.TransactionException;
-import com.hazelcast.transaction.TransactionalTask;
-import com.hazelcast.transaction.TransactionalTaskContext;
-
 import java.security.DigestException;
 
 final class UTS {
@@ -199,9 +191,8 @@ final class UTS {
 
     var count:Long = 0;
     // if places have died, process remaning nodes seqentially at place 0
-    for (eany in Worker.singletonWorker.map.entrySet()) {
-      val e = eany as java.util.Map.Entry;
-      val b:Bag = (e.getValue() as Checkpoint).bag;
+    for (e in Worker.singletonWorker.map.entrySet()) {
+      val b:Bag = e.getValue().bag;
       if (b != null && b.size != 0n) {
         Console.ERR.println("Recovering " + e.getKey());
         count += Worker.singletonWorker.seq(b);
@@ -209,8 +200,7 @@ final class UTS {
     }
 
     // collect all counts
-    for (cany in Worker.singletonWorker.map.values()) {
-    	val c:Checkpoint = cany as Checkpoint;
+    for (c in Worker.singletonWorker.map.values()) {
     	count += c.count;
     }
 

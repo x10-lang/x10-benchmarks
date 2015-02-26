@@ -2,13 +2,6 @@ package uts;
 
 import x10.util.concurrent.Monitor;
 
-import com.hazelcast.core.HazelcastInstance;
-import com.hazelcast.core.IMap;
-import com.hazelcast.core.TransactionalMap;
-import com.hazelcast.transaction.TransactionException;
-import com.hazelcast.transaction.TransactionalTask;
-import com.hazelcast.transaction.TransactionalTaskContext;
-
 import java.security.DigestException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
@@ -20,9 +13,9 @@ import x10.util.concurrent.AtomicBoolean;
 import x10.interop.Java;
 import x10.compiler.Native;
 import x10.compiler.Uncounted;
-import x10.util.resilient.managed.HazelcastMap;
 import x10.util.resilient.ResilientMap;
-import x10.util.resilient.ResilientMap.Entry;
+import x10.util.resilient.ResilientTransactionalMap;
+import x10.util.Map.Entry;
 
 final class Worker {
 	static val singletonWorker:Worker = new Worker();
@@ -169,9 +162,6 @@ final class Worker {
 		}
 	}
 		
-	@Native("java", "x10.x10rt.X10RT.getHazelcastInstance()")
-	private native static def getHazelcastInstance(): com.hazelcast.core.HazelcastInstance;
-
 	public static val TRANSFER_MODE_TRANSACTIONAL:Int = 0n;
 	public static val TRANSFER_MODE_ATOMIC:Int = 1n;
 		public static val TRANSFER_MODE_ATOMIC_SUBMIT:Int = 2n;
@@ -184,8 +174,8 @@ final class Worker {
 	
 	private var transfer_mode:Int = TRANSFER_MODE_TRANSACTIONAL;
 	
-	val hz:HazelcastInstance = getHazelcastInstance();
-	val map:IMap = (hz == null) ? hazelErr() : hz.getMap("map");
+	val map:ResilientMap[Place,Checkpoint] = ResilientMap.getMap[Place,Checkpoint]("map");
+
 	
 	val home:Place = here;
 	val places:Long = Place.numPlaces();
@@ -201,11 +191,7 @@ final class Worker {
 	var state:Long = -2; // -2: inactive, -1: running, p: stealing from p
 
 	var stats:Stats = new Stats();
-	
-	static def hazelErr():IMap {
-		throw new IllegalStateException("Hazelcast not initialized.  Make sure to run X10 with -DX10RT_DATASTORE=Hazelcast");
-	}
-	
+		
 	def digest() throws DigestException : Int {
 		if (bag.size >= bag.depth.size as Int) {
 			grow();
@@ -438,32 +424,29 @@ final class Worker {
 		while(true) {
 			try {
 				if(transfer_mode == TRANSFER_MODE_TRANSACTIONAL) {
-					hz.executeTransaction(new TransactionalTask() {
-						public def execute(context:TransactionalTaskContext)
-						throws TransactionException : Any {
-							val map:TransactionalMap = context.getMap("map");
+                    ResilientTransactionalMap.runTransaction("map",
+                    (map:ResilientTransactionalMap[Place, Checkpoint]) => {
 							map.set(home, new Checkpoint(bag, count));
 							val cor:Checkpoint = map.getForUpdate(p) as Checkpoint;
 							val n:long = cor == null ? 0 :cor.count;
 							map.set(p, new Checkpoint(b, n));
 							return null;
 						}
-					});
+					);
 				} else if(transfer_mode == TRANSFER_MODE_ATOMIC) {
-					val map:ResilientMap[Place,Checkpoint] = HazelcastMap.getMap[Place,Checkpoint]("map");
 					// change to use set
 					map.set(home, new Checkpoint(bag, count));
 					val cor:Checkpoint = map.get(p);
 					val n:long = cor == null ? 0 : cor.count;
 					map.set(p, new Checkpoint(b, n));
 				} else if(transfer_mode == TRANSFER_MODE_ATOMIC_SUBMIT) {
-					val map:ResilientMap[Place,Checkpoint] = HazelcastMap.getMap[Place,Checkpoint]("map");
 					// change to use set
 					map.set(home, new Checkpoint(bag, count));
-					finish map.asyncSubmitToKey(p, (e:Entry[Place,Checkpoint]):void => {
+					finish map.asyncSubmitToKey(p, (e:Entry[Place,Checkpoint]):Any => {
 						val cor:Checkpoint = e.getValue();
 						val n:long = cor == null ? 0 : cor.count;
 						e.setValue(new Checkpoint(b,n));
+						return null;
 					});
 				} else {
 					Console.ERR.println("Unknown transfer mode: " + transfer_mode);
