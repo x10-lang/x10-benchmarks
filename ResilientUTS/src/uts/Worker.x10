@@ -20,7 +20,7 @@ import x10.util.Map.Entry;
 final class Worker {
 	static val singletonWorker:Worker = new Worker();
 
-	public static def setTransferModes(newMode:Int) {
+	public static def initTransferModes(newMode:Int) {
 		try {
 			finish {
 				val pl = Place.places();
@@ -138,8 +138,23 @@ final class Worker {
 		};
 	}
 	
+	def useMap() {
+		return TRANSFER_MODE_NOMAP != transfer_mode;
+	}
+	
 	def unblockIfBlockedOnDeadPlaceDaemon():Daemon {
-		return waitingDaemon(() => {unblockIfBlockedOnDeadPlace();});
+		if(useMap()) {
+			return waitingDaemon(() => {unblockIfBlockedOnDeadPlace();});
+		} else {
+			return new Daemon() {
+				public def start():void {
+					
+				}
+				public def stop():void {
+					
+				}
+			};
+		}
 	}
 	
 	def unblockIfBlockedOnDeadPlace():void {
@@ -164,17 +179,21 @@ final class Worker {
 		
 	public static val TRANSFER_MODE_TRANSACTIONAL:Int = 0n;
 	public static val TRANSFER_MODE_ATOMIC:Int = 1n;
-		public static val TRANSFER_MODE_ATOMIC_SUBMIT:Int = 2n;
+	public static val TRANSFER_MODE_ATOMIC_SUBMIT:Int = 2n;
+	public static val TRANSFER_MODE_NOMAP:Int = 3n;
 	public static val TRANSFER_MODE_DEFAULT:Int = TRANSFER_MODE_TRANSACTIONAL;
 
-	public def setTransferMode(newMode:Int) {
+	private def setTransferMode(newMode:Int) {
 		this.transfer_mode = newMode;
+		if(useMap()) {
+			this.map = ResilientMap.getMap[Place,Checkpoint]("map");
+		}
 	}
 	
 	
-	private var transfer_mode:Int = TRANSFER_MODE_TRANSACTIONAL;
+	private var transfer_mode:Int = TRANSFER_MODE_DEFAULT;
 	
-	val map:ResilientMap[Place,Checkpoint] = ResilientMap.getMap[Place,Checkpoint]("map");
+	var map:ResilientMap[Place,Checkpoint];
 
 	
 	val home:Place = here;
@@ -218,7 +237,9 @@ final class Worker {
 			bag.upper(0) = v;
 			bag.size = 1n;
 		}
-		map.set(home, new Checkpoint(bag, count));
+		if(useMap()) {
+			map.set(home, new Checkpoint(bag, count));
+		}
 	}
 
 	def expand() throws DigestException : void {
@@ -277,7 +298,9 @@ final class Worker {
 				}
 				distribute();
 			}
-			map.set(home, new Checkpoint(count));
+			if(useMap()) {
+				map.set(home, new Checkpoint(count));
+			}
 			steal();
 		}
 		
@@ -448,6 +471,8 @@ final class Worker {
 						e.setValue(new Checkpoint(b,n));
 						return null;
 					});
+				} else if(transfer_mode == TRANSFER_MODE_NOMAP) {
+					// don't do anything
 				} else {
 					Console.ERR.println("Unknown transfer mode: " + transfer_mode);
 					throw new IllegalStateException("Unknown transfer mode: " + transfer_mode);

@@ -12,6 +12,7 @@
 package uts;
 
 import java.security.DigestException;
+import x10.util.concurrent.AtomicLong;
 
 final class UTS {
 
@@ -29,6 +30,7 @@ final class UTS {
 	  Console.ERR.println("-transferMode transact\tUse a transaction to transfer data (default)");
 	  Console.ERR.println("-transferMode atomic\tUse atomic operations to transfer data (not-resilient)");
 	  Console.ERR.println("-transferMode atomic-submit\tUse atomic operations to transfer data (not-resilient), and use key submission");
+	  Console.ERR.println("-transferMode nomap\tDon't use a resilient map to transfer data");
 
 	  Console.ERR.println("-depth <INT>\t\tSet the depth to be used");
 	  Console.ERR.println("-d <INT>\t\tSet the depth to be used");
@@ -68,10 +70,10 @@ final class UTS {
 	for(var curArg:Long = 0; curArg < args.size; curArg++) {
 		val arg = args(curArg);
 		
-		if(arg.equals("-help") || arg.equals("-usage")) {
+		if(arg.equalsIgnoreCase("-help") || arg.equalsIgnoreCase("-usage")) {
 			printUsage();
 			return;
-		} else if(arg.equals("-statsHeader")) {
+		} else if(arg.equalsIgnoreCase("-statsHeader")) {
 			curArg++;
 			if(curArg >= args.size) {
 				Console.ERR.println("Illegal -statsHeader argument with no corresponding format");
@@ -80,9 +82,9 @@ final class UTS {
 				return;
 			}
 			val arg2 = args(curArg);
-			if(arg2.equals("csv")) {
+			if(arg2.equalsIgnoreCase("csv")) {
 				printCSVHeader();
-			} else if(arg2.equals("human")) {
+			} else if(arg2.equalsIgnoreCase("human")) {
 				
 			} else {
 				Console.ERR.println("-statsHeader with illegal format " + arg2);
@@ -93,7 +95,7 @@ final class UTS {
 
 			return;
 		}	
-		else if(arg.equals("-statsFormat")) {
+		else if(arg.equalsIgnoreCase("-statsFormat")) {
 			curArg++;
 			if(curArg >= args.size) {
 				Console.ERR.println("Illegal -statsFormat argument with no corresponding format");
@@ -102,9 +104,9 @@ final class UTS {
 				return;
 			}
 			val arg2 = args(curArg);
-			if(arg2.equals("csv")) {
+			if(arg2.equalsIgnoreCase("csv")) {
 				csv = true;
-			} else if(arg2.equals("human")) {
+			} else if(arg2.equalsIgnoreCase("human")) {
 				
 			} else {
 				Console.ERR.println("-statsFormat with illegal format " + arg2);
@@ -112,9 +114,9 @@ final class UTS {
 				System.setExitCode(-1n);
 				return;
 			}
-		} else if(arg.equals("-csv")) {
+		} else if(arg.equalsIgnoreCase("-csv")) {
 			csv = true;
-		} else if(arg.equals("-transferMode")) {
+		} else if(arg.equalsIgnoreCase("-transferMode")) {
 			curArg++;
 			if(curArg >= args.size) {
 				Console.ERR.println("Illegal -transferMode argument with no corresponding mode");
@@ -123,12 +125,14 @@ final class UTS {
 				return;
 			}
 			val arg2 = args(curArg);
-			if(arg2.equals("transact") || arg2.equals("transactional") || arg2.equals("t")) {
+			if(arg2.equalsIgnoreCase("transact") || arg2.equalsIgnoreCase("transactional") || arg2.equalsIgnoreCase("t")) {
 				transferMode = Worker.TRANSFER_MODE_TRANSACTIONAL;
-			} else if(arg2.equals("atomic") || arg2.equals("atom") || arg2.equals("a")) {
+			} else if(arg2.equalsIgnoreCase("atomic") || arg2.equalsIgnoreCase("atom") || arg2.equalsIgnoreCase("a")) {
 				transferMode = Worker.TRANSFER_MODE_ATOMIC;
-			} else if(arg2.equals("atomic-submit") || arg2.equals("atom-submit") || arg2.equals("as")) {
+			} else if(arg2.equalsIgnoreCase("atomic-submit") || arg2.equalsIgnoreCase("atom-submit") || arg2.equalsIgnoreCase("as")) {
 				transferMode = Worker.TRANSFER_MODE_ATOMIC;
+			} else if(arg2.equalsIgnoreCase("nomap") || arg2.equalsIgnoreCase("nm")) {
+				transferMode = Worker.TRANSFER_MODE_NOMAP;
 			} else {
 				Console.ERR.println("transferMode argument is not valid " + arg2);
 				printUsage();
@@ -136,7 +140,7 @@ final class UTS {
 				return;
 			}
 
-		} else if(arg.equals("-depth") || arg.equals("-d")) {
+		} else if(arg.equalsIgnoreCase("-depth") || arg.equalsIgnoreCase("-d")) {
 			curArg++;
 			if(curArg >= args.size) {
 				Console.ERR.println("Illegal -d argument with no corresponding depth");
@@ -168,9 +172,7 @@ final class UTS {
 	
     val depth:int = d;
 
-    if(transferMode != Worker.TRANSFER_MODE_DEFAULT) {
-    	Worker.setTransferModes(transferMode);
-    }
+    Worker.initTransferModes(transferMode);
     
     //Console.OUT.println("Starting...");
     val startTime:Long = System.nanoTime();
@@ -191,17 +193,41 @@ final class UTS {
 
     var count:Long = 0;
     // if places have died, process remaning nodes seqentially at place 0
-    for (e in Worker.singletonWorker.map.entrySet()) {
-      val b:Bag = e.getValue().bag;
-      if (b != null && b.size != 0n) {
-        Console.ERR.println("Recovering " + e.getKey());
-        count += Worker.singletonWorker.seq(b);
-      }
-    }
-
-    // collect all counts
-    for (c in Worker.singletonWorker.map.values()) {
-    	count += c.count;
+    if(Worker.singletonWorker.useMap()) {
+	    for (e in Worker.singletonWorker.map.entrySet()) {
+	      val b:Bag = e.getValue().bag;
+	      if (b != null && b.size != 0n) {
+	        Console.ERR.println("Recovering " + e.getKey());
+	        count += Worker.singletonWorker.seq(b);
+	      }
+	    }
+	
+	    // collect all counts
+	    for (c in Worker.singletonWorker.map.values()) {
+	    	count += c.count;
+	    }
+    } else {
+    		// don't use the resilient map
+    	    if(Place.numDead() > 0) {
+    	    	   Console.ERR.println("A place died.  " +
+    	    			   "Recovering from place death is not supported using transfer mode " 
+    	    			   + transferMode + ".");
+    	    	   System.setExitCode(-1n);
+    	    	   return;
+    	    }
+    	    val counter = new AtomicLong(0L);
+    	    val pg = Place.places();
+    	    finish {
+	    	    	for (p in pg) {
+	    	    		if(p != here) {
+	    	    			async counter.addAndGet(at(p) Worker.singletonWorker.count);
+	    	    		}
+	    	    	}
+	    	    	if(pg.contains(here)) {
+	    	    		counter.addAndGet(Worker.singletonWorker.count);
+	    	    	}
+    	    }
+    	    count = counter.get();
     }
 
     val endTime = System.nanoTime();
@@ -211,7 +237,7 @@ final class UTS {
     val stats = Worker.getGlobalStats();
 
     if(csv) {
-    	printCSV(time, count, stats);    	
+    		printCSV(time, count, stats);    	
     } else {
 	    Console.OUT.println("Performance: " + count + "/"
 	        + sub("" + time / 1e9, 0n, 6n) + " = "
