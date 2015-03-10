@@ -1,7 +1,7 @@
 import x10.compiler.Ifdef;
 import x10.compiler.Inline;
 import x10.compiler.Pragma;
-import x10.compiler.Immediate;
+import x10.compiler.Uncounted;
 import x10.util.Option;
 import x10.util.OptionsParser;
 import x10.util.Random;
@@ -117,10 +117,10 @@ public final class UTS {
             val thief = thieves.pop();
             if (thief >= 0) {
                 ++logger.lifelineStealsSuffered;
-                at (Place(thief)) @Immediate async { st().deal(st, loot, victim); st().waiting = false; }
+                at (Place(thief)) @Uncounted async { st().deal(st, loot, victim); st().waiting = false; }
             } else {
                 ++logger.stealsSuffered;
-                at (Place(-thief-1)) @Immediate async { st().deal(st, loot, -1); st().waiting = false; }
+                at (Place(-thief-1)) @Uncounted async { st().deal(st, loot, -1); st().waiting = false; }
             }
         } else {
             ++logger.lifelineStealsSuffered;
@@ -141,9 +141,9 @@ public final class UTS {
             val thief = thieves.pop();
             if (thief >= 0) {
                 lifelineThieves.push(thief);
-                at (Place(thief)) @Immediate async { st().waiting = false; }
+                at (Place(thief)) @Uncounted async { st().waiting = false; }
             } else {
-                at (Place(-thief-1)) @Immediate async { st().waiting = false; }
+                at (Place(-thief-1)) @Uncounted async { st().waiting = false; }
             }
         }
     }
@@ -157,7 +157,7 @@ public final class UTS {
             waiting = true;
             logger.stopLive();
             val v = victims(random.nextInt(m));
-            at (Place(v)) @Immediate async st().request(st, p, false);
+            at (Place(v)) @Uncounted async st().request(st, p, false);
             while (waiting) probe(v);
             logger.startLive();
         }
@@ -168,7 +168,7 @@ public final class UTS {
                 lifelinesActivated(lifeline) = true;
                 waiting = true;
                 logger.stopLive();
-                at (Place(lifeline)) @Immediate async st().request(st, p, true);
+                at (Place(lifeline)) @Uncounted async st().request(st, p, true);
                 while (waiting) probe(-lifeline);
                 logger.startLive();
             }
@@ -181,7 +181,7 @@ public final class UTS {
             if (lifeline) ++logger.lifelineStealsReceived; else ++logger.stealsReceived;
             if (empty || waiting) {
                 if (lifeline) lifelineThieves.push(thief);
-                at (Place(thief)) @Immediate async { st().waiting = false; }
+                at (Place(thief)) @Uncounted async { st().waiting = false; }
             } else {
                 if (lifeline) thieves.push(thief); else thieves.push(-thief-1);
             }
