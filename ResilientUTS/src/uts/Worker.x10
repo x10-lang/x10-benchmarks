@@ -18,21 +18,34 @@ import x10.util.resilient.ResilientTransactionalMap;
 import x10.util.Map.Entry;
 
 final class Worker {
-	static val singletonWorker:Worker = new Worker();
+	
+	static type Workers = PlaceLocalHandle[Worker];
+	
+	public static def make(pg:PlaceGroup, transfer_mode:Int):Workers {
+		val workers = PlaceLocalHandle.make(pg, () => new Worker(transfer_mode) as Worker);
+		initAllWorkers(pg, workers);
+		return workers;
+	}
+	
+	var workers:Workers;
 
-	public static def initTransferModes(newMode:Int) {
+	private def initWorkers(new_workers:Workers) {
+		this.workers = new_workers;
+	}
+	
+	public static def initAllWorkers(pg:PlaceGroup, workers:PlaceLocalHandle[Worker]) {
 		try {
 			finish {
-				val pl = Place.places();
+				val pl = pg;
 				for (p in pl) {
 					if(p != here) {
 						async at(p) {
-							Worker.singletonWorker.setTransferMode(newMode);
+							workers().initWorkers(workers);
 						}
 					}
 				}
 				if(pl.contains(here)) {
-					Worker.singletonWorker.setTransferMode(newMode);
+					workers().initWorkers(workers);
 				}
 			}
 		} catch(me:MultipleExceptions) {
@@ -44,7 +57,6 @@ final class Worker {
 			}
 		}
 	}
-
 	
 	static def encoder():MessageDigest {
 		try {
@@ -138,7 +150,7 @@ final class Worker {
 		};
 	}
 	
-	def useMap() {
+	final def useMap() {
 		return TRANSFER_MODE_NOMAP != transfer_mode;
 	}
 	
@@ -183,15 +195,18 @@ final class Worker {
 	public static val TRANSFER_MODE_NOMAP:Int = 3n;
 	public static val TRANSFER_MODE_DEFAULT:Int = TRANSFER_MODE_TRANSACTIONAL;
 
-	private def setTransferMode(newMode:Int) {
-		this.transfer_mode = newMode;
+	def this() {
+		this(TRANSFER_MODE_DEFAULT);
+	}
+	
+	def this(transfer_mode:Int) {
+		this.transfer_mode = transfer_mode;
 		if(useMap()) {
 			this.map = ResilientMap.getMap[Place,Checkpoint]("map");
 		}
-	}
+	}	
 	
-	
-	private var transfer_mode:Int = TRANSFER_MODE_DEFAULT;
+	private val transfer_mode:Int;
 	
 	var map:ResilientMap[Place,Checkpoint];
 
@@ -323,7 +338,7 @@ final class Worker {
 		try {
 			val victim = Place((here.id + places - 1) % places);
 			at (victim) async {
-				singletonWorker.lifeline.set(true);
+				workers().lifeline.set(true);
 			};
 		} catch (e:DeadPlaceException) {
 			// TODO should go to next lifeline, but correct as is
@@ -354,7 +369,7 @@ final class Worker {
 		
 		try {
 			at(pp) @Uncounted async {
-				singletonWorker.request(from);
+				workers().request(from);
 			};
 		} catch (e:DeadPlaceException) {
 			// pretend stealing failed
@@ -394,7 +409,7 @@ final class Worker {
 		try {
 			val h:Place = home;
 			at(p) @Uncounted async {
-				singletonWorker.deal(h, null);
+				workers().deal(h, null);
 			};
 		} catch (e:DeadPlaceException) {
 			// place is dead, nothing to do
@@ -509,7 +524,7 @@ final class Worker {
 					transfer(p, b);
 					try {
 						at(p) async {
-							singletonWorker.lifelinedeal(b);
+							workers().lifelinedeal(b);
 						};
 					} catch (e:DeadPlaceException) {
 						// thief died, nothing to do
@@ -526,7 +541,7 @@ final class Worker {
 				try {
 					val h:Place = home;
 					at(p) @Uncounted async {
-						singletonWorker.deal(h, b);
+						workers().deal(h, b);
 					};
 				} catch (e:DeadPlaceException) {
 					// thief died, nothing to do
@@ -549,15 +564,14 @@ final class Worker {
 		return count;
 	}
 
-	public static def getGlobalStats():Stats {
+	public static def getGlobalStats(pg:PlaceGroup, workers:Workers):Stats {
 		val stats = new Stats();
 		finish {
-			val pg =  Place.places();
 			for (p in pg) {
 				if(p != here) {
 					async {
 						try {
-							val otherStats = at(p) Worker.singletonWorker.stats;
+							val otherStats = at(p) workers().stats;
 							stats.add(otherStats);
 						} catch(de:DeadPlaceException) {
 							// do nothing
@@ -566,7 +580,7 @@ final class Worker {
 				}
 			}
 			if(pg.contains(here)) {
-				stats.add(Worker.singletonWorker.stats);
+				stats.add(workers().stats);
 			}
 		}
 		return stats;

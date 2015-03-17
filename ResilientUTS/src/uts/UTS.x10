@@ -172,15 +172,16 @@ final class UTS {
 	
     val depth:int = d;
 
-    Worker.initTransferModes(transferMode);
+    val pg = Place.places();
+    val workers = Worker.make(pg, transferMode);
     
     //Console.OUT.println("Starting...");
     val startTime:Long = System.nanoTime();
 
     try {
     	finish {
-	      Worker.singletonWorker.init(19n, depth);
-	      Worker.singletonWorker.run();
+	      workers().init(19n, depth);
+	      workers().run();
 	    };
     } catch(me:MultipleExceptions) {
     	val me2 = me.filterExceptionsOfType[DeadPlaceException](true);
@@ -193,17 +194,17 @@ final class UTS {
 
     var count:Long = 0;
     // if places have died, process remaning nodes seqentially at place 0
-    if(Worker.singletonWorker.useMap()) {
-	    for (e in Worker.singletonWorker.map.entrySet()) {
+    if(workers().useMap()) {
+	    for (e in workers().map.entrySet()) {
 	      val b:Bag = e.getValue().bag;
 	      if (b != null && b.size != 0n) {
 	        Console.ERR.println("Recovering " + e.getKey());
-	        count += Worker.singletonWorker.seq(b);
+	        count += workers().seq(b);
 	      }
 	    }
 	
 	    // collect all counts
-	    for (c in Worker.singletonWorker.map.values()) {
+	    for (c in workers().map.values()) {
 	    	count += c.count;
 	    }
     } else {
@@ -216,15 +217,14 @@ final class UTS {
     	    	   return;
     	    }
     	    val counter = new AtomicLong(0L);
-    	    val pg = Place.places();
     	    finish {
 	    	    	for (p in pg) {
 	    	    		if(p != here) {
-	    	    			async counter.addAndGet(at(p) Worker.singletonWorker.count);
+	    	    			async counter.addAndGet(at(p) workers().count);
 	    	    		}
 	    	    	}
 	    	    	if(pg.contains(here)) {
-	    	    		counter.addAndGet(Worker.singletonWorker.count);
+	    	    		counter.addAndGet(workers().count);
 	    	    	}
     	    }
     	    count = counter.get();
@@ -234,7 +234,7 @@ final class UTS {
     val time = endTime - startTime;
     //Console.OUT.println("Finished.");
 
-    val stats = Worker.getGlobalStats();
+    val stats = Worker.getGlobalStats(pg, workers);
 
     if(csv) {
     		printCSV(time, count, stats);    	
