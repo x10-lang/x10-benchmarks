@@ -32,6 +32,7 @@ final class UTS {
 	  Console.ERR.println("-transferMode atomic-submit\tUse atomic operations to transfer data (not-resilient), and use key submission");
 	  Console.ERR.println("-transferMode nomap\tDon't use a resilient map to transfer data");
 
+	  Console.ERR.println("-workers <INT>\t\tSet the number of workers used (per-place)");
 	  Console.ERR.println("-depth <INT>\t\tSet the depth to be used");
 	  Console.ERR.println("-d <INT>\t\tSet the depth to be used");
 	  Console.ERR.println("<INT>\t\tSet the depth to be used");
@@ -56,14 +57,9 @@ final class UTS {
 
   
   public static def main(args:Rail[String]) throws DigestException : void {
-    // if (System.getProperty(Configuration.APGAS_PLACES) == null) {
-    //   System.setProperty(Configuration.APGAS_PLACES, "4");
-    // }
-    // System.setProperty(Configuration.APGAS_SERIALIZATION_EXCEPTION, "true");
-    // System.setProperty(Configuration.APGAS_RESILIENT, "true");
-    // GlobalRuntime.getRuntime(); // force init
 
 	var d:Int = 13n;
+	var w:Int = 1n;
 	var transferMode:Int = Worker.TRANSFER_MODE_DEFAULT;
 	var csv:Boolean = false;
 	
@@ -140,10 +136,27 @@ final class UTS {
 				return;
 			}
 
+		} else if(arg.equalsIgnoreCase("-workers") || arg.equalsIgnoreCase("-w")) {
+			curArg++;
+			if(curArg >= args.size) {
+				Console.ERR.println("Illegal " + arg + " argument with no corresponding number");
+				printUsage();
+				System.setExitCode(-1n);
+				return;
+			}
+			val arg2 = args(curArg);
+			try {
+				w = Int.parseInt(arg2);
+			} catch(e:Exception) {
+				Console.ERR.println("workers argument is not parseable as an integer " + arg2);
+				printUsage();
+				System.setExitCode(-1n);
+				return;
+			}
 		} else if(arg.equalsIgnoreCase("-depth") || arg.equalsIgnoreCase("-d")) {
 			curArg++;
 			if(curArg >= args.size) {
-				Console.ERR.println("Illegal -d argument with no corresponding depth");
+				Console.ERR.println("Illegal " + arg + " argument with no corresponding depth");
 				printUsage();
 				System.setExitCode(-1n);
 				return;
@@ -169,19 +182,33 @@ final class UTS {
 		}
 	}
 	
-	
+	if(d <= 0) {
+		Console.ERR.println("depth argument must be greater than zero, not " + d);
+		printUsage();
+		System.setExitCode(-1n);
+		return;
+	}
+
+	if(w <= 0) {
+		Console.ERR.println("workers argument must be greater than zero, not " + w);
+		printUsage();
+		System.setExitCode(-1n);
+		return;
+	}
+
     val depth:int = d;
+    val numWorkersPerPlace:Long = w as Long;
 
     val pg = Place.places();
-    val workers = Worker.make(pg, transferMode);
+    val workers = Worker.make(pg, numWorkersPerPlace, transferMode);
     
     //Console.OUT.println("Starting...");
     val startTime:Long = System.nanoTime();
 
     try {
     	finish {
-	      workers().init(19n, depth);
-	      workers().run();
+	      workers()(0).init(19n, depth);
+	      workers()(0).run();
 	    };
     } catch(me:MultipleExceptions) {
     	val me2 = me.filterExceptionsOfType[DeadPlaceException](true);
@@ -194,17 +221,17 @@ final class UTS {
 
     var count:Long = 0;
     // if places have died, process remaning nodes seqentially at place 0
-    if(workers().useMap()) {
-	    for (e in workers().map.entrySet()) {
+    if(workers()(0).useMap()) {
+	    for (e in workers()(0).map.entrySet()) {
 	      val b:Bag = e.getValue().bag;
 	      if (b != null && b.size != 0n) {
 	        Console.ERR.println("Recovering " + e.getKey());
-	        count += workers().seq(b);
+	        count += workers()(0).seq(b);
 	      }
 	    }
 	
 	    // collect all counts
-	    for (c in workers().map.values()) {
+	    for (c in workers()(0).map.values()) {
 	    	count += c.count;
 	    }
     } else {
@@ -216,25 +243,14 @@ final class UTS {
     	    	   System.setExitCode(-1n);
     	    	   return;
     	    }
-    	    val counter = new AtomicLong(0L);
-    	    finish {
-	    	    	for (p in pg) {
-	    	    		if(p != here) {
-	    	    			async counter.addAndGet(at(p) workers().count);
-	    	    		}
-	    	    	}
-	    	    	if(pg.contains(here)) {
-	    	    		counter.addAndGet(workers().count);
-	    	    	}
-    	    }
-    	    count = counter.get();
+    	    count = Worker.getGlobalCount(pg, numWorkersPerPlace, workers);
     }
 
     val endTime = System.nanoTime();
     val time = endTime - startTime;
     //Console.OUT.println("Finished.");
 
-    val stats = Worker.getGlobalStats(pg, workers);
+    val stats = Worker.getGlobalStats(pg, numWorkersPerPlace, workers);
 
     if(csv) {
     		printCSV(time, count, stats);    	

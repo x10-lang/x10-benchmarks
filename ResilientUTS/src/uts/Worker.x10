@@ -10,42 +10,77 @@ import java.util.Random;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
 import x10.util.concurrent.AtomicBoolean;
+import x10.util.concurrent.AtomicLong;
+
 import x10.interop.Java;
 import x10.compiler.Native;
 import x10.compiler.Uncounted;
+import x10.io.Unserializable;
 import x10.util.resilient.ResilientMap;
 import x10.util.resilient.ResilientTransactionalMap;
 import x10.util.Map.Entry;
 
-final class Worker {
+final class Worker(numWorkersPerPlace:Long) implements Unserializable {
+	private static val DEBUG=false;
 	
-	static type Workers = PlaceLocalHandle[Worker];
-	
-	public static def make(pg:PlaceGroup, transfer_mode:Int):Workers {
-		val workers = PlaceLocalHandle.make(pg, () => new Worker(transfer_mode) as Worker);
-		initAllWorkers(pg, workers);
+	static type LocalWorkers(n:Long) = Rail[Worker{numWorkersPerPlace==n}]{self.size==n};
+	static type Workers(n:Long) = PlaceLocalHandle[LocalWorkers(n)];
+
+	public static def make(pg:PlaceGroup, numWorkersPerPlace:Long, transfer_mode:Int):Workers(numWorkersPerPlace) {
+		val numPlaces = pg.size();
+		val numLocations = numPlaces * numWorkersPerPlace;
+		val workers = PlaceLocalHandle.make(pg,
+				(p:Place) => pg.indexOf(p),
+				(placeIndex:Long) => {
+					val baseLocation = placeIndex*numWorkersPerPlace;
+					return new Rail[Worker{self.numWorkersPerPlace==numWorkersPerPlace}](numWorkersPerPlace, 
+						(i:Long) => 
+							new Worker(baseLocation+i, numLocations, numWorkersPerPlace, transfer_mode) as Worker{self.numWorkersPerPlace==numWorkersPerPlace})
+							as LocalWorkers(numWorkersPerPlace);
+				});
+		initAllWorkers(pg, numWorkersPerPlace, workers);
 		return workers;
 	}
 	
-	var workers:Workers;
+	def this(globalLocation:Long, locations:Long, numWorkersPerPlace:Long, transfer_mode:Int)
+	:Worker{self.numWorkersPerPlace==numWorkersPerPlace} {
+		property(numWorkersPerPlace);
 
-	private def initWorkers(new_workers:Workers) {
+		this.transfer_mode = transfer_mode;
+		if(useMap()) {
+			this.map = ResilientMap.getMap[Long,Checkpoint]("map");
+		}
+		this.location = globalLocation;
+		this.numLocations = locations;
+		this.lifeline = new AtomicBoolean(globalLocation != locations - 1);
+	}	
+
+	var pg:PlaceGroup;
+	var workers:Workers(numWorkersPerPlace);
+
+	private def initWorkers(pg:PlaceGroup, new_workers:Workers(numWorkersPerPlace)) {
+		this.pg = pg;
 		this.workers = new_workers;
 	}
 	
-	public static def initAllWorkers(pg:PlaceGroup, workers:PlaceLocalHandle[Worker]) {
+	public static def initAllWorkers(pg:PlaceGroup, numWorkersPerPlace:Long, workers:Workers(numWorkersPerPlace)) {
 		try {
 			finish {
 				val pl = pg;
 				for (p in pl) {
 					if(p != here) {
+						val wplh = workers;
 						async at(p) {
-							workers().initWorkers(workers);
+							for(w in wplh()) {
+								w.initWorkers(pg, workers);
+							}
 						}
 					}
 				}
 				if(pl.contains(here)) {
-					workers().initWorkers(workers);
+					for(w in workers()) {
+						w.initWorkers(pg, workers);
+					}
 				}
 			}
 		} catch(me:MultipleExceptions) {
@@ -173,10 +208,11 @@ final class Worker {
 		sync_lock.lock();
 		// p is dead, unblock if waiting on p
 		// TODO: should not allocate a new Place all the time like this
-		if (state > 0 && new Place(state).isDead()) {
+		val state_place = placeOfLocation(state);
+		if (state > 0 && state_place.isDead()) {
 			try {				
 				// attempt to extract loot from store
-				val c:Checkpoint = map.get(home) as Checkpoint;
+				val c:Checkpoint = map.get(location) as Checkpoint;
 				if (c.bag != null) {
 					merge(c.bag);
 				}
@@ -195,24 +231,12 @@ final class Worker {
 	public static val TRANSFER_MODE_NOMAP:Int = 3n;
 	public static val TRANSFER_MODE_DEFAULT:Int = TRANSFER_MODE_TRANSACTIONAL;
 
-	def this() {
-		this(TRANSFER_MODE_DEFAULT);
-	}
-	
-	def this(transfer_mode:Int) {
-		this.transfer_mode = transfer_mode;
-		if(useMap()) {
-			this.map = ResilientMap.getMap[Place,Checkpoint]("map");
-		}
-	}	
-	
 	private val transfer_mode:Int;
 	
-	var map:ResilientMap[Place,Checkpoint];
+	var map:ResilientMap[Long,Checkpoint];
 
-	
-	val home:Place = here;
-	val places:Long = Place.numPlaces();
+	val location:Long;
+	val numLocations:Long;
 	
 	val random:Random = new Random();
 	val md:MessageDigest = encoder();
@@ -221,11 +245,11 @@ final class Worker {
 	var count:Long;
 
 	val thieves:ConcurrentLinkedQueue = new ConcurrentLinkedQueue();
-	val lifeline:AtomicBoolean = new AtomicBoolean(home.id != places - 1);
+	val lifeline:AtomicBoolean;
 	var state:Long = -2; // -2: inactive, -1: running, p: stealing from p
 
 	var stats:Stats = new Stats();
-		
+	
 	def digest() throws DigestException : Int {
 		if (bag.size >= bag.depth.size as Int) {
 			grow();
@@ -253,7 +277,7 @@ final class Worker {
 			bag.size = 1n;
 		}
 		if(useMap()) {
-			map.set(home, new Checkpoint(bag, count));
+			map.set(location, new Checkpoint(bag, count));
 		}
 	}
 
@@ -297,7 +321,9 @@ final class Worker {
 	}
 
 	def run() throws DigestException : void {
-		Console.ERR.println(here + " starting");
+		if(DEBUG) {
+			Console.ERR.println(getLocationString(location) + ": run() starting");
+		}
 		
 		sync_lock.lock();
 	    try {
@@ -314,7 +340,7 @@ final class Worker {
 				distribute();
 			}
 			if(useMap()) {
-				map.set(home, new Checkpoint(count));
+				map.set(location, new Checkpoint(count));
 			}
 			steal();
 		}
@@ -327,18 +353,40 @@ final class Worker {
 		}
 		
 		lifelinesteal();
-		Console.ERR.println(here + " stopping");
+		if(DEBUG) {
+			Console.ERR.println(getLocationString(location) + ": run() stopping");
+		}
 		distribute();
 	}
 
+	public def workerOfLocation(loc:Long):Long { 
+		return loc % numWorkersPerPlace;
+	}
+
+	public def placeOfLocation(loc:Long):Place { 
+		return pg(loc / numWorkersPerPlace);
+	}
+	
+	
+	def getLocationString(location:Long) {
+		return 
+		location + "=" + placeOfLocation(location).id + 
+		"[" + workerOfLocation(location) + "]"; 
+	}
+
+
 	def lifelinesteal():void {
-		if (places == 1) {
+		if (numLocations == 1) {
 			return;
 		}
 		try {
-			val victim = Place((here.id + places - 1) % places);
-			at (victim) async {
-				workers().lifeline.set(true);
+			val victim = (location + numLocations - 1) % numLocations;
+			val victim_worker = workerOfLocation(victim);
+			val victim_place = placeOfLocation(victim);
+			
+			val wplh = workers;
+			at(victim_place) async {
+				wplh()(victim_worker).lifeline.set(true);
 			};
 		} catch (e:DeadPlaceException) {
 			// TODO should go to next lifeline, but correct as is
@@ -346,30 +394,36 @@ final class Worker {
 	}
 
 	def steal():void {
-		if (places == 1) {
+		if (numLocations == 1) {
 			return;
 		}
-		val from:Place = home;
-		var p:Long = random.nextInt((places - 1) as Int) as Long;
-		if (p >= from.id) {
-			p++;
+		val thief = location;
+		
+		var victim:Long = random.nextInt((numLocations - 1) as Int) as Long;
+		if (victim >= thief) {
+			victim++;
 		}
-		val pp = Place(p);
-		if (!Place.places().contains(pp)) {
+		if(victim >= numLocations) {
+			return;
+		}
+		val victim_place = placeOfLocation(victim);
+		if (!pg.contains(victim_place)) {
 			// TODO should try other place, but ok as is
 			return;
 		}
 		
 		sync_lock.lock();
 		try {
-			state = p;
+			state = victim;
 		} finally {
 			sync_lock.unlock();
 		}
 		
 		try {
-			at(pp) @Uncounted async {
-				workers().request(from);
+			val wplh = workers;
+			val victim_worker = workerOfLocation(victim);
+			at(victim_place) @Uncounted async {
+				wplh()(victim_worker).request(thief);
 			};
 		} catch (e:DeadPlaceException) {
 			// pretend stealing failed
@@ -385,10 +439,10 @@ final class Worker {
 		sync_lock.lock();
 		try {
 			while (state >= 0) {
-				val daemon = unblockIfBlockedOnDeadPlaceDaemon();
-				daemon.start();
+				//val daemon = unblockIfBlockedOnDeadPlaceDaemon();
+				//daemon.start();
 				sync_lock.await();
-				daemon.stop();
+				//daemon.stop();
 			}
 		} finally {
 			sync_lock.unlock();
@@ -396,20 +450,30 @@ final class Worker {
 
 	}
 
-	def request(p:Place):void {
+	def request(thief:Long):void {
 		sync_lock.lock();
 		try {
 			if (state == -1) {
-				thieves.add(p);
+				if(DEBUG) {
+					Console.ERR.println(getLocationString(location) + ": request(" + getLocationString(thief) + ") being queued");
+				}
+				thieves.add(thief);
 				return;
 			}
 		} finally {
 			sync_lock.unlock();
 		}
 		try {
-			val h:Place = home;
-			at(p) @Uncounted async {
-				workers().deal(h, null);
+			val victim:Long = location;
+			val thief_worker = workerOfLocation(thief);
+			val thief_place = placeOfLocation(thief);
+			val wplh = workers;
+			if(DEBUG) {
+				Console.ERR.println(getLocationString(location) + ": request(" + getLocationString(thief) + ") being dealt");
+			}
+
+			at(thief_place) @Uncounted async {
+				wplh()(thief_worker).deal(victim, null);
 			};
 		} catch (e:DeadPlaceException) {
 			// place is dead, nothing to do
@@ -438,11 +502,19 @@ final class Worker {
 		}
 	}
 
-	 def deal(p:Place, b:Bag) : void {
+	 def deal(victim:Long, b:Bag) : void {
+		 if(DEBUG) {
+			 Console.ERR.println(getLocationString(location) + ": deal(" + getLocationString(victim) + "): initiated");
+		 }
+
 		val startTime = stats.startDeal();
 		sync_lock.lock();
 		try {
-			if (state != p.id) {
+			if (state != victim) {
+				if(DEBUG) {
+					Console.ERR.println(getLocationString(location) + ": deal(" + getLocationString(victim) + "): dead victim");
+				}
+
 				// victim is dead, ignore late distribution
 				return;
 			}
@@ -457,30 +529,30 @@ final class Worker {
 		}
 	}
 
-	def transfer(p:Place, b:Bag) : void {
+	def transfer(thief:Long, b:Bag) : void {
 		var startTime:Long = stats.startTransfer();
 		while(true) {
 			try {
 				if(transfer_mode == TRANSFER_MODE_TRANSACTIONAL) {
                     ResilientTransactionalMap.runTransaction("map",
-                    (map:ResilientTransactionalMap[Place, Checkpoint]) => {
-							map.set(home, new Checkpoint(bag, count));
-							val cor:Checkpoint = map.getForUpdate(p) as Checkpoint;
+                    (map:ResilientTransactionalMap[Long, Checkpoint]) => {
+							map.set(location, new Checkpoint(bag, count));
+							val cor:Checkpoint = map.getForUpdate(thief) as Checkpoint;
 							val n:long = cor == null ? 0 :cor.count;
-							map.set(p, new Checkpoint(b, n));
+							map.set(thief, new Checkpoint(b, n));
 							return null;
 						}
 					);
 				} else if(transfer_mode == TRANSFER_MODE_ATOMIC) {
 					// change to use set
-					map.set(home, new Checkpoint(bag, count));
-					val cor:Checkpoint = map.get(p);
+					map.set(location, new Checkpoint(bag, count));
+					val cor:Checkpoint = map.get(thief);
 					val n:long = cor == null ? 0 : cor.count;
-					map.set(p, new Checkpoint(b, n));
+					map.set(thief, new Checkpoint(b, n));
 				} else if(transfer_mode == TRANSFER_MODE_ATOMIC_SUBMIT) {
 					// change to use set
-					map.set(home, new Checkpoint(bag, count));
-					finish map.asyncSubmitToKey(p, (e:Entry[Place,Checkpoint]):Any => {
+					map.set(location, new Checkpoint(bag, count));
+					finish map.asyncSubmitToKey(thief, (e:Entry[Long,Checkpoint]):Any => {
 						val cor:Checkpoint = e.getValue();
 						val n:long = cor == null ? 0 : cor.count;
 						e.setValue(new Checkpoint(b,n));
@@ -496,7 +568,8 @@ final class Worker {
 				stats.endTransfer(startTime);
 				return;
 			} catch (t:CheckedThrowable) {
-				Console.ERR.println("Exception in transaction at " + here +
+							
+				Console.ERR.println(getLocationString(location) + ": Exception in transaction" +
 						" ... retrying");
 				t.printStackTrace();
 				startTime = stats.retryTransfer(startTime);
@@ -519,29 +592,37 @@ final class Worker {
 			if (lifeline.get()) {
 				val b:Bag = split(bag);
 				if (b != null) {
-					val p = Place((here.id + 1) % places);
+					val thief = ((location + 1) % numLocations);
 					lifeline.set(false);
-					transfer(p, b);
+					transfer(thief, b);
 					try {
-						at(p) async {
-							workers().lifelinedeal(b);
+						val thief_worker = workerOfLocation(thief);
+						val thief_place = placeOfLocation(thief);
+
+						val wplh = workers;
+						at(thief_place) async {
+							wplh()(thief_worker).lifelinedeal(b);
 						};
 					} catch (e:DeadPlaceException) {
 						// thief died, nothing to do
 					}
 				}
 			}
-			var por : Any;
-			while ((por = thieves.poll()) != null) {
-				val p = por as Place;
+			var thief_boxed : Any;
+			while ((thief_boxed = thieves.poll()) != null) {
+				val thief = thief_boxed as Long;
 				val b:Bag = split(bag);
 				if (b != null) {
-					transfer(p, b);
+					transfer(thief, b);
 				}
 				try {
-					val h:Place = home;
-					at(p) @Uncounted async {
-						workers().deal(h, b);
+					val victim:Long = location;
+					val thief_worker = workerOfLocation(thief);
+					val thief_place = placeOfLocation(thief);
+					val wplh = workers;
+
+					at(thief_place) @Uncounted async {
+						wplh()(thief_worker).deal(victim, b);
 					};
 				} catch (e:DeadPlaceException) {
 					// thief died, nothing to do
@@ -563,15 +644,47 @@ final class Worker {
 		}
 		return count;
 	}
+	
+	public static def getLocalCount(numWorkersPerPlace:Long, workers:LocalWorkers(numWorkersPerPlace)):Long {
+		var count:Long = 0;
+		for(worker in workers) {
+			count += worker.count;
+		}
+		return count; 
+	}
+	
+	public static def getGlobalCount(pg:PlaceGroup, numWorkersPerPlace:Long, workers:Workers(numWorkersPerPlace)):Long {
+		val counter = new AtomicLong(0L);
+		finish {
+			for (p in pg) {
+				if(p != here) {
+					async counter.addAndGet(at(p) getLocalCount(numWorkersPerPlace, workers()));
+				}
+			}
+			if(pg.contains(here)) {
+				counter.addAndGet(getLocalCount(numWorkersPerPlace, workers()));
+			}
+		}
+		return counter.get();
+	}
 
-	public static def getGlobalStats(pg:PlaceGroup, workers:Workers):Stats {
+
+	public static def getLocalStats(numWorkersPerPlace:Long, workers:LocalWorkers(numWorkersPerPlace)):Stats {
+		val stats = new Stats();
+		for(worker in workers) {
+			stats.add(worker.stats);
+		}
+		return stats;
+	}
+	
+	public static def getGlobalStats(pg:PlaceGroup, numWorkersPerPlace:Long, workers:Workers(numWorkersPerPlace)):Stats {
 		val stats = new Stats();
 		finish {
 			for (p in pg) {
 				if(p != here) {
 					async {
 						try {
-							val otherStats = at(p) workers().stats;
+							val otherStats = at(p) getLocalStats(numWorkersPerPlace, workers());
 							stats.add(otherStats);
 						} catch(de:DeadPlaceException) {
 							// do nothing
@@ -580,10 +693,9 @@ final class Worker {
 				}
 			}
 			if(pg.contains(here)) {
-				stats.add(workers().stats);
+				stats.add(getLocalStats(numWorkersPerPlace, workers()));
 			}
 		}
 		return stats;
 	}
-	
 }
