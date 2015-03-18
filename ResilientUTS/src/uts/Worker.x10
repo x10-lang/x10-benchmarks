@@ -71,6 +71,7 @@ final class Worker(numWorkersPerPlace:Long) implements Unserializable {
 					if(p != here) {
 						val wplh = workers;
 						async at(p) {
+							registerPlaceDeadHandler(numWorkersPerPlace, wplh());
 							for(w in wplh()) {
 								w.initWorkers(pg, workers);
 							}
@@ -78,6 +79,7 @@ final class Worker(numWorkersPerPlace:Long) implements Unserializable {
 					}
 				}
 				if(pl.contains(here)) {
+					registerPlaceDeadHandler(numWorkersPerPlace, workers());
 					for(w in workers()) {
 						w.initWorkers(pg, workers);
 					}
@@ -103,114 +105,28 @@ final class Worker(numWorkersPerPlace:Long) implements Unserializable {
 		return null;
 	}
 	
-	val sync_lock:Monitor = new Monitor();
+	val sync_lock:Monitor = new Monitor();	
 	
-	/*** TODO: This needs to be put in a polling loop somewhere
-	 * that checks if numPlaces has increased from last time we checked.
-	 * {
-	 * GlobalRuntime.getRuntime().setPlaceFailureHandler(place -> {
-	 * if (place.id > 0) {
-	 * System.err.println(home + " observes that " + place + " failed!");
-	 * }
-	 * singletonWorker.handle(place);
-	 * });
-	 * }
-	 */
-
-	//var placesAlreadyKnownDead:PlaceGroup;
-	//var placesAlreadyKnown:PlaceGroup;
-	
-	
-/*	def handleDeadPlaces():void {
-		var deadPlace:Long = -1;
-		sync_lock.lock();
-		try {
-			if(Place.numDead() != placesAlreadyKnownDead.size()) {
-				// the number of dead places has changed
-				for(pl in placesAlreadyKnown) {
-					if(pl.
-					if (!pl.isDead()) {
-						addDeadPlace(pl);
-						deadPlace = pl.id;
-						break;
-					}
-				}
+	private static def registerPlaceDeadHandler(numWorkersPerPlace:Long, workers:LocalWorkers(numWorkersPerPlace)) {
+		System.registerPlaceRemovedHandler((place:Place) => {
+			if(place.id > 0) {
+				Console.ERR.println(here + " observes that " + place + " failed!");
 			}
-		} finally {
-			sync_lock.unlock();
-		}
+			for(worker in workers) {
+				worker.handle(place);
+			}
+		});
 	}
-  
-	
-	def handle(p:Place):void {
+		
+	private def handle(p:Place):void {
 		sync_lock.lock();
 		// p is dead, unblock if waiting on p
-		if (state == p.id) {
+		val statePlace = placeOfLocation(state);
+		if (statePlace == p) {
 			try {
-				
-				// attempt to extract loot from store
-				val c:Checkpoint = map.get(home) as Checkpoint;
-				if (c.bag != null) {
-					merge(c.bag);
+				if(DEBUG) {
+					Console.ERR.println(getLocationString(location) + ": handle(" + p + "): unblocking");
 				}
-				state = -1;
-			} finally {
-				sync_lock.release();
-			}
-		} else {
-			sync_lock.unlock();
-		}
-	}
-	*/
-	
-	interface Daemon {
-		def start():void;
-		def stop():void;
-	}
-	
-	def waitingDaemon(f:()=>void):Daemon {
-		return new Daemon() {
-			val stopped:AtomicBoolean = new AtomicBoolean(false);
-			public def start():void {
-				@Uncounted async{
-					while(! stopped.get()) {
-						f();
-						System.sleep(1000);
-					}
-				}
-			}
-			public def stop():void {
-				stopped.set(true);
-			}
-		};
-	}
-	
-	final def useMap() {
-		return TRANSFER_MODE_NOMAP != transfer_mode;
-	}
-	
-	def unblockIfBlockedOnDeadPlaceDaemon():Daemon {
-		if(useMap()) {
-			return waitingDaemon(() => {unblockIfBlockedOnDeadPlace();});
-		} else {
-			return new Daemon() {
-				public def start():void {
-					
-				}
-				public def stop():void {
-					
-				}
-			};
-		}
-	}
-	
-	def unblockIfBlockedOnDeadPlace():void {
-		sync_lock.lock();
-		// p is dead, unblock if waiting on p
-		// TODO: should not allocate a new Place all the time like this
-		val state_place = placeOfLocation(state);
-		if (state > 0 && state_place.isDead()) {
-			try {				
 				// attempt to extract loot from store
 				val c:Checkpoint = map.get(location) as Checkpoint;
 				if (c.bag != null) {
@@ -223,6 +139,10 @@ final class Worker(numWorkersPerPlace:Long) implements Unserializable {
 		} else {
 			sync_lock.unlock();
 		}
+	}
+	
+	final def useMap() {
+		return TRANSFER_MODE_NOMAP != transfer_mode;
 	}
 		
 	public static val TRANSFER_MODE_TRANSACTIONAL:Int = 0n;
@@ -439,10 +359,7 @@ final class Worker(numWorkersPerPlace:Long) implements Unserializable {
 		sync_lock.lock();
 		try {
 			while (state >= 0) {
-				//val daemon = unblockIfBlockedOnDeadPlaceDaemon();
-				//daemon.start();
 				sync_lock.await();
-				//daemon.stop();
 			}
 		} finally {
 			sync_lock.unlock();

@@ -225,7 +225,7 @@ final class UTS {
 	    for (e in workers()(0).map.entrySet()) {
 	      val b:Bag = e.getValue().bag;
 	      if (b != null && b.size != 0n) {
-	        Console.ERR.println("Recovering " + e.getKey());
+	        Console.ERR.println("Recovering " + workers()(0).getLocationString(e.getKey()));
 	        count += workers()(0).seq(b);
 	      }
 	    }
@@ -251,7 +251,7 @@ final class UTS {
     //Console.OUT.println("Finished.");
 
     val stats = Worker.getGlobalStats(pg, numWorkersPerPlace, workers);
-
+    
     if(csv) {
     		printCSV(time, count, stats);    	
     } else {
