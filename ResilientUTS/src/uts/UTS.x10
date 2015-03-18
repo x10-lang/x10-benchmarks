@@ -32,7 +32,7 @@ final class UTS {
 	  Console.ERR.println("-transferMode atomic-submit\tUse atomic operations to transfer data (not-resilient), and use key submission");
 	  Console.ERR.println("-transferMode nomap\tDon't use a resilient map to transfer data");
 
-	  Console.ERR.println("-workers <INT>\t\tSet the number of workers used (per-place)");
+	  Console.ERR.println("-workers <INT>\t\tSet the number of workers used (per-place).  If this is set to 0, a special sequential version is run");
 	  Console.ERR.println("-depth <INT>\t\tSet the depth to be used");
 	  Console.ERR.println("-d <INT>\t\tSet the depth to be used");
 	  Console.ERR.println("<INT>\t\tSet the depth to be used");
@@ -60,7 +60,7 @@ final class UTS {
 
 	var d:Int = 13n;
 	var w:Int = 1n;
-	var transferMode:Int = Worker.TRANSFER_MODE_DEFAULT;
+	var specifiedTransferMode:Int = Worker.TRANSFER_MODE_DEFAULT;
 	var csv:Boolean = false;
 	
 	for(var curArg:Long = 0; curArg < args.size; curArg++) {
@@ -122,13 +122,13 @@ final class UTS {
 			}
 			val arg2 = args(curArg);
 			if(arg2.equalsIgnoreCase("transact") || arg2.equalsIgnoreCase("transactional") || arg2.equalsIgnoreCase("t")) {
-				transferMode = Worker.TRANSFER_MODE_TRANSACTIONAL;
+				specifiedTransferMode = Worker.TRANSFER_MODE_TRANSACTIONAL;
 			} else if(arg2.equalsIgnoreCase("atomic") || arg2.equalsIgnoreCase("atom") || arg2.equalsIgnoreCase("a")) {
-				transferMode = Worker.TRANSFER_MODE_ATOMIC;
+				specifiedTransferMode = Worker.TRANSFER_MODE_ATOMIC;
 			} else if(arg2.equalsIgnoreCase("atomic-submit") || arg2.equalsIgnoreCase("atom-submit") || arg2.equalsIgnoreCase("as")) {
-				transferMode = Worker.TRANSFER_MODE_ATOMIC;
+				specifiedTransferMode = Worker.TRANSFER_MODE_ATOMIC;
 			} else if(arg2.equalsIgnoreCase("nomap") || arg2.equalsIgnoreCase("nm")) {
-				transferMode = Worker.TRANSFER_MODE_NOMAP;
+				specifiedTransferMode = Worker.TRANSFER_MODE_NOMAP;
 			} else {
 				Console.ERR.println("transferMode argument is not valid " + arg2);
 				printUsage();
@@ -189,17 +189,21 @@ final class UTS {
 		return;
 	}
 
-	if(w <= 0) {
-		Console.ERR.println("workers argument must be greater than zero, not " + w);
+	if(w < 0) {
+		Console.ERR.println("workers argument must be less than zero, not " + w);
 		printUsage();
 		System.setExitCode(-1n);
 		return;
 	}
 
     val depth:int = d;
-    val numWorkersPerPlace:Long = w as Long;
-
-    val pg = Place.places();
+    val isSequential = w == 0n;
+    val numWorkersPerPlace:Long = isSequential ? 1 : w as Long;
+    
+    // If we are running sequentially, we do not want to use Hazelcast
+    val transferMode = isSequential ? Worker.TRANSFER_MODE_NOMAP : specifiedTransferMode;
+    
+    val pg = isSequential ? new SparsePlaceGroup(here) : Place.places();
     val workers = Worker.make(pg, numWorkersPerPlace, transferMode);
     
     //Console.OUT.println("Starting...");
@@ -208,6 +212,9 @@ final class UTS {
     try {
     	finish {
 	      workers()(0).init(19n, depth);
+	      if(isSequential) {
+	    	      workers()(0).seq();
+	      }
 	      workers()(0).run();
 	    };
     } catch(me:MultipleExceptions) {

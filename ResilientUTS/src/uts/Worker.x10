@@ -550,16 +550,20 @@ final class Worker(numWorkersPerPlace:Long) implements Unserializable {
 		}
 	}
 
-	def seq(b:Bag):Long {
+	def seq():Long {
 		count = 0;
 		try {
-			bag = b;
 			while (bag.size > 0n) {
 				expand();
 			}
 		} catch (e:DigestException) {
 		}
 		return count;
+	}
+	
+	def seq(b:Bag):Long {
+		bag = b;
+		return seq();
 	}
 	
 	public static def getLocalCount(numWorkersPerPlace:Long, workers:LocalWorkers(numWorkersPerPlace)):Long {
