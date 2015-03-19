@@ -133,20 +133,22 @@ final class Worker(numWorkersPerPlace:Long) implements Unserializable {
 	private def handle(p:Place):void {
 		sync_lock.lock();
 		// p is dead, unblock if waiting on p
-		val statePlace = placeOfLocation(state);
-		if (statePlace == p) {
-			try {
-				if(DEBUG) {
-					Console.ERR.println(getLocationString(location) + ": handle(" + p + "): unblocking");
+		if(state >= 0) {
+			val statePlace = placeOfLocation(state);
+			if (statePlace == p) {
+				try {
+					if(DEBUG) {
+						Console.ERR.println(getLocationString(location) + ": handle(" + p + "): unblocking");
+					}
+					// attempt to extract loot from store
+					val c:Checkpoint = map.get(location) as Checkpoint;
+					if (c.bag != null) {
+						merge(c.bag);
+					}
+					state = -1;
+				} finally {
+					sync_lock.release();
 				}
-				// attempt to extract loot from store
-				val c:Checkpoint = map.get(location) as Checkpoint;
-				if (c.bag != null) {
-					merge(c.bag);
-				}
-				state = -1;
-			} finally {
-				sync_lock.release();
 			}
 		} else {
 			sync_lock.unlock();
