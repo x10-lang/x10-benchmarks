@@ -202,9 +202,10 @@ final class UTS {
     
     // If we are running sequentially, we do not want to use Hazelcast
     val transferMode = isSequential ? Worker.TRANSFER_MODE_NOMAP : specifiedTransferMode;
+    val diffThreads = isSequential ? 0n : (w + 1n - x10.xrx.Runtime.NTHREADS);
     
     val pg = isSequential ? new SparsePlaceGroup(here) : Place.places();
-    val workers = Worker.make(pg, numWorkersPerPlace, transferMode);
+    val workers = Worker.make(diffThreads, pg, numWorkersPerPlace, transferMode);
     
     //Console.OUT.println("Starting...");
     val startTime:Long = System.nanoTime();

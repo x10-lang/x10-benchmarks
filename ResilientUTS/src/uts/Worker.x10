@@ -26,7 +26,7 @@ final class Worker(numWorkersPerPlace:Long) implements Unserializable {
 	static type LocalWorkers(n:Long) = Rail[Worker{numWorkersPerPlace==n}]{self.size==n};
 	static type Workers(n:Long) = PlaceLocalHandle[LocalWorkers(n)];
 
-	public static def make(pg:PlaceGroup, numWorkersPerPlace:Long, transfer_mode:Int):Workers(numWorkersPerPlace) {
+	public static def make(diffThreads:Int, pg:PlaceGroup, numWorkersPerPlace:Long, transfer_mode:Int):Workers(numWorkersPerPlace) {
 		val numPlaces = pg.size();
 		val numLocations = numPlaces * numWorkersPerPlace;
 		val workers = PlaceLocalHandle.make(pg,
@@ -38,7 +38,7 @@ final class Worker(numWorkersPerPlace:Long) implements Unserializable {
 							new Worker(baseLocation+i, numLocations, numWorkersPerPlace, transfer_mode) as Worker{self.numWorkersPerPlace==numWorkersPerPlace})
 							as LocalWorkers(numWorkersPerPlace);
 				});
-		initAllWorkers(pg, numWorkersPerPlace, workers);
+		initAllWorkers(diffThreads, pg, numWorkersPerPlace, workers);
 		return workers;
 	}
 	
@@ -63,7 +63,17 @@ final class Worker(numWorkersPerPlace:Long) implements Unserializable {
 		this.workers = new_workers;
 	}
 	
-	public static def initAllWorkers(pg:PlaceGroup, numWorkersPerPlace:Long, workers:Workers(numWorkersPerPlace)) {
+	private static def adjustThreads(diffThreads:Int) {
+		if(diffThreads > 0n) {
+			for(var i:Int = 0n; i < diffThreads; i++) {
+				x10.xrx.Runtime.increaseParallelism();
+			}
+		} else if(diffThreads < 0n) {
+			x10.xrx.Runtime.decreaseParallelism(-diffThreads);
+		}
+	}
+	
+	public static def initAllWorkers(diffThreads:Int, pg:PlaceGroup, numWorkersPerPlace:Long, workers:Workers(numWorkersPerPlace)) {
 		try {
 			finish {
 				val pl = pg;
@@ -71,6 +81,7 @@ final class Worker(numWorkersPerPlace:Long) implements Unserializable {
 					if(p != here) {
 						val wplh = workers;
 						async at(p) {
+							adjustThreads(diffThreads);
 							registerPlaceDeadHandler(numWorkersPerPlace, wplh());
 							for(w in wplh()) {
 								w.initWorkers(pg, workers);
@@ -79,6 +90,7 @@ final class Worker(numWorkersPerPlace:Long) implements Unserializable {
 					}
 				}
 				if(pl.contains(here)) {
+					adjustThreads(diffThreads);
 					registerPlaceDeadHandler(numWorkersPerPlace, workers());
 					for(w in workers()) {
 						w.initWorkers(pg, workers);
