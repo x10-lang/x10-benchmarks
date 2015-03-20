@@ -27,6 +27,11 @@ do
     echo "Running experiments with transferMode $mode"
     unset BENCH_RESULTS
     BENCH_LOG_DIR="${BASE_BENCH_LOG_DIR}/$mode"
-    BENCH_LOG_DIR="$BENCH_LOG_DIR" GLOBAL_BENCH_ARGS="-transferMode $mode" ${BASE_DIR}/runTestConfigs.sh "$@"
+    GLOBAL_BENCH_X10_ARGS=
+    if [ "$mode" != "nomap" ]; then
+	export GLOBAL_BENCH_X10_ARGS="-DX10RT_DATASTORE=Hazelcast"
+    fi
+
+    BENCH_LOG_DIR="$BENCH_LOG_DIR" GLOBAL_BENCH_MODE="$mode" ${BASE_DIR}/runTestConfigs.sh "$@"
     cat $BENCH_LOG_DIR/results.csv >> ${BASE_RESULTS}
 done
