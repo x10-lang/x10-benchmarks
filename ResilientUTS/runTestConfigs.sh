@@ -20,8 +20,9 @@ x10 -cp ${BENCH_JAR} uts.UTS -statsHeader csv | sed 's/CSV/Transfer Mode, #Machi
 for testConfigFile in "$@"
 do
     echo "Running $testConfigFile experiments"
-    while read -r line
+    while read -u 10 -r line 
     do
+	echo "Running $line"
 	OIFS=$IFS
 	IFS=","
 	line_parts=($line)
@@ -120,5 +121,5 @@ do
 	x10 ${ALL_BENCH_X10_ARGS} -cp ${BENCH_JAR} uts.UTS -statsFormat csv -workers ${ACTUAL_BENCH_WORKERS} -depth ${BENCH_DEPTH} -transferMode ${ACTUAL_BENCH_MODE} ${ALL_BENCH_ARGS} >> ${LOG_FILE} 2> ${LOG_FILE}.err
 
 	grep CSV ${LOG_FILE} | sed "s/CSV/$ACTUAL_BENCH_MODE, $BENCH_NODES, $BENCH_PLACES_PER_NODE, $ACTUAL_BENCH_WORKERS, $BENCH_DEPTH, $ALL_BENCH_ARGS/" >> ${BENCH_RESULTS}
-    done < $testConfigFile
+    done 10< $testConfigFile
 done
