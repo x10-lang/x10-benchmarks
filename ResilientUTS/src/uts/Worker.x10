@@ -286,11 +286,11 @@ final class Worker(numWorkersPerPlace:Long) implements Unserializable {
 			sync_lock.unlock();
 		}
 		
+		distribute();
 		lifelinesteal();
 		if(DEBUG) {
 			Console.ERR.println(getLocationString(location) + ": run() stopping");
 		}
-		distribute();
 	}
 
 	public def workerOfLocation(loc:Long):Long { 
