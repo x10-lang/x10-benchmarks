@@ -17,14 +17,14 @@ public class SeriesRunner {
 	var array_rows: int;
 	var nthreads: int;
 
-	public def this(var id: int, var p: int, var rows: int, var a: Array[double]): SeriesRunner = {
+	public def this(var id: int, var p: int, var rows: int, var a: Array[double]): SeriesRunner {
 		this.id = id;
 		this.nthreads = p;
 		this.testArray = a;
 		this.array_rows = rows;
 	}
 
-	public def run(): void = {
+	public def run(): void {
 		var omega: double;       // Fundamental frequency.
 		var ilow: int;
 		var iupper: int;
@@ -88,7 +88,7 @@ public class SeriesRunner {
 	 * select = 0 for the A[0] term, 1 for cosine terms, and 2 for
 	 * sine terms. Returns the value.
 	 */
-	private def TrapezoidIntegrate(var x0: double, var x1: double, var nsteps: int, var omegan: double, var select: int): double = {
+	private def TrapezoidIntegrate(var x0: double, var x1: double, var nsteps: int, var omegan: double, var select: int): double {
 		var x: double;               // Independent variable.
 		var dx: double;              // Step size.
 		var rvalue: double;          // Return value.
@@ -131,7 +131,7 @@ public class SeriesRunner {
 	 * and select chooses which of the sine/cosine functions
 	 * are used. Note the special case for select = 0.
 	 */
-	private def thefunction(var x: double, var omegan: double, var select: int): double = {
+	private def thefunction(var x: double, var omegan: double, var select: int): double {
 		// Use select to pick which function we call.
 
 		switch (select)

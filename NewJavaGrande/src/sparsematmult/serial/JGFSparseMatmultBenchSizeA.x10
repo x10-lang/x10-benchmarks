@@ -25,14 +25,14 @@ import harness.x10Test;;
 
 public class JGFSparseMatmultBenchSizeA extends x10Test {
 
-	public def run(): boolean = {
+	public def run(): boolean {
 		JGFInstrumentor.printHeader(2, 0);
 		var smm: JGFSparseMatmultBench = new JGFSparseMatmultBench();
 		smm.JGFrun(0);
 		return true;
 	}
 
-	public static def main(var args: Rail[String]): void = {
+	public static def main(var args: Rail[String]): void {
 		new JGFSparseMatmultBenchSizeA().execute();
 	}
 }

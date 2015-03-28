@@ -102,7 +102,7 @@ public class ReturnPath extends PathId {
 	/**
 	 * Default constructor.
 	 */
-	public def this(): ReturnPath = {
+	public def this(): ReturnPath {
 		super();
 		set_prompt(prompt);
 		set_DEBUG(debug);
@@ -117,7 +117,7 @@ public class ReturnPath extends PathId {
 	 * @param returnDefinition to tell this class how the return path values
 	 *                         were computed.
 	 */
-	public def this(var pathValue: Array[double], var nPathValue: int, var returnDefinition: int): ReturnPath = {
+	public def this(var pathValue: Array[double], var nPathValue: int, var returnDefinition: int): ReturnPath {
 		set_prompt(prompt);
 		set_DEBUG(debug);
 		this.pathValue = pathValue;
@@ -138,7 +138,7 @@ public class ReturnPath extends PathId {
 	 * @return Value of instance variable <code>pathValue</code>.
 	 * @exception DemoException thrown if instance variable <code>pathValue</code> is undefined.
 	 */
-	public def get_pathValue(): Array[double] = {
+	public def get_pathValue(): Array[double] {
 		// (VIVEK) The following test is no longer necessary because pathValue is not nullable
 		// if (this.pathValue == null)
 		// throw new DemoException("Variable pathValue is undefined!");
@@ -149,7 +149,7 @@ public class ReturnPath extends PathId {
 	 * Set method for private instance variable <code>pathValue</code>.
 	 * @param pathValue the value to set for the instance variable <code>pathValue</code>.
 	 */
-	public def set_pathValue(var pathValue: Array[double]): void = {
+	public def set_pathValue(var pathValue: Array[double]): void {
 		this.pathValue = pathValue;
 	}
 
@@ -158,7 +158,7 @@ public class ReturnPath extends PathId {
 	 * @return Value of instance variable <code>nPathValue</code>.
 	 * @exception DemoException thrown if instance variable <code>nPathValue</code> is undefined.
 	 */
-	public def get_nPathValue(): int = {
+	public def get_nPathValue(): int {
 		if (this.nPathValue == 0)
 			throw new DemoException("Variable nPathValue is undefined!");
 		return (this.nPathValue);
@@ -168,7 +168,7 @@ public class ReturnPath extends PathId {
 	 * Set method for private instance variable <code>nPathValue</code>.
 	 * @param nPathValue the value to set for the instance variable <code>nPathValue</code>.
 	 */
-	public def set_nPathValue(var nPathValue: int): void = {
+	public def set_nPathValue(var nPathValue: int): void {
 		this.nPathValue = nPathValue;
 	}
 
@@ -177,7 +177,7 @@ public class ReturnPath extends PathId {
 	 * @return Value of instance variable <code>returnDefinition</code>.
 	 * @exception DemoException thrown if instance variable <code>returnDefinition</code> is undefined.
 	 */
-	public def get_returnDefinition(): int = {
+	public def get_returnDefinition(): int {
 		if (this.returnDefinition == 0)
 			throw new DemoException("Variable returnDefinition is undefined!");
 		return (this.returnDefinition);
@@ -187,7 +187,7 @@ public class ReturnPath extends PathId {
 	 * Set method for private instance variable <code>returnDefinition</code>.
 	 * @param returnDefinition the value to set for the instance variable <code>returnDefinition</code>.
 	 */
-	public def set_returnDefinition(var returnDefinition: int): void = {
+	public def set_returnDefinition(var returnDefinition: int): void {
 		this.returnDefinition = returnDefinition;
 	}
 
@@ -196,7 +196,7 @@ public class ReturnPath extends PathId {
 	 * @return Value of instance variable <code>expectedReturnRate</code>.
 	 * @exception DemoException thrown if instance variable <code>expectedReturnRate</code> is undefined.
 	 */
-	public def get_expectedReturnRate(): double = {
+	public def get_expectedReturnRate(): double {
 		if (this.expectedReturnRate == Double.NaN)
 			throw new DemoException("Variable expectedReturnRate is undefined!");
 		return (this.expectedReturnRate);
@@ -206,7 +206,7 @@ public class ReturnPath extends PathId {
 	 * Set method for private instance variable <code>expectedReturnRate</code>.
 	 * @param expectedReturnRate the value to set for the instance variable <code>expectedReturnRate</code>.
 	 */
-	public def set_expectedReturnRate(var expectedReturnRate: double): void = {
+	public def set_expectedReturnRate(var expectedReturnRate: double): void {
 		this.expectedReturnRate = expectedReturnRate;
 	}
 
@@ -215,7 +215,7 @@ public class ReturnPath extends PathId {
 	 * @return Value of instance variable <code>volatility</code>.
 	 * @exception DemoException thrown if instance variable <code>volatility</code> is undefined.
 	 */
-	public def get_volatility(): double = {
+	public def get_volatility(): double {
 		if (this.volatility == Double.NaN)
 			throw new DemoException("Variable volatility is undefined!");
 		return (this.volatility);
@@ -225,7 +225,7 @@ public class ReturnPath extends PathId {
 	 * Set method for private instance variable <code>volatility</code>.
 	 * @param volatility the value to set for the instance variable <code>volatility</code>.
 	 */
-	public def set_volatility(var volatility: double): void = {
+	public def set_volatility(var volatility: double): void {
 		this.volatility = volatility;
 	}
 
@@ -234,7 +234,7 @@ public class ReturnPath extends PathId {
 	 * @return Value of instance variable <code>volatility2</code>.
 	 * @exception DemoException thrown if instance variable <code>volatility2</code> is undefined.
 	 */
-	public def get_volatility2(): double = {
+	public def get_volatility2(): double {
 		if (this.volatility2 == Double.NaN)
 			throw new DemoException("Variable volatility2 is undefined!");
 		return (this.volatility2);
@@ -244,7 +244,7 @@ public class ReturnPath extends PathId {
 	 * Set method for private instance variable <code>volatility2</code>.
 	 * @param volatility2 the value to set for the instance variable <code>volatility2</code>.
 	 */
-	public def set_volatility2(var volatility2: double): void = {
+	public def set_volatility2(var volatility2: double): void {
 		this.volatility2 = volatility2;
 	}
 
@@ -253,7 +253,7 @@ public class ReturnPath extends PathId {
 	 * @return Value of instance variable <code>mean</code>.
 	 * @exception DemoException thrown if instance variable <code>mean</code> is undefined.
 	 */
-	public def get_mean(): double = {
+	public def get_mean(): double {
 		if (this.mean == Double.NaN)
 			throw new DemoException("Variable mean is undefined!");
 		return (this.mean);
@@ -263,7 +263,7 @@ public class ReturnPath extends PathId {
 	 * Set method for private instance variable <code>mean</code>.
 	 * @param mean the value to set for the instance variable <code>mean</code>.
 	 */
-	public def set_mean(var mean: double): void = {
+	public def set_mean(var mean: double): void {
 		this.mean = mean;
 	}
 
@@ -272,7 +272,7 @@ public class ReturnPath extends PathId {
 	 * @return Value of instance variable <code>variance</code>.
 	 * @exception DemoException thrown if instance variable <code>variance</code> is undefined.
 	 */
-	public def get_variance(): double = {
+	public def get_variance(): double {
 		if (this.variance == Double.NaN)
 			throw new DemoException("Variable variance is undefined!");
 		return (this.variance);
@@ -282,7 +282,7 @@ public class ReturnPath extends PathId {
 	 * Set method for private instance variable <code>variance</code>.
 	 * @param variance the value to set for the instance variable <code>variance</code>.
 	 */
-	public def set_variance(var variance: double): void = {
+	public def set_variance(var variance: double): void {
 		this.variance = variance;
 	}
 
@@ -295,7 +295,7 @@ public class ReturnPath extends PathId {
 	 *
 	 * @exception DemoException thrown one tries to obtain an undefined variable.
 	 */
-	public def computeExpectedReturnRate(): void = {
+	public def computeExpectedReturnRate(): void {
 		this.expectedReturnRate = mean/get_dTime() + 0.5*volatility2;
 	}
 
@@ -308,7 +308,7 @@ public class ReturnPath extends PathId {
 	 * @exception DemoException thrown if one of the quantites in the
 	 *                          computation are undefined.
 	 */
-	public def computeVolatility(): void = {
+	public def computeVolatility(): void {
 		if (this.variance == Double.NaN)
 			throw new DemoException("Variable variance is not defined!");
 		this.volatility2 = variance / get_dTime();
@@ -322,7 +322,7 @@ public class ReturnPath extends PathId {
 	 * @exception DemoException thrown if <code>nPathValue</code> is
 	 *            undefined.
 	 */
-	public def computeMean(): void = {
+	public def computeMean(): void {
 		if (this.nPathValue == 0)
 			throw new DemoException("Variable nPathValue is undefined!");
 		this.mean = 0.0;
@@ -339,7 +339,7 @@ public class ReturnPath extends PathId {
 	 * @exception DemoException thrown if the <code>mean</code> or
 	 *            <code>nPathValue</code> values are undefined.
 	 */
-	public def computeVariance(): void = {
+	public def computeVariance(): void {
 		if (this.mean == Double.NaN || this.nPathValue == 0)
 			throw new DemoException("Variable mean and/or nPathValue are undefined!");
 		this.variance = 0.0;
@@ -356,7 +356,7 @@ public class ReturnPath extends PathId {
 	 * @exception DemoException thrown if there is a problem reading any
 	 *            variables.
 	 */
-	public def estimatePath(): void = {
+	public def estimatePath(): void {
 		computeMean();
 		computeVariance();
 		computeExpectedReturnRate();
@@ -366,7 +366,7 @@ public class ReturnPath extends PathId {
 	/**
 	 * Dumps the contents of the fields, to standard-out, for debugging.
 	 */
-	public def dbgDumpFields(): void = {
+	public def dbgDumpFields(): void {
 		//super.dbgDumpFields();
 		//dbgPrintln("nPathValue = "        +this.nPathValue);
 		//dbgPrintln("expectedReturnRate = "+this.expectedReturnRate);

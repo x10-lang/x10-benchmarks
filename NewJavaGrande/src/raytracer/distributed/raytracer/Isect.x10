@@ -27,13 +27,13 @@ public class Isect {
 	public var enter: int;
 	public var prim: Primitive;
 	public var surf: Surface;
-	public def this(): Isect = {
+	public def this(): Isect {
 		t = 0.0;
 		enter = 0;
 		prim = null;
 		surf = null;
 	}
-	public def this(var t_: double, var enter_: int, var prim_: Primitive, var surf_: Surface): Isect = {
+	public def this(var t_: double, var enter_: int, var prim_: Primitive, var surf_: Surface): Isect {
 		t = t_;
 		enter = enter_;
 		prim = prim_;

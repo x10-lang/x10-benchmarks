@@ -46,7 +46,7 @@ public class Universal {
 	/**
 	 * Default constructor.
 	 */
-	public def this(): Universal = {
+	public def this(): Universal {
 		super();
 		this.debug = true;
 		this.prompt = "Universal> ";
@@ -64,7 +64,7 @@ public class Universal {
 	 * Accessor method for private instance variable <code>debug</code>.
 	 * @return Value of instance variable <code>debug</code>.
 	 */
-	public def get_DEBUG(): boolean = {
+	public def get_DEBUG(): boolean {
 		return (this.debug);
 	}
 
@@ -72,7 +72,7 @@ public class Universal {
 	 * set method for private instance variable <code>DEBUG</code>.
 	 * @param DEBUG the value to set for the instance variable <code>DEBUG</code>.
 	 */
-	@NonEscaping final public def set_DEBUG(var debug: boolean): void = {
+	@NonEscaping final public def set_DEBUG(var debug: boolean): void {
 		this.debug = debug;
 	}
 
@@ -80,7 +80,7 @@ public class Universal {
 	 * Accessor method for private instance variable <code>UNIVERSAL_DEBUG</code>.
 	 * @return Value of instance variable <code>UNIVERSAL_DEBUG</code>.
 	 */
-	public def get_UNIVERSAL_DEBUG(): boolean = {
+	public def get_UNIVERSAL_DEBUG(): boolean {
 		return (this.universal_debug);
 	}
 
@@ -89,7 +89,7 @@ public class Universal {
 	 * @param UNIVERSAL_DEBUG the value to set for the instance
 	 *        variable <code>UNIVERSAL_DEBUG</code>.
 	 */
-	public def set_UNIVERSAL_DEBUG(var UNIVERSAL_DEBUG: boolean): void = {
+	public def set_UNIVERSAL_DEBUG(var UNIVERSAL_DEBUG: boolean): void {
 		this.universal_debug = UNIVERSAL_DEBUG;
 	}
 
@@ -97,7 +97,7 @@ public class Universal {
 	 * Accessor method for private instance variable <code>prompt</code>.
 	 * @return Value of instance variable <code>prompt</code>.
 	 */
-	public def get_prompt(): String = {
+	public def get_prompt(): String {
 		return (this.prompt);
 	}
 
@@ -105,7 +105,7 @@ public class Universal {
 	 * Set method for private instance variable <code>prompt</code>.
 	 * @param prompt the value to set for the instance variable <code>prompt</code>.
 	 */
-	@NonEscaping final public def set_prompt(var prompt: String): void = {
+	@NonEscaping final public def set_prompt(var prompt: String): void {
 		this.prompt = prompt;
 	}
 
@@ -116,7 +116,7 @@ public class Universal {
 	 *
 	 * @param s The debug message to print out, to PrintStream "out".
 	 */
-	public def dbgPrintln(var s: String): void = {
+	public def dbgPrintln(var s: String): void {
 		if (debug || universal_debug) {
 			Console.OUT.println("DBG "+prompt+s);
 		}
@@ -127,7 +127,7 @@ public class Universal {
 	 *
 	 * @param s The debug message to print out, to PrintStream "out".
 	 */
-	public def dbgPrint(var s: String): void = {
+	public def dbgPrint(var s: String): void {
 		if (debug || universal_debug) {
 			Console.OUT.print("DBG "+prompt+s);
 		}
@@ -138,7 +138,7 @@ public class Universal {
 	 *
 	 * @param s The error message to print out, to PrintStream "err".
 	 */
-	public def errPrintln(var s: String): void = {
+	public def errPrintln(var s: String): void {
 		Console.ERR.println(prompt+s);
 	}
 
@@ -147,7 +147,7 @@ public class Universal {
 	 *
 	 * @param s The error message to print out, to PrintStream "err".
 	 */
-	public def errPrint(var s: String): void = {
+	public def errPrint(var s: String): void {
 		Console.ERR.print(prompt+s);
 	}
 }

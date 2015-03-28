@@ -33,7 +33,7 @@ final public class Utilities {
 	 * @return           The full pathname of where the executable lives,
 	 *                   or failing that the error message "<executable> not found.".
 	 */
-	public static def which(var executable: String, var pathEnv: String): String = {
+	public static def which(var executable: String, var pathEnv: String): String {
 		var executablePath: String;
 		var paths: Array[String];
 
@@ -71,7 +71,7 @@ final public class Utilities {
 	 * @param stringArray The array of strings to join.
 	 * @return            A string of the joined string array.
 	 */
-	public static def joinString(var joinChar: String, var stringArray: Array[String]): String = {
+	public static def joinString(var joinChar: String, var stringArray: Array[String]): String {
 		return joinString(joinChar,stringArray,0);
 	}
 
@@ -83,7 +83,7 @@ final public class Utilities {
 	 * @param index       The array index on which to start joining.
 	 * @return            A string of the joined string array.
 	 */
-	public static def joinString(var joinChar: String, var stringArray: Array[String], var index: int): String = {
+	public static def joinString(var joinChar: String, var stringArray: Array[String], var index: int): String {
 		var methodName: String = "join";
 		var tmpString: StringBuffer;
 
@@ -106,7 +106,7 @@ final public class Utilities {
 	 * @param arg       The string to be split.
 	 * @return          A string array of the split string.
 	 */
-	public static def splitString(var splitChar: String, var arg: String): Rail[String] = {
+	public static def splitString(var splitChar: String, var arg: String): Rail[String] {
 		var methodName: String = "split";
 
 		var myArgs: Array[String];

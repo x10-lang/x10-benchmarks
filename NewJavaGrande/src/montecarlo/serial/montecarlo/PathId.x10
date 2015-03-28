@@ -65,7 +65,7 @@ public class PathId extends Universal {
 	/**
 	 * Default constructor.
 	 */
-	public def this(): PathId = {
+	public def this(): PathId {
 		super();
 		set_prompt(prompt);
 		set_DEBUG(debug);
@@ -76,7 +76,7 @@ public class PathId extends Universal {
 	 *
 	 * @param name The name for the security to record.
 	 */
-	public def this(var name: String): PathId = {
+	public def this(var name: String): PathId {
 		set_prompt(prompt);
 		set_DEBUG(debug);
 		this.name = name;
@@ -95,7 +95,7 @@ public class PathId extends Universal {
 	 * @return Value of instance variable <code>name</code>.
 	 * @exception DemoException thrown if instance variable <code>name</code> is undefined.
 	 */
-	public def get_name(): String = {
+	public def get_name(): String {
 		// (VIVEK) The following test is no longer necessary because name is not nullable
 		//if (this.name == null)
 		//	throw new DemoException("Variable name is undefined!");
@@ -106,7 +106,7 @@ public class PathId extends Universal {
 	 * Set method for private instance variable <code>name</code>.
 	 * @param name the value to set for the instance variable <code>name</code>.
 	 */
-	@NonEscaping final public def set_name(var name: String): void = {
+	@NonEscaping final public def set_name(var name: String): void {
 		this.name = name;
 	}
 
@@ -115,7 +115,7 @@ public class PathId extends Universal {
 	 * @return Value of instance variable <code>startDate</code>.
 	 * @exception DemoException thrown if instance variable <code>startDate</code> is undefined.
 	 */
-	public def get_startDate(): int = {
+	public def get_startDate(): int {
 		if (this.startDate == 0)
 			throw new DemoException("Variable startDate is undefined!");
 		return (this.startDate);
@@ -125,7 +125,7 @@ public class PathId extends Universal {
 	 * Set method for private instance variable <code>startDate</code>.
 	 * @param startDate the value to set for the instance variable <code>startDate</code>.
 	 */
-	@NonEscaping final public def set_startDate(var startDate: int): void = {
+	@NonEscaping final public def set_startDate(var startDate: int): void {
 		this.startDate = startDate;
 	}
 
@@ -134,7 +134,7 @@ public class PathId extends Universal {
 	 * @return Value of instance variable <code>endDate</code>.
 	 * @exception DemoException thrown if instance variable <code>endDate</code> is undefined.
 	 */
-	public def get_endDate(): int = {
+	public def get_endDate(): int {
 		if (this.endDate == 0)
 			throw new DemoException("Variable endDate is undefined!");
 		return (this.endDate);
@@ -144,7 +144,7 @@ public class PathId extends Universal {
 	 * Set method for private instance variable <code>endDate</code>.
 	 * @param endDate the value to set for the instance variable <code>endDate</code>.
 	 */
-	@NonEscaping final public def set_endDate(var endDate: int): void = {
+	@NonEscaping final public def set_endDate(var endDate: int): void {
 		this.endDate = endDate;
 	}
 
@@ -153,7 +153,7 @@ public class PathId extends Universal {
 	 * @return Value of instance variable <code>dTime</code>.
 	 * @exception DemoException thrown if instance variable <code>dTime</code> is undefined.
 	 */
-	public def get_dTime(): double = {
+	public def get_dTime(): double {
 		if (this.dTime == Double.NaN)
 			throw new DemoException("Variable dTime is undefined!");
 		return (this.dTime);
@@ -163,7 +163,7 @@ public class PathId extends Universal {
 	 * Set method for private instance variable <code>dTime</code>.
 	 * @param dTime the value to set for the instance variable <code>dTime</code>.
 	 */
-	@NonEscaping final public def set_dTime(var dTime: double): void = {
+	@NonEscaping final public def set_dTime(var dTime: double): void {
 		this.dTime = dTime;
 	}
 
@@ -177,7 +177,7 @@ public class PathId extends Universal {
 	 * @exception DemoException thrown if the values to be copied contain
 	 *                          any undefined objects.
 	 */
-	@NonEscaping final public def copyInstanceVariables(var obj: PathId): void = {
+	@NonEscaping final public def copyInstanceVariables(var obj: PathId): void {
 		this.name      = obj.get_name();
 		this.startDate = obj.get_startDate();
 		this.endDate   = obj.get_endDate();
@@ -187,7 +187,7 @@ public class PathId extends Universal {
 	/**
 	 * Dumps the contents of the fields, to standard-out, for debugging.
 	 */
-	public def dbgDumpFields(): void = {
+	public def dbgDumpFields(): void {
 		//dbgPrintln("name = "     +this.name);
 		//dbgPrintln("startDate = "+this.startDate);
 		//dbgPrintln("endDate = "  +this.endDate);

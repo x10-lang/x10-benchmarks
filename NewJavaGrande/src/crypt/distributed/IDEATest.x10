@@ -51,7 +51,7 @@ public class IDEATest {
 	var ZR: DistArray[int];       // Encryption subkey (userkey derived).
 	var DKR: DistArray[int];      // Decryption subkey (userkey derived).
 
-	def Do(): void = {
+	def Do(): void {
 		// Start the stopwatch.
 		JGFInstrumentor.startTimer("Section2:Crypt:Kernel");
 		finish ateach ([p]: Point in Dist.makeUnique()) {
@@ -67,7 +67,7 @@ public class IDEATest {
 	 * 
 	 * Builds the data used for the test -- each time the test is run.
 	 */
-	def buildTestData(): void = {
+	def buildTestData(): void {
 		// WARNING: This assumes that array_rows/NUMBER_OF_LOCAL_PLACES
 		// is a multiple of 8!
 		val D = Dist.makeBlock(0..(array_rows-1));

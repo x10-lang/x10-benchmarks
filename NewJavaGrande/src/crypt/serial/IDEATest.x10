@@ -50,7 +50,7 @@ public class IDEATest {
 	var Z: Array[int];                     // Encryption subkey (userkey derived).
 	var DK: Array[int];                    // Decryption subkey (userkey derived).
 
-	def Do(): void = {
+	def Do(): void {
 		// Start the stopwatch.
 		JGFInstrumentor.startTimer("Section2:Crypt:Kernel");
 
@@ -237,7 +237,7 @@ public class IDEATest {
 	 * modulo 0x10001 interprets a zero sub-block as 0x10000; it must to
 	 * fit in 16 bits.
 	 */
-	private def cipher_idea(var text1: Array[int], var text2: Array[int], var key: Array[int]): void = {
+	private def cipher_idea(var text1: Array[int], var text2: Array[int], var key: Array[int]): void {
 		var i1: int = 0;                 // Index into first text array.
 		var i2: int = 0;                 // Index into second text array.
 		var ik: int;                     // Index into key array.
@@ -390,7 +390,7 @@ public class IDEATest {
 	 * in the Symantec Caje IDE. So it's not called for now; the test
 	 * uses Java % instead.
 	 */
-	private def mul(var a: int, var b: int): int = {
+	private def mul(var a: int, var b: int): int {
 		var p: long;             // Large enough to catch 16-bit multiply
 		                    // without hitting sign bit.
 		if (a != 0)
@@ -421,7 +421,7 @@ public class IDEATest {
 	 * Java: Though it uses signed 32-bit ints, the interpretation
 	 * of the bits within is strictly unsigned 16-bit.
 	 */
-	private def inv(var x: int): int = {
+	private def inv(var x: int): int {
 		var t0: int;
 		var t1: int;
 		var q: int;
@@ -454,7 +454,7 @@ public class IDEATest {
 	 *
 	 * Nulls arrays and forces garbage collection to free up memory.
 	 */
-	def freeTestData(): void = {
+	def freeTestData(): void {
 		/*  // avoid nullable, this is X10
 		plain1 = null;
 		crypt1 = null;

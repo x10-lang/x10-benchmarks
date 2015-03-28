@@ -55,7 +55,7 @@ public class Psinv extends MGWorker {
 	  r1: Array[Double](1){rail};
 	  r2: Array[Double](1){rail};
 
-	public def this( mg: MG,  i: int): Psinv = {
+	public def this( mg: MG,  i: int): Psinv {
 		super(mg, i);
 		r1 = new Array[double](nm+1);
 		r2 = new Array[double](nm+1);

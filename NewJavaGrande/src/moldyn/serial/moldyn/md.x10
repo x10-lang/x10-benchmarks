@@ -67,7 +67,7 @@ public class md {
 
 	var randnum: Random;
 
-	public def initialise(): void = {
+	public def initialise(): void {
 		/* Parameter determination */
 		mm = datasizes(size);
 		partsize = mm*mm*mm*4;
@@ -187,7 +187,7 @@ public class md {
 		/* MD simulation */
 	}
 
-	public def runiters(): void = {
+	public def runiters(): void {
 		var n: int = 0;
 		move = 0;
 		for (move = 0; move<movemx; move++) {

@@ -62,7 +62,7 @@ public class JGFInstrumentor {
 
   }
 
-  public atomic static def startTimer(name: String)= {
+  public atomic static def startTimer(name: String) {
     if (timers.containsKey(name)) {
       timers.get(name).value.start();
     }

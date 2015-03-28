@@ -13,7 +13,7 @@ public class Particle {
 	public var xvelocity: double;public var yvelocity: double;public var zvelocity: double;
 	public var xforce: double;public var yforce: double;public var zforce: double;
 
-	public def this(var xcoord: double, var ycoord: double, var zcoord: double, var xvelocity: double, var yvelocity: double, var zvelocity: double, var xforce: double, var yforce: double, var zforce: double): Particle = {
+	public def this(var xcoord: double, var ycoord: double, var zcoord: double, var xvelocity: double, var yvelocity: double, var zvelocity: double, var xforce: double, var yforce: double, var zforce: double): Particle {
 		this.xcoord = xcoord;
 		this.ycoord = ycoord;
 		this.zcoord = zcoord;
@@ -25,7 +25,7 @@ public class Particle {
 		this.zforce = zforce;
 	}
 
-	public def domove(var side: double): void = {
+	public def domove(var side: double): void {
 		xcoord = xcoord + xvelocity + xforce;
 		ycoord = ycoord + yvelocity + yforce;
 		zcoord = zcoord + zvelocity + zforce;
@@ -46,7 +46,7 @@ public class Particle {
 		zforce = 0.0;
 	}
 
-	public def force(var side: double, var rcoff: double, var mdsize: int, var x: int, var md1: md): void = {
+	public def force(var side: double, var rcoff: double, var mdsize: int, var x: int, var md1: md): void {
 		var sideh: double;
 		var rcoffs: double;
 
@@ -108,7 +108,7 @@ public class Particle {
 		zforce = zforce + fzi;
 	}
 
-	public def mkekin(var hsq2: double): double = {
+	public def mkekin(var hsq2: double): double {
 		var sumt: double = 0.0;
 
 		xforce = xforce * hsq2;
@@ -123,7 +123,7 @@ public class Particle {
 		return sumt;
 	}
 
-	public def velavg(var vaverh: double, var h: double, var md1: md): double = {
+	public def velavg(var vaverh: double, var h: double, var md1: md): double {
 		var velt: double;
 		var sq: double;
 
@@ -136,7 +136,7 @@ public class Particle {
 		return velt;
 	}
 
-	public def dscal(var sc: double, var incx: int): void = {
+	public def dscal(var sc: double, var incx: int): void {
 		xvelocity = xvelocity * sc;
 		yvelocity = yvelocity * sc;
 		zvelocity = zvelocity * sc;

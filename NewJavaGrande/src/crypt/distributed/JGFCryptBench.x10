@@ -26,20 +26,20 @@ public class JGFCryptBench extends IDEATest implements JGFSection2 {
 	private var size: int;
 	private var datasizes: Array[int] = [ 32000, 20000000, 50000000 ];
 
-	public def JGFsetsize(var size: int): void = {
+	public def JGFsetsize(var size: int): void {
 		this.size = size;
 	}
 
-	public def JGFinitialise(): void = {
+	public def JGFinitialise(): void {
 		array_rows = datasizes(size);
 		buildTestData();
 	}
 
-	public def JGFkernel(): void = {
+	public def JGFkernel(): void {
 		Do();
 	}
 
-	public def JGFvalidate(): void = {
+	public def JGFvalidate(): void {
 		finish ateach ([i]: Point in plain1) {
 			if (plain1(i) != plain2(i)) {
 				Console.OUT.println("Validation failed");
@@ -51,11 +51,11 @@ public class JGFCryptBench extends IDEATest implements JGFSection2 {
 		}
 	}
 
-	public def JGFtidyup(): void = {
+	public def JGFtidyup(): void {
 		freeTestData();
 	}
 
-	public def JGFrun(var size: int): void = {
+	public def JGFrun(var size: int): void {
 		JGFInstrumentor.addTimer("Section2:Crypt:Kernel", "Kbyte", size);
 
 		JGFsetsize(size);

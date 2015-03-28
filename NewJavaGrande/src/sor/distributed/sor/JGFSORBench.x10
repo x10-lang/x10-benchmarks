@@ -77,7 +77,7 @@ public class JGFSORBench extends SOR implements JGFSection2 {
 		at(t.dist(i, j)) t(i, j) = v;
 	}
 
-	private static def blockStar(val r1: Region, val r2: Region{rank==1}): Dist = {
+	private static def blockStar(val r1: Region, val r2: Region{rank==1}): Dist {
 		val d1: Dist = Dist.makeBlock(r1);
 		return distTimesRegion(d1, r2);
 	}

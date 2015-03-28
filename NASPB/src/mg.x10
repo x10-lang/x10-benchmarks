@@ -16,7 +16,7 @@ import NPB3_0_X10.*;
 
 public class mg  {
 
-	public def run(): boolean = {
+	public def run(): boolean {
 		MG.entryPoint(["-np8", "CLASS=S"]);
 		return true;
 	}

@@ -28,7 +28,7 @@ public class SparseMatmult {
 
 	/* 10 iterations used to make kernel have roughly
 	   same granulairty as other Scimark kernels. */
-	public static def test(var y: Array[double], var vall: Array[double], var row: Array[int], var col: Array[int], var x: Array[double], var NUM_ITERATIONS: int): void = {
+	public static def test(var y: Array[double], var vall: Array[double], var row: Array[int], var col: Array[int], var x: Array[double], var NUM_ITERATIONS: int): void {
 		val nz: int = vall.size;
 
 		JGFInstrumentor.startTimer("Section2:SparseMatmult:Kernel");

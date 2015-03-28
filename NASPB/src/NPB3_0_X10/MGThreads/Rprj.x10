@@ -55,7 +55,7 @@ public class Rprj extends MGWorker {
 	private val x1: Array[Double](1){rail};
         private val y1: Array[Double](1){rail};
 
-	public def this( mg: MG,  i: int): Rprj = {
+	public def this( mg: MG,  i: int): Rprj {
 		super(mg, i);
 		x1 = new Array[double](nm+1);
 		y1 = new Array[double](nm+1);
@@ -64,7 +64,7 @@ public class Rprj extends MGWorker {
 	public def step( done: boolean,  wstart: int,  wend: int, 
 			 m1k: int,  m2k: int,  m3k: int, 
 			 m1j: int,  m2j: int,  m3j: int, 
-			 roff: int,  zoff: int): void = {
+			 roff: int,  zoff: int): void {
 		getWork(wstart, wend); // not wend?? vj,m3j?
 		if (work == 0) return;
 		 r: Array[Double](1){rail} = mg.r;
@@ -86,7 +86,7 @@ public class Rprj extends MGWorker {
 			var m2j: int, var m3j: int, 
 			var x1: Array[Double](1){rail}, 
 			var y1: Array[Double](1){rail}, var start: int, 
-			var end: int): void = {
+			var end: int): void {
 		val d1: int = (m1k == 3) ? 2 : 1;
 		val d2: int = (m2k == 3) ? 2 : 1;
 		val d3: int = (m3k == 3) ? 2 : 1;

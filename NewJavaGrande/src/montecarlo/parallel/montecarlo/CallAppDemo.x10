@@ -19,7 +19,7 @@ public class CallAppDemo {
 	var input: Array[int] = new Array[int](2);
 	var ap: AppDemo = null;
 
-	public def initialise(): void = {
+	public def initialise(): void {
 
 		input(0) = 1000;
 		input(1) = datasizes(size);
@@ -30,11 +30,11 @@ public class CallAppDemo {
 		ap.initSerial();
 	}
 
-	public def runiters(): void = {
+	public def runiters(): void {
 		ap.runSerial();
 	}
 
-	public def presults(): void = {
+	public def presults(): void {
 		ap.processSerial();
 	}
 }

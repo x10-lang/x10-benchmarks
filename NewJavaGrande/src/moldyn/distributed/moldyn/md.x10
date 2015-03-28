@@ -105,7 +105,7 @@ public class md {
 	var nprocess: int;
 
 
-	public def initialise(var rank: int, var nprocess: int): void = {
+	public def initialise(var rank: int, var nprocess: int): void {
 		this.rank = rank;
 		this.nprocess = nprocess;
 
@@ -228,7 +228,7 @@ public class md {
 		/* MD simulation */
 	}
 
-	public def runiters(val C: Clock): void = {
+	public def runiters(val C: Clock): void {
 
 		var n: int = 0;
 		move = 0;
@@ -291,7 +291,7 @@ public class md {
 		Clock.advanceAll();
 	}
 
-	def allreduce(): void = {
+	def allreduce(): void {
 		// Place holder for now to emulate allreduce. To be optimized
 		if (rank != 0) return;
 		val P: DistArray[md](1) = JGFMolDynBench.P;

@@ -29,41 +29,41 @@ public class Scene {
 	public val objects: ArrayList[Primitive];
 	private val view: View;
 
-	public def this(var v: View): Scene = {
+	public def this(var v: View): Scene {
 		lights = new ArrayList[Light] ();
 		objects = new ArrayList[Primitive] ();
 		view = v;
 	}
 
-	public def addLight(var l: Light): void = {
+	public def addLight(var l: Light): void {
 		this.lights.add(l);
 	}
 
-	public def addObject(var object: Primitive): void = {
+	public def addObject(var object: Primitive): void {
 		this.objects.add(object);
 	}
 
-	public def getView(): View = {
+	public def getView(): View {
 		return this.view;
 	}
 
-	public def getLight(var number: int): Light = {
+	public def getLight(var number: int): Light {
 		return this.lights.get(number) as Light;
 	}
 
-	public def getObject(var number: int): Primitive = {
+	public def getObject(var number: int): Primitive {
 		return objects.get(number) as Primitive;
 	}
 
-	public def getLights(): int = {
+	public def getLights(): int {
 		return this.lights.size();
 	}
 
-	public def getObjects(): int = {
+	public def getObjects(): int {
 		return this.objects.size();
 	}
 
-	public def setObject(var object: Primitive, var pos: int): void = {
+	public def setObject(var object: Primitive, var pos: int): void {
 		this.objects.set(object, pos);
 	}
 }

@@ -31,7 +31,7 @@ public class View {
 	public val angle: double;
 	public val aspect: double;
 
-	public def this(var from_: Vec, var at_: Vec, var up_: Vec, var dist_: double, var angle_: double, var aspect_: double): View = {
+	public def this(var from_: Vec, var at_: Vec, var up_: Vec, var dist_: double, var angle_: double, var aspect_: double): View {
 		from = from_;
 		att = at_;
 		up = up_;

@@ -74,7 +74,7 @@ public class RayTracer {
 	 * Create and initialize the scene for the rendering picture.
 	 * @return The scene just created
 	 */
-	def createScene(): Scene = {
+	def createScene(): Scene {
 		val x: int = 0;
 		val y: int = 0;
 
@@ -113,7 +113,7 @@ public class RayTracer {
 		return scene;
 	}
 
-	public def setScene(var scene: Scene): void = {
+	public def setScene(var scene: Scene): void {
 		// Get the objects count
 		var nLights: int = scene.getLights();
 		var nObjects: int = scene.getObjects();
@@ -135,7 +135,7 @@ public class RayTracer {
 		view = scene.getView();
 	}
 
-	public def render(val interval: Interval): void = {
+	public def render(val interval: Interval): void {
 
 		// Screen variables
 		val row: Array[int] = new Array[int](interval.width * (interval.yto-interval.yfrom));
@@ -178,7 +178,7 @@ public class RayTracer {
 		} // end for (y)
 	}
 
-	def intersect(var r: Ray, var maxt: double, var inter: Isect): boolean = {
+	def intersect(var r: Ray, var maxt: double, var inter: Isect): boolean {
 		var tp: Isect;
 		var i: int;
 		var nhits: int;
@@ -204,7 +204,7 @@ public class RayTracer {
 	 * @param r The ray
 	 * @return Returns 1 if there is a shadow, 0 if there isn't
 	 */
-	def Shadow(var r: Ray, var tmax: double, var inter: Isect): int = {
+	def Shadow(var r: Ray, var tmax: double, var inter: Isect): int {
 		if (intersect(r, tmax, inter))
 			return 0;
 		return 1;
@@ -214,14 +214,14 @@ public class RayTracer {
 	 * Return the Vector's reflection direction
 	 * @return The specular direction
 	 */
-	def SpecularDirection(var I: Vec, var N: Vec): Vec = {
+	def SpecularDirection(var I: Vec, var N: Vec): Vec {
 		return Vec.comb(1.0/Math.abs(Vec.dot(I, N)), I, 2.0, N).normalized();
 	}
 
 	/**
 	 * Return the Vector's transmission direction
 	 */
-	def TransDir(var m1: Surface, var m2: Surface, var I: Vec, var N: Vec): Vec = {
+	def TransDir(var m1: Surface, var m2: Surface, var I: Vec, var N: Vec): Vec {
 		var n1: double = m1 == null ? 1.0 : m1.ior;
 		var n2: double = m2 == null ? 1.0 : m2.ior;
 		var eta: double = n1/n2;
@@ -235,7 +235,7 @@ public class RayTracer {
 	 * Returns the shaded color
 	 * @return The color in Vec form (rgb)
 	 */
-	def shade(var level: int, var weight: double, var P: Vec, var N: Vec, var I: Vec, var hit: Isect, var tRay: Ray): Vec = {
+	def shade(var level: int, var weight: double, var P: Vec, var N: Vec, var I: Vec, var hit: Isect, var tRay: Ray): Vec {
 
 		var surf: Surface = hit.surf;
 		var bigr: Vec = new Vec();
@@ -296,7 +296,7 @@ public class RayTracer {
 	/**
 	 * Launches a ray
 	 */
-	def trace(var level: int, var weight: double, var r: Ray, var inter: Isect, var tRay: Ray): Vec = {
+	def trace(var level: int, var weight: double, var r: Ray, var inter: Isect, var tRay: Ray): Vec {
 		// Checks the recursion level
 		if (level > 6) {
 			return new Vec();

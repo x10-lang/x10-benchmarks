@@ -26,7 +26,7 @@ public class ToResult {// implements x10.io.Serializable {
 	 * @param header Simple header string.
 	 * @param pathValue Data computed by the Monte Carlo generator.
 	 */
-	public def this(var header: String, var expectedReturnRate: double, var volatility: double, var volatility2: double, var finalStockPrice: double, var pathValue: Array[double]): ToResult = {
+	public def this(var header: String, var expectedReturnRate: double, var volatility: double, var volatility2: double, var finalStockPrice: double, var pathValue: Array[double]): ToResult {
 		this.header = header;
 		this.expectedReturnRate = expectedReturnRate;
 		this.volatility = volatility;
@@ -39,7 +39,7 @@ public class ToResult {// implements x10.io.Serializable {
 	 * Gives a simple string representation of this object.
 	 * @return String representation of this object.
 	 */
-	public def toString(): String = {
+	public def toString(): String {
 		return (header);
 	}
 
@@ -52,7 +52,7 @@ public class ToResult {// implements x10.io.Serializable {
 	 * Accessor method for private instance variable <code>header</code>.
 	 * @return Value of instance variable <code>header</code>.
 	 */
-	public def get_header(): String = {
+	public def get_header(): String {
 		return (this.header);
 	}
 
@@ -60,7 +60,7 @@ public class ToResult {// implements x10.io.Serializable {
 	 * Set method for private instance variable <code>header</code>.
 	 * @param header the value to set for the instance variable <code>header</code>.
 	 */
-	public def set_header(var header: String): void = {
+	public def set_header(var header: String): void {
 		this.header = header;
 	}
 
@@ -68,7 +68,7 @@ public class ToResult {// implements x10.io.Serializable {
 	 * Accessor method for private instance variable <code>expectedReturnRate</code>.
 	 * @return Value of instance variable <code>expectedReturnRate</code>.
 	 */
-	public def get_expectedReturnRate(): double = {
+	public def get_expectedReturnRate(): double {
 		return (this.expectedReturnRate);
 	}
 
@@ -77,7 +77,7 @@ public class ToResult {// implements x10.io.Serializable {
 	 * @param expectedReturnRate the value to set for the instance variable
 	 * <code>expectedReturnRate</code>.
 	 */
-	public def set_expectedReturnRate(var expectedReturnRate: double): void = {
+	public def set_expectedReturnRate(var expectedReturnRate: double): void {
 		this.expectedReturnRate = expectedReturnRate;
 	}
 
@@ -85,7 +85,7 @@ public class ToResult {// implements x10.io.Serializable {
 	 * Accessor method for private instance variable <code>volatility</code>.
 	 * @return Value of instance variable <code>volatility</code>.
 	 */
-	public def get_volatility(): double = {
+	public def get_volatility(): double {
 		return (this.volatility);
 	}
 
@@ -93,7 +93,7 @@ public class ToResult {// implements x10.io.Serializable {
 	 * Set method for private instance variable <code>volatility</code>.
 	 * @param volatility the value to set for the instance variable <code>volatility</code>.
 	 */
-	public def set_volatility(var volatility: double): void = {
+	public def set_volatility(var volatility: double): void {
 		this.volatility = volatility;
 	}
 
@@ -101,7 +101,7 @@ public class ToResult {// implements x10.io.Serializable {
 	 * Accessor method for private instance variable <code>volatility2</code>.
 	 * @return Value of instance variable <code>volatility2</code>.
 	 */
-	public def get_volatility2(): double = {
+	public def get_volatility2(): double {
 		return (this.volatility2);
 	}
 
@@ -109,7 +109,7 @@ public class ToResult {// implements x10.io.Serializable {
 	 * Set method for private instance variable <code>volatility2</code>.
 	 * @param volatility2 the value to set for the instance variable <code>volatility2</code>.
 	 */
-	public def set_volatility2(var volatility2: double): void = {
+	public def set_volatility2(var volatility2: double): void {
 		this.volatility2 = volatility2;
 	}
 
@@ -117,7 +117,7 @@ public class ToResult {// implements x10.io.Serializable {
 	 * Accessor method for private instance variable <code>finalStockPrice</code>.
 	 * @return Value of instance variable <code>finalStockPrice</code>.
 	 */
-	public def get_finalStockPrice(): double = {
+	public def get_finalStockPrice(): double {
 		return (this.finalStockPrice);
 	}
 
@@ -126,7 +126,7 @@ public class ToResult {// implements x10.io.Serializable {
 	 * @param finalStockPrice the value to set for the instance variable
 	 * <code>finalStockPrice</code>.
 	 */
-	public def set_finalStockPrice(var finalStockPrice: double): void = {
+	public def set_finalStockPrice(var finalStockPrice: double): void {
 		this.finalStockPrice = finalStockPrice;
 	}
 
@@ -134,7 +134,7 @@ public class ToResult {// implements x10.io.Serializable {
 	 * Accessor method for private instance variable <code>pathValue</code>.
 	 * @return Value of instance variable <code>pathValue</code>.
 	 */
-	public def get_pathValue(): Array[double] = {
+	public def get_pathValue(): Array[double] {
 		return (this.pathValue);
 	}
 
@@ -142,7 +142,7 @@ public class ToResult {// implements x10.io.Serializable {
 	 * Set method for private instance variable <code>pathValue</code>.
 	 * @param pathValue the value to set for the instance variable <code>pathValue</code>.
 	 */
-	public def set_pathValue(var pathValue: Array[double]): void = {
+	public def set_pathValue(var pathValue: Array[double]): void {
 		this.pathValue = pathValue;
 	}
 

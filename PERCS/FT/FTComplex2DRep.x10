@@ -78,9 +78,9 @@ class FTComplex2DRep(M:Long, verify:Boolean) {
 
     @Inline min(i:Long, j:Long):Long=i<j?i:j;
     @Inline global(i:Long,j:Long):Long = (I*nRows+i)*j;
-    @Inline def root(sign:Int, N:Long, u:Long):Complex = {
+    @Inline def root(sign:Int, N:Long, u:Long):Complex {
     	val W_N=2.0*Math.PI/N,UW=u*W_N;
-    	Complex(Math.cos(UW), sign*Math.sin(UW))
+    	return Complex(Math.cos(UW), sign*Math.sin(UW));
     }
     def bytwiddle(sign:Int) {
         for ([i,j] in  A.indices()) 

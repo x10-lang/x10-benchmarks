@@ -23,11 +23,11 @@ import jgfutil.*;
 
 public class JGFRayTracerBench extends RayTracer implements JGFSection3 {
 
-	public def JGFsetsize(var size: int): void = {
+	public def JGFsetsize(var size: int): void {
 		this.size = size;
 	}
 
-	public def JGFinitialise(): void = {
+	public def JGFinitialise(): void {
 		JGFInstrumentor.startTimer("Section3:RayTracer:Init");
 
 		// set image size
@@ -44,7 +44,7 @@ public class JGFRayTracerBench extends RayTracer implements JGFSection3 {
 		JGFInstrumentor.stopTimer("Section3:RayTracer:Init");
 	}
 
-	public def JGFapplication(): void = {
+	public def JGFapplication(): void {
 		JGFInstrumentor.startTimer("Section3:RayTracer:Run");
 
 		// Set interval to be rendered to the whole picture
@@ -57,7 +57,7 @@ public class JGFRayTracerBench extends RayTracer implements JGFSection3 {
 		JGFInstrumentor.stopTimer("Section3:RayTracer:Run");
 	}
 
-	public def JGFvalidate(): void = {
+	public def JGFvalidate(): void {
 		//long refval[] = { 2676692, 29827635 };
 		var refval: Array[long] = [ 51398 as long, 29827635 as long ]; // reduced data size
 		var dev: long = checksum - refval(size);
@@ -69,7 +69,7 @@ public class JGFRayTracerBench extends RayTracer implements JGFSection3 {
 		}
 	}
 
-	public def JGFtidyup(): void = {
+	public def JGFtidyup(): void {
 		/*
 		scene = null;
 		lights = null;
@@ -80,7 +80,7 @@ public class JGFRayTracerBench extends RayTracer implements JGFSection3 {
 		//System.gc();
 	}
 
-	public def JGFrun(var size: int): void = {
+	public def JGFrun(var size: int): void {
 		JGFInstrumentor.addTimer("Section3:RayTracer:Total", "Solutions", size);
 		JGFInstrumentor.addTimer("Section3:RayTracer:Init", "Objects", size);
 		JGFInstrumentor.addTimer("Section3:RayTracer:Run", "Pixels", size);

@@ -40,11 +40,11 @@ public class JGFSparseMatmultBench extends SparseMatmult implements JGFSection2 
 	var col: Array[int];
 	var row: Array[int];
 
-	public def JGFsetsize(var size: int): void = {
+	public def JGFsetsize(var size: int): void {
 		this.size = size;
 	}
 
-	public def JGFinitialise(): void = {
+	public def JGFinitialise(): void {
 		x = RandomVector(datasizes_N(size), R);
 		y = new Array[double](datasizes_M(size));
 
@@ -64,11 +64,11 @@ public class JGFSparseMatmultBench extends SparseMatmult implements JGFSection2 
 		}
 	}
 
-	public def JGFkernel(): void = {
+	public def JGFkernel(): void {
 		SparseMatmult.test(y, vall, row, col, x, SPARSE_NUM_ITER);
 	}
 
-	public def JGFvalidate(): void = {
+	public def JGFvalidate(): void {
 		var refval: Array[double] = [ 0.1436496372119012, 150.0130719633895, 749.5245870753752 ];
 		var dev: double = Math.abs(SparseMatmult.ytotal.value - refval(size));
 		if (dev > 1.0e-12) {
@@ -78,11 +78,11 @@ public class JGFSparseMatmultBench extends SparseMatmult implements JGFSection2 
 		}
 	}
 
-	public def JGFtidyup(): void = {
+	public def JGFtidyup(): void {
 		//System.gc();
 	}
 
-	public def JGFrun(var size: int): void = {
+	public def JGFrun(var size: int): void {
 		JGFInstrumentor.addTimer("Section2:SparseMatmult:Kernel", "Iterations", size);
 
 		JGFsetsize(size);
@@ -96,7 +96,7 @@ public class JGFSparseMatmultBench extends SparseMatmult implements JGFSection2 
 		JGFInstrumentor.printTimer("Section2:SparseMatmult:Kernel");
 	}
 
-	private static def RandomVector(var N: int, var R: Random): Array[double] = {
+	private static def RandomVector(var N: int, var R: Random): Array[double] {
 		var A: Array[double] = new Array[double](N);
 
 		for (var i: int = 0; i < N; i++)

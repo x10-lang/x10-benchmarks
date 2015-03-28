@@ -34,60 +34,60 @@ public class JGFTimer {
   private var start_time: long;
   private var on: boolean; 
 
-  public def this(var name: String, var opname: String): JGFTimer = {
+  public def this(var name: String, var opname: String): JGFTimer {
     this.name = name;
     this.opname = opname;
     reset(); 
   }
 
-  public def this(var name: String, var opname: String, var size: int): JGFTimer = {
+  public def this(var name: String, var opname: String, var size: int): JGFTimer {
     this.name = name;
     this.opname = opname;
     this.size = size;
     reset();
   }
 
-  public def this(var name: String): JGFTimer = {
+  public def this(var name: String): JGFTimer {
     this(name,""); 
   }
 
 
 
-  public def start(): void = {
+  public def start(): void {
     if (on) Console.OUT.println("Warning timer " + name + " was already turned on");
     on = true; 
     start_time = System.currentTimeMillis();
   }
 
 
-  public def stop(): void = {
+  public def stop(): void {
     time += ((System.currentTimeMillis()-start_time) / 1000.) as Double;
     if (!on) Console.OUT.println("Warning timer " + name + " wasn't turned on");
     calls++;
     on = false;  
   }
 
-  public def addops(var count: double): void = {
+  public def addops(var count: double): void {
     opcount += count;
   } 
 
-  final public def reset(): void = {
+  final public def reset(): void {
     time = 0.0; 
     calls = 0; 
     opcount = 0; 
     on = false;
   }
 
-  public def perf(): double = {
+  public def perf(): double {
     return opcount / time; 
   }
 
-  public def longprint(): void = {
+  public def longprint(): void {
       Console.OUT.println("Timer            Calls         Time(s)       Performance("+opname+"/s)");   
      Console.OUT.println(name + "           " + calls +    "           "  +  time + "        " + this.perf());
   }
 
-  public def print(): void = {
+  public def print(): void {
     if (opname.equals("")) {
       Console.OUT.println(name + "   " + time + " (s)");
     }
@@ -120,7 +120,7 @@ public class JGFTimer {
   }
 
 
-  public def printperf(): void = {
+  public def printperf(): void {
 
      var name: String;
      name = this.name; 

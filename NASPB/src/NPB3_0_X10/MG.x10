@@ -103,7 +103,7 @@ public class MG extends MGBase {
 		mg.runBenchMark();
 	}
 	
-	public def run(): void = { runBenchMark(); }
+	public def run(): void { runBenchMark(); }
 	
 	public def runBenchMark(): void {
 		BMArgs.Banner(BMName, CLASS, serial, num_threads);
@@ -171,7 +171,7 @@ public class MG extends MGBase {
 		if (verified != 1) throw new Error("Verification failed");
 	}
 	
-	public def verify( rnm2: double): int = {
+	public def verify( rnm2: double): int {
 		var verify_value: double = 0.0;
 		
 		if (CLASS != 'U') {
@@ -242,7 +242,7 @@ public class MG extends MGBase {
 		return nit;
 	}
 	
-	public def setTimers(): void = {
+	public def setTimers(): void {
 		f1: File = new File("timer.flag");
 	if (f1.exists()) {
 		timeron = true;
@@ -258,7 +258,7 @@ public class MG extends MGBase {
 	}
 	}
 	
-	public def printTimers(): void = { //% of the ime should be fixed
+	public def printTimers(): void { //% of the ime should be fixed
 		Console.OUT.println("  SECTION   Time (secs)");
 		var tmax: double = timer.readTimer(T_bench);
 		if (tmax == 0.0) tmax = 1.0;
@@ -273,7 +273,7 @@ public class MG extends MGBase {
 		}
 	}
 	
-	public def setup(nsizes:Rail[Int]): void = {
+	public def setup(nsizes:Rail[Int]): void {
 		var size1:Int=3;
 		var size2:Int=10;
 		val mi = new Rail[Int](size1*size2);
@@ -594,7 +594,7 @@ public class MG extends MGBase {
 			
 			public def mg3Pmaster(u: Array[double](1){rail}, 
 					v: Array[double](1){rail}, r: Array[double](1){rail}, 
-					n1: int,   n2: int, n3: int): void = {
+					n1: int,   n2: int, n3: int): void {
 						//		c---------------------------------------------------------------------
 						//		c     multigrid V-cycle routine
 						//		c---------------------------------------------------------------------
@@ -660,7 +660,7 @@ public class MG extends MGBase {
 					
 					public def interp( u: Array[Double](1){rail},  zoff: int,  mm1: int, 
 							mm2: int,  mm3: int,  uoff: int,  n1: int, 
-							n2: int,  n3: int): void = {
+							n2: int,  n3: int): void {
 						val m: int = 535;
 						val z1 = new Array[Double](m);
 						val z2 = new Array[Double](m);
@@ -672,7 +672,7 @@ public class MG extends MGBase {
 					
 					public def psinv( r: Array[Double](1){rail},  roff: int, 
 							u: Array[Double](1){rail},  uoff: int,  n1: int, 
-							n2: int,  n3: int): void = {
+							n2: int,  n3: int): void {
 								if (timeron) timer.start(T_psinv);
 								Psinv.psinv(r, roff, u, uoff, n1, n2, n3, 
 										new Array[Double](nm+1), new Array[Double](nm+1), c, 1, n3-1);
@@ -729,7 +729,7 @@ public class MG extends MGBase {
 									
 									public def psinvMaster(val r: Array[Double](1){rail}, val roffl: int, 
 											val u: Array[Double](1){rail}, val uoffl: int, val n1: int, 
-											val n2: int, val n3: int): void = {
+											val n2: int, val n3: int): void {
 												if (timeron) 
 													timer.start(T_psinv);
 												if (num_threads == 1) psinv(r, roffl, u, uoffl, n1, n2, n3);

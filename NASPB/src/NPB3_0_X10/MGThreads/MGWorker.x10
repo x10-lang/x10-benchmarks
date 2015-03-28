@@ -27,7 +27,7 @@ abstract public class MGWorker {
 	public var wend: int;
 	public var wstart: int;
 	
-	protected def this(mg0: MG, id0: int): MGWorker = {
+	protected def this(mg0: MG, id0: int): MGWorker {
 		mg = mg0;
 		id = id0;
 		//initialize shared data
@@ -40,7 +40,7 @@ abstract public class MGWorker {
 		a = mg.a;
 	}
 	
-	protected def getWork(var wstart: int, var wend: int): void = {
+	protected def getWork(var wstart: int, var wend: int): void {
 		var workpt: int = (wend-wstart)/num_threads;
 		var remainder: int = wend-wstart-workpt*num_threads;
 		if (workpt == 0) {

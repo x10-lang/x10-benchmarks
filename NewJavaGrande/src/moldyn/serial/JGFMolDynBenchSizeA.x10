@@ -30,14 +30,14 @@ import harness.x10Test;
  */
 public class JGFMolDynBenchSizeA extends x10Test {
 
-	public def run(): boolean = {
+	public def run(): boolean {
 		JGFInstrumentor.printHeader(3, 0);
 		var mold: JGFMolDynBench = new JGFMolDynBench();
 		mold.JGFrun(0);
 		return true;
 	}
 
-	public static def main(var args: Rail[String]): void = {
+	public static def main(var args: Rail[String]): void {
 		new JGFMolDynBenchSizeA().execute();
 	}
 }

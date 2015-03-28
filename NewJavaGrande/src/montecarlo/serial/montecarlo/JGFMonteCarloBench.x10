@@ -21,15 +21,15 @@ import jgfutil.*;
  */
 public class JGFMonteCarloBench extends CallAppDemo implements JGFSection3 {
 
-	public def JGFsetsize(var size: int): void = {
+	public def JGFsetsize(var size: int): void {
 		this.size = size;
 	}
 
-	public def JGFinitialise(): void = {
+	public def JGFinitialise(): void {
 		initialise();
 	}
 
-	public def JGFapplication(): void = {
+	public def JGFapplication(): void {
 		Console.OUT.println("JGFMonteCarloBench size = " + datasizes(size));
 		JGFInstrumentor.startTimer("Section3:MonteCarlo:Run");
 
@@ -40,7 +40,7 @@ public class JGFMonteCarloBench extends CallAppDemo implements JGFSection3 {
 		presults();
 	}
 
-	public def JGFvalidate(): void = {
+	public def JGFvalidate(): void {
 		//double[] refval = { -0.0333976656762814D, -0.03215796752868655D };
 		var refval: Array[double] = [ -0.03234469082617506D, -0.03215796752868655D ];
 		var dev: double = Math.abs(AppDemo.JGFavgExpectedReturnRateMC() - refval(size));
@@ -51,11 +51,11 @@ public class JGFMonteCarloBench extends CallAppDemo implements JGFSection3 {
 		}
 	}
 
-	public def JGFtidyup(): void = {
+	public def JGFtidyup(): void {
 		//System.gc();
 	}
 
-	public def JGFrun(var size: int): void = {
+	public def JGFrun(var size: int): void {
 		JGFInstrumentor.addTimer("Section3:MonteCarlo:Total", "Solutions", size);
 		JGFInstrumentor.addTimer("Section3:MonteCarlo:Run", "Samples", size);
 

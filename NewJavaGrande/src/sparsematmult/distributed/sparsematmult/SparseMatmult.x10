@@ -30,7 +30,7 @@ public class SparseMatmult {
 
 	/* 10 iterations used to make kernel have roughly
 	   same granulairty as other Scimark kernels. */
-	public static def test(val y: DistArray[double], val vall: DistArray[double], val row: DistArray[int], val col: DistArray[int], val x: DistArray[double], val NUM_ITERATIONS: int, val lowsum: DistArray[int], val highsum: DistArray[int]): void = {
+	public static def test(val y: DistArray[double], val vall: DistArray[double], val row: DistArray[int], val col: DistArray[int], val x: DistArray[double], val NUM_ITERATIONS: int, val lowsum: DistArray[int], val highsum: DistArray[int]): void {
 		val nz: int = vall.region.size();
 
 		JGFInstrumentor.startTimer("Section2:SparseMatmult:Kernel");

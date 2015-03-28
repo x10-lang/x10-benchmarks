@@ -76,9 +76,9 @@ public class BMResults  {
 	public var verified: int;
 	public var out: Printer = null;
 
-	public def this(): BMResults = { }
+	public def this(): BMResults { }
 
-	public def this(bid: int): BMResults = {
+	public def this(bid: int): BMResults {
 		pid = bid;
 		clss = 'S';
 		optype = "floating point";
@@ -87,7 +87,7 @@ public class BMResults  {
 	public def this(bname: String, CLASS: char, bn1: int, bn2: int, bn3: int, bniter: int, 
 			btime: double, bmops: double, boptype: String, 
 			passed_verification: int, bserial: boolean, num_threads: int, 
-			bid: int): BMResults = {
+			bid: int): BMResults {
 		pid = bid;
 		name = bname;
 		clss = CLASS;
@@ -103,7 +103,7 @@ public class BMResults  {
 		numthreads = num_threads;
 	}
 
-	public def print(): void = {
+	public def print(): void {
 		val fmt = "%.3f";
 		var outbuf:StringBuilder = new StringBuilder().add("                                "
 				+"                               *");
@@ -287,7 +287,7 @@ public class BMResults  {
 		}
 	}
 
-	public def getFromFile(filename: String): int = {
+	public def getFromFile(filename: String): int {
 		var inp: FileReader = null;
 		verified =-1;
 		try {
@@ -328,7 +328,7 @@ public class BMResults  {
 		return 1;
 	}
 
-	public static def printVerificationStatus(var clss: char, var verified: int, var BMName: String): void = {
+	public static def printVerificationStatus(var clss: char, var verified: int, var BMName: String): void {
 		if (clss == 'U'||verified == -1) {
 			verified = -1;
 			x10.io.Console.OUT.println(" Problem size unknown");

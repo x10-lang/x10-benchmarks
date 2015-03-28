@@ -31,7 +31,7 @@ public class Interval {
 	public val yto: int;
 	public val total: int;
 
-	public def this(var number_: int, var width_: int, var height_: int, var yfrom_: int, var yto_: int, var total_: int): Interval = {
+	public def this(var number_: int, var width_: int, var height_: int, var yfrom_: int, var yto_: int, var total_: int): Interval {
 		number = number_;
 		width = width_;
 		height = height_;

@@ -24,7 +24,7 @@ public class DemoException extends x10.lang.Exception {
 	/**
 	 * Default constructor.
 	 */
-	public def this(): DemoException = {
+	public def this(): DemoException {
 		super();
 		if (debug) {
 			//printStackTrace();
@@ -34,7 +34,7 @@ public class DemoException extends x10.lang.Exception {
 	/**
 	 * Default constructor for reporting an error message.
 	 */
-	public def this(var s: String): DemoException = {
+	public def this(var s: String): DemoException {
 		super(s);
 		if (debug) {
 			//printStackTrace();
@@ -44,7 +44,7 @@ public class DemoException extends x10.lang.Exception {
 	/**
 	 * Default constructor for reporting an error code.
 	 */
-	public def this(var ierr: int): DemoException = {
+	public def this(var ierr: int): DemoException {
 		super(String.valueOf(ierr));
 		if (debug) {
 			//printStackTrace();

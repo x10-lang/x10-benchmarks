@@ -30,24 +30,24 @@ public class JGFMolDynBench extends md implements JGFSection3 {
 
 	//int size;
 
-	public def this(): JGFMolDynBench = {
+	public def this(): JGFMolDynBench {
 	}
 
-	public def JGFsetsize(var size: int): void = {
+	public def JGFsetsize(var size: int): void {
 		this.size = size;
 	}
 
-	public def JGFinitialise(): void = {
+	public def JGFinitialise(): void {
 		initialise();
 	}
 
-	public def JGFapplication(): void = {
+	public def JGFapplication(): void {
 		JGFInstrumentor.startTimer("Section3:MolDyn:Run");
 		runiters();
 		JGFInstrumentor.stopTimer("Section3:MolDyn:Run");
 	}
 
-	public def JGFvalidate(): void = {
+	public def JGFvalidate(): void {
 		var myNode: md = this;
 		// double refval[] = { 1731.4306625334357, 7397.392307839352 };
 		var refval: Array[double] = [ 275.97175611773514, 7397.392307839352 ];
@@ -59,11 +59,11 @@ public class JGFMolDynBench extends md implements JGFSection3 {
 		}
 	}
 
-	public def JGFtidyup(): void = {
+	public def JGFtidyup(): void {
 		//System.gc();
 	}
 
-	public def JGFrun(var size: int): void = {
+	public def JGFrun(var size: int): void {
 		JGFInstrumentor.addTimer("Section3:MolDyn:Total", "Solutions", size);
 		JGFInstrumentor.addTimer("Section3:MolDyn:Run", "Interactions", size);
 

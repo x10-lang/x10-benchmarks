@@ -47,7 +47,7 @@ public class ToInitAllTasks {
 	 * @param pathStartValue The stock price value to use at the start of each
 	 *        Monte Carlo simulation path.
 	 */
-	public def this(var header_: String, var name_: String, var startDate_: int, var endDate_: int, var dTime_: double, var returnDefinition_: int, var expectedReturnRate_: double, var volatility_: double, var pathStartValue_: double): ToInitAllTasks = {
+	public def this(var header_: String, var name_: String, var startDate_: int, var endDate_: int, var dTime_: double, var returnDefinition_: int, var expectedReturnRate_: double, var volatility_: double, var pathStartValue_: double): ToInitAllTasks {
 		header             = header_;
 		name               = name_;
 		startDate          = startDate_;
@@ -74,7 +74,7 @@ public class ToInitAllTasks {
 	 * @exception DemoException thrown if there is a problem accessing the
 	 *                          instance variables from the target objetct.
 	 */
-	public def this(var obj: ReturnPath, var nTimeSteps_: int, var pathStartValue_: double): ToInitAllTasks = {
+	public def this(var obj: ReturnPath, var nTimeSteps_: int, var pathStartValue_: double): ToInitAllTasks {
 		//
 		// Instance variables defined in the PathId object.
 		header = ""; //vj
@@ -100,7 +100,7 @@ public class ToInitAllTasks {
 	 * Accessor method for private instance variable <code>header</code>.
 	 * @return Value of instance variable <code>header</code>.
 	 */
-	public def get_header(): String = {
+	public def get_header(): String {
 		return (this.header);
 	}
 
@@ -118,7 +118,7 @@ public class ToInitAllTasks {
 	 * Accessor method for private instance variable <code>name</code>.
 	 * @return Value of instance variable <code>name</code>.
 	 */
-	public def get_name(): String = {
+	public def get_name(): String {
 		return (this.name);
 	}
 
@@ -136,7 +136,7 @@ public class ToInitAllTasks {
 	 * Accessor method for private instance variable <code>startDate</code>.
 	 * @return Value of instance variable <code>startDate</code>.
 	 */
-	public def get_startDate(): int = {
+	public def get_startDate(): int {
 		return (this.startDate);
 	}
 
@@ -154,7 +154,7 @@ public class ToInitAllTasks {
 	 * Accessor method for private instance variable <code>endDate</code>.
 	 * @return Value of instance variable <code>endDate</code>.
 	 */
-	public def get_endDate(): int = {
+	public def get_endDate(): int {
 		return (this.endDate);
 	}
 
@@ -172,7 +172,7 @@ public class ToInitAllTasks {
 	 * Accessor method for private instance variable <code>dTime</code>.
 	 * @return Value of instance variable <code>dTime</code>.
 	 */
-	public def get_dTime(): double = {
+	public def get_dTime(): double {
 		return (this.dTime);
 	}
 
@@ -190,7 +190,7 @@ public class ToInitAllTasks {
 	 * Accessor method for private instance variable <code>returnDefinition</code>.
 	 * @return Value of instance variable <code>returnDefinition</code>.
 	 */
-	public def get_returnDefinition(): int = {
+	public def get_returnDefinition(): int {
 		return (this.returnDefinition);
 	}
 
@@ -208,7 +208,7 @@ public class ToInitAllTasks {
 	 * Accessor method for private instance variable <code>expectedReturnRate</code>.
 	 * @return Value of instance variable <code>expectedReturnRate</code>.
 	 */
-	public def get_expectedReturnRate(): double = {
+	public def get_expectedReturnRate(): double {
 		return (this.expectedReturnRate);
 	}
 
@@ -226,7 +226,7 @@ public class ToInitAllTasks {
 	 * Accessor method for private instance variable <code>volatility</code>.
 	 * @return Value of instance variable <code>volatility</code>.
 	 */
-	public def get_volatility(): double = {
+	public def get_volatility(): double {
 		return (this.volatility);
 	}
 
@@ -244,7 +244,7 @@ public class ToInitAllTasks {
 	 * Accessor method for private instance variable <code>nTimeSteps</code>.
 	 * @return Value of instance variable <code>nTimeSteps</code>.
 	 */
-	public def get_nTimeSteps(): int = {
+	public def get_nTimeSteps(): int {
 		return (this.nTimeSteps);
 	}
 
@@ -262,7 +262,7 @@ public class ToInitAllTasks {
 	 * Accessor method for private instance variable <code>pathStartValue</code>.
 	 * @return Value of instance variable <code>pathStartValue</code>.
 	 */
-	public def get_pathStartValue(): double = {
+	public def get_pathStartValue(): double {
 		return (this.pathStartValue);
 	}
 

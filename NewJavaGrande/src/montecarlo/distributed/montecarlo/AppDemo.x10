@@ -27,7 +27,7 @@ public class AppDemo extends Universal {
 	//------------------------------------------------------------------------
 
 	public static val JGFavgExpectedReturnRateMC: Cell[Double] = new Cell[Double](0.0 as Double);
-	public static def JGFavgExpectedReturnRateMC(): double = { return JGFavgExpectedReturnRateMC.value; }
+	public static def JGFavgExpectedReturnRateMC(): double { return JGFavgExpectedReturnRateMC.value; }
 
 	/**
 	 * A class variable.
@@ -83,7 +83,7 @@ public class AppDemo extends Universal {
 	private var tasks: DistArray[ToTask];
 	private val expectedReturnRate: DistArray[double](1);
 	private val volatility: DistArray[double];
-	public def this(var dataDirname: String, var dataFilename: String, var nTimeStepsMC: int, var nRunsMC: int): AppDemo = {
+	public def this(var dataDirname: String, var dataFilename: String, var nTimeStepsMC: int, var nRunsMC: int): AppDemo {
 		this.dataDirname    = dataDirname;
 		this.dataFilename   = dataFilename;
 		this.nTimeStepsMC   = nTimeStepsMC;
@@ -113,7 +113,7 @@ public class AppDemo extends Universal {
 	 * Note that if the <code>hostname</code> is set to the string "none",
 	 * then the demonstrator runs in purely serial mode.
 	 */
-	public def initSerial(): void = {
+	public def initSerial(): void {
 		try {
 			//
 			// Measure the requested path rate.
@@ -139,7 +139,7 @@ public class AppDemo extends Universal {
 		}
 	}
 
-	public def runSerial(): void = {
+	public def runSerial(): void {
 		val t: ToInitAllTasks = initAllTasks as ToInitAllTasks;
 		finish ateach ([i]: Point in expectedReturnRate) {
 			var ps: PriceStock = new PriceStock();
@@ -152,7 +152,7 @@ public class AppDemo extends Universal {
 		};
 	}
 
-	public def processSerial(): void = {
+	public def processSerial(): void {
 		//
 		// Process the results.
 		try {
@@ -171,7 +171,7 @@ public class AppDemo extends Universal {
 	 * @param nRunsMC the number of tasks, and hence Monte Carlo paths to
 	 *        produce.
 	 */
-	private def initTasks(var nRunsMC: int): void = {
+	private def initTasks(var nRunsMC: int): void {
 		tasks = DistArray.make[ToTask](D, ([i]: Point): ToTask => { return new ToTask("MC run " + i, i as long*11); });
 	}
 
@@ -183,7 +183,7 @@ public class AppDemo extends Universal {
 	 * @exception DemoException thrown if there is a problem with reading in
 	 *            any values.
 	 */
-	private def processResults(): void = {
+	private def processResults(): void {
 		var avgExpectedReturnRateMC: double = expectedReturnRate.reduce((a:double, b:double)=>a+b, 0 as double)/nRunsMC;
 		var avgVolatilityMC: double = volatility.reduce((a:double, b:double)=>a+b,0 as double)/nRunsMC;
 		/*
@@ -217,7 +217,7 @@ public class AppDemo extends Universal {
 	 * Accessor method for private instance variable <code>dataDirname</code>.
 	 * @return Value of instance variable <code>dataDirname</code>.
 	 */
-	public def get_dataDirname(): String = {
+	public def get_dataDirname(): String {
 		return (this.dataDirname);
 	}
 
@@ -225,7 +225,7 @@ public class AppDemo extends Universal {
 	 * Set method for private instance variable <code>dataDirname</code>.
 	 * @param dataDirname the value to set for the instance variable <code>dataDirname</code>.
 	 */
-	public def set_dataDirname(var dataDirname: String): void = {
+	public def set_dataDirname(var dataDirname: String): void {
 		this.dataDirname = dataDirname;
 	}
 
@@ -233,7 +233,7 @@ public class AppDemo extends Universal {
 	 * Accessor method for private instance variable <code>dataFilename</code>.
 	 * @return Value of instance variable <code>dataFilename</code>.
 	 */
-	public def get_dataFilename(): String = {
+	public def get_dataFilename(): String {
 		return (this.dataFilename);
 	}
 
@@ -241,7 +241,7 @@ public class AppDemo extends Universal {
 	 * Set method for private instance variable <code>dataFilename</code>.
 	 * @param dataFilename the value to set for the instance variable <code>dataFilename</code>.
 	 */
-	public def set_dataFilename(var dataFilename: String): void = {
+	public def set_dataFilename(var dataFilename: String): void {
 		this.dataFilename = dataFilename;
 	}
 
@@ -249,7 +249,7 @@ public class AppDemo extends Universal {
 	 * Accessor method for private instance variable <code>nTimeStepsMC</code>.
 	 * @return Value of instance variable <code>nTimeStepsMC</code>.
 	 */
-	public def get_nTimeStepsMC(): int = {
+	public def get_nTimeStepsMC(): int {
 		return (this.nTimeStepsMC);
 	}
 
@@ -257,7 +257,7 @@ public class AppDemo extends Universal {
 	 * Set method for private instance variable <code>nTimeStepsMC</code>.
 	 * @param nTimeStepsMC the value to set for the instance variable <code>nTimeStepsMC</code>.
 	 */
-	public def set_nTimeStepsMC(var nTimeStepsMC: int): void = {
+	public def set_nTimeStepsMC(var nTimeStepsMC: int): void {
 		this.nTimeStepsMC = nTimeStepsMC;
 	}
 
@@ -265,7 +265,7 @@ public class AppDemo extends Universal {
 	 * Accessor method for private instance variable <code>nRunsMC</code>.
 	 * @return Value of instance variable <code>nRunsMC</code>.
 	 */
-	public def get_nRunsMC(): int = {
+	public def get_nRunsMC(): int {
 		return (this.nRunsMC);
 	}
 
@@ -273,7 +273,7 @@ public class AppDemo extends Universal {
 	 * Set method for private instance variable <code>nRunsMC</code>.
 	 * @param nRunsMC the value to set for the instance variable <code>nRunsMC</code>.
 	 */
-	public def set_nRunsMC(var nRunsMC: int): void = {
+	public def set_nRunsMC(var nRunsMC: int): void {
 		this.nRunsMC = nRunsMC;
 	}
 
@@ -281,7 +281,7 @@ public class AppDemo extends Universal {
 	 * Accessor method for private instance variable <code>tasks</code>.
 	 * @return Value of instance variable <code>tasks</code>.
 	 */
-	public def get_tasks(): DistArray[ToTask] = {
+	public def get_tasks(): DistArray[ToTask] {
 		return (this.tasks);
 	}
 
@@ -289,7 +289,7 @@ public class AppDemo extends Universal {
 	 * Set method for private instance variable <code>tasks</code>.
 	 * @param tasks the value to set for the instance variable <code>tasks</code>.
 	 */
-	public def set_tasks(var tasks: DistArray[ToTask]): void = {
+	public def set_tasks(var tasks: DistArray[ToTask]): void {
 		this.tasks = tasks;
 	}
 

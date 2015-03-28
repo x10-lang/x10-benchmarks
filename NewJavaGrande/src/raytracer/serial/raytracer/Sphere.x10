@@ -28,18 +28,18 @@ public class Sphere extends Primitive {
 	val r: double;
 	val r2: double;
 
-	public def this(var center: Vec, var radius: double, var s: Surface): Sphere = {
+	public def this(var center: Vec, var radius: double, var s: Surface): Sphere {
 		super(s);
 		c = center;
 		r = radius;
 		r2 = r*r;
 	}
 
-	public def this(var center: Vec, var radius: double): Sphere = {
+	public def this(var center: Vec, var radius: double): Sphere {
 		this(center, radius, new Surface());
 	}
 
-	public def intersect(var ry: Ray): Isect = {
+	public def intersect(var ry: Ray): Isect {
 		var v: Vec = Vec.sub(c, ry.p);
 		var b: double = Vec.dot(v, ry.d);
 		var disc: double = b*b - Vec.dot(v, v) + r2;
@@ -55,15 +55,15 @@ public class Sphere extends Primitive {
 		return ip;
 	}
 
-	public def normal(var p: Vec): Vec = {
+	public def normal(var p: Vec): Vec {
 		return Vec.sub(p, c).normalized();
 	}
 
-	public def toString(): String = {
+	public def toString(): String {
 		return "Sphere { " + c.toString() + "," + r + " }";
 	}
 
-	public def getCenter(): Vec = {
+	public def getCenter(): Vec {
 		return c;
 	}
 }

@@ -88,7 +88,7 @@ public class RatePath extends PathId {
 	 * @exception DemoException thrown if there is a problem reading in
 	 *                          the data file.
 	 */
-	public def this(var filename: String): RatePath = {
+	public def this(var filename: String): RatePath {
 		set_prompt(prompt);
 		set_DEBUG(debug);
 		readRatesFile(null, filename);
@@ -103,7 +103,7 @@ public class RatePath extends PathId {
 	 * @exception DemoException thrown if there is a problem reading in
 	 *                          the data file.
 	 */
-	public def this(var dirName: String, var filename: String): RatePath = {
+	public def this(var dirName: String, var filename: String): RatePath {
 		set_prompt(prompt);
 		set_DEBUG(debug);
 		readRatesFile(dirName, filename);
@@ -123,7 +123,7 @@ public class RatePath extends PathId {
 	 * @param dTime the time interval between successive path values, in
 	 *        fractions of a year.
 	 */
-	public def this(var pathValue: Array[double], var name: String, var startDate: int, var endDate: int, var dTime: double): RatePath = {
+	public def this(var pathValue: Array[double], var name: String, var startDate: int, var endDate: int, var dTime: double): RatePath {
 		set_name(name);
 		set_startDate(startDate);
 		set_endDate(endDate);
@@ -143,7 +143,7 @@ public class RatePath extends PathId {
 	 * @exception DemoException thrown if there is an attempt to access
 	 *            an undefined variable.
 	 */
-	public def this(var mc: MonteCarloPath): RatePath = {
+	public def this(var mc: MonteCarloPath): RatePath {
 		//
 		// Fields pertaining to the parent PathId object:
 		set_name(mc.get_name());
@@ -174,7 +174,7 @@ public class RatePath extends PathId {
 	 * @param dTime the time interval between successive path values, in
 	 *        fractions of a year.
 	 */
-	public def this(var pathValueLength: int, var name: String, var startDate: int, var endDate: int, var dTime: double): RatePath = {
+	public def this(var pathValueLength: int, var name: String, var startDate: int, var endDate: int, var dTime: double): RatePath {
 		set_name(name);
 		set_startDate(startDate);
 		set_endDate(endDate);
@@ -197,7 +197,7 @@ public class RatePath extends PathId {
 	 * @exception DemoException thrown if there is a mismatch between the
 	 *            lengths of the operand and target arrays.
 	 */
-	public def inc_pathValue(var operandPath: Array[double]): void = {
+	public def inc_pathValue(var operandPath: Array[double]): void {
 		if (pathValue.size != operandPath.size)
 			throw new DemoException("The path to update has a different size to the path to update with!");
 		for (var i: int = 0; i<pathValue.size; i++)
@@ -212,7 +212,7 @@ public class RatePath extends PathId {
 	 * @exception DemoException thrown if there is a mismatch between the
 	 *            lengths of the operand and target arrays.
 	 */
-	public def inc_pathValue(var scale: double): void = {
+	public def inc_pathValue(var scale: double): void {
 		// (VIVEK) Remove null checks on non-nullable field (pathValue)
 		// if (pathValue == null)
 		//  throw new DemoException("Variable pathValue is undefined!");
@@ -230,7 +230,7 @@ public class RatePath extends PathId {
 	 * @return Value of instance variable <code>pathValue</code>.
 	 * @exception DemoException thrown if instance variable <code>pathValue</code> is undefined.
 	 */
-	public def get_pathValue(): Array[double] = {
+	public def get_pathValue(): Array[double] {
 		// (VIVEK) Remove null checks on non-nullable field (pathValue)
 		//  if (this.pathValue == null)
 		// throw new DemoException("Variable pathValue is undefined!");
@@ -241,7 +241,7 @@ public class RatePath extends PathId {
 	 * Set method for private instance variable <code>pathValue</code>.
 	 * @param pathValue the value to set for the instance variable <code>pathValue</code>.
 	 */
-	public def set_pathValue(var pathValue: Array[double]): void = {
+	public def set_pathValue(var pathValue: Array[double]): void {
 		this.pathValue = pathValue;
 	}
 
@@ -250,7 +250,7 @@ public class RatePath extends PathId {
 	 * @return Value of instance variable <code>pathDate</code>.
 	 * @exception DemoException thrown if instance variable <code>pathDate</code> is undefined.
 	 */
-	public def get_pathDate(): Array[int] = {
+	public def get_pathDate(): Array[int] {
 		// (VIVEK) Remove null checks on non-nullable field (pathDate)
 		// if (this.pathDate == null)
 		//  throw new DemoException("Variable pathDate is undefined!");
@@ -261,7 +261,7 @@ public class RatePath extends PathId {
 	 * Set method for private instance variable <code>pathDate</code>.
 	 * @param pathDate the value to set for the instance variable <code>pathDate</code>.
 	 */
-	public def set_pathDate(var pathDate: Array[int]): void = {
+	public def set_pathDate(var pathDate: Array[int]): void {
 		this.pathDate = pathDate;
 	}
 
@@ -273,7 +273,7 @@ public class RatePath extends PathId {
 	 *
 	 * @return The last value in the rate path.
 	 */
-	public def getEndPathValue(): double = {
+	public def getEndPathValue(): double {
 		return (getPathValue(pathValue.size-1));
 	}
 
@@ -284,7 +284,7 @@ public class RatePath extends PathId {
 	 * @param index the index on which to return the path value.
 	 * @return The value of the path at the designated index.
 	 */
-	public def getPathValue(var index: int): double = {
+	public def getPathValue(var index: int): double {
 		return (pathValue(index));
 	}
 
@@ -297,7 +297,7 @@ public class RatePath extends PathId {
 	 * @exception DemoException thrown if there is a problem with the
 	 *                          calculation.
 	 */
-	public def getReturnCompounded(): ReturnPath = {
+	public def getReturnCompounded(): ReturnPath {
 		// (VIVEK) Remove null checks on non-nullable field (pathValue)
 		//if (pathValue == null || nAcceptedPathValue == 0) { // }
 		if (nAcceptedPathValue == 0) {
@@ -330,7 +330,7 @@ public class RatePath extends PathId {
 	 * @exception DemoException thrown if there is a problem with the
 	 *                          calculation.
 	 */
-	public def getReturnNonCompounded(): ReturnPath = {
+	public def getReturnNonCompounded(): ReturnPath {
 		// (VIVEK) Remove null checks on non-nullable field (pathValue)
 		//if (pathValue == null || nAcceptedPathValue == 0) { // }
 		if (nAcceptedPathValue == 0) {
@@ -390,7 +390,7 @@ public class RatePath extends PathId {
 	 * @exception DemoException thrown if there was a problem with the data
 	 *                          file.
 	 */
-	private def readRatesFile(var ndirName: String, var filename: String): void = {
+	private def readRatesFile(var ndirName: String, var filename: String): void {
 		var dirName: String = ndirName as String;
 		var ratesFile: x10.io.File = new File(dirName, filename);
 		var inn: x10.io.BufferedReader;

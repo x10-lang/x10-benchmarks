@@ -25,7 +25,7 @@ import harness.x10Test;;
 
 public class JGFLUFactBenchSizeA extends x10Test {
 
-	public def run(): boolean = {
+	public def run(): boolean {
 		JGFInstrumentor.printHeader(2, 0);
 		var lub: JGFLUFactBench = new JGFLUFactBench();
 		lub.JGFrun(0);

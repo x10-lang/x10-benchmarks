@@ -72,7 +72,7 @@ public class PriceStock extends Universal {
 	/**
 	 * Default constructor.
 	 */
-	public def this(): PriceStock = {
+	public def this(): PriceStock {
 		super();
 		mcPath = new MonteCarloPath();
 		set_prompt(prompt);
@@ -92,7 +92,7 @@ public class PriceStock extends Universal {
 	 *
 	 * @param obj Object representing data which are common to all tasks.
 	 */
-	public def setInitAllTasks(var obj: ToInitAllTasks): void = {
+	public def setInitAllTasks(var obj: ToInitAllTasks): void {
 		val initAllTasks: ToInitAllTasks = obj as ToInitAllTasks;
 		finish async at (mcPath) {
 			mcPath.set_name(initAllTasks.get_name());
@@ -117,7 +117,7 @@ public class PriceStock extends Universal {
 	 *
 	 * @param obj Object representing the data which defines a given task.
 	 */
-	public def setTask(var obj: x10.lang.Object): void = {
+	public def setTask(var obj: x10.lang.Object): void {
 		var task: ToTask = obj as ToTask;
 		this.taskHeader     = task.get_header();
 		this.randomSeed     = task.get_randomSeed();
@@ -127,7 +127,7 @@ public class PriceStock extends Universal {
 	 * The business end.  Invokes the necessary computation routine, for a
 	 * a given task.
 	 */
-	public def run(): void = {
+	public def run(): void {
 		try {
 			mcPath.computeFluctuationsGaussian(randomSeed);
 			mcPath.computePathValue(pathStartValue);
@@ -148,7 +148,7 @@ public class PriceStock extends Universal {
 	 * Method which returns the results of a computation back to the caller.
 	 * @return An object representing the computed results.
 	 */
-	public def getResult(): x10.lang.Object = {
+	public def getResult(): x10.lang.Object {
 		var resultHeader: String = "Result of task with Header = "+taskHeader+": randomSeed = "+randomSeed+": pathStartValue = "+pathStartValue;
 		var res: ToResult = new ToResult(resultHeader,expectedReturnRate,volatility,
 									volatility2,finalStockPrice,pathValue);

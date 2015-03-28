@@ -104,7 +104,7 @@ public class MGBase {
 	protected var timeron: boolean = false;
 	protected var CLASS: char;
 	
-	public def this( clss: char,  np: int,  serial: boolean): MGBase = {
+	public def this( clss: char,  np: int,  serial: boolean): MGBase {
 		CLASS = clss;
 		num_threads = np;
 		switch (CLASS) {

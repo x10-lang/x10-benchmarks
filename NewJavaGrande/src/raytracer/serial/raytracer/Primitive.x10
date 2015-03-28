@@ -26,10 +26,10 @@ package raytracer.serial.raytracer;
 public abstract class Primitive {
 	public var surf: Surface;
 
-	public def this(): Primitive = {
+	public def this(): Primitive {
 		surf = new Surface();
 	}
-	public def this(var s: Surface): Primitive = {
+	public def this(var s: Surface): Primitive {
 		surf = ((s == null) ? new Surface() : s as Surface);
 	}
 

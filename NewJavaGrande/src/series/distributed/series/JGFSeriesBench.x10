@@ -26,24 +26,24 @@ public class JGFSeriesBench extends SeriesTest implements JGFSection2 {
 	private var size: int;
 	private var datasizes: Array[int] = [ 10000, 100000, 1000000 ];
 
-	public def this(): JGFSeriesBench = {
+	public def this(): JGFSeriesBench {
 	}
 
-	public def JGFsetsize(var size: int): void = {
+	public def JGFsetsize(var size: int): void {
 		this.size = size;
 	}
 
-	public def JGFinitialise(): void = {
+	public def JGFinitialise(): void {
 		array_rows = datasizes(size);
 
 		buildTestData();
 	}
 
-	public def JGFkernel(): void = {
+	public def JGFkernel(): void {
 		Do();
 	}
 	
-	public def JGFvalidate(): void = {
+	public def JGFvalidate(): void {
 		var ref: Array[Array[double]] = [ [ 2.8729524964837996, 0.0 ] as Array[Double],
 		                                  [ 1.1161046676147888, -1.8819691893398025 ] ,
 		                                  [ 0.34429060398168704, -1.1645642623320958 ] ,
@@ -65,11 +65,11 @@ public class JGFSeriesBench extends SeriesTest implements JGFSection2 {
 		}
 	}
 	
-	public def JGFtidyup(): void = {
+	public def JGFtidyup(): void {
 		freeTestData();
 	}
 
-	public def JGFrun(var size: int): void = {
+	public def JGFrun(var size: int): void {
 		JGFInstrumentor.addTimer("Section2:Series:Kernel", "coefficients", size);
 		JGFsetsize(size);
 		JGFinitialise();

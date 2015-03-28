@@ -26,11 +26,11 @@ final public class Ray {
 	public var p: Vec;
 	public var d: Vec;
 
-	public def this(var pnt: Vec, var dir: Vec): Ray = {
+	public def this(var pnt: Vec, var dir: Vec): Ray {
 		this(pnt, dir, true);
 	}
 
-	public def this(var pnt: Vec, var dir: Vec, var normalize: boolean): Ray = {
+	public def this(var pnt: Vec, var dir: Vec, var normalize: boolean): Ray {
 		if (normalize) {
 			p = new Vec(pnt.x, pnt.y, pnt.z);
 			d =  new Vec(dir.x, dir.y, dir.z).normalized();
@@ -40,20 +40,20 @@ final public class Ray {
 		}
 	}
 
-	public def this(): Ray = {
+	public def this(): Ray {
 		p = new Vec();
 		d = new Vec();
 	}
 
-	public def d(var d_: Vec): Ray = {
+	public def d(var d_: Vec): Ray {
 		return new Ray(p, d_, false);
 	}
 
-	public def point(var t: double): Vec = {
+	public def point(var t: double): Vec {
 		return new Vec(p.x + d.x * t, p.y + d.y * t, p.z + d.z * t);
 	}
 
-	public def toString(): String = {
+	public def toString(): String {
 		return "{ " + p.toString() + "->" + d.toString() + " }";
 	}
 }

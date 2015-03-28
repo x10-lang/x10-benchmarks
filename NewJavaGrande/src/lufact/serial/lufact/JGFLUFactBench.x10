@@ -26,11 +26,11 @@ public class JGFLUFactBench extends Linpack implements JGFSection2 {
 	private var size: int;
 	 private var datasizes: Array[int] = [ 500, 1000, 2000 ];
 	// private int datasizes[] = { 50, 1000, 2000 };
-	public def JGFsetsize(var size: int): void = {
+	public def JGFsetsize(var size: int): void {
 		this.size = size;
 	}
 
-	public def JGFinitialise(): void = {
+	public def JGFinitialise(): void {
 		n = datasizes(size);
 		Console.OUT.println("ATTENTION: Running with smaller size (" + n + " instead of 500)");
 		ldaa = n;
@@ -49,7 +49,7 @@ public class JGFLUFactBench extends Linpack implements JGFSection2 {
 		norma = matgen(a, lda, n, b);
 	}
 
-	public def JGFkernel(): void = {
+	public def JGFkernel(): void {
 		JGFInstrumentor.startTimer("Section2:LUFact:Kernel");
 
 		info = dgefa(a, lda, n, ipvt);
@@ -58,7 +58,7 @@ public class JGFLUFactBench extends Linpack implements JGFSection2 {
 		JGFInstrumentor.stopTimer("Section2:LUFact:Kernel");
 	}
 
-	public def JGFvalidate(): void = {
+	public def JGFvalidate(): void {
 		var i: int;
 		var eps: double;
 		var residn: double;
@@ -91,7 +91,7 @@ public class JGFLUFactBench extends Linpack implements JGFSection2 {
 		}
 	}
 
-	public def JGFtidyup(): void = {
+	public def JGFtidyup(): void {
 		// Make sure large arrays are gc'd.
 		/*a = null;  // X10: avoid nullable!
 		  b = null;
@@ -100,7 +100,7 @@ public class JGFLUFactBench extends Linpack implements JGFSection2 {
 		//System.gc();
 	}
 
-	public def JGFrun(var size: int): void = {
+	public def JGFrun(var size: int): void {
 		JGFInstrumentor.addTimer("Section2:LUFact:Kernel", "Mflops", size);
 
 		JGFsetsize(size);

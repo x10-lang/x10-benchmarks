@@ -49,7 +49,7 @@ public class SeriesTest {
 	 * buildTestData.
 	 * Instantiate array(s) to hold fourier coefficients.
 	 */
-	def buildTestData(): void = {
+	def buildTestData(): void {
 		val R: Region(2) = (0..1)*(0..(array_rows-1));
 		testArray = DistArray.make[double](Dist.makeConstant(R, here));  // Array of arrays.
 	}
@@ -62,7 +62,7 @@ public class SeriesTest {
 	 * the interval 0,2. n is given by array_rows, the array size.
 	 * NOTE: The # of integration steps is fixed at 1000.
 	 */
-	def Do(): void = {
+	def Do(): void {
 		// Start the stopwatch.
 
 		JGFInstrumentor.startTimer("Section2:Series:Kernel");
@@ -118,7 +118,7 @@ public class SeriesTest {
 	 * select = 0 for the A[0] term, 1 for cosine terms, and 2 for
 	 * sine terms. Returns the value.
 	 */
-	private def TrapezoidIntegrate(var x0: double, var x1: double, var nsteps: int, var omegan: double, var select: int): double = {
+	private def TrapezoidIntegrate(var x0: double, var x1: double, var nsteps: int, var omegan: double, var select: int): double {
 		var x: double;               // Independent variable.
 		var dx: double;              // Step size.
 		var rvalue: double;          // Return value.
@@ -161,7 +161,7 @@ public class SeriesTest {
 	 * and select chooses which of the sine/cosine functions
 	 * are used. Note the special case for select = 0.
 	 */
-	private def thefunction(var x: double, var omegan: double, var select: int): double = {
+	private def thefunction(var x: double, var omegan: double, var select: int): double {
 		// Use select to pick which function we call.
 
 		switch (select)
@@ -183,7 +183,7 @@ public class SeriesTest {
 	 * Nulls array that is created with every run and forces garbage
 	 * collection to free up memory.
 	 */
-	def freeTestData(): void = {
+	def freeTestData(): void {
 		//testArray = null;    // Destroy the array.
 		//System.gc();         // Force garbage collection.
 	}

@@ -64,8 +64,8 @@ public class Random {
 	public static val d2m46  = Math.pow(0.5, 46);
 	protected static val i246m1 = (Math.pow(2, 46)-1) as Long;
 	
-	public def this(): Random = { }
-	public def this(var sd: double): Random = { seed = sd; }
+	public def this(): Random { }
+	public def this(var sd: double): Random { seed = sd; }
 	
 	//Random number generator with an external seed
 	public def randlc(var x: double, var a: double): double   {
@@ -111,7 +111,7 @@ public class Random {
 	}
 	
 	//Random number generator with an internal seed
-	public def randlc(var a: double): double = {
+	public def randlc(var a: double): double {
 		var y: Array[double];
 		var r23: double;
 		var r46: double;
@@ -153,7 +153,7 @@ public class Random {
 		return (r46 * tran);
 	}
 	
-	public def vranlc(var n: double, var x: double, var a: double, var y: Array[double](1),  offset: int): double = {
+	public def vranlc(var n: double, var x: double, var a: double, var y: Array[double](1),  offset: int): double {
 		var Lx: long = x as long ;
 		var La: long = a as Long;
 		
@@ -165,7 +165,7 @@ public class Random {
 	}
 	
 	public var seed: double;
-	public def ipow46( a: double,  exponent: int): double = {
+	public def ipow46( a: double,  exponent: int): double {
 		var n: int;
 		var n2: int;
 		var q: double;
@@ -196,7 +196,7 @@ public class Random {
 		return seed;
 	}
 	
-	public def power( a: double,  n: int): double = {
+	public def power( a: double,  n: int): double {
 		//c---------------------------------------------------------------------
 		//c     power  raises an integer, disguised as a double
 		//c     precision real, to an integer power

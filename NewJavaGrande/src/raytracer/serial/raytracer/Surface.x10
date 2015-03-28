@@ -31,7 +31,7 @@ public class Surface {
 	public val kt: double;
 	public val ior: double;
 
-	public def this(): Surface = {
+	public def this(): Surface {
 		color = new Vec(1, 0, 0);
 		kd = 1.0;
 		ks = 0.0;
@@ -40,7 +40,7 @@ public class Surface {
 		ior = 1.0;
 	}
 
-	public def this(var shine_: double, var ks_: double, var kt_: double, var c_: Vec): Surface = {
+	public def this(var shine_: double, var ks_: double, var kt_: double, var c_: Vec): Surface {
 		kd = 1.0;
 		ks = ks_;
 		shine = shine_;
@@ -49,7 +49,7 @@ public class Surface {
 		color = c_;
 	}
 
-	public def toString(): String = {
+	public def toString(): String {
 		return "Surface { color = " + color + " }";
 	}
 }

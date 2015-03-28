@@ -67,7 +67,7 @@ public class Interp extends MGWorker {
 
 	public def step( done: boolean,  wstart: int,  wend: int, 
 			 mm1: int,  mm2: int,  mm3: int,  n1: int, 
-			 n2: int,  n3: int,  zoff: int,  uoff: int): void  = {
+			 n2: int,  n3: int,  zoff: int,  uoff: int): void   {
 		getWork(wstart,wend);
 		if (work == 0) return;
 		interp(u, zoff, mm1, mm2, mm3, uoff, n1, n2, n3, z1, z2, z3, start, end);

@@ -20,7 +20,7 @@ public class ToTask {//implements java.io.Serializable {
 	private var header: String;
 	private var randomSeed: long;
 
-	public def this(var header: String, var randomSeed: long): ToTask = {
+	public def this(var header: String, var randomSeed: long): ToTask {
 		this.header         = header;
 		this.randomSeed     = randomSeed;
 	}
@@ -34,7 +34,7 @@ public class ToTask {//implements java.io.Serializable {
 	 * Accessor method for private instance variable <code>header</code>.
 	 * @return Value of instance variable <code>header</code>.
 	 */
-	public def get_header(): String = {
+	public def get_header(): String {
 		return (this.header);
 	}
 
@@ -42,7 +42,7 @@ public class ToTask {//implements java.io.Serializable {
 	 * Set method for private instance variable <code>header</code>.
 	 * @param header the value to set for the instance variable <code>header</code>.
 	 */
-	public def set_header(var header: String): void = {
+	public def set_header(var header: String): void {
 		this.header = header;
 	}
 
@@ -50,7 +50,7 @@ public class ToTask {//implements java.io.Serializable {
 	 * Accessor method for private instance variable <code>randomSeed</code>.
 	 * @return Value of instance variable <code>randomSeed</code>.
 	 */
-	public def get_randomSeed(): long = {
+	public def get_randomSeed(): long {
 		return (this.randomSeed);
 	}
 
@@ -58,7 +58,7 @@ public class ToTask {//implements java.io.Serializable {
 	 * Set method for private instance variable <code>randomSeed</code>.
 	 * @param randomSeed the value to set for the instance variable <code>randomSeed</code>.
 	 */
-	public def set_randomSeed(var randomSeed: long): void = {
+	public def set_randomSeed(var randomSeed: long): void {
 		this.randomSeed = randomSeed;
 	}
 

@@ -396,7 +396,7 @@ public class IDEATest {
 	 * in the Symantec Caje IDE. So it's not called for now; the test
 	 * uses Java % instead.
 	 */
-	private def mul(var a: Int, var b: Int): Int = {
+	private def mul(var a: Int, var b: Int): Int {
 		var p: Long;             // Large enough to catch 16-bit multiply
 		                    // without hitting sign bit.
 		if (a != 0)

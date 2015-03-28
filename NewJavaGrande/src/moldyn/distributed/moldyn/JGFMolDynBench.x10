@@ -34,18 +34,18 @@ public class JGFMolDynBench extends md implements JGFSection3 {
 	static val D: Dist(1) = Dist.makeUnique();
 	public static val P = DistArray.make[md](D, ([j]: Point(1)): md => { return new md(); });
 
-	public def this(): JGFMolDynBench = {
+	public def this(): JGFMolDynBench {
 	}
 
-	public def JGFsetsize(var size: int): void = {
+	public def JGFsetsize(var size: int): void {
 		this.size = size;
 	}
 
-	public def JGFinitialise(): void = {
+	public def JGFinitialise(): void {
 		finish ateach ([j]: Point in D) (P(j)).initialise(j, Place.MAX_PLACES);
 	}
 
-	public def JGFapplication(): void = {
+	public def JGFapplication(): void {
 		JGFInstrumentor.startTimer("Section3:MolDyn:Run");
 		finish async {
 			val C: Clock = Clock.make();
@@ -54,7 +54,7 @@ public class JGFMolDynBench extends md implements JGFSection3 {
 		JGFInstrumentor.stopTimer("Section3:MolDyn:Run");
 	}
 
-	public def JGFvalidate(): void = {
+	public def JGFvalidate(): void {
 		finish ateach ([j]: Point in D) {
 			var myNode: md = P(j);
 			var refval: Array[double] = [ 275.97175611773514, 7397.392307839352 ];
@@ -67,11 +67,11 @@ public class JGFMolDynBench extends md implements JGFSection3 {
 		}
 	}
 
-	public def JGFtidyup(): void = {
+	public def JGFtidyup(): void {
 		//System.gc();
 	}
 
-	public def JGFrun(var size: int): void = {
+	public def JGFrun(var size: int): void {
 		JGFInstrumentor.addTimer("Section3:MolDyn:Total", "Solutions", size);
 		JGFInstrumentor.addTimer("Section3:MolDyn:Run", "Interactions", size);
 

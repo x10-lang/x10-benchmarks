@@ -28,12 +28,12 @@ public class Light {
 	public val pos: Vec;
 	public val brightness: double;
 
-	public def this(): Light = {
+	public def this(): Light {
 		pos = null;
 		brightness = 0.0;
 	}
 
-	public def this(var x: double, var y: double, var z: double, var b: double): Light = {
+	public def this(var x: double, var y: double, var z: double, var b: double): Light {
 		pos = new Vec(x, y, z);
 		brightness = b;
 	}

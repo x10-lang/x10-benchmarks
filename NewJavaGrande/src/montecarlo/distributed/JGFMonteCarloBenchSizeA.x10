@@ -19,14 +19,14 @@ import harness.x10Test;;
  */
 public class JGFMonteCarloBenchSizeA extends x10Test {
 
-	public def run(): boolean = {
+	public def run(): boolean {
 		JGFInstrumentor.printHeader(3, 0);
 		var mc: JGFMonteCarloBench = new JGFMonteCarloBench();
 		mc.JGFrun(0);
 		return true;
 	}
 
-	public static def main(var args: Rail[String]): void = {
+	public static def main(var args: Rail[String]): void {
 		new JGFMonteCarloBenchSizeA().execute();
 	}
 }

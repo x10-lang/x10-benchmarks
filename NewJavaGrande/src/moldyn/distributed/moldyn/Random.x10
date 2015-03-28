@@ -13,13 +13,13 @@ public class Random {
 	public var v1: double;
 	public var v2: double;
 
-	public def this(var iseed: int, var v1: double, var v2: double): Random = {
+	public def this(var iseed: int, var v1: double, var v2: double): Random {
 		this.iseed = iseed;
 		this.v1 = v1;
 		this.v2 = v2;
 	}
 
-	public def update(): double = {
+	public def update(): double {
 		var rand: double;
 		var scale: double = 4.656612875e-10;
 
@@ -42,7 +42,7 @@ public class Random {
 		return rand;
 	}
 
-	public def seed(): double = {
+	public def seed(): double {
 		var s: double;var u1: double;var u2: double;var r: double;
 		s = 1.0;
 		do {

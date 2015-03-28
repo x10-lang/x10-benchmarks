@@ -48,15 +48,15 @@ public class JGFSparseMatmultBench extends SparseMatmult implements JGFSection2 
 
 	var y: DistArray[double];
 
-	public def this(): JGFSparseMatmultBench = {
+	public def this(): JGFSparseMatmultBench {
 		this.nthreads = Place.MAX_PLACES;
 	}
 
-	public def JGFsetsize(var size: int): void = {
+	public def JGFsetsize(var size: int): void {
 		this.size = size;
 	}
 
-	public def JGFinitialise(): void = {
+	public def JGFinitialise(): void {
 		val ds_N: int = datasizes_N(size);
 		val ds_M: int = datasizes_M(size);
 		val ds_nz: int = datasizes_nz(size);
@@ -129,11 +129,11 @@ public class JGFSparseMatmultBench extends SparseMatmult implements JGFSection2 
 		//highsum = intArray.factory.intValueArray(highsumin);
 	}
 
-	public def JGFkernel(): void = {
+	public def JGFkernel(): void {
 		SparseMatmult.test(y, vall, row, col, x, SPARSE_NUM_ITER, lowsum, highsum);
 	}
 
-	public def JGFvalidate(): void = {
+	public def JGFvalidate(): void {
 		//double refval[] = { 75.02484945753453, 150.0130719633895, 749.5245870753752 };
 		var refval: Array[double] = [ 0.1436496372119012, 150.0130719633895, 749.5245870753752 ];
 		var dev: double = Math.abs(ytotal.value - refval(size));
@@ -144,11 +144,11 @@ public class JGFSparseMatmultBench extends SparseMatmult implements JGFSection2 
 		}
 	}
 
-	public def JGFtidyup(): void = {
+	public def JGFtidyup(): void {
 		//System.gc();
 	}
 
-	public def JGFrun(var size: int): void = {
+	public def JGFrun(var size: int): void {
 		JGFInstrumentor.addTimer("Section2:SparseMatmult:Kernel", "Iterations", size);
 
 		JGFsetsize(size);
@@ -162,7 +162,7 @@ public class JGFSparseMatmultBench extends SparseMatmult implements JGFSection2 
 		JGFInstrumentor.printTimer("Section2:SparseMatmult:Kernel");
 	}
 
-	private static def init(var a: Array[double], var R: Random): Array[double] = {
+	private static def init(var a: Array[double], var R: Random): Array[double] {
 		for ([i]: Point in 0..(a.size-1)) 
 			a(i) = R.nextDouble() * 1e-6;
 		return a;

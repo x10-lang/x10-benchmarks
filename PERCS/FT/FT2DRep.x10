@@ -57,10 +57,10 @@ class FT2DRep(M:Long, verify:Boolean) {
     	}
     	@Inline def index(i:Long,j:Long)=i*N*2+2*j;
     	@Inline public operator this(i:Long, j:Long):Complex=Complex(A0(index(i,j)),A0(index(i,j)+1));
-    	@Inline public operator this(i:Long, j:Long)=(v:Complex):Complex ={
+    	@Inline public operator this(i:Long, j:Long)=(v:Complex):Complex{
     		A0(index(i,j)) = v.re;
     		A0(index(i,j)+1)=v.im;
-    		v
+    		return v;
     	}
     }
     val SQRTNL=1<<M,SQRTN=SQRTNL as Int,N=SQRTNL*SQRTNL;

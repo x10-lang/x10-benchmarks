@@ -120,7 +120,7 @@ class GCTest {
     
     // WGG - this was Math.random(), but we need something a little less random
     //  and system-specific in order to achieve cross-platform repeatability.
-    def fiborandom(): Long = {
+    def fiborandom(): Long {
         var sum: Long = seed1 + seed2;
         if (sum < 0) sum *= -1;
 
