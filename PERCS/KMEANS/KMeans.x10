@@ -64,6 +64,7 @@ final class KMeans {
             val start_time = System.nanoTime();
 
             for (var iter:Int=0n; iter<iterations; ++iter) {
+                val iter_start = System.nanoTime();
 
                 Rail.copy(host_clusters, old_clusters);
                 host_clusters.clear();
@@ -114,7 +115,7 @@ final class KMeans {
                 }
 
                 if (role == 0) {
-                    Console.OUT.println("Iteration: " + iter);
+                    Console.OUT.println("Iteration: " + iter+" "+((System.nanoTime()-iter_start)/1e9)+" secs");
                     if (verbose) printClusters(host_clusters, dim);
                 }
             }
