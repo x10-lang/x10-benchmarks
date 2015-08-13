@@ -38,11 +38,36 @@ class Bag {
     return b;
   }
 
-  def merge(b:Bag):void {
-	Rail.copy(b.hash, 0, hash, size * 20, b.size * 20);
-	Rail.copy(b.depth, 0, depth, size as Long, b.size as Long);
-	Rail.copy(b.lower, 0, lower, size as Long, b.size as Long);
-	Rail.copy(b.upper, 0, upper, size as Long, b.size as Long);
-    size += b.size;
+  def merge(b:Bag):Bag {
+	  var newSize:Int = depth.size as Int;
+	  
+	  // Not sure it needs to be a multiple of 2
+	  while (size + b.size > newSize) {
+		  newSize = newSize * 2n;
+	  }
+
+	  val newBag:Bag;
+	  if(newSize == depth.size as Int) {
+		  newBag = this;
+	  } else {
+		  newBag = new Bag(newSize);
+
+		  Rail.copy(hash, 0, newBag.hash, 0, size * 20);
+		  Rail.copy(depth, 0, newBag.depth, 0, size as Long);
+		  Rail.copy(lower, 0, newBag.lower, 0, size as Long);
+		  Rail.copy(upper, 0, newBag.upper, 0, size as Long);
+		  newBag.size = size;
+	  }
+
+	  newBag.mergeUnsafe(b);
+	  return newBag;
+  }
+  
+  private def mergeUnsafe(b:Bag):void {
+	  Rail.copy(b.hash, 0, hash, size * 20, b.size * 20);
+	  Rail.copy(b.depth, 0, depth, size as Long, b.size as Long);
+	  Rail.copy(b.lower, 0, lower, size as Long, b.size as Long);
+	  Rail.copy(b.upper, 0, upper, size as Long, b.size as Long);
+	  size += b.size;
   }
 }

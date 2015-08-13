@@ -73,6 +73,40 @@ final class Worker(numWorkersPerPlace:Long) implements Unserializable {
 		}
 	}
 	
+	private def resetWorker() {
+		this.bag = new Bag(4096n);
+		this.count = 0;
+	}
+	
+	public static def resetAllWorkers(pg:PlaceGroup, numWorkersPerPlace:Long, workers:Workers(numWorkersPerPlace)) {
+		try {
+			finish {
+				val pl = pg;
+				for (p in pl) {
+					if(p != here) {
+						val wplh = workers;
+						async at(p) {
+							for(w in wplh()) {
+								w.resetWorker();
+							}
+						}
+					}
+				}
+				if(pl.contains(here)) {
+					for(w in workers()) {
+						w.resetWorker();
+					}
+				}
+			}
+		} catch(me:MultipleExceptions) {
+			val me2 = me.filterExceptionsOfType[DeadPlaceException](true);
+			if(me2 != null) {
+				throw me;
+			} else {
+				// Just DeadPlaceExceptions, which can be safely ignored
+			}
+		}
+	}
 	public static def initAllWorkers(diffThreads:Int, pg:PlaceGroup, numWorkersPerPlace:Long, workers:Workers(numWorkersPerPlace)) {
 		try {
 			finish {
@@ -198,7 +232,21 @@ final class Worker(numWorkersPerPlace:Long) implements Unserializable {
 		return (Math.log(1.0 - v / 2147483648.0) / den) as Int;
 	}
 
+	/**
+	 * used to reset the bag and get ready for another round.
+	 * Should only be called when a round has completed.
+	 */
+	def init(bag:Bag) {
+		this.bag = bag;
+		init();
+	}
+		
 	def init(seed:Int, depth:Int) throws DigestException : void {
+		initBag(seed, depth);
+		init();
+	}
+	
+	private def initBag(seed:Int, depth:Int) throws DigestException : void {
 		bag.hash(16) = (seed >> 24n) as Byte;
 		bag.hash(17) = (seed >> 16n) as Byte;
 		bag.hash(18) = (seed >> 8n) as Byte;
@@ -210,6 +258,11 @@ final class Worker(numWorkersPerPlace:Long) implements Unserializable {
 			bag.upper(0) = v;
 			bag.size = 1n;
 		}
+	}
+	
+	
+	
+	private def init() {
 		if(useMap()) {
 			map.set(location, new Checkpoint(bag, count));
 		}
@@ -414,10 +467,7 @@ final class Worker(numWorkersPerPlace:Long) implements Unserializable {
 	def merge(b:Bag):void {
 		val startTime = stats.startMerge();
 		try {
-			while (bag.size + b.size > bag.depth.size as Int) {
-				grow();
-			}
-			bag.merge(b);
+			this.bag = bag.merge(b);
 		} finally {
 			stats.endMerge(startTime);
 		}
