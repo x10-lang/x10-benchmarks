@@ -510,48 +510,93 @@ final class Worker(numWorkersPerPlace:Long) implements Unserializable {
 		}
 	}
 
-	def transfer(thief:Long, b:Bag) : void {
+	/** Records in the backing map that bag b now belongs to the thief
+	  * and our bag is {@code this.bag}.  If the thief already has a non-empty bag
+	  * then this operation will fail.
+	  * @param thief The lucky recipient of the bag b
+	  * @param the bag to give the thief
+	  * @return If the transfer succeeded.  If it did not,
+	  * the backing map will be unmodified.  The caller is responsible
+	  * for restoring {@code this.bag @}
+	  * 
+	  */
+	def transfer(thief:Long, b:Bag) : Boolean {
 		var startTime:Long = stats.startTransfer();
 		while(true) {
 			try {
 				if(transfer_mode == TRANSFER_MODE_TRANSACTIONAL) {
-                    ResilientTransactionalMap.runTransaction("map",
-                    (map:ResilientTransactionalMap[Long, Checkpoint]) => {
-							map.set(location, new Checkpoint(bag, count));
-							val cor:Checkpoint = map.getForUpdate(thief) as Checkpoint;
-							val n:long = cor == null ? 0 :cor.count;
-							map.set(thief, new Checkpoint(b, n));
-							return null;
-						}
+					val success = ResilientTransactionalMap.runTransaction("map",
+							(map:ResilientTransactionalMap[Long, Checkpoint]) => {
+								val cor:Checkpoint = map.getForUpdate(thief) as Checkpoint;
+								if(cor != null && cor.bag != null && cor.bag.size > 0) {
+									// the thief bag is non-empty.
+									// This is a possible race condition
+									// (because they could be processing their non-empty bag)
+									// so we abort
+									return false;
+								}
+								val n:long = cor == null ? 0 :cor.count;
+								map.set(location, new Checkpoint(bag, count));
+								map.set(thief, new Checkpoint(b, n));
+								return true;
+							}
 					);
+					stats.endTransfer(startTime, success);
+					return success;
 				} else if(transfer_mode == TRANSFER_MODE_ATOMIC) {
 					// change to use set
-					map.set(location, new Checkpoint(bag, count));
 					val cor:Checkpoint = map.get(thief);
+					if(cor != null && cor.bag != null && cor.bag.size > 0) {
+						// the thief bag is non-empty.
+						// This is a possible race condition
+						// (because they could be processing their non-empty bag)
+						// so we abort
+						stats.endTransfer(startTime, false);
+					}
 					val n:long = cor == null ? 0 : cor.count;
+					map.set(location, new Checkpoint(bag, count));
 					map.set(thief, new Checkpoint(b, n));
+					stats.endTransfer(startTime, true);
 				} else if(transfer_mode == TRANSFER_MODE_ATOMIC_SUBMIT) {
 					// change to use set
-					map.set(location, new Checkpoint(bag, count));
-					finish map.asyncSubmitToKey(thief, (e:Entry[Long,Checkpoint]):Any => {
+					val success = map.submitToKey(thief, (e:Entry[Long,Checkpoint]):Any => {
 						val cor:Checkpoint = e.getValue();
+						if(cor != null && cor.bag != null && cor.bag.size > 0) {
+							// the thief bag is non-empty.
+							// This is a possible race condition
+							// (because they could be processing their non-empty bag)
+							// so we abort
+							return false;
+						}
 						val n:long = cor == null ? 0 : cor.count;
 						e.setValue(new Checkpoint(b,n));
-						return null;
-					});
+						return true;
+					}) as Boolean;
+					if(success) {
+						map.set(location, new Checkpoint(bag, count));
+					}
+					stats.endTransfer(startTime, success);
+					return success;
 				} else if(transfer_mode == TRANSFER_MODE_NOMAP) {
 					// don't do anything
+					// note that this seems unsafe
+					// since the thief could get a bag even if its
+					// current bag is non-empty
+					// However, this can happen only due to a race condition
+					// caused by place failure, and TRANSFER_MODE_NOMAP is
+					// is not resilient to place failure anyway
+
+					stats.endTransfer(startTime, true);
+					return true;
 				} else {
 					Console.ERR.println("Unknown transfer mode: " + transfer_mode);
+					stats.endTransfer(startTime, false);
 					throw new IllegalStateException("Unknown transfer mode: " + transfer_mode);
 				}
-				                              
-				stats.endTransfer(startTime);
-				return;
 			} catch (t:CheckedThrowable) {
-							
+				
 				Console.ERR.println(getLocationString(location) + ": Exception in transaction" +
-						" ... retrying");
+				" ... retrying");
 				t.printStackTrace();
 				startTime = stats.retryTransfer(startTime);
 			}
@@ -575,17 +620,23 @@ final class Worker(numWorkersPerPlace:Long) implements Unserializable {
 				if (b != null) {
 					val thief = ((location + 1) % numLocations);
 					lifeline.set(false);
-					transfer(thief, b);
-					try {
-						val thief_worker = workerOfLocation(thief);
-						val thief_place = placeOfLocation(thief);
-
-						val wplh = workers;
-						at(thief_place) async {
-							wplh()(thief_worker).lifelinedeal(b);
-						};
-					} catch (e:DeadPlaceException) {
-						// thief died, nothing to do
+					val transferSuccess = transfer(thief, b);
+					if(transferSuccess) {
+						try {
+							val thief_worker = workerOfLocation(thief);
+							val thief_place = placeOfLocation(thief);
+	
+							val wplh = workers;
+							at(thief_place) async {
+								wplh()(thief_worker).lifelinedeal(b);
+							};
+						} catch (e:DeadPlaceException) {
+							// thief died, nothing to do
+						}
+					} else {
+						// since we did not succeed in transferring the bag,
+						// we need to merge it back in 
+						merge(b);
 					}
 				}
 			}
@@ -594,19 +645,23 @@ final class Worker(numWorkersPerPlace:Long) implements Unserializable {
 				val thief = thief_boxed as Long;
 				val b:Bag = split(bag);
 				if (b != null) {
-					transfer(thief, b);
-				}
-				try {
-					val victim:Long = location;
-					val thief_worker = workerOfLocation(thief);
-					val thief_place = placeOfLocation(thief);
-					val wplh = workers;
-
-					at(thief_place) @Uncounted async {
-						wplh()(thief_worker).deal(victim, b);
-					};
-				} catch (e:DeadPlaceException) {
-					// thief died, nothing to do
+					val transferSuccess = transfer(thief, b);
+					if(transferSuccess) {
+						try {
+							val victim:Long = location;
+							val thief_worker = workerOfLocation(thief);
+							val thief_place = placeOfLocation(thief);
+							val wplh = workers;
+		
+							at(thief_place) @Uncounted async {
+								wplh()(thief_worker).deal(victim, b);
+							};
+						} catch (e:DeadPlaceException) {
+							// thief died, nothing to do
+						}
+					} else {
+						merge(b);
+					}
 				}
 			}
 		} finally {

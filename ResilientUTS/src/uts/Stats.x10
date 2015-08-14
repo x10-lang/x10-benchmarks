@@ -6,15 +6,22 @@ public class Stats {
 	
 	// TRANSFERS
 	
-	// number of transfers
+	// number of succesfful transfers
 	private val transfers:AtomicLong = new AtomicLong(0L);
 	// number of transfer retries
 	private val retriedTransfers:AtomicLong = new AtomicLong(0L);
-
+	// number of failed retries
+	private val failedTransfers:AtomicLong = new AtomicLong(0L);
+	
 	// how long we took transferring stuff (not including failures)
 	private val transferTime:AtomicLong = new AtomicLong(0L);
 	// how long we wasted on transfers that were retried
 	private val retriedTransferTime:AtomicLong = new AtomicLong(0L);
+
+	// how long we took failing transfers
+	// how long we wasted on transfers that were retried
+	private val failedTransferTime:AtomicLong = new AtomicLong(0L);
+
 	
 	// how long it took to distribute stuff
 	private val distributeTime:AtomicLong = new AtomicLong(0L);
@@ -66,15 +73,39 @@ public class Stats {
 		retriedTransferTime.addAndGet(elapsed);
 		return t;
 	}
+	
+	/**
+	 * Marks a failed transfer
+	 * @param startTime The start time of the transfer
+	 * @return the new start time, to be used for subsequent operations
+	 */
+	private def failTransfer(startTime:Long):void {
+		val t = time();
+		failedTransfers.incrementAndGet();
+		val elapsed = t-startTime;
+		failedTransferTime.addAndGet(elapsed);
+	}
 
 	/**
 	 * Marks the end of a transfer
 	 * @param startTime the start time of the transfer
 	 */
-	public def endTransfer(startTime:Long) {
+	private def completeTransfer(startTime:Long) {
 		val elapsed = time() - startTime;
 		transferTime.addAndGet(elapsed);
 		transfers.incrementAndGet();
+	}
+	
+	/**
+	 * Marks the end of a transfer, either succes or failed
+	 * @param startTime the start time of the transfer
+	 */
+	public def endTransfer(startTime:Long, success:Boolean) {
+		if(success) {
+			completeTransfer(startTime);
+		} else {
+			failTransfer(startTime);
+		}
 	}
 	
 	public def startDistribute():Long = time();
@@ -156,6 +187,8 @@ public class Stats {
 		+ ", " + "transferTime"
 		+ ", " + "retriedTransfers"
 		+ ", " + "retriedTransferTime"
+		+ ", " + "failedTransfers"
+		+ ", " + "failedTransferTime"
 		+ ", " + "distributes"
 		+ ", " + "distributeTime"
 		+ ", " + "deals"
@@ -173,6 +206,8 @@ public class Stats {
    		+ ", " + transferTime.get()
    		+ ", " + retriedTransfers.get()
    		+ ", " + retriedTransferTime.get()
+   		+ ", " + failedTransfers.get()
+   		+ ", " + failedTransferTime.get()
 		+ ", " + distributes.get()
  		+ ", " + distributeTime.get()
  		+ ", " + deals.get()
