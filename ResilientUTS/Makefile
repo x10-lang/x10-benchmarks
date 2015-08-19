@@ -13,7 +13,7 @@ RES_UTS_SRC= \
 	uts/Checkpoint.x10 \
 	uts/Stats.x10 \
 	uts/UTS.x10 \
-	uts/Worker.x10 \
+	uts/UTSWorker.x10 \
 
 default: bin-managed/res_uts.jar
 

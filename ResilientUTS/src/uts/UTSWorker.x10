@@ -20,10 +20,10 @@ import x10.util.resilient.ResilientMap;
 import x10.util.resilient.ResilientTransactionalMap;
 import x10.util.Map.Entry;
 
-final class Worker(numWorkersPerPlace:Long) implements Unserializable {
+final class UTSWorker(numWorkersPerPlace:Long) implements Unserializable {
 	private static val DEBUG=false;
 	
-	static type LocalWorkers(n:Long) = Rail[Worker{numWorkersPerPlace==n}]{self.size==n};
+	static type LocalWorkers(n:Long) = Rail[UTSWorker{numWorkersPerPlace==n}]{self.size==n};
 	static type Workers(n:Long) = PlaceLocalHandle[LocalWorkers(n)];
 
 	public static def make(diffThreads:Int, pg:PlaceGroup, numWorkersPerPlace:Long, transfer_mode:Int):Workers(numWorkersPerPlace) {
@@ -33,9 +33,9 @@ final class Worker(numWorkersPerPlace:Long) implements Unserializable {
 				(p:Place) => pg.indexOf(p),
 				(placeIndex:Long) => {
 					val baseLocation = placeIndex*numWorkersPerPlace;
-					return new Rail[Worker{self.numWorkersPerPlace==numWorkersPerPlace}](numWorkersPerPlace, 
+					return new Rail[UTSWorker{self.numWorkersPerPlace==numWorkersPerPlace}](numWorkersPerPlace, 
 						(i:Long) => 
-							new Worker(baseLocation+i, numLocations, numWorkersPerPlace, transfer_mode) as Worker{self.numWorkersPerPlace==numWorkersPerPlace})
+							new UTSWorker(baseLocation+i, numLocations, numWorkersPerPlace, transfer_mode) as UTSWorker{self.numWorkersPerPlace==numWorkersPerPlace})
 							as LocalWorkers(numWorkersPerPlace);
 				});
 		initAllWorkers(diffThreads, pg, numWorkersPerPlace, workers);
@@ -43,7 +43,7 @@ final class Worker(numWorkersPerPlace:Long) implements Unserializable {
 	}
 	
 	def this(globalLocation:Long, locations:Long, numWorkersPerPlace:Long, transfer_mode:Int)
-	:Worker{self.numWorkersPerPlace==numWorkersPerPlace} {
+	:UTSWorker{self.numWorkersPerPlace==numWorkersPerPlace} {
 		property(numWorkersPerPlace);
 
 		this.transfer_mode = transfer_mode;
@@ -52,7 +52,11 @@ final class Worker(numWorkersPerPlace:Long) implements Unserializable {
 		}
 		this.location = globalLocation;
 		this.numLocations = locations;
-		this.lifeline = new AtomicBoolean(globalLocation != locations - 1);
+		val lastLocation = locations - 1;
+		// Warning: I am not confident that initialization is resilient
+		// Note: we don't have to worry about overflow,
+		val llfrom = globalLocation == lastLocation ? -1 : globalLocation+1; 
+		this.lifeline = new AtomicLong(llfrom);
 	}	
 
 	var pg:PlaceGroup;
@@ -61,6 +65,11 @@ final class Worker(numWorkersPerPlace:Long) implements Unserializable {
 	private def initWorkers(pg:PlaceGroup, new_workers:Workers(numWorkersPerPlace)) {
 		this.pg = pg;
 		this.workers = new_workers;
+		if(Stats.IS_TRACE()) {
+			this.stats = new Stats(" " + getLocationString(location));
+		} else {
+			this.stats = new Stats();			
+		}
 	}
 	
 	private static def adjustThreads(diffThreads:Int) {
@@ -180,6 +189,9 @@ final class Worker(numWorkersPerPlace:Long) implements Unserializable {
 						merge(c.bag);
 					}
 					state = -1;
+					if(DEBUG) {
+						Console.ERR.println(getLocationString(location) + ": STATE=-1 (handle(" + p.id + "))");
+					}
 				} finally {
 					sync_lock.release();
 				}
@@ -213,10 +225,12 @@ final class Worker(numWorkersPerPlace:Long) implements Unserializable {
 	var count:Long;
 
 	val thieves:ConcurrentLinkedQueue = new ConcurrentLinkedQueue();
-	val lifeline:AtomicBoolean;
+	// the place that set the lifeline
+	// -1 means that the lifeline is not set
+	val lifeline:AtomicLong;
 	var state:Long = -2; // -2: inactive, -1: running, p: stealing from p
 
-	var stats:Stats = new Stats();
+	var stats:Stats;
 	
 	def digest() throws DigestException : Int {
 		if (bag.size >= bag.depth.size as Int) {
@@ -311,38 +325,46 @@ final class Worker(numWorkersPerPlace:Long) implements Unserializable {
 		if(DEBUG) {
 			Console.ERR.println(getLocationString(location) + ": run() starting");
 		}
-		
-		sync_lock.lock();
-	    try {
-			state = -1;
-		} finally {
-			sync_lock.unlock();
-	  	}
-		
-		while (bag.size > 0n) {
-			while (bag.size > 0n) {
-				for (var n:int = 500n; (n > 0n) && (bag.size > 0n); --n) {
-					expand();
-				}
-				distribute();
-			}
-			if(useMap()) {
-				map.set(location, new Checkpoint(count));
-			}
-			steal();
-		}
-		
-		sync_lock.lock();
 		try {
-			state = -2;
+			sync_lock.lock();
+		    try {
+				state = -1;
+			} finally {
+				sync_lock.unlock();
+		  	}
+			if(DEBUG) {
+				Console.ERR.println(getLocationString(location) + ": STATE=-1 (run)");
+			}
+			
+			while (bag.size > 0n) {
+				while (bag.size > 0n) {
+					for (var n:int = 500n; (n > 0n) && (bag.size > 0n); --n) {
+						expand();
+					}
+					distribute();
+				}
+				if(useMap()) {
+					map.set(location, new Checkpoint(count));
+				}
+				steal();
+			}
+			
+			sync_lock.lock();
+			try {
+				state = -2;
+			} finally {
+				sync_lock.unlock();
+			}
+			if(DEBUG) {
+				Console.ERR.println(getLocationString(location) + ": STATE=-2 (run)");
+			}
+			
+			distribute();
+			lifelinesteal();
 		} finally {
-			sync_lock.unlock();
-		}
-		
-		distribute();
-		lifelinesteal();
-		if(DEBUG) {
-			Console.ERR.println(getLocationString(location) + ": run() stopping");
+			if(DEBUG) {
+				Console.ERR.println(getLocationString(location) + ": run() stopping");
+			}
 		}
 	}
 
@@ -361,22 +383,92 @@ final class Worker(numWorkersPerPlace:Long) implements Unserializable {
 		"[" + workerOfLocation(location) + "]"; 
 	}
 
+	/**
+	 * Returns true if the first thief is "farther" to us then the second thief.
+	 * Here farther is defined as per the lifeline graph (from the thief's perspective)
+	 */
+	// our current lifeline graph is a cycle, where lifelines are established
+	// with our closest "backwards" (modular negative) neighbor
+	private def fartherThief(thief1:Long, thief2:Long) {
+		val thief1Before = thief1 <= this.location;
+		val thief2Before = thief2 <= this.location;
+		if(thief1Before == thief2Before) {
+			// they are both on the same side of us,
+			// so the larger one is "farther" away
+			return thief1 > thief2;
+		} else {
+			// they are on opposite sides of us
+			// so the one to our "left" is farther away then
+			// the one to our "right".
+			// since the "left" one is smaller then the right "one",
+			// the smaller one must be farther away
+			return thief1 < thief2;
+		}
+	}
+	
+	private def setLifeline(thief_location:Long) {
+		// if there is no current lifeline, set the new one
+		val success = this.lifeline.compareAndSet(-1, thief_location);
+		if(success) {
+			if(DEBUG) {
+				Console.ERR.println(getLocationString(location) + ": lifeline set by: " + getLocationString(thief_location));
+			}
+		} else {
+			// there is already a lifeline, so we need to see who will win
+			// we always pick the "farthest" thief.
+			// This is because that thief would only have requested a lifeline if
+			// it believed that the closer place was dead.
+			while(true) {
+				val oldThief = this.lifeline.get();
+				if(fartherThief(thief_location, oldThief)) {
+					val success2 = this.lifeline.compareAndSet(oldThief, thief_location);
+					if(success2) {
+						Console.ERR.println(getLocationString(location) + ": lifeline set by the farther: " + getLocationString(thief_location) + ", replacing " + getLocationString(oldThief));
+						return;
+					}
+					// otherwise, there was a race condition, so try again
+					Console.ERR.println(getLocationString(location) + ": race while trying set a lifeline from: " + getLocationString(thief_location));
+				} else {
+					Console.ERR.println(getLocationString(location) + ": lifeline attemptted to be set by: " + getLocationString(thief_location) + ", but it was an outdated (too close) request");
+					return;
+				}
+			}
+		}
+	}
 
 	def lifelinesteal():void {
 		if (numLocations == 1) {
 			return;
 		}
-		try {
-			val victim = (location + numLocations - 1) % numLocations;
-			val victim_worker = workerOfLocation(victim);
-			val victim_place = placeOfLocation(victim);
-			
-			val wplh = workers;
-			at(victim_place) async {
-				wplh()(victim_worker).lifeline.set(true);
-			};
-		} catch (e:DeadPlaceException) {
-			// TODO should go to next lifeline, but correct as is
+
+		var victim:Long = location;
+		while(true) {
+			try {
+				victim = (victim + numLocations - 1) % numLocations;
+				if(victim == location) {
+					// there is no one left to lifeline on
+					if(DEBUG) {
+						Console.ERR.println(getLocationString(location) + ": nobody left to set a lifeline with");
+					}
+					return;
+				}
+				val victim_worker = workerOfLocation(victim);
+				val victim_place = placeOfLocation(victim);
+				
+				val wplh = workers;
+				val thief_location = location;
+				at(victim_place) async {
+					wplh()(victim_worker).setLifeline(thief_location);
+				};
+				// if we did not get a DPE, we assume success.
+				// the handler will take care of matters in that case
+				break;
+			} catch (e:DeadPlaceException) {
+				// fall through and try the next place
+				if(DEBUG) {
+					Console.ERR.println(getLocationString(location) + ": failed to set a lifeline at " + getLocationString(victim) + ".  will try the next in line");
+				}
+			}
 		}
 	}
 
@@ -405,6 +497,9 @@ final class Worker(numWorkersPerPlace:Long) implements Unserializable {
 		} finally {
 			sync_lock.unlock();
 		}
+		if(DEBUG) {
+			Console.ERR.println(getLocationString(location) + ": STATE=" + getLocationString(victim) + " (steal)");
+		}
 		
 		try {
 			val wplh = workers;
@@ -421,11 +516,17 @@ final class Worker(numWorkersPerPlace:Long) implements Unserializable {
 			} finally {
 				sync_lock.unlock();
 			}
+			if(DEBUG) {
+				Console.ERR.println(getLocationString(location) + ": STATE=-1" + " (steal/dpe)");
+			}
 		}
 		
 		sync_lock.lock();
 		try {
 			while (state >= 0) {
+				if(DEBUG) {
+					Console.ERR.println(getLocationString(location) + ": STATE=" + state + " (awaiting)");
+				}
 				sync_lock.await();
 			}
 		} finally {
@@ -485,7 +586,8 @@ final class Worker(numWorkersPerPlace:Long) implements Unserializable {
 
 	 def deal(victim:Long, b:Bag) : void {
 		 if(DEBUG) {
-			 Console.ERR.println(getLocationString(location) + ": deal(" + getLocationString(victim) + "): initiated");
+			 val s = b == null ? ", null" : "";
+			 Console.ERR.println(getLocationString(location) + ": deal(" + getLocationString(victim) + s + "): initiated");
 		 }
 
 		val startTime = stats.startDeal();
@@ -503,6 +605,9 @@ final class Worker(numWorkersPerPlace:Long) implements Unserializable {
 				merge(b);
 			}
 			state = -1;
+			if(DEBUG) {
+				Console.ERR.println(getLocationString(location) + ": STATE=-1 (deal)");
+			}
 		} finally {
 			sync_lock.release();
 			stats.endDeal(startTime);
@@ -614,17 +719,24 @@ final class Worker(numWorkersPerPlace:Long) implements Unserializable {
 	
 	def distribute():void {
 		val startTime:Long = stats.startDistribute();
-		try {			
-			if (lifeline.get()) {
+		try {	
+			val llThief = lifeline.get();
+			if (llThief != -1) {
 				val b:Bag = split(bag);
 				if (b != null) {
-					val thief = ((location + 1) % numLocations);
-					lifeline.set(false);
-					val transferSuccess = transfer(thief, b);
+					val transferSuccess:Boolean;
+					if(lifeline.compareAndSet(llThief, -1)) {
+                        if(DEBUG) {
+                        	Console.ERR.println(getLocationString(location) + ": lifeline reset (old: " + getLocationString(llThief) + ")");
+                        }
+						transferSuccess = transfer(llThief, b);
+					} else {
+						transferSuccess = false;						
+					}
 					if(transferSuccess) {
 						try {
-							val thief_worker = workerOfLocation(thief);
-							val thief_place = placeOfLocation(thief);
+							val thief_worker = workerOfLocation(llThief);
+							val thief_place = placeOfLocation(llThief);
 	
 							val wplh = workers;
 							at(thief_place) async {
@@ -635,34 +747,66 @@ final class Worker(numWorkersPerPlace:Long) implements Unserializable {
 						}
 					} else {
 						// since we did not succeed in transferring the bag,
-						// we need to merge it back in 
+						// we need to merge it back in
+                        Console.ERR.println(getLocationString(location) + ": attempt to lifeline transfer to " + getLocationString(llThief) + " failed");
 						merge(b);
 					}
 				}
 			}
+			
+			val victim:Long = location;
+			val wplh = workers;
+
 			var thief_boxed : Any;
+			var b:Bag = null;
 			while ((thief_boxed = thieves.poll()) != null) {
 				val thief = thief_boxed as Long;
-				val b:Bag = split(bag);
-				if (b != null) {
+				if(b != null) {
+					b = split(bag);
+				}
+				val thief_worker = workerOfLocation(thief);
+				val thief_place = placeOfLocation(thief);
+				
+				if (b == null) {
+					if(DEBUG) {
+						Console.ERR.println(getLocationString(location) + ": no work for thief: " + getLocationString(thief));
+								
+					}
+					at(thief_place) @Uncounted async {
+						wplh()(thief_worker).deal(victim, null);
+					};
+				} else {
 					val transferSuccess = transfer(thief, b);
 					if(transferSuccess) {
 						try {
-							val victim:Long = location;
-							val thief_worker = workerOfLocation(thief);
-							val thief_place = placeOfLocation(thief);
-							val wplh = workers;
-		
+							val bagToGiveThem = b;
+							b = null;
+							if(DEBUG) {
+								Console.ERR.println(getLocationString(location) + ": dealing to thief: " + getLocationString(thief));
+							}
 							at(thief_place) @Uncounted async {
-								wplh()(thief_worker).deal(victim, b);
+								wplh()(thief_worker).deal(victim, bagToGiveThem);
 							};
 						} catch (e:DeadPlaceException) {
 							// thief died, nothing to do
 						}
 					} else {
-						merge(b);
+						if(DEBUG) {
+							Console.ERR.println(getLocationString(location) + ": failed to give work to thief: " + getLocationString(thief));
+						}
+						at(thief_place) @Uncounted async {
+							wplh()(thief_worker).deal(victim, null);
+						};
+					// if the transfer failed, keep the split bag
+					// around for the next thief
 					}
 				}
+			}
+			// if we still have a bag that we split for a thief
+			// but did not transfer to them (or any subsequent thieves)
+			// then we need to merge it back in
+			if(b != null) {
+				merge(b);
 			}
 		} finally {
 			stats.endDistribute(startTime);

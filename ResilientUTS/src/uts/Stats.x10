@@ -4,9 +4,15 @@ import x10.util.concurrent.AtomicLong;
 
 public class Stats {
 	
+	static val TRACE=false;
+	static val TRACE_DISTRIBUTE=false;
+	
+	static def IS_TRACE() = TRACE || TRACE_DISTRIBUTE;
+	
+	val trace_string : String;
 	// TRANSFERS
 	
-	// number of succesfful transfers
+	// number of successfull transfers
 	private val transfers:AtomicLong = new AtomicLong(0L);
 	// number of transfer retries
 	private val retriedTransfers:AtomicLong = new AtomicLong(0L);
@@ -50,16 +56,27 @@ public class Stats {
 
 	
 	public def this() {
-		
+		this.trace_string = null;
 	}
-	
+
+	public def this(trace_string:String) {
+		this.trace_string = trace_string;
+	}
+
 	private static def time() = System.nanoTime();
 
 	/**
 	 * Starts a transfer operation
 	 * @return the start time
 	 */
-	public def startTransfer():Long = time();
+	public def startTransfer():Long {
+		val t = time();
+		if(TRACE) {
+			Console.ERR.println("TRACE" + trace_string + " startTransfer: " + t);
+		}
+
+		return t;
+	}
 	
 	/**
 	 * Marks a retry a transfer
@@ -71,6 +88,9 @@ public class Stats {
 		retriedTransfers.incrementAndGet();
 		val elapsed = t-startTime;
 		retriedTransferTime.addAndGet(elapsed);
+		if(TRACE) {
+			Console.ERR.println("TRACE" + trace_string + " retryTransfer: " + t + "-" + startTime + "=" + elapsed);
+		}
 		return t;
 	}
 	
@@ -84,6 +104,9 @@ public class Stats {
 		failedTransfers.incrementAndGet();
 		val elapsed = t-startTime;
 		failedTransferTime.addAndGet(elapsed);
+		if(TRACE) {
+			Console.ERR.println("TRACE" + trace_string + " failTransfer: " + t + "-" + startTime + "=" + elapsed);
+		}
 	}
 
 	/**
@@ -91,9 +114,14 @@ public class Stats {
 	 * @param startTime the start time of the transfer
 	 */
 	private def completeTransfer(startTime:Long) {
-		val elapsed = time() - startTime;
+		val t = time();
+		val elapsed = t - startTime;
 		transferTime.addAndGet(elapsed);
 		transfers.incrementAndGet();
+		if(TRACE) {
+			Console.ERR.println("TRACE" + trace_string + " completeTransfer: " + t + "-" + startTime + "=" + elapsed);
+		}
+
 	}
 	
 	/**
@@ -108,47 +136,95 @@ public class Stats {
 		}
 	}
 	
-	public def startDistribute():Long = time();
-
+	public def startDistribute():Long {
+		val t = time();
+		if(TRACE_DISTRIBUTE) {
+			Console.ERR.println("TRACE" + trace_string + " startDistribute: " + t);
+		}
+		return t;
+	}
+	
 	public def endDistribute(startTime:Long) {
-		val elapsed = time() - startTime;
+		val t = time();
+		val elapsed = t - startTime;
 		distributeTime.addAndGet(elapsed);
 		distributes.incrementAndGet();
+		if(TRACE_DISTRIBUTE) {
+			Console.ERR.println("TRACE" + trace_string + " endDistribute: " + t + "-" + startTime + "=" + elapsed);
+		}
 	}
 
-	public def startDeal():Long = time();
+	public def startDeal():Long  {
+		val t = time();
+		if(TRACE) {
+			Console.ERR.println("TRACE" + trace_string + " startDeal: " + t);
+		}
+		return t;
+	}
 
 	public def endDeal(startTime:Long) {
-		val elapsed = time() - startTime;
+		val t = time();
+		val elapsed = t - startTime;
 		dealTime.addAndGet(elapsed);
 		deals.incrementAndGet();
+		if(TRACE) {
+			Console.ERR.println("TRACE" + trace_string + " endDeal: " + t + "-" + startTime + "=" + elapsed);
+		}
 	}
 
-	public def startLifelineDeal():Long = time();
+	public def startLifelineDeal():Long  {
+		val t = time();
+		if(TRACE) {
+			Console.ERR.println("TRACE" + trace_string + " startLifelineDeal: " + t);
+		}
+		return t;
+	}
 
 	public def endLifelineDeal(startTime:Long) {
-		val elapsed = time() - startTime;
+		val t = time();
+		val elapsed = t - startTime;
 		lifelineDealTime.addAndGet(elapsed);
 		lifelineDeals.incrementAndGet();
+		if(TRACE) {
+			Console.ERR.println("TRACE" + trace_string + " endLifelineDeal: " + t + "-" + startTime + "=" + elapsed);
+		}
 	}
 
-	public def startMerge():Long = time();
+	public def startMerge():Long  {
+		val t = time();
+		if(TRACE) {
+			Console.ERR.println("TRACE" + trace_string + " startMerge: " + t);
+		}
+		return t;
+	}
 
 	public def endMerge(startTime:Long) {
-		val elapsed = time() - startTime;
+		val t = time();
+		val elapsed = t - startTime;
 		mergeTime.addAndGet(elapsed);
 		merges.incrementAndGet();
+		if(TRACE) {
+			Console.ERR.println("TRACE" + trace_string + " endMerge: " + t + "-" + startTime + "=" + elapsed);
+		}
 	}
 
-	public def startSplit():Long = time();
-
+	public def startSplit():Long  {
+		val t = time();
+		if(TRACE) {
+			Console.ERR.println("TRACE" + trace_string + " startSplit: " + t);
+		}
+		return t;
+	}
 	public def endSplit(startTime:Long) {
-		val elapsed = time() - startTime;
+		val t = time();
+		val elapsed = t - startTime;
 		splitTime.addAndGet(elapsed);
 		splits.incrementAndGet();
+		if(TRACE) {
+			Console.ERR.println("TRACE" + trace_string + " endSplit: " + t + "-" + startTime + "=" + elapsed);
+		}
 	}
 
-	
 	public def add(other:Stats) {
 		transfers.addAndGet(other.transfers.get());
 		transferTime.addAndGet(other.transferTime.get());

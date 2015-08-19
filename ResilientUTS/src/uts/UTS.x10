@@ -70,7 +70,7 @@ final class UTS {
 
 	var specifiedDepth:Int = 13n;
 	var specifiedWorkers:Int = 1n;
-	var specifiedTransferMode:Int = Worker.TRANSFER_MODE_DEFAULT;
+	var specifiedTransferMode:Int = UTSWorker.TRANSFER_MODE_DEFAULT;
 	var specifiedRecoveryMode:Int = RECOVERY_MODE_DEFAULT;
 	var csv:Boolean = false;
 	
@@ -133,13 +133,13 @@ final class UTS {
 			}
 			val arg2 = args(curArg);
 			if(arg2.equalsIgnoreCase("transact") || arg2.equalsIgnoreCase("transactional") || arg2.equalsIgnoreCase("t")) {
-				specifiedTransferMode = Worker.TRANSFER_MODE_TRANSACTIONAL;
+				specifiedTransferMode = UTSWorker.TRANSFER_MODE_TRANSACTIONAL;
 			} else if(arg2.equalsIgnoreCase("atomic") || arg2.equalsIgnoreCase("atom") || arg2.equalsIgnoreCase("a")) {
-				specifiedTransferMode = Worker.TRANSFER_MODE_ATOMIC;
+				specifiedTransferMode = UTSWorker.TRANSFER_MODE_ATOMIC;
 			} else if(arg2.equalsIgnoreCase("atomic-submit") || arg2.equalsIgnoreCase("atom-submit") || arg2.equalsIgnoreCase("as")) {
-				specifiedTransferMode = Worker.TRANSFER_MODE_ATOMIC;
+				specifiedTransferMode = UTSWorker.TRANSFER_MODE_ATOMIC;
 			} else if(arg2.equalsIgnoreCase("nomap") || arg2.equalsIgnoreCase("nm")) {
-				specifiedTransferMode = Worker.TRANSFER_MODE_NOMAP;
+				specifiedTransferMode = UTSWorker.TRANSFER_MODE_NOMAP;
 			} else {
 				Console.ERR.println("transferMode argument is not valid " + arg2);
 				printUsage();
@@ -233,11 +233,11 @@ final class UTS {
     val numWorkersPerPlace:Long = isSequential ? 1 : specifiedWorkers as Long;
     
     // If we are running sequentially, we do not want to use Hazelcast
-    val transferMode = isSequential ? Worker.TRANSFER_MODE_NOMAP : specifiedTransferMode;
+    val transferMode = isSequential ? UTSWorker.TRANSFER_MODE_NOMAP : specifiedTransferMode;
     val diffThreads = isSequential ? 0n : (specifiedWorkers + 1n - x10.xrx.Runtime.NTHREADS);
     
     val pg = isSequential ? new SparsePlaceGroup(here) : Place.places();
-    val workers = Worker.make(diffThreads, pg, numWorkersPerPlace, transferMode);
+    val workers = UTSWorker.make(diffThreads, pg, numWorkersPerPlace, transferMode);
     
     //Console.OUT.println("Starting...");
     val startTime:Long = System.nanoTime();
@@ -256,7 +256,7 @@ final class UTS {
 			workers()(0).init(19n, depth);
 			runSequential = isSequential;
 		} else {
-			Worker.resetAllWorkers(pg, numWorkersPerPlace, workers);
+			UTSWorker.resetAllWorkers(pg, numWorkersPerPlace, workers);
 			workers()(0).init(workLeftBag);
 			runSequential = isSequential || isRecoverySequential;
 		}
@@ -312,7 +312,7 @@ final class UTS {
 	    			System.setExitCode(-1n);
 	    			return;
 	    		}
-	    		count = Worker.getGlobalCount(pg, numWorkersPerPlace, workers);
+	    		count = UTSWorker.getGlobalCount(pg, numWorkersPerPlace, workers);
 		    }
 	    	stillHasWork = workLeftBag != null;
 	    } finally {
@@ -327,7 +327,7 @@ final class UTS {
     val time = endTime - startTime;
     //Console.OUT.println("Finished.");
 
-    val stats = Worker.getGlobalStats(pg, numWorkersPerPlace, workers);
+    val stats = UTSWorker.getGlobalStats(pg, numWorkersPerPlace, workers);
     
     if(csv) {
     		printCSV(time, count, waves, stats);    	
