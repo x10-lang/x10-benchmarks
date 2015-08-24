@@ -1,0 +1,132 @@
+# /PERCS/FT/
+/PERCS/FT/ft
+/PERCS/FT/ft2drep
+/PERCS/FT/ftnew
+/PERCS/FT/ft.jar
+/PERCS/FT/*.class
+/PERCS/FT/tmp
+/PERCS/FT/tmp.*
+/PERCS/FT/log.*
+
+# /PERCS/GLB/
+/PERCS/GLB/uts
+/PERCS/GLB/uts.jar
+/PERCS/GLB/*.class
+/PERCS/GLB/tmp
+/PERCS/GLB/log.*
+
+# /PERCS/GLB-SSCA2/
+/PERCS/GLB-SSCA2/tmp
+/PERCS/GLB-SSCA2/ssca2.jar
+/PERCS/GLB-SSCA2/MySSCA2
+/PERCS/GLB-SSCA2/log.*
+
+# /PERCS/GLB-UTS/
+/PERCS/GLB-UTS/tmp
+/PERCS/GLB-UTS/*.class
+/PERCS/GLB-UTS/MyUTS
+/PERCS/GLB-UTS/uts.jar
+/PERCS/GLB-UTS/log.*
+
+# /PERCS/GLB-UTS/GLB-SSCA2/
+/PERCS/GLB-UTS/GLB-SSCA2/tmp
+/PERCS/GLB-UTS/GLB-SSCA2/ssca2.jar
+/PERCS/GLB-UTS/GLB-SSCA2/MySSCA2
+/PERCS/GLB-UTS/GLB-SSCA2/log.*
+
+# /PERCS/GLB-UTS/myuts/
+/PERCS/GLB-UTS/myuts/*.class
+
+# /PERCS/GLB-UTS-SSCA2/
+/PERCS/GLB-UTS-SSCA2/MyUTS
+/PERCS/GLB-UTS-SSCA2/MySSCA2
+/PERCS/GLB-UTS-SSCA2/UTS
+/PERCS/GLB-UTS-SSCA2/BCG
+/PERCS/GLB-UTS-SSCA2/ssca2.jar
+/PERCS/GLB-UTS-SSCA2/uts.jar
+/PERCS/GLB-UTS-SSCA2/bcg.jar
+/PERCS/GLB-UTS-SSCA2/fib.jar
+/PERCS/GLB-UTS-SSCA2/log.*
+/PERCS/GLB-UTS-SSCA2/tmp
+
+# /PERCS/GLB-UTS-SSCA2/myuts/
+/PERCS/GLB-UTS-SSCA2/myuts/*.class
+
+# /PERCS/GLB-UTS-SSCA2/uts/
+/PERCS/GLB-UTS-SSCA2/uts/*.class
+
+# /PERCS/KMEANS/
+/PERCS/KMEANS/kmeans
+/PERCS/KMEANS/kmeans.jar
+/PERCS/KMEANS/tmp
+/PERCS/KMEANS/log.*
+
+# /PERCS/LU/
+/PERCS/LU/lu
+/PERCS/LU/lu.jar
+/PERCS/LU/*.class
+/PERCS/LU/tmp
+/PERCS/LU/log.*
+
+# /PERCS/RA/
+/PERCS/RA/ra
+/PERCS/RA/ra.jar
+/PERCS/RA/tmp
+/PERCS/RA/log.*
+
+# /PERCS/SSCA1/
+/PERCS/SSCA1/ssca1
+/PERCS/SSCA1/ssca1.jar
+/PERCS/SSCA1/tmp
+/PERCS/SSCA1/log.*
+
+# /PERCS/SSCA2/
+/PERCS/SSCA2/ssca2
+/PERCS/SSCA2/ssca2.jar
+/PERCS/SSCA2/tmp
+/PERCS/SSCA2/log.*
+
+# /PERCS/STREAM/
+/PERCS/STREAM/stream
+/PERCS/STREAM/stream.jar
+/PERCS/STREAM/tmp
+/PERCS/STREAM/log.*
+
+# /PERCS/UTS/
+/PERCS/UTS/uts
+/PERCS/UTS/uts.jar
+/PERCS/UTS/*.class
+/PERCS/UTS/tmp
+/PERCS/UTS/log.*
+
+# /PERCS/UTS-363/
+/PERCS/UTS-363/uts
+/PERCS/UTS-363/uts.jar
+/PERCS/UTS-363/tmp
+/PERCS/UTS-363/log.*
+
+# /RayTracer/
+/RayTracer/out-dbg
+/RayTracer/out-opt
+/RayTracer/Benchmark.opt
+/RayTracer/Benchmark.dbg
+/RayTracer/GLFrontend.dbg
+/RayTracer/GLFrontend.opt
+/RayTracer/QuatTest.dbg
+/RayTracer/QuatTest.opt
+/RayTracer/Vector3Test.dbg
+/RayTracer/Vector3Test.opt
+/RayTracer/OctreeTest.dbg
+/RayTracer/OctreeTest.opt
+/RayTracer/Texture2DTest.dbg
+/RayTracer/Texture2DTest.opt
+/RayTracer/*.prof
+
+# /microbenchmarks/Integrate/
+/microbenchmarks/Integrate/cppint2
+/microbenchmarks/Integrate/x10int2
+/microbenchmarks/Integrate/gen-x10
+/microbenchmarks/Integrate/*.class
+
+# /microbenchmarks/KMeans/
+/microbenchmarks/KMeans/bin
