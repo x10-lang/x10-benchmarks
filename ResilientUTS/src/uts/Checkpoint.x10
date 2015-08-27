@@ -11,7 +11,7 @@ class Checkpoint {
 	}
 
 	def this(b:Bag, c:long) {
-		if (b.size as Long == b.depth.size) {
+		if (b == null || b.size as Long == b.depth.size) {
 			bag = b;
 		} else {
 			bag = new Bag(b.size);

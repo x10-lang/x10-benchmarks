@@ -19,14 +19,29 @@ import x10.io.Unserializable;
 import x10.util.resilient.ResilientMap;
 import x10.util.resilient.ResilientTransactionalMap;
 import x10.util.Map.Entry;
+import x10.util.Set;
+import x10.util.HashSet;
+import x10.util.Pair;
 
+/**
+ * Worker class to compute UTS.
+ * For the resilient version, the computation uses the resilient map to checkpoint
+ * the state of the computation.
+ * It keeps as an: sum_{checkpoints in map} UTS(Checkpoint).
+ * Where UTS(cp)=cp.count+UTS.seq(cp.bag).
+ * The goal is to get cp.bag==0 for all the bags (so they have all finished working)
+ * and to reduce things to having a single checkpoint (so that it is easy to read the answer out).
+ * All map operations (in full transactional mode) are careful to preserve this 
+ * invariant, ensuring that the answer (if computed) is correct.
+ * 
+ */
 final class UTSWorker(numWorkersPerPlace:Long) implements Unserializable {
 	private static val DEBUG=false;
 	
 	static type LocalWorkers(n:Long) = Rail[UTSWorker{numWorkersPerPlace==n}]{self.size==n};
 	static type Workers(n:Long) = PlaceLocalHandle[LocalWorkers(n)];
 
-	public static def make(diffThreads:Int, pg:PlaceGroup, numWorkersPerPlace:Long, transfer_mode:Int):Workers(numWorkersPerPlace) {
+	public static def make(diffThreads:Int, pg:PlaceGroup, numWorkersPerPlace:Long, transfer_mode:Int, killTimes:Rail[Long]):Workers(numWorkersPerPlace) {
 		val numPlaces = pg.size();
 		val numLocations = numPlaces * numWorkersPerPlace;
 		val workers = PlaceLocalHandle.make(pg,
@@ -38,7 +53,7 @@ final class UTSWorker(numWorkersPerPlace:Long) implements Unserializable {
 							new UTSWorker(baseLocation+i, numLocations, numWorkersPerPlace, transfer_mode) as UTSWorker{self.numWorkersPerPlace==numWorkersPerPlace})
 							as LocalWorkers(numWorkersPerPlace);
 				});
-		initAllWorkers(diffThreads, pg, numWorkersPerPlace, workers);
+		initAllWorkers(diffThreads, pg, numWorkersPerPlace, workers, killTimes);
 		return workers;
 	}
 	
@@ -57,6 +72,7 @@ final class UTSWorker(numWorkersPerPlace:Long) implements Unserializable {
 		// Note: we don't have to worry about overflow,
 		val llfrom = globalLocation == lastLocation ? -1 : globalLocation+1; 
 		this.lifeline = new AtomicLong(llfrom);
+		this.harvestedVictims = new HashSet[Long]();
 	}	
 
 	var pg:PlaceGroup;
@@ -116,23 +132,85 @@ final class UTSWorker(numWorkersPerPlace:Long) implements Unserializable {
 			}
 		}
 	}
-	public static def initAllWorkers(diffThreads:Int, pg:PlaceGroup, numWorkersPerPlace:Long, workers:Workers(numWorkersPerPlace)) {
+	
+	public static def setKillTime(time:Long) {
+		killer.setKillTime(time);
+	}
+	
+	public static def startKiller() {
+		killer.startKiller();
+	}
+	
+	private static class Killer implements java.lang.Runnable {
+		def this() { }
+		
+		public def startKiller() {
+			if(killDelay > 0) {
+				val t = new java.lang.Thread(this, "Suicide (delayed) thread");
+				t.setDaemon(true);
+				t.start();
+				// we can lose the to reference, since there is no
+				// way to cancel suicide :-
+			}
+		}
+		
+		def setKillTime(newTime:Long) {
+			this.killDelay = newTime;
+		}
+		
+		private var killDelay : Long;
+		
+		public def run():void {
+			if(killDelay <= 0) {
+				return;
+			}
+			val startTime = java.lang.System.nanoTime();
+
+			val endTime = startTime + killDelay;
+			var curTime : Long;
+			
+			while ((curTime = java.lang.System.nanoTime()) < endTime) {
+				val timeLeftNs = endTime - curTime;
+				val timeLeftMspart = timeLeftNs / 1000;
+				val timeLeftNspart = timeLeftNs % 1000;
+				try {
+					java.lang.Thread.sleep(timeLeftMspart, timeLeftNspart as Int);
+				} catch (iex:java.lang.InterruptedException) {}
+			}
+			// time ran out.  time to commit suicide
+			java.lang.System.exit(-1n);
+		}
+	};
+	
+	private static killer:Killer = new Killer();
+	
+	public static def initAllWorkers(
+			diffThreads:Int,
+			pg:PlaceGroup, 
+			numWorkersPerPlace:Long, 
+			workers:Workers(numWorkersPerPlace), 
+			killTimes:Rail[Long]) {
 		try {
 			finish {
 				val pl = pg;
 				for (p in pl) {
 					if(p != here) {
 						val wplh = workers;
+						val killTime = killTimes(p.id);
 						async at(p) {
+							setKillTime(killTime);
 							adjustThreads(diffThreads);
 							registerPlaceDeadHandler(numWorkersPerPlace, wplh());
 							for(w in wplh()) {
 								w.initWorkers(pg, workers);
 							}
+							startKiller();
 						}
 					}
 				}
 				if(pl.contains(here)) {
+					val killTime = killTimes(here.id);
+					setKillTime(killTime);
 					adjustThreads(diffThreads);
 					registerPlaceDeadHandler(numWorkersPerPlace, workers());
 					for(w in workers()) {
@@ -173,6 +251,7 @@ final class UTSWorker(numWorkersPerPlace:Long) implements Unserializable {
 		});
 	}
 		
+	// TODO: think about and fix the handler
 	private def handle(p:Place):void {
 		sync_lock.lock();
 		// p is dead, unblock if waiting on p
@@ -223,7 +302,12 @@ final class UTSWorker(numWorkersPerPlace:Long) implements Unserializable {
 	val den:double = Math.log(4.0 / (1.0 + 4.0)); // branching factor: 4.0
 	var bag:Bag = new Bag(4096n);
 	var count:Long;
-
+	
+	// a list of victims that are known to be dead and 
+	// "harvested" -- we checked, and they don't appear 
+	// to have any work to do
+	val harvestedVictims:Set[Long];
+	
 	val thieves:ConcurrentLinkedQueue = new ConcurrentLinkedQueue();
 	// the place that set the lifeline
 	// -1 means that the lifeline is not set
@@ -278,7 +362,7 @@ final class UTSWorker(numWorkersPerPlace:Long) implements Unserializable {
 	
 	private def init() {
 		if(useMap()) {
-			map.set(location, new Checkpoint(bag, count));
+			map.set(location, new Checkpoint(this.bag, this.count));
 		}
 	}
 
@@ -336,15 +420,38 @@ final class UTSWorker(numWorkersPerPlace:Long) implements Unserializable {
 				Console.ERR.println(getLocationString(location) + ": STATE=-1 (run)");
 			}
 			
-			while (bag.size > 0n) {
-				while (bag.size > 0n) {
+			while (bag != null && bag.size > 0n) {
+				while (bag != null && bag.size > 0n) {
 					for (var n:int = 500n; (n > 0n) && (bag.size > 0n); --n) {
 						expand();
 					}
 					distribute();
 				}
 				if(useMap()) {
-					map.set(location, new Checkpoint(count));
+					val newCheckpoint = new Checkpoint(bag, count);
+					if(map.replace(location, newCheckpoint) == null) {
+						// since we ran, the bag can't have originally been empty.
+						// so this means that the replacement failed
+						// because our location was removed from the map
+						// which happens only when we are harvested.
+						// if we were harvested, someone believes us to be (X10) dead
+						// and that believe will propagate, so there is nothing left for us to do
+						if(DEBUG) {
+							Console.ERR.println(getLocationString(location) + ": run checkpoint replacement failed.  We have been harvested!");
+						}
+						// since we have been harvested, we can die.
+						// we probably don't really need to change states.
+						sync_lock.lock();
+						try {
+							state = -2;
+						} finally {
+							sync_lock.unlock();
+						}
+						if(DEBUG) {
+							Console.ERR.println(getLocationString(location) + ": STATE=-2 (run after being harvested)");
+						}
+						return;
+					}
 				}
 				steal();
 			}
@@ -423,13 +530,19 @@ final class UTSWorker(numWorkersPerPlace:Long) implements Unserializable {
 				if(fartherThief(thief_location, oldThief)) {
 					val success2 = this.lifeline.compareAndSet(oldThief, thief_location);
 					if(success2) {
-						Console.ERR.println(getLocationString(location) + ": lifeline set by the farther: " + getLocationString(thief_location) + ", replacing " + getLocationString(oldThief));
+						if(DEBUG) {
+							Console.ERR.println(getLocationString(location) + ": lifeline set by the farther: " + getLocationString(thief_location) + ", replacing " + getLocationString(oldThief));
+						}
 						return;
 					}
 					// otherwise, there was a race condition, so try again
-					Console.ERR.println(getLocationString(location) + ": race while trying set a lifeline from: " + getLocationString(thief_location));
+					if(DEBUG) {
+						Console.ERR.println(getLocationString(location) + ": race while trying set a lifeline from: " + getLocationString(thief_location));
+					}
 				} else {
-					Console.ERR.println(getLocationString(location) + ": lifeline attemptted to be set by: " + getLocationString(thief_location) + ", but it was an outdated (too close) request");
+					if(DEBUG) {
+						Console.ERR.println(getLocationString(location) + ": lifeline attemptted to be set by: " + getLocationString(thief_location) + ", but it was an outdated (too close) request");
+					}
 					return;
 				}
 			}
@@ -489,6 +602,19 @@ final class UTSWorker(numWorkersPerPlace:Long) implements Unserializable {
 		if (!pg.contains(victim_place)) {
 			// TODO should try other place, but ok as is
 			return;
+		}
+		
+		if(victim_place.isDead()) {
+			// the victim place is already dead
+			if(harvestedVictims.contains(victim)) {
+				// the victim is already dead and probably does not contain
+				// any work
+				// just return for now (could optionally try again)
+				return;
+			} else {
+				// we are done irrespective of success
+				harvest(victim);
+			}
 		}
 		
 		sync_lock.lock();
@@ -568,7 +694,11 @@ final class UTSWorker(numWorkersPerPlace:Long) implements Unserializable {
 	def merge(b:Bag):void {
 		val startTime = stats.startMerge();
 		try {
-			this.bag = bag.merge(b);
+			if(this.bag == null) {
+				this.bag = b;
+			} else {
+				this.bag = bag.merge(b);
+			}
 		} finally {
 			stats.endMerge(startTime);
 		}
@@ -615,6 +745,78 @@ final class UTSWorker(numWorkersPerPlace:Long) implements Unserializable {
 		}
 	}
 
+	 /**
+	  * This "harvest": steals from another place's map.
+	  * While always safe (thanks to our global map invariant)
+	  * this should be done only if we believe that the victim is already
+	  * dead.
+	  * @return If we harvested anything
+	  */
+	 // TODO: get this to work with non-transactional transfer moe
+	 def harvest(victim:Long) : Boolean {
+		 var startTime:Long = stats.startHarvest();
+		 // since we are trying to steal from it
+		 // we mark it as harvested
+		 harvestedVictims.add(victim);
+		 val victimCheckpoint = map.get(victim) as Checkpoint;
+		 if(victimCheckpoint == null || victimCheckpoint.bag == null) {
+			 return false;
+		 }
+		 if(DEBUG) {
+			 Console.ERR.println(getLocationString(location) + ": trying to harvest from: " + getLocationString(victim));								
+		 }
+		 assert(this.bag == null || this.bag.size == 0n) : "harvest called with a non-empty local bag";
+		 if(transfer_mode == TRANSFER_MODE_TRANSACTIONAL) {
+			 try {
+				 val ourLocation = location;
+				 
+				 val newCheckpoint = ResilientTransactionalMap.runTransaction("map",
+						 (map:ResilientTransactionalMap[Long, Checkpoint]) => {
+							 
+							 val victimCheckpoint:Checkpoint = map.getForUpdate(victim) as Checkpoint;
+							 if(victimCheckpoint == null || victimCheckpoint.bag == null || victimCheckpoint.bag.size == 0n) {
+								 // there is nothing to steal
+								 return null;
+							 }	
+
+							 val ourCheckpoint:Checkpoint = map.getForUpdate(ourLocation) as Checkpoint;
+							 if(ourCheckpoint == null || ourCheckpoint.bag == null || ourCheckpoint.bag.size == 0n) {
+								 val newCheckpoint = new Checkpoint(victimCheckpoint.bag, victimCheckpoint.count + ourCheckpoint.count);
+								 // since they have data, and we don't, we can take theirs
+								 map.set(ourLocation, newCheckpoint);
+								 // we stole the bag and count
+								 // we need to delete the key from the map
+								 // since the run() method of the victim may try to update
+								 // it with replace()
+								 map.deleteVoid(victim);
+								 return newCheckpoint;
+							 } else {
+								 // we are not empty.  This is a race condition, so we need to abort
+							 	return null;
+							 }
+						 }
+				 );
+				 val success = newCheckpoint != null;
+				 if(success) {
+					 this.bag = newCheckpoint.bag;
+					 this.count = newCheckpoint.count;
+					 if(DEBUG) {
+						 Console.ERR.println(getLocationString(location) + ": successfully harvested from: " + getLocationString(victim));								
+					 }
+				 }
+				 stats.endHarvest(startTime, success);
+				 return success;
+			 } catch (t:CheckedThrowable) {
+				 Console.ERR.println(getLocationString(location) + ": Exception in harvest(" + getLocationString(victim) + ") transaction");
+				 t.printStackTrace();
+				 stats.endHarvest(startTime, false);
+				 return false;
+			 }
+		 } else {
+			 return false;
+		 }
+	 }
+	 
 	/** Records in the backing map that bag b now belongs to the thief
 	  * and our bag is {@code this.bag}.  If the thief already has a non-empty bag
 	  * then this operation will fail.
@@ -624,28 +826,39 @@ final class UTSWorker(numWorkersPerPlace:Long) implements Unserializable {
 	  * the backing map will be unmodified.  The caller is responsible
 	  * for restoring {@code this.bag @}
 	  * 
+	  * transfer is called only when the local bag is originally non-empty
+	  * 
 	  */
 	def transfer(thief:Long, b:Bag) : Boolean {
 		var startTime:Long = stats.startTransfer();
 		while(true) {
 			try {
 				if(transfer_mode == TRANSFER_MODE_TRANSACTIONAL) {
-					val success = ResilientTransactionalMap.runTransaction("map",
+					val ourCheckpoint = new Checkpoint(bag, count);
+					val ourLocation = location;
+					val errCode = ResilientTransactionalMap.runTransaction("map",
 							(map:ResilientTransactionalMap[Long, Checkpoint]) => {
-								val cor:Checkpoint = map.getForUpdate(thief) as Checkpoint;
-								if(cor != null && cor.bag != null && cor.bag.size > 0) {
+								val thiefCheckpoint:Checkpoint = map.getForUpdate(thief) as Checkpoint;
+								if(thiefCheckpoint != null && thiefCheckpoint.bag != null && thiefCheckpoint.bag.size > 0) {
 									// the thief bag is non-empty.
 									// This is a possible race condition
 									// (because they could be processing their non-empty bag)
 									// so we abort
-									return false;
+									return -1;
 								}
-								val n:long = cor == null ? 0 :cor.count;
-								map.set(location, new Checkpoint(bag, count));
+								val n:long = thiefCheckpoint == null ? 0 : thiefCheckpoint.count;
+								//map.set(ourLocation, ourCheckpoint);
+								map.set(ourLocation, ourCheckpoint);
 								map.set(thief, new Checkpoint(b, n));
-								return true;
+								return 0;
 							}
 					);
+					val success = errCode == 0;
+					if(! success) {
+						if(DEBUG) {
+							Console.ERR.println(getLocationString(location) + ": failed transfer to " + getLocationString(location) + " with errCode " + errCode);
+						}
+					}
 					stats.endTransfer(startTime, success);
 					return success;
 				} else if(transfer_mode == TRANSFER_MODE_ATOMIC) {
@@ -748,8 +961,11 @@ final class UTSWorker(numWorkersPerPlace:Long) implements Unserializable {
 					} else {
 						// since we did not succeed in transferring the bag,
 						// we need to merge it back in
-                        Console.ERR.println(getLocationString(location) + ": attempt to lifeline transfer to " + getLocationString(llThief) + " failed");
+						if(DEBUG) {
+                        	Console.ERR.println(getLocationString(location) + ": attempt to lifeline transfer to " + getLocationString(llThief) + " failed");
+						}
 						merge(b);
+						lifeline.compareAndSet(-1, llThief);
 					}
 				}
 			}
@@ -769,8 +985,7 @@ final class UTSWorker(numWorkersPerPlace:Long) implements Unserializable {
 				
 				if (b == null) {
 					if(DEBUG) {
-						Console.ERR.println(getLocationString(location) + ": no work for thief: " + getLocationString(thief));
-								
+						Console.ERR.println(getLocationString(location) + ": no work for thief: " + getLocationString(thief));								
 					}
 					at(thief_place) @Uncounted async {
 						wplh()(thief_worker).deal(victim, null);

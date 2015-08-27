@@ -27,6 +27,18 @@ public class Stats {
 	// how long we took failing transfers
 	// how long we wasted on transfers that were retried
 	private val failedTransferTime:AtomicLong = new AtomicLong(0L);
+	
+	// number of successfull harvests
+	private val harvests:AtomicLong = new AtomicLong(0L);
+	// number of failed retries
+	private val failedHarvests:AtomicLong = new AtomicLong(0L);
+	
+	// how long we took harvesting stuff (not including failures)
+	private val harvestTime:AtomicLong = new AtomicLong(0L);
+
+	// how long we took failing harvests
+	// how long we wasted on harvests that were retried
+	private val failedHarvestTime:AtomicLong = new AtomicLong(0L);
 
 	
 	// how long it took to distribute stuff
@@ -136,6 +148,61 @@ public class Stats {
 		}
 	}
 	
+	/**
+	 * Starts a harvest operation
+	 * @return the start time
+	 */
+	public def startHarvest():Long {
+		val t = time();
+		if(TRACE) {
+			Console.ERR.println("TRACE" + trace_string + " startHarvest: " + t);
+		}
+
+		return t;
+	}
+	
+	/**
+	 * Marks a failed harvest
+	 * @param startTime The start time of the harvest
+	 * @return the new start time, to be used for subsequent operations
+	 */
+	private def failHarvest(startTime:Long):void {
+		val t = time();
+		failedHarvests.incrementAndGet();
+		val elapsed = t-startTime;
+		failedHarvestTime.addAndGet(elapsed);
+		if(TRACE) {
+			Console.ERR.println("TRACE" + trace_string + " failHarvest: " + t + "-" + startTime + "=" + elapsed);
+		}
+	}
+
+	/**
+	 * Marks the end of a harvest
+	 * @param startTime the start time of the harvest
+	 */
+	private def completeHarvest(startTime:Long) {
+		val t = time();
+		val elapsed = t - startTime;
+		harvestTime.addAndGet(elapsed);
+		harvests.incrementAndGet();
+		if(TRACE) {
+			Console.ERR.println("TRACE" + trace_string + " completeHarvest: " + t + "-" + startTime + "=" + elapsed);
+		}
+
+	}
+	
+	/**
+	 * Marks the end of a harvest, either succes or failed
+	 * @param startTime the start time of the harvest
+	 */
+	public def endHarvest(startTime:Long, success:Boolean) {
+		if(success) {
+			completeHarvest(startTime);
+		} else {
+			failHarvest(startTime);
+		}
+	}
+	
 	public def startDistribute():Long {
 		val t = time();
 		if(TRACE_DISTRIBUTE) {
@@ -230,16 +297,23 @@ public class Stats {
 		transferTime.addAndGet(other.transferTime.get());
 		retriedTransfers.addAndGet(other.retriedTransfers.get());
 		retriedTransferTime.addAndGet(other.retriedTransferTime.get());
+        failedTransfers.addAndGet(other.failedTransfers.get());
+        failedTransferTime.addAndGet(other.failedTransferTime.get());
 		distributes.addAndGet(other.distributes.get());
 		distributeTime.addAndGet(other.distributeTime.get());
-		 deals.addAndGet(other.deals.get());
-		 dealTime.addAndGet(other.dealTime.get());	
-		 lifelineDeals.addAndGet(other.lifelineDeals.get());
-		 lifelineDealTime.addAndGet(other.lifelineDealTime.get());	
-		 merges.addAndGet(other.merges.get());
-		 mergeTime.addAndGet(other.mergeTime.get());
-		 splits.addAndGet(other.splits.get());
-		 splitTime.addAndGet(other.splitTime.get());
+		deals.addAndGet(other.deals.get());
+		dealTime.addAndGet(other.dealTime.get());	
+		lifelineDeals.addAndGet(other.lifelineDeals.get());
+		lifelineDealTime.addAndGet(other.lifelineDealTime.get());	
+		harvests.addAndGet(other.harvests.get());
+		harvestTime.addAndGet(other.harvestTime.get());
+		failedHarvests.addAndGet(other.failedHarvests.get());
+		failedHarvestTime.addAndGet(other.failedHarvestTime.get());
+
+		merges.addAndGet(other.merges.get());
+		mergeTime.addAndGet(other.mergeTime.get());
+		splits.addAndGet(other.splits.get());
+		splitTime.addAndGet(other.splitTime.get());
 	}
 	
 	public def print(out:Printer):void {
@@ -271,6 +345,10 @@ public class Stats {
 		+ ", " + "dealTime"
 		+ ", " + "lifelineDeals"
 		+ ", " + "lifelineDealTime"
+		+ ","  + "harvests"
+		+ ", " + "harvestTime"
+		+ ", " + "failedHarvests"
+		+ ", " + "failedHarvestTime"
 		+ ", " + "merges"
 		+ ", " + "mergeTime"
 		+ ", " + "splits"
@@ -290,6 +368,10 @@ public class Stats {
  		+ ", " + dealTime.get()	
  		+ ", " + lifelineDeals.get()	
  		+ ", " + lifelineDealTime.get()	
+		+ ", " + harvests.get() 
+		+ ", " + harvestTime.get()
+		+ ", " + failedHarvests.get()
+		+ ", " + failedHarvestTime.get()
 		+ ", " + merges.get()	
 		+ ", " + mergeTime.get()
 		+ ", " + splits.get()	
