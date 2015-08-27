@@ -73,6 +73,9 @@ final class UTSWorker(numWorkersPerPlace:Long) implements Unserializable {
 		val llfrom = globalLocation == lastLocation ? -1 : globalLocation+1; 
 		this.lifeline = new AtomicLong(llfrom);
 		this.harvestedVictims = new HashSet[Long]();
+		
+		val nextLocation = (globalLocation + numLocations - 1) % numLocations;
+		this.nextLocationInLifelineGraph = new AtomicLong(nextLocation);
 	}	
 
 	var pg:PlaceGroup;
@@ -309,9 +312,15 @@ final class UTSWorker(numWorkersPerPlace:Long) implements Unserializable {
 	val harvestedVictims:Set[Long];
 	
 	val thieves:ConcurrentLinkedQueue = new ConcurrentLinkedQueue();
+	
 	// the place that set the lifeline
 	// -1 means that the lifeline is not set
 	val lifeline:AtomicLong;
+	
+	// the next place in the lifeline graph.
+	// This is the place we go to when we need to *set* a lifeline
+	// with no failures, it would just be location - 1. 
+	val nextLocationInLifelineGraph:AtomicLong;
 	var state:Long = -2; // -2: inactive, -1: running, p: stealing from p
 
 	var stats:Stats;
@@ -549,19 +558,20 @@ final class UTSWorker(numWorkersPerPlace:Long) implements Unserializable {
 		}
 	}
 
+	
+	
 	def lifelinesteal():void {
 		if (numLocations == 1) {
 			return;
 		}
 
-		var victim:Long = location;
+		var victim:Long = nextLocationInLifelineGraph.get();
 		while(true) {
 			try {
-				victim = (victim + numLocations - 1) % numLocations;
 				if(victim == location) {
 					// there is no one left to lifeline on
 					if(DEBUG) {
-						Console.ERR.println(getLocationString(location) + ": nobody left to set a lifeline with");
+						Console.ERR.println(getLocationString(location) + ": nobody left to set a lifeline with :-(");
 					}
 					return;
 				}
@@ -577,9 +587,16 @@ final class UTSWorker(numWorkersPerPlace:Long) implements Unserializable {
 				// the handler will take care of matters in that case
 				break;
 			} catch (e:DeadPlaceException) {
-				// fall through and try the next place
 				if(DEBUG) {
 					Console.ERR.println(getLocationString(location) + ": failed to set a lifeline at " + getLocationString(victim) + ".  will try the next in line");
+				}
+				// we retarget to the same worker as before, but at the previous place.
+				// we do not want to overwhelm the last worker at the previous place.
+				val nextLocation = (victim + numLocations - numWorkersPerPlace) % numLocations;
+				if(nextLocationInLifelineGraph.compareAndSet(victim, nextLocation)) {
+					victim = nextLocation;
+				} else {
+					victim = nextLocationInLifelineGraph.get();
 				}
 			}
 		}
