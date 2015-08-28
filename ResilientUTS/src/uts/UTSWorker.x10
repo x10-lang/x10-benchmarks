@@ -181,7 +181,9 @@ final class UTSWorker(numWorkersPerPlace:Long) implements Unserializable {
 				} catch (iex:java.lang.InterruptedException) {}
 			}
 			// time ran out.  time to commit suicide
-			java.lang.System.exit(-1n);
+			// NB: do not use -1, since this will be
+			// interpreted by the X10Launcher as ssh failing to start the process
+			java.lang.System.exit(1n);
 		}
 	};
 	
