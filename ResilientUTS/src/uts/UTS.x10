@@ -308,7 +308,7 @@ final class UTS {
 				}
 
 				// allow and ignore places that are too large
-				val cappedLastPlaceToKill = Math.min(lastPlaceToKill, Place.numAllPlaces());
+				val cappedLastPlaceToKill = Math.min(lastPlaceToKill, Place.numAllPlaces()-1);
 				for(pl in firstPlaceToKill..cappedLastPlaceToKill) {
 					killTimes(pl) = timeToKill;
 				}

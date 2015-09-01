@@ -36,7 +36,7 @@ import x10.util.Pair;
  * 
  */
 final class UTSWorker(numWorkersPerPlace:Long) implements Unserializable {
-	private static val DEBUG=false;
+	private static val DEBUG=true;
 	
 	static type LocalWorkers(n:Long) = Rail[UTSWorker{numWorkersPerPlace==n}]{self.size==n};
 	static type Workers(n:Long) = PlaceLocalHandle[LocalWorkers(n)];
@@ -259,19 +259,50 @@ final class UTSWorker(numWorkersPerPlace:Long) implements Unserializable {
 	// TODO: think about and fix the handler
 	private def handle(p:Place):void {
 		sync_lock.lock();
-		// p is dead, unblock if waiting on p
-		if(state >= 0) {
+		if(DEBUG) {
+			Console.ERR.println(getLocationString(location) + " has STATE=" + state + " and observes that " + p + " failed!");
+		}
+		if(state == -2) { // if we are sleeping (lifelined)
+			try {
+				val lloc = nextLocationInLifelineGraph.get();
+				val lplace = placeOfLocation(lloc);
+				// and the dead place had our lifeline,
+				// we need to re-establish it with the next location.
+				if(p == lplace) {
+					if(DEBUG) {
+						Console.ERR.println(getLocationString(location) + ": handle(" + p + "): unblocking our lifeline on " + getLocationString(lloc));
+					}
+
+					// we had a lifeline established at this place.
+					// so we need to try again
+					val nextLocation = (lloc + numLocations - numWorkersPerPlace) % numLocations;
+					val newLifeline:Long;
+					if(nextLocationInLifelineGraph.compareAndSet(lloc, nextLocation)) {
+						newLifeline = nextLocation;
+					} else {
+						newLifeline = nextLocationInLifelineGraph.get();
+					}
+					lifelinesteal();
+					return;
+				}
+			} finally {
+				sync_lock.unlock();
+			}
+		} else if(state >= 0) { // p is dead, unblock if waiting on p
 			val statePlace = placeOfLocation(state);
 			if (statePlace == p) {
 				try {
 					if(DEBUG) {
-						Console.ERR.println(getLocationString(location) + ": handle(" + p + "): unblocking");
+						Console.ERR.println(getLocationString(location) + ": handle(" + p + "): unblocking our stealing attempt from " + getLocationString(state));
 					}
+					// if we are sleeping, we should not have any work to do
+					assert this.bag == null || this.bag.size == 0n : "Sleeping (in handle) with non-empty bag";
+					// don't bother extracting loot, since there is a race condition here anyway
 					// attempt to extract loot from store
-					val c:Checkpoint = map.get(location) as Checkpoint;
-					if (c.bag != null) {
-						merge(c.bag);
-					}
+					// val c:Checkpoint = map.get(location) as Checkpoint;
+					// if (c.bag != null) {
+					// 	merge(c.bag);
+					// }
 					state = -1;
 					if(DEBUG) {
 						Console.ERR.println(getLocationString(location) + ": STATE=-1 (handle(" + p.id + "))");
@@ -477,7 +508,8 @@ final class UTSWorker(numWorkersPerPlace:Long) implements Unserializable {
 				Console.ERR.println(getLocationString(location) + ": STATE=-2 (run)");
 			}
 			
-			distribute();
+			// TODO: why do we need distribute here? it introduces race conditions
+			// distribute();
 			lifelinesteal();
 		} finally {
 			if(DEBUG) {
@@ -645,6 +677,10 @@ final class UTSWorker(numWorkersPerPlace:Long) implements Unserializable {
 		if(DEBUG) {
 			Console.ERR.println(getLocationString(location) + ": STATE=" + getLocationString(victim) + " (steal)");
 		}
+		// since we are stealing, that means we have nothing to give thieves
+		// so if there are any thieves, we want to wake them up
+		// any new incoming thief requests will be immediately rejected since STATE!=-1
+		distribute();
 		
 		try {
 			val wplh = workers;
@@ -664,6 +700,7 @@ final class UTSWorker(numWorkersPerPlace:Long) implements Unserializable {
 			if(DEBUG) {
 				Console.ERR.println(getLocationString(location) + ": STATE=-1" + " (steal/dpe)");
 			}
+			return;
 		}
 		
 		sync_lock.lock();
@@ -677,7 +714,6 @@ final class UTSWorker(numWorkersPerPlace:Long) implements Unserializable {
 		} finally {
 			sync_lock.unlock();
 		}
-
 	}
 
 	def request(thief:Long):void {
@@ -699,7 +735,7 @@ final class UTSWorker(numWorkersPerPlace:Long) implements Unserializable {
 			val thief_place = placeOfLocation(thief);
 			val wplh = workers;
 			if(DEBUG) {
-				Console.ERR.println(getLocationString(location) + ": request(" + getLocationString(thief) + ") being dealt");
+				Console.ERR.println(getLocationString(location) + ": request(" + getLocationString(thief) + ") being rejected");
 			}
 
 			at(thief_place) @Uncounted async {
@@ -723,23 +759,40 @@ final class UTSWorker(numWorkersPerPlace:Long) implements Unserializable {
 		}
 	}
 	
+	def lifelinedeal_helper(b:Bag) throws DigestException : void {
+		if(b != null) {
+			merge(b);
+		}
+		run();
+	}
+	
 	def lifelinedeal(b:Bag) throws DigestException : void {
 		val startTime = stats.startLifelineDeal();
 		try {
-			merge(b);
-			run();
+			lifelinedeal_helper(b);
+		} finally {
+			stats.endLifelineDeal(startTime);
+		}
+	}
+	
+	def lifelinedeal() throws DigestException : void {
+		val startTime = stats.startLifelineDeal();
+		try {
+			val cp = map.get(location) as Checkpoint;
+			if(cp != null) {
+				lifelinedeal_helper(cp.bag);
+			}
 		} finally {
 			stats.endLifelineDeal(startTime);
 		}
 	}
 
-	 def deal(victim:Long, b:Bag) : void {
+	 def deal_helper(victim:Long, b:Bag) : void {
 		 if(DEBUG) {
 			 val s = b == null ? ", null" : "";
 			 Console.ERR.println(getLocationString(location) + ": deal(" + getLocationString(victim) + s + "): initiated");
 		 }
 
-		val startTime = stats.startDeal();
 		sync_lock.lock();
 		try {
 			if (state != victim) {
@@ -759,10 +812,29 @@ final class UTSWorker(numWorkersPerPlace:Long) implements Unserializable {
 			}
 		} finally {
 			sync_lock.release();
-			stats.endDeal(startTime);
-
 		}
 	}
+	 
+	 def deal(victim:Long, b:Bag) : void {
+		 val startTime = stats.startDeal();
+		 try {
+			 deal_helper(victim, b);
+		 } finally {
+			 stats.endDeal(startTime);
+		 }
+	 }
+	 
+	 def deal(victim:Long) : void {
+		 val startTime = stats.startDeal();
+		 try {
+			 val cp = map.get(location) as Checkpoint;
+			 if(cp != null) {
+				 deal_helper(victim, cp.bag);
+			 }
+		 } finally {
+			 stats.endDeal(startTime);
+		 }
+	 }
 
 	 /**
 	  * This "harvest": steals from another place's map.
@@ -965,12 +1037,14 @@ final class UTSWorker(numWorkersPerPlace:Long) implements Unserializable {
 					} else {
 						transferSuccess = false;						
 					}
+					
+					val thief_worker = workerOfLocation(llThief);
+					val thief_place = placeOfLocation(llThief);
+
+					val wplh = workers;
+
 					if(transferSuccess) {
 						try {
-							val thief_worker = workerOfLocation(llThief);
-							val thief_place = placeOfLocation(llThief);
-	
-							val wplh = workers;
 							at(thief_place) async {
 								wplh()(thief_worker).lifelinedeal(b);
 							};
@@ -981,11 +1055,21 @@ final class UTSWorker(numWorkersPerPlace:Long) implements Unserializable {
 						// since we did not succeed in transferring the bag,
 						// we need to merge it back in
 						if(DEBUG) {
-                        	Console.ERR.println(getLocationString(location) + ": attempt to lifeline transfer to " + getLocationString(llThief) + " failed");
+							Console.ERR.println(getLocationString(location) + ": attempt to lifeline transfer to " + getLocationString(llThief) + " failed");
 						}
 						merge(b);
-						lifeline.compareAndSet(-1, llThief);
+						// even if the transfer fails, we still "wake up" our lifeline
+						// so that it can process
+						try {
+							at(thief_place) async {
+								wplh()(thief_worker).lifelinedeal();
+							};
+						} catch (e:DeadPlaceException) {
+							// thief died, nothing to do
+						}
 					}
+					
+					
 				}
 			}
 			
@@ -1028,8 +1112,10 @@ final class UTSWorker(numWorkersPerPlace:Long) implements Unserializable {
 						if(DEBUG) {
 							Console.ERR.println(getLocationString(location) + ": failed to give work to thief: " + getLocationString(thief));
 						}
+						// tell it that it should look at its own map entry
+						// since that is probably why the transfer failed
 						at(thief_place) @Uncounted async {
-							wplh()(thief_worker).deal(victim, null);
+							wplh()(thief_worker).deal(victim);
 						};
 					// if the transfer failed, keep the split bag
 					// around for the next thief
