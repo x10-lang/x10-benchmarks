@@ -15,7 +15,7 @@ BENCH_JAR=bin-managed/res_uts.jar
 
 mkdir -p "${BENCH_LOG_DIR}"
 
-x10 -cp ${BENCH_JAR} uts.UTS -statsHeader csv | sed 's/CSV/Transfer Mode, #Machines, # Places\/ Machine, Workers, Depth, Options/' > ${BENCH_RESULTS}
+x10 -cp ${BENCH_JAR} uts.UTS -statsHeader csv | sed 's/^CSV/Transfer Mode, #Machines, # Places\/ Machine, Workers, Depth, Options/' > ${BENCH_RESULTS}
 
 for testConfigFile in "$@"
 do
@@ -120,6 +120,6 @@ do
 
 	x10 ${ALL_BENCH_X10_ARGS} -cp ${BENCH_JAR} uts.UTS -statsFormat csv -workers ${ACTUAL_BENCH_WORKERS} -depth ${BENCH_DEPTH} -transferMode ${ACTUAL_BENCH_MODE} ${ALL_BENCH_ARGS} >> ${LOG_FILE} 2> ${LOG_FILE}.err
 
-	grep CSV ${LOG_FILE} | sed "s/CSV/$ACTUAL_BENCH_MODE, $BENCH_NODES, $BENCH_PLACES_PER_NODE, $ACTUAL_BENCH_WORKERS, $BENCH_DEPTH, $ALL_BENCH_ARGS/" >> ${BENCH_RESULTS}
+	grep CSV ${LOG_FILE} | sed "s/^CSV/$ACTUAL_BENCH_MODE, $BENCH_NODES, $BENCH_PLACES_PER_NODE, $ACTUAL_BENCH_WORKERS, $BENCH_DEPTH, $ALL_BENCH_ARGS/" >> ${BENCH_RESULTS}
     done 10< $testConfigFile
 done
