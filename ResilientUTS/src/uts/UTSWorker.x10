@@ -36,7 +36,7 @@ import x10.util.Pair;
  * 
  */
 final class UTSWorker(numWorkersPerPlace:Long) implements Unserializable {
-	private static val DEBUG=true;
+	private static val DEBUG=false;
 	
 	static type LocalWorkers(n:Long) = Rail[UTSWorker{numWorkersPerPlace==n}]{self.size==n};
 	static type Workers(n:Long) = PlaceLocalHandle[LocalWorkers(n)];
