@@ -38,7 +38,7 @@ import x10.util.StringBuilder;
  * 
  */
 final class UTSWorker(numWorkersPerPlace:Long) implements Unserializable {
-	private static val DEBUG=false;
+	private static val DEBUG=true;
 	
 	static type LocalWorkers(n:Long) = Rail[UTSWorker{numWorkersPerPlace==n}]{self.size==n};
 	static type Workers(n:Long) = PlaceLocalHandle[LocalWorkers(n)];
@@ -1192,12 +1192,11 @@ final class UTSWorker(numWorkersPerPlace:Long) implements Unserializable {
 			val lloc = nextLocationInLifelineGraph.get();
 			s.add("|-\t");
 			s.add(getLocationString(location));
-			s.add("[->");
+			s.add("(->");
 			s.add(getLocationString(lloc));
-			s.add("]: STATE=");
+			s.add("): STATE=");
 			if(state == -2) {
 				s.add("SLEEPING");
-				s.add(") ");
 			} else if(state == -1) {
 				s.add("RUNNING");
 			} else {
@@ -1217,7 +1216,7 @@ final class UTSWorker(numWorkersPerPlace:Long) implements Unserializable {
 						} else {
 							s.add(", ");
 						}
-						s.add(thief);
+						s.add(getLocationString(thief));
 					}
 				}
 			}
