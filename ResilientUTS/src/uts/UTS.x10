@@ -18,7 +18,7 @@ final class UTS {
 
 	// if this is non-zero, then we will start a thread
 	// to print out the statistics every timeBetweenStatsInMs ms
-	static val timeBetweenStatsInMs:Long = 0;
+	static val timeBetweenStateInMs:Cell[Long] = new Cell[Long](0);
 	
   static def sub(str:String, start:int, end:int):String {
     return str.substring(start, Math.min(end, str.length()));
@@ -38,13 +38,16 @@ final class UTS {
 
 	  Console.ERR.println("-recoveryMode wave\t Recover in waves  (default)");
 	  Console.ERR.println("-recoveryMode sequential\t Recover sequentially ");
-	  
+
 	  Console.ERR.println("-workers <INT>\t\tSet the number of workers used (per-place).  If this is set to 0, a special sequential version is run");
 	  Console.ERR.println("-depth <INT>\t\tSet the depth to be used");
 	  Console.ERR.println("-d <INT>\t\tSet the depth to be used");
 	  Console.ERR.println("<INT>\t\tSet the depth to be used");
 
-	  Console.ERR.println("-kill place:millis\t\tTells the place to kill itself after the allotted time (after any warmup) in nanoseconds (ns, default), milliseconds (ms), seconds(s), minutes(m), or hours(h)");
+	  Console.ERR.println("-printStateEvery <timespan>\t\t Print global state every timespan ");
+	  Console.ERR.println("-kill <place>:<timespan>\t\tTells the place to kill itself after the allotted timespan (after any warmup)");
+	  Console.ERR.println("\t\t <timespan> can be specified, using an optional suffix, in nanoseconds (ns, default), milliseconds (ms), seconds(s), minutes(m), or hours(h)");
+	  
   }
   
   public static val RECOVERY_MODE_SEQUENTIAL = 0n;
@@ -213,7 +216,7 @@ final class UTS {
 		} else if(arg.equalsIgnoreCase("-kill") || arg.equalsIgnoreCase("-killAfter") || arg.equalsIgnoreCase("-k")) {
 			curArg++;
 			if(curArg >= args.size) {
-				Console.ERR.println("Illegal " + arg + " argument with no corresponding place:millisecond argument");
+				Console.ERR.println("Illegal " + arg + " argument with no corresponding place:timespan argument");
 				printUsage();
 				System.setExitCode(-1n);
 				return;
@@ -227,31 +230,12 @@ final class UTS {
 				return;
 			}
 
+			val timeString : String = sp(1);
 			var timeToKill : Long;
 			try {
-				val units : Long;
-				var timeString : String = sp(1);
-				if(timeString.endsWith("ns")) {
-					timeString = timeString.substring(0n,(timeString.length()-2n) as Int);
-					units = 1;
-				} else if(timeString.endsWith("ms")) {
-					timeString = timeString.substring(0n,(timeString.length()-2n) as Int);
-					units = 1000;
-				} else if(timeString.endsWith("s")) {
-					timeString = timeString.substring(0n,(timeString.length()-1n) as Int);
-					units = 1000*1000;
-				} else if(timeString.endsWith("m")) {
-					timeString = timeString.substring(0n,(timeString.length()-1n) as Int);
-					units = 1000*1000*60;
-				} else if(timeString.endsWith("h")) {
-					timeString = timeString.substring(0n,(timeString.length()-1n) as Int);
-					units = 1000*1000*60*60;
-				} else {
-					units = 1;
-				}
-				timeToKill = Long.parseLong(timeString) * units;
+				timeToKill = getTime(timeString);
 			} catch(e:Exception) {
-				Console.ERR.println("Malformed " + arg + " argument.  The second part of '" + arg2 + "' is not parseable as a long.  Note that only ns and s are allowed as suffixes");
+				Console.ERR.println("Malformed " + arg + " argument.  The second part of '" + arg2 + "' is not parseable as a long.  Note that only ns, ms, s, and m, and h are allowed as suffixes");
 				printUsage();
 				System.setExitCode(-1n);
 				return;
@@ -318,6 +302,25 @@ final class UTS {
 				}
 				
 			}
+		} else if(arg.equalsIgnoreCase("-printStateEvery") || arg.equalsIgnoreCase("-pse")) {
+			curArg++;
+			if(curArg >= args.size) {
+				Console.ERR.println("Illegal " + arg + " argument with no corresponding timsepan argument");
+				printUsage();
+				System.setExitCode(-1n);
+				return;
+			}
+			val timeString = args(curArg);
+			var timeToPrint : Long;
+			try {
+				timeToPrint = getTime(timeString);
+			} catch(e:Exception) {
+				Console.ERR.println("Malformed " + arg + " argument.  '" + timeString + "' is not parseable as a long.  Note that only ns, ms, s, and m, and h are allowed as suffixes");
+				printUsage();
+				System.setExitCode(-1n);
+				return;
+			}
+			timeBetweenStateInMs.set(timeToPrint);
 		} else {
 			try {
 				specifiedDepth = Int.parseInt(arg);
@@ -462,15 +465,45 @@ final class UTS {
     }
   }
   
+  /**
+   * parses a string and returns the corresponding timespan in nanoseconds
+   */
+  public static def getTime(var timeString:String):Long {
+	  val units : Long;
+
+	  if(timeString.endsWith("ns")) {
+		  timeString = timeString.substring(0n,(timeString.length()-2n) as Int);
+		  units = 1;
+	  } else if(timeString.endsWith("ms")) {
+		  timeString = timeString.substring(0n,(timeString.length()-2n) as Int);
+		  units = 1000;
+	  } else if(timeString.endsWith("s")) {
+		  timeString = timeString.substring(0n,(timeString.length()-1n) as Int);
+		  units = 1000*1000;
+	  } else if(timeString.endsWith("m")) {
+		  timeString = timeString.substring(0n,(timeString.length()-1n) as Int);
+		  units = 1000*1000*60;
+	  } else if(timeString.endsWith("h")) {
+		  timeString = timeString.substring(0n,(timeString.length()-1n) as Int);
+		  units = 1000*1000*60*60;
+	  } else {
+		  units = 1;
+	  }
+	  return Long.parseLong(timeString) * units;
+  }
+  
   static def startStatePrinter(pg:PlaceGroup, numWorkersPerPlace:Long, workers:UTSWorker.Workers(numWorkersPerPlace)) {
-	  if(timeBetweenStatsInMs <= 0) {
+	  val timeToWait = timeBetweenStateInMs();
+	  if(timeToWait <= 0) {
 		  return;
 	  }
+	  val timeToSleepMs = timeToWait / 1000;
+	  val timeToSleepNs = timeToWait % 1000;
 	  val statePrinterRunner = new java.lang.Runnable() {
 		  public def run():void {
 			  while (true) {
 				  try {
-					  java.lang.Thread.sleep(timeBetweenStatsInMs);
+					  java.lang.Thread.sleep(timeToSleepMs, timeToSleepNs as Int);
 					  UTSWorker.printCurrentState(pg, numWorkersPerPlace, workers);
 				  } catch (iex:java.lang.InterruptedException) {}
 			  }
