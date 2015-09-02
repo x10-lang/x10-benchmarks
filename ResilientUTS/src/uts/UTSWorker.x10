@@ -23,6 +23,8 @@ import x10.util.Set;
 import x10.util.HashSet;
 import x10.util.Pair;
 
+import x10.util.StringBuilder;
+
 /**
  * Worker class to compute UTS.
  * For the resilient version, the computation uses the resilient map to checkpoint
@@ -519,18 +521,29 @@ final class UTSWorker(numWorkersPerPlace:Long) implements Unserializable {
 	}
 
 	public def workerOfLocation(loc:Long):Long { 
+		return workerOfLocation(pg, numWorkersPerPlace, loc);
+	}
+	
+	public static def workerOfLocation(pg:PlaceGroup, numWorkersPerPlace:Long, loc:Long):Long { 
 		return loc % numWorkersPerPlace;
 	}
 
 	public def placeOfLocation(loc:Long):Place { 
-		return pg(loc / numWorkersPerPlace);
+		return placeOfLocation(pg, numWorkersPerPlace, loc);
+	}
+
+	public static def placeOfLocation(pg:PlaceGroup, numWorkersPerPlace:Long, location:Long):Place { 
+		return pg(location / numWorkersPerPlace);
+	}
+
+	def getLocationString(loc:Long) {
+		return getLocationString(pg, numWorkersPerPlace, loc);
 	}
 	
-	
-	def getLocationString(location:Long) {
+	static def getLocationString(pg:PlaceGroup, numWorkersPerPlace:Long, location:Long) {
 		return 
-		location + "=" + placeOfLocation(location).id + 
-		"[" + workerOfLocation(location) + "]"; 
+		location + "=" + placeOfLocation(pg, numWorkersPerPlace, location).id + 
+		"[" + workerOfLocation(pg, numWorkersPerPlace, location) + "]"; 
 	}
 
 	/**
@@ -1171,7 +1184,73 @@ final class UTSWorker(numWorkersPerPlace:Long) implements Unserializable {
 		}
 		return counter.get();
 	}
-
+	
+	def printCurrentLocalState() {
+		sync_lock.lock();
+		val s = new StringBuilder();
+		try {
+			val lloc = nextLocationInLifelineGraph.get();
+			s.add("|-\t");
+			s.add(getLocationString(location));
+			s.add("[->");
+			s.add(getLocationString(lloc));
+			s.add("]: STATE=");
+			if(state == -2) {
+				s.add("SLEEPING");
+				s.add(") ");
+			} else if(state == -1) {
+				s.add("RUNNING");
+			} else {
+				s.add("STEALING from ");
+				s.add(getLocationString(state));
+			}
+			if(! thieves.isEmpty()) {
+				var isFirst : Boolean = true;
+				s.add("; thieves: ");
+				val iter = thieves.iterator();
+				while(iter.hasNext()) {
+					val thief_boxed = iter.next();
+					if (thief_boxed != null) {
+						val thief = thief_boxed as Long;
+						if(isFirst) {
+							isFirst = false;
+						} else {
+							s.add(", ");
+						}
+						s.add(thief);
+					}
+				}
+			}
+		} finally {
+			sync_lock.unlock();
+		}
+		Console.ERR.println(s.toString());
+	}
+	
+	public static def printCurrentLocalState(numWorkersPerPlace:Long, workers:LocalWorkers(numWorkersPerPlace)):void {
+		for(worker in workers) {
+			worker.printCurrentLocalState();
+		}
+	}
+	
+	public static def printCurrentState(pg:PlaceGroup, numWorkersPerPlace:Long, workers:Workers(numWorkersPerPlace)):void {
+		Console.ERR.println("|| Current state of the world:");
+		finish {
+			for (p in pg) {
+				try {
+					at(p) {
+						printCurrentLocalState(numWorkersPerPlace, workers());
+					}
+				} catch(ex:DeadPlaceException) {
+					val startIndex = pg.indexOf(p) * numWorkersPerPlace;
+					for(i in 0..(numWorkersPerPlace-1)) {
+						val loc = startIndex + i;
+						Console.ERR.println("|-\t" + getLocationString(pg, numWorkersPerPlace, loc) + ": DEAD");
+					}
+				}
+			}
+		}
+	}
 
 	public static def getLocalStats(numWorkersPerPlace:Long, workers:LocalWorkers(numWorkersPerPlace)):Stats {
 		val stats = new Stats();

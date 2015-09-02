@@ -16,6 +16,10 @@ import x10.util.concurrent.AtomicLong;
 
 final class UTS {
 
+	// if this is non-zero, then we will start a thread
+	// to print out the statistics every timeBetweenStatsInMs ms
+	static val timeBetweenStatsInMs:Long = 0;
+	
   static def sub(str:String, start:int, end:int):String {
     return str.substring(start, Math.min(end, str.length()));
   }
@@ -362,6 +366,8 @@ final class UTS {
     var count:Long = 0;
     var waves:Long = 0;
 
+    startStatePrinter(pg, numWorkersPerPlace, workers);
+
     while(stillHasWork) {
     	val waveStartTime:Long = System.nanoTime();
     	waves++;
@@ -454,5 +460,24 @@ final class UTS {
 	    
 	    stats.print(Console.OUT);
     }
+  }
+  
+  static def startStatePrinter(pg:PlaceGroup, numWorkersPerPlace:Long, workers:UTSWorker.Workers(numWorkersPerPlace)) {
+	  if(timeBetweenStatsInMs <= 0) {
+		  return;
+	  }
+	  val statePrinterRunner = new java.lang.Runnable() {
+		  public def run():void {
+			  while (true) {
+				  try {
+					  java.lang.Thread.sleep(timeBetweenStatsInMs);
+					  UTSWorker.printCurrentState(pg, numWorkersPerPlace, workers);
+				  } catch (iex:java.lang.InterruptedException) {}
+			  }
+		  }
+	  };
+	  val statePrinterThread = new java.lang.Thread(statePrinterRunner, "Stat printer thread");
+	  statePrinterThread.setDaemon(true);
+	  statePrinterThread.start();
   }
 }
