@@ -38,7 +38,7 @@ import x10.util.StringBuilder;
  * 
  */
 final class UTSWorker(numWorkersPerPlace:Long) implements Unserializable {
-	private static val DEBUG=true;
+	private static val DEBUG=false;
 	
 	static type LocalWorkers(n:Long) = Rail[UTSWorker{numWorkersPerPlace==n}]{self.size==n};
 	static type Workers(n:Long) = PlaceLocalHandle[LocalWorkers(n)];
@@ -191,6 +191,32 @@ final class UTSWorker(numWorkersPerPlace:Long) implements Unserializable {
 	
 	private static killer:Killer = new Killer();
 	
+	public static def startAllKillers(
+			pg:PlaceGroup, 			
+			numWorkersPerPlace:Long, 
+			workers:Workers(numWorkersPerPlace)) { 
+		try {
+			finish {
+				val pl = pg;
+				for (p in pl) {
+					if(p != here) {
+						val wplh = workers;
+						async at(p) {
+							startKiller();
+						}
+					}
+				}
+			}
+		} catch(me:MultipleExceptions) {
+			val me2 = me.filterExceptionsOfType[DeadPlaceException](true);
+			if(me2 != null) {
+				throw me;
+			} else {
+				// Just DeadPlaceExceptions, which can be safely ignored
+			}
+		}
+	}
+			
 	public static def initAllWorkers(
 			diffThreads:Int,
 			pg:PlaceGroup, 
@@ -211,7 +237,6 @@ final class UTSWorker(numWorkersPerPlace:Long) implements Unserializable {
 							for(w in wplh()) {
 								w.initWorkers(pg, workers);
 							}
-							startKiller();
 						}
 					}
 				}

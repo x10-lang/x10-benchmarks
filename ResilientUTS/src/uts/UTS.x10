@@ -43,6 +43,7 @@ final class UTS {
 	  Console.ERR.println("-depth <INT>\t\tSet the depth to be used");
 	  Console.ERR.println("-d <INT>\t\tSet the depth to be used");
 	  Console.ERR.println("<INT>\t\tSet the depth to be used");
+	  Console.ERR.println("-warmupDepth <INT>\t\tSet the depth to be used for warmup.  Negative value is relative to depth.  0 (default) omits the warmup.");
 
 	  Console.ERR.println("-printStateEvery <timespan>\t\t Print global state every timespan ");
 	  Console.ERR.println("-kill <place>:<timespan>\t\tTells the place to kill itself after the allotted timespan (after any warmup)");
@@ -78,6 +79,7 @@ final class UTS {
   public static def main(args:Rail[String]) throws DigestException : void {
 
 	var specifiedDepth:Int = 13n;
+	var specifiedWarmupDepth:Int = 0n;
 	var specifiedWorkers:Int = 1n;
 	var specifiedTransferMode:Int = UTSWorker.TRANSFER_MODE_DEFAULT;
 	var specifiedRecoveryMode:Int = RECOVERY_MODE_DEFAULT;
@@ -209,6 +211,23 @@ final class UTS {
 				specifiedDepth = Int.parseInt(arg2);
 			} catch(e:Exception) {
 				Console.ERR.println("depth argument is not parseable as an integer " + arg2);
+				printUsage();
+				System.setExitCode(-1n);
+				return;
+			}
+		} else if(arg.equalsIgnoreCase("-warmupDepth") || arg.equalsIgnoreCase("-warmup") || arg.equalsIgnoreCase("-wd")) {
+			curArg++;
+			if(curArg >= args.size) {
+				Console.ERR.println("Illegal " + arg + " argument with no corresponding depth");
+				printUsage();
+				System.setExitCode(-1n);
+				return;
+			}
+			val arg2 = args(curArg);
+			try {
+				specifiedWarmupDepth = Int.parseInt(arg2);
+			} catch(e:Exception) {
+				Console.ERR.println("warmupDepth argument is not parseable as an integer " + arg2);
 				printUsage();
 				System.setExitCode(-1n);
 				return;
@@ -347,9 +366,9 @@ final class UTS {
 		return;
 	}
 
-	// TODO: ad support for "warming up" with depth-2
-	
     val depth:int = specifiedDepth;
+    val warmupDepth = specifiedWarmupDepth < 0n ? depth + specifiedWarmupDepth : specifiedWarmupDepth; 
+
     val isSequential = specifiedWorkers == 0n;
     val isRecoverySequential : Boolean = specifiedRecoveryMode == RECOVERY_MODE_SEQUENTIAL;
     val numWorkersPerPlace:Long = isSequential ? 1 : specifiedWorkers as Long;
@@ -361,16 +380,41 @@ final class UTS {
     val pg = isSequential ? new SparsePlaceGroup(here) : Place.places();
     val workers = UTSWorker.make(diffThreads, pg, numWorkersPerPlace, transferMode, killTimes);
     
-    //Console.OUT.println("Starting...");
-    var startTime:Long = System.nanoTime();
-    
     var stillHasWork : Boolean = true;
     var workLeftBag: Bag = null;
     var count:Long = 0;
     var waves:Long = 0;
 
+    if(warmupDepth != 0n) {
+    	// a negative warmup depth is relative to the depth
+    	workers()(0).init(19n, warmupDepth);
+    	Console.ERR.println("Warm up (depth=" + warmupDepth + "): Starting");
+    	if(isSequential) {
+    		workers()(0).seq();
+    	} else {
+    		try {
+    			finish {
+    				workers()(0).run();
+    			};
+    		} catch(me:MultipleExceptions) {
+    			val me2 = me.filterExceptionsOfType[DeadPlaceException](true);
+    			if(me2 != null) {
+    				throw me;
+    			} else {
+    				// Just DeadPlaceExceptions, which can be safely ignored
+    			}
+    		}
+    		if(workers()(0).useMap()) {
+    			workers()(0).map.clear();
+    		}
+    		UTSWorker.resetAllWorkers(pg, numWorkersPerPlace, workers);
+    	}
+    	Console.ERR.println("Warm up (depth=" + warmupDepth + "): Finished");
+    }
+    UTSWorker.startAllKillers(pg, numWorkersPerPlace, workers);
     startStatePrinter(pg, numWorkersPerPlace, workers);
-
+    var startTime:Long = System.nanoTime();
+    
     while(stillHasWork) {
     	val waveStartTime:Long = System.nanoTime();
     	waves++;
@@ -386,7 +430,7 @@ final class UTS {
 			runSequential = isSequential || isRecoverySequential;
 		}
 		val seqString = runSequential ? " (sequential) " : " ";
-		Console.ERR.println("Starting" + seqString + "wave " + waves);
+		Console.ERR.println("Starting" + seqString + "wave " + waves + "(depth=" + depth + ")");
 		workLeftBag = null;
 		try {
 			if(runSequential) {
