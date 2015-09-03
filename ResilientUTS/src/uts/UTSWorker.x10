@@ -510,8 +510,7 @@ final class UTSWorker(numWorkersPerPlace:Long) implements Unserializable {
 				Console.ERR.println(getLocationString(location) + ": STATE=-2 (run)");
 			}
 			
-			// TODO: why do we need distribute here? it introduces race conditions
-			// distribute();
+			distribute();
 			lifelinesteal();
 		} finally {
 			if(DEBUG) {
@@ -1093,7 +1092,7 @@ final class UTSWorker(numWorkersPerPlace:Long) implements Unserializable {
 			var b:Bag = null;
 			while ((thief_boxed = thieves.poll()) != null) {
 				val thief = thief_boxed as Long;
-				if(b != null) {
+				if(b == null) {
 					b = split(bag);
 				}
 				val thief_worker = workerOfLocation(thief);
