@@ -1,0 +1,5922 @@
+	.file	"Trmm.cc"
+	.section	.text._ZN3x104lang9Reference9_isMortalEv,"axG",@progbits,_ZN3x104lang9Reference9_isMortalEv,comdat
+	.align 2
+	.p2align 4,,15
+	.weak	_ZN3x104lang9Reference9_isMortalEv
+	.type	_ZN3x104lang9Reference9_isMortalEv, @function
+_ZN3x104lang9Reference9_isMortalEv:
+.LFB1590:
+	.cfi_startproc
+	.cfi_personality 0x3,__gxx_personality_v0
+	xorl	%eax, %eax
+	ret
+	.cfi_endproc
+.LFE1590:
+	.size	_ZN3x104lang9Reference9_isMortalEv, .-_ZN3x104lang9Reference9_isMortalEv
+	.section	.text._ZN3x104lang9Reference6equalsEPNS0_3AnyE,"axG",@progbits,_ZN3x104lang9Reference6equalsEPNS0_3AnyE,comdat
+	.align 2
+	.p2align 4,,15
+	.weak	_ZN3x104lang9Reference6equalsEPNS0_3AnyE
+	.type	_ZN3x104lang9Reference6equalsEPNS0_3AnyE, @function
+_ZN3x104lang9Reference6equalsEPNS0_3AnyE:
+.LFB1591:
+	.cfi_startproc
+	.cfi_personality 0x3,__gxx_personality_v0
+	movq	(%rdi), %rax
+	movq	32(%rax), %rax
+	jmp	*%rax
+	.cfi_endproc
+.LFE1591:
+	.size	_ZN3x104lang9Reference6equalsEPNS0_3AnyE, .-_ZN3x104lang9Reference6equalsEPNS0_3AnyE
+	.section	.text._ZN3x104lang9Reference14_struct_equalsEPS1_,"axG",@progbits,_ZN3x104lang9Reference14_struct_equalsEPS1_,comdat
+	.align 2
+	.p2align 4,,15
+	.weak	_ZN3x104lang9Reference14_struct_equalsEPS1_
+	.type	_ZN3x104lang9Reference14_struct_equalsEPS1_, @function
+_ZN3x104lang9Reference14_struct_equalsEPS1_:
+.LFB1592:
+	.cfi_startproc
+	.cfi_personality 0x3,__gxx_personality_v0
+	cmpq	%rdi, %rsi
+	sete	%al
+	ret
+	.cfi_endproc
+.LFE1592:
+	.size	_ZN3x104lang9Reference14_struct_equalsEPS1_, .-_ZN3x104lang9Reference14_struct_equalsEPS1_
+	.section	.text._ZN3x104lang9Reference15_get_network_idEv,"axG",@progbits,_ZN3x104lang9Reference15_get_network_idEv,comdat
+	.align 2
+	.p2align 4,,15
+	.weak	_ZN3x104lang9Reference15_get_network_idEv
+	.type	_ZN3x104lang9Reference15_get_network_idEv, @function
+_ZN3x104lang9Reference15_get_network_idEv:
+.LFB1593:
+	.cfi_startproc
+	.cfi_personality 0x3,__gxx_personality_v0
+	xorl	%eax, %eax
+	ret
+	.cfi_endproc
+.LFE1593:
+	.size	_ZN3x104lang9Reference15_get_network_idEv, .-_ZN3x104lang9Reference15_get_network_idEv
+	.section	.text._ZN3x104lang8X10Class11_getITablesEv,"axG",@progbits,_ZN3x104lang8X10Class11_getITablesEv,comdat
+	.align 2
+	.p2align 4,,15
+	.weak	_ZN3x104lang8X10Class11_getITablesEv
+	.type	_ZN3x104lang8X10Class11_getITablesEv, @function
+_ZN3x104lang8X10Class11_getITablesEv:
+.LFB1707:
+	.cfi_startproc
+	.cfi_personality 0x3,__gxx_personality_v0
+	movl	$_ZN3x104lang8X10Class12empty_itableE, %eax
+	ret
+	.cfi_endproc
+.LFE1707:
+	.size	_ZN3x104lang8X10Class11_getITablesEv, .-_ZN3x104lang8X10Class11_getITablesEv
+	.section	.text._ZN3x104lang8X10Class6equalsEPNS0_3AnyE,"axG",@progbits,_ZN3x104lang8X10Class6equalsEPNS0_3AnyE,comdat
+	.align 2
+	.p2align 4,,15
+	.weak	_ZN3x104lang8X10Class6equalsEPNS0_3AnyE
+	.type	_ZN3x104lang8X10Class6equalsEPNS0_3AnyE, @function
+_ZN3x104lang8X10Class6equalsEPNS0_3AnyE:
+.LFB1708:
+	.cfi_startproc
+	.cfi_personality 0x3,__gxx_personality_v0
+	movq	(%rdi), %rax
+	movq	32(%rax), %rax
+	jmp	*%rax
+	.cfi_endproc
+.LFE1708:
+	.size	_ZN3x104lang8X10Class6equalsEPNS0_3AnyE, .-_ZN3x104lang8X10Class6equalsEPNS0_3AnyE
+	.section	.text._ZN3x104lang8X10Class14_struct_equalsEPNS0_9ReferenceE,"axG",@progbits,_ZN3x104lang8X10Class14_struct_equalsEPNS0_9ReferenceE,comdat
+	.align 2
+	.p2align 4,,15
+	.weak	_ZN3x104lang8X10Class14_struct_equalsEPNS0_9ReferenceE
+	.type	_ZN3x104lang8X10Class14_struct_equalsEPNS0_9ReferenceE, @function
+_ZN3x104lang8X10Class14_struct_equalsEPNS0_9ReferenceE:
+.LFB1709:
+	.cfi_startproc
+	.cfi_personality 0x3,__gxx_personality_v0
+	cmpq	%rsi, %rdi
+	sete	%al
+	ret
+	.cfi_endproc
+.LFE1709:
+	.size	_ZN3x104lang8X10Class14_struct_equalsEPNS0_9ReferenceE, .-_ZN3x104lang8X10Class14_struct_equalsEPNS0_9ReferenceE
+	.section	.text._ZN3x104lang8X10Class8hashCodeEv,"axG",@progbits,_ZN3x104lang8X10Class8hashCodeEv,comdat
+	.align 2
+	.p2align 4,,15
+	.weak	_ZN3x104lang8X10Class8hashCodeEv
+	.type	_ZN3x104lang8X10Class8hashCodeEv, @function
+_ZN3x104lang8X10Class8hashCodeEv:
+.LFB1710:
+	.cfi_startproc
+	.cfi_personality 0x3,__gxx_personality_v0
+	movq	%rdi, %rax
+	shrq	$32, %rax
+	xorl	%edi, %eax
+	ret
+	.cfi_endproc
+.LFE1710:
+	.size	_ZN3x104lang8X10Class8hashCodeEv, .-_ZN3x104lang8X10Class8hashCodeEv
+	.section	.text._ZN3x104lang8X10Class11_destructorEv,"axG",@progbits,_ZN3x104lang8X10Class11_destructorEv,comdat
+	.align 2
+	.p2align 4,,15
+	.weak	_ZN3x104lang8X10Class11_destructorEv
+	.type	_ZN3x104lang8X10Class11_destructorEv, @function
+_ZN3x104lang8X10Class11_destructorEv:
+.LFB1712:
+	.cfi_startproc
+	.cfi_personality 0x3,__gxx_personality_v0
+	rep
+	ret
+	.cfi_endproc
+.LFE1712:
+	.size	_ZN3x104lang8X10Class11_destructorEv, .-_ZN3x104lang8X10Class11_destructorEv
+	.section	.text._ZN4Trmm21_get_serialization_idEv,"axG",@progbits,_ZN4Trmm21_get_serialization_idEv,comdat
+	.align 2
+	.p2align 4,,15
+	.weak	_ZN4Trmm21_get_serialization_idEv
+	.type	_ZN4Trmm21_get_serialization_idEv, @function
+_ZN4Trmm21_get_serialization_idEv:
+.LFB1905:
+	.cfi_startproc
+	.cfi_personality 0x3,__gxx_personality_v0
+	movzwl	_ZN4Trmm17_serialization_idE(%rip), %eax
+	ret
+	.cfi_endproc
+.LFE1905:
+	.size	_ZN4Trmm21_get_serialization_idEv, .-_ZN4Trmm21_get_serialization_idEv
+	.section	.text._ZN16Trmm__closure__111_getITablesEv,"axG",@progbits,_ZN16Trmm__closure__111_getITablesEv,comdat
+	.align 2
+	.p2align 4,,15
+	.weak	_ZN16Trmm__closure__111_getITablesEv
+	.type	_ZN16Trmm__closure__111_getITablesEv, @function
+_ZN16Trmm__closure__111_getITablesEv:
+.LFB4161:
+	.cfi_startproc
+	.cfi_personality 0x3,__gxx_personality_v0
+	movl	$_ZN16Trmm__closure__18_itablesE, %eax
+	ret
+	.cfi_endproc
+.LFE4161:
+	.size	_ZN16Trmm__closure__111_getITablesEv, .-_ZN16Trmm__closure__111_getITablesEv
+	.section	.text._ZN16Trmm__closure__17__applyEv,"axG",@progbits,_ZN16Trmm__closure__17__applyEv,comdat
+	.align 2
+	.p2align 4,,15
+	.weak	_ZN16Trmm__closure__17__applyEv
+	.type	_ZN16Trmm__closure__17__applyEv, @function
+_ZN16Trmm__closure__17__applyEv:
+.LFB4162:
+	.cfi_startproc
+	.cfi_personality 0x3,__gxx_personality_v0
+	movq	16(%rdi), %rax
+	movq	8(%rdi), %rsi
+	movsd	40(%rdi), %xmm0
+	movq	(%rax), %r8
+	movq	24(%rdi), %rax
+	movq	(%rax), %r9
+	movq	32(%rdi), %rax
+	addq	$2, %r8
+	movq	(%rsi,%r8,8), %rcx
+	movq	%r9, %rdx
+	subq	%rax, %rdx
+	addq	%rax, %rax
+	subq	%r9, %rax
+	movq	48(%rdi), %r9
+	addq	$2, %rdx
+	movq	(%rsi,%rdx,8), %rsi
+	movq	(%r9,%r8,8), %r8
+	mulsd	16(%r8,%rax,8), %xmm0
+	mulsd	16(%rsi,%rax,8), %xmm0
+	addsd	(%rcx,%rdx,8), %xmm0
+	movsd	%xmm0, (%rcx,%rdx,8)
+	ret
+	.cfi_endproc
+.LFE4162:
+	.size	_ZN16Trmm__closure__17__applyEv, .-_ZN16Trmm__closure__17__applyEv
+	.section	.text._ZN16Trmm__closure__121_get_serialization_idEv,"axG",@progbits,_ZN16Trmm__closure__121_get_serialization_idEv,comdat
+	.align 2
+	.p2align 4,,15
+	.weak	_ZN16Trmm__closure__121_get_serialization_idEv
+	.type	_ZN16Trmm__closure__121_get_serialization_idEv, @function
+_ZN16Trmm__closure__121_get_serialization_idEv:
+.LFB4163:
+	.cfi_startproc
+	.cfi_personality 0x3,__gxx_personality_v0
+	movzwl	_ZN16Trmm__closure__117_serialization_idE(%rip), %eax
+	ret
+	.cfi_endproc
+.LFE4163:
+	.size	_ZN16Trmm__closure__121_get_serialization_idEv, .-_ZN16Trmm__closure__121_get_serialization_idEv
+	.section	.text._ZN16Trmm__closure__115_get_network_idEv,"axG",@progbits,_ZN16Trmm__closure__115_get_network_idEv,comdat
+	.align 2
+	.p2align 4,,15
+	.weak	_ZN16Trmm__closure__115_get_network_idEv
+	.type	_ZN16Trmm__closure__115_get_network_idEv, @function
+_ZN16Trmm__closure__115_get_network_idEv:
+.LFB4164:
+	.cfi_startproc
+	.cfi_personality 0x3,__gxx_personality_v0
+	movzwl	_ZN16Trmm__closure__111_network_idE(%rip), %eax
+	ret
+	.cfi_endproc
+.LFE4164:
+	.size	_ZN16Trmm__closure__115_get_network_idEv, .-_ZN16Trmm__closure__115_get_network_idEv
+	.section	.rodata.str1.8,"aMS",@progbits,1
+	.align 8
+.LC0:
+	.string	"/local/huangruochen/polybench-x10-time/linear-algebra/kernels/trmm/parallel_only/Trmm.x10:63-65"
+	.section	.text._ZN16Trmm__closure__114toNativeStringEv,"axG",@progbits,_ZN16Trmm__closure__114toNativeStringEv,comdat
+	.align 2
+	.p2align 4,,15
+	.weak	_ZN16Trmm__closure__114toNativeStringEv
+	.type	_ZN16Trmm__closure__114toNativeStringEv, @function
+_ZN16Trmm__closure__114toNativeStringEv:
+.LFB4172:
+	.cfi_startproc
+	.cfi_personality 0x3,__gxx_personality_v0
+	movl	$.LC0, %eax
+	ret
+	.cfi_endproc
+.LFE4172:
+	.size	_ZN16Trmm__closure__114toNativeStringEv, .-_ZN16Trmm__closure__114toNativeStringEv
+	.text
+	.align 2
+	.p2align 4,,15
+.globl _ZN4Trmm6setPBsEl
+	.type	_ZN4Trmm6setPBsEl, @function
+_ZN4Trmm6setPBsEl:
+.LFB4173:
+	.cfi_startproc
+	.cfi_personality 0x3,__gxx_personality_v0
+	movq	%rsi, 8(%rdi)
+	ret
+	.cfi_endproc
+.LFE4173:
+	.size	_ZN4Trmm6setPBsEl, .-_ZN4Trmm6setPBsEl
+	.align 2
+	.p2align 4,,15
+.globl _ZN4Trmm10init_arrayElPN3x104lang4RailIdEEPNS2_IS4_EES6_
+	.type	_ZN4Trmm10init_arrayElPN3x104lang4RailIdEEPNS2_IS4_EES6_, @function
+_ZN4Trmm10init_arrayElPN3x104lang4RailIdEEPNS2_IS4_EES6_:
+.LFB4174:
+	.cfi_startproc
+	.cfi_personality 0x3,__gxx_personality_v0
+	movabsq	$4674638556675702784, %rax
+	testq	%rsi, %rsi
+	movq	%rax, 16(%rdx)
+	jle	.L37
+	cvtsi2sdq	%rsi, %xmm2
+	xorl	%edx, %edx
+.L35:
+	cvtsi2sdq	%rdx, %xmm1
+	movq	16(%rcx,%rdx,8), %r9
+	movq	16(%r8,%rdx,8), %rdi
+	xorl	%eax, %eax
+.L36:
+	cvtsi2sdq	%rax, %xmm0
+	mulsd	%xmm1, %xmm0
+	divsd	%xmm2, %xmm0
+	movsd	%xmm0, 16(%r9,%rax,8)
+	movsd	%xmm0, 16(%rdi,%rax,8)
+	addq	$1, %rax
+	cmpq	%rsi, %rax
+	jne	.L36
+	addq	$1, %rdx
+	cmpq	%rsi, %rdx
+	jne	.L35
+.L37:
+	rep
+	ret
+	.cfi_endproc
+.LFE4174:
+	.size	_ZN4Trmm10init_arrayElPN3x104lang4RailIdEEPNS2_IS4_EES6_, .-_ZN4Trmm10init_arrayElPN3x104lang4RailIdEEPNS2_IS4_EES6_
+	.align 2
+	.p2align 4,,15
+.globl _ZN4Trmm18Trmm____this__TrmmEv
+	.type	_ZN4Trmm18Trmm____this__TrmmEv, @function
+_ZN4Trmm18Trmm____this__TrmmEv:
+.LFB4181:
+	.cfi_startproc
+	.cfi_personality 0x3,__gxx_personality_v0
+	movq	%rdi, %rax
+	ret
+	.cfi_endproc
+.LFE4181:
+	.size	_ZN4Trmm18Trmm____this__TrmmEv, .-_ZN4Trmm18Trmm____this__TrmmEv
+	.align 2
+	.p2align 4,,15
+.globl _ZN4Trmm12_constructorEv
+	.type	_ZN4Trmm12_constructorEv, @function
+_ZN4Trmm12_constructorEv:
+.LFB4182:
+	.cfi_startproc
+	.cfi_personality 0x3,__gxx_personality_v0
+	movq	$0, 8(%rdi)
+	ret
+	.cfi_endproc
+.LFE4182:
+	.size	_ZN4Trmm12_constructorEv, .-_ZN4Trmm12_constructorEv
+	.align 2
+	.p2align 4,,15
+.globl _ZN4Trmm24__fieldInitializers_TrmmEv
+	.type	_ZN4Trmm24__fieldInitializers_TrmmEv, @function
+_ZN4Trmm24__fieldInitializers_TrmmEv:
+.LFB4184:
+	.cfi_startproc
+	.cfi_personality 0x3,__gxx_personality_v0
+	movq	$0, 8(%rdi)
+	ret
+	.cfi_endproc
+.LFE4184:
+	.size	_ZN4Trmm24__fieldInitializers_TrmmEv, .-_ZN4Trmm24__fieldInitializers_TrmmEv
+	.section	.text._ZN3x104lang4RailIPNS1_IdEEE7__applyEl,"axG",@progbits,_ZN3x104lang4RailIPNS1_IdEEE7__applyEl,comdat
+	.align 2
+	.p2align 4,,15
+	.weak	_ZN3x104lang4RailIPNS1_IdEEE7__applyEl
+	.type	_ZN3x104lang4RailIPNS1_IdEEE7__applyEl, @function
+_ZN3x104lang4RailIPNS1_IdEEE7__applyEl:
+.LFB4315:
+	.cfi_startproc
+	.cfi_personality 0x3,__gxx_personality_v0
+	movq	16(%rdi,%rsi,8), %rax
+	ret
+	.cfi_endproc
+.LFE4315:
+	.size	_ZN3x104lang4RailIPNS1_IdEEE7__applyEl, .-_ZN3x104lang4RailIPNS1_IdEEE7__applyEl
+	.section	.text._ZN3x104lang4RailIdE7__applyEl,"axG",@progbits,_ZN3x104lang4RailIdE7__applyEl,comdat
+	.align 2
+	.p2align 4,,15
+	.weak	_ZN3x104lang4RailIdE7__applyEl
+	.type	_ZN3x104lang4RailIdE7__applyEl, @function
+_ZN3x104lang4RailIdE7__applyEl:
+.LFB4317:
+	.cfi_startproc
+	.cfi_personality 0x3,__gxx_personality_v0
+	movsd	16(%rdi,%rsi,8), %xmm0
+	ret
+	.cfi_endproc
+.LFE4317:
+	.size	_ZN3x104lang4RailIdE7__applyEl, .-_ZN3x104lang4RailIdE7__applyEl
+	.section	.text._ZN3x104lang4RailIPNS1_IdEEE11_getITablesEv,"axG",@progbits,_ZN3x104lang4RailIPNS1_IdEEE11_getITablesEv,comdat
+	.align 2
+	.p2align 4,,15
+	.weak	_ZN3x104lang4RailIPNS1_IdEEE11_getITablesEv
+	.type	_ZN3x104lang4RailIPNS1_IdEEE11_getITablesEv, @function
+_ZN3x104lang4RailIPNS1_IdEEE11_getITablesEv:
+.LFB4540:
+	.cfi_startproc
+	.cfi_personality 0x3,__gxx_personality_v0
+	movl	$_ZN3x104lang4RailIPNS1_IdEEE8_itablesE, %eax
+	ret
+	.cfi_endproc
+.LFE4540:
+	.size	_ZN3x104lang4RailIPNS1_IdEEE11_getITablesEv, .-_ZN3x104lang4RailIPNS1_IdEEE11_getITablesEv
+	.section	.text._ZN3x104lang4RailIPNS1_IdEEE21_get_serialization_idEv,"axG",@progbits,_ZN3x104lang4RailIPNS1_IdEEE21_get_serialization_idEv,comdat
+	.align 2
+	.p2align 4,,15
+	.weak	_ZN3x104lang4RailIPNS1_IdEEE21_get_serialization_idEv
+	.type	_ZN3x104lang4RailIPNS1_IdEEE21_get_serialization_idEv, @function
+_ZN3x104lang4RailIPNS1_IdEEE21_get_serialization_idEv:
+.LFB4543:
+	.cfi_startproc
+	.cfi_personality 0x3,__gxx_personality_v0
+	movzwl	_ZN3x104lang4RailIPNS1_IdEEE17_serialization_idE(%rip), %eax
+	ret
+	.cfi_endproc
+.LFE4543:
+	.size	_ZN3x104lang4RailIPNS1_IdEEE21_get_serialization_idEv, .-_ZN3x104lang4RailIPNS1_IdEEE21_get_serialization_idEv
+	.section	.text._ZN3x104lang4RailIdE11_getITablesEv,"axG",@progbits,_ZN3x104lang4RailIdE11_getITablesEv,comdat
+	.align 2
+	.p2align 4,,15
+	.weak	_ZN3x104lang4RailIdE11_getITablesEv
+	.type	_ZN3x104lang4RailIdE11_getITablesEv, @function
+_ZN3x104lang4RailIdE11_getITablesEv:
+.LFB4545:
+	.cfi_startproc
+	.cfi_personality 0x3,__gxx_personality_v0
+	movl	$_ZN3x104lang4RailIdE8_itablesE, %eax
+	ret
+	.cfi_endproc
+.LFE4545:
+	.size	_ZN3x104lang4RailIdE11_getITablesEv, .-_ZN3x104lang4RailIdE11_getITablesEv
+	.section	.text._ZN3x104lang4RailIdE21_get_serialization_idEv,"axG",@progbits,_ZN3x104lang4RailIdE21_get_serialization_idEv,comdat
+	.align 2
+	.p2align 4,,15
+	.weak	_ZN3x104lang4RailIdE21_get_serialization_idEv
+	.type	_ZN3x104lang4RailIdE21_get_serialization_idEv, @function
+_ZN3x104lang4RailIdE21_get_serialization_idEv:
+.LFB4548:
+	.cfi_startproc
+	.cfi_personality 0x3,__gxx_personality_v0
+	movzwl	_ZN3x104lang4RailIdE17_serialization_idE(%rip), %eax
+	ret
+	.cfi_endproc
+.LFE4548:
+	.size	_ZN3x104lang4RailIdE21_get_serialization_idEv, .-_ZN3x104lang4RailIdE21_get_serialization_idEv
+	.section	.text._ZN3x104lang4IBoxIdE11_getITablesEv,"axG",@progbits,_ZN3x104lang4IBoxIdE11_getITablesEv,comdat
+	.align 2
+	.p2align 4,,15
+	.weak	_ZN3x104lang4IBoxIdE11_getITablesEv
+	.type	_ZN3x104lang4IBoxIdE11_getITablesEv, @function
+_ZN3x104lang4IBoxIdE11_getITablesEv:
+.LFB4549:
+	.cfi_startproc
+	.cfi_personality 0x3,__gxx_personality_v0
+	movl	$_ZN3x104lang13itable_DoubleE, %eax
+	ret
+	.cfi_endproc
+.LFE4549:
+	.size	_ZN3x104lang4IBoxIdE11_getITablesEv, .-_ZN3x104lang4IBoxIdE11_getITablesEv
+	.section	.text._ZN3x104lang4IBoxIdE14_struct_equalsEPNS0_9ReferenceE,"axG",@progbits,_ZN3x104lang4IBoxIdE14_struct_equalsEPNS0_9ReferenceE,comdat
+	.align 2
+	.p2align 4,,15
+	.weak	_ZN3x104lang4IBoxIdE14_struct_equalsEPNS0_9ReferenceE
+	.type	_ZN3x104lang4IBoxIdE14_struct_equalsEPNS0_9ReferenceE, @function
+_ZN3x104lang4IBoxIdE14_struct_equalsEPNS0_9ReferenceE:
+.LFB4551:
+	.cfi_startproc
+	.cfi_personality 0x3,__gxx_personality_v0
+	movq	%rbx, -24(%rsp)
+	movq	%rbp, -16(%rsp)
+	movq	%rdi, %rbx
+	.cfi_offset 6, -24
+	.cfi_offset 3, -32
+	movq	%r12, -8(%rsp)
+	subq	$24, %rsp
+	.cfi_def_cfa_offset 32
+	.cfi_offset 12, -16
+	testq	%rsi, %rsi
+	movq	%rsi, %rbp
+	je	.L61
+	movq	(%rsi), %rax
+	movq	%rsi, %rdi
+	call	*8(%rax)
+	movq	%rax, %r12
+	movq	(%rbx), %rax
+	movq	%rbx, %rdi
+	call	*8(%rax)
+	cmpq	%rax, %r12
+	je	.L64
+.L61:
+	xorl	%eax, %eax
+.L62:
+	movq	(%rsp), %rbx
+	movq	8(%rsp), %rbp
+	movq	16(%rsp), %r12
+	addq	$24, %rsp
+	.cfi_remember_state
+	.cfi_def_cfa_offset 8
+	ret
+	.p2align 4,,10
+	.p2align 3
+.L64:
+	.cfi_restore_state
+	movsd	8(%rbp), %xmm0
+	ucomisd	8(%rbx), %xmm0
+	sete	%al
+	setnp	%dl
+	andl	%edx, %eax
+	jmp	.L62
+	.cfi_endproc
+.LFE4551:
+	.size	_ZN3x104lang4IBoxIdE14_struct_equalsEPNS0_9ReferenceE, .-_ZN3x104lang4IBoxIdE14_struct_equalsEPNS0_9ReferenceE
+	.section	.text._ZN3x104lang4IBoxIdE21_get_serialization_idEv,"axG",@progbits,_ZN3x104lang4IBoxIdE21_get_serialization_idEv,comdat
+	.align 2
+	.p2align 4,,15
+	.weak	_ZN3x104lang4IBoxIdE21_get_serialization_idEv
+	.type	_ZN3x104lang4IBoxIdE21_get_serialization_idEv, @function
+_ZN3x104lang4IBoxIdE21_get_serialization_idEv:
+.LFB4554:
+	.cfi_startproc
+	.cfi_personality 0x3,__gxx_personality_v0
+	movzwl	_ZN3x104lang4IBoxIdE17_serialization_idE(%rip), %eax
+	ret
+	.cfi_endproc
+.LFE4554:
+	.size	_ZN3x104lang4IBoxIdE21_get_serialization_idEv, .-_ZN3x104lang4IBoxIdE21_get_serialization_idEv
+	.section	.text._ZN3x104lang12RailIteratorIdE11_getITablesEv,"axG",@progbits,_ZN3x104lang12RailIteratorIdE11_getITablesEv,comdat
+	.align 2
+	.p2align 4,,15
+	.weak	_ZN3x104lang12RailIteratorIdE11_getITablesEv
+	.type	_ZN3x104lang12RailIteratorIdE11_getITablesEv, @function
+_ZN3x104lang12RailIteratorIdE11_getITablesEv:
+.LFB4609:
+	.cfi_startproc
+	.cfi_personality 0x3,__gxx_personality_v0
+	movl	$_ZN3x104lang12RailIteratorIdE8_itablesE, %eax
+	ret
+	.cfi_endproc
+.LFE4609:
+	.size	_ZN3x104lang12RailIteratorIdE11_getITablesEv, .-_ZN3x104lang12RailIteratorIdE11_getITablesEv
+	.section	.text._ZN3x104lang12RailIteratorIdE21_get_serialization_idEv,"axG",@progbits,_ZN3x104lang12RailIteratorIdE21_get_serialization_idEv,comdat
+	.align 2
+	.p2align 4,,15
+	.weak	_ZN3x104lang12RailIteratorIdE21_get_serialization_idEv
+	.type	_ZN3x104lang12RailIteratorIdE21_get_serialization_idEv, @function
+_ZN3x104lang12RailIteratorIdE21_get_serialization_idEv:
+.LFB4611:
+	.cfi_startproc
+	.cfi_personality 0x3,__gxx_personality_v0
+	movzwl	_ZN3x104lang12RailIteratorIdE17_serialization_idE(%rip), %eax
+	ret
+	.cfi_endproc
+.LFE4611:
+	.size	_ZN3x104lang12RailIteratorIdE21_get_serialization_idEv, .-_ZN3x104lang12RailIteratorIdE21_get_serialization_idEv
+	.section	.text._ZN3x104lang12RailIteratorIdE4nextEv,"axG",@progbits,_ZN3x104lang12RailIteratorIdE4nextEv,comdat
+	.align 2
+	.p2align 4,,15
+	.weak	_ZN3x104lang12RailIteratorIdE4nextEv
+	.type	_ZN3x104lang12RailIteratorIdE4nextEv, @function
+_ZN3x104lang12RailIteratorIdE4nextEv:
+.LFB4613:
+	.cfi_startproc
+	.cfi_personality 0x3,__gxx_personality_v0
+	movq	16(%rdi), %rax
+	leaq	1(%rax), %rdx
+	movq	%rdx, 16(%rdi)
+	movq	8(%rdi), %rdx
+	movsd	16(%rdx,%rax,8), %xmm0
+	ret
+	.cfi_endproc
+.LFE4613:
+	.size	_ZN3x104lang12RailIteratorIdE4nextEv, .-_ZN3x104lang12RailIteratorIdE4nextEv
+	.section	.text._ZN3x104lang12RailIteratorIdE7hasNextEv,"axG",@progbits,_ZN3x104lang12RailIteratorIdE7hasNextEv,comdat
+	.align 2
+	.p2align 4,,15
+	.weak	_ZN3x104lang12RailIteratorIdE7hasNextEv
+	.type	_ZN3x104lang12RailIteratorIdE7hasNextEv, @function
+_ZN3x104lang12RailIteratorIdE7hasNextEv:
+.LFB4614:
+	.cfi_startproc
+	.cfi_personality 0x3,__gxx_personality_v0
+	movq	8(%rdi), %rax
+	movq	8(%rax), %rdx
+	cmpq	%rdx, 16(%rdi)
+	setl	%al
+	ret
+	.cfi_endproc
+.LFE4614:
+	.size	_ZN3x104lang12RailIteratorIdE7hasNextEv, .-_ZN3x104lang12RailIteratorIdE7hasNextEv
+	.section	.text._ZN3x104lang12RailIteratorIdE56x10__lang__RailIterator____this__x10__lang__RailIteratorEv,"axG",@progbits,_ZN3x104lang12RailIteratorIdE56x10__lang__RailIterator____this__x10__lang__RailIteratorEv,comdat
+	.align 2
+	.p2align 4,,15
+	.weak	_ZN3x104lang12RailIteratorIdE56x10__lang__RailIterator____this__x10__lang__RailIteratorEv
+	.type	_ZN3x104lang12RailIteratorIdE56x10__lang__RailIterator____this__x10__lang__RailIteratorEv, @function
+_ZN3x104lang12RailIteratorIdE56x10__lang__RailIterator____this__x10__lang__RailIteratorEv:
+.LFB4615:
+	.cfi_startproc
+	.cfi_personality 0x3,__gxx_personality_v0
+	movq	%rdi, %rax
+	ret
+	.cfi_endproc
+.LFE4615:
+	.size	_ZN3x104lang12RailIteratorIdE56x10__lang__RailIterator____this__x10__lang__RailIteratorEv, .-_ZN3x104lang12RailIteratorIdE56x10__lang__RailIterator____this__x10__lang__RailIteratorEv
+	.section	.text._ZN3x104lang12RailIteratorIdE41__fieldInitializers_x10_lang_RailIteratorEv,"axG",@progbits,_ZN3x104lang12RailIteratorIdE41__fieldInitializers_x10_lang_RailIteratorEv,comdat
+	.align 2
+	.p2align 4,,15
+	.weak	_ZN3x104lang12RailIteratorIdE41__fieldInitializers_x10_lang_RailIteratorEv
+	.type	_ZN3x104lang12RailIteratorIdE41__fieldInitializers_x10_lang_RailIteratorEv, @function
+_ZN3x104lang12RailIteratorIdE41__fieldInitializers_x10_lang_RailIteratorEv:
+.LFB4616:
+	.cfi_startproc
+	.cfi_personality 0x3,__gxx_personality_v0
+	movq	$0, 16(%rdi)
+	ret
+	.cfi_endproc
+.LFE4616:
+	.size	_ZN3x104lang12RailIteratorIdE41__fieldInitializers_x10_lang_RailIteratorEv, .-_ZN3x104lang12RailIteratorIdE41__fieldInitializers_x10_lang_RailIteratorEv
+	.section	.text._ZN3x104lang12RailIteratorIPNS0_4RailIdEEE11_getITablesEv,"axG",@progbits,_ZN3x104lang12RailIteratorIPNS0_4RailIdEEE11_getITablesEv,comdat
+	.align 2
+	.p2align 4,,15
+	.weak	_ZN3x104lang12RailIteratorIPNS0_4RailIdEEE11_getITablesEv
+	.type	_ZN3x104lang12RailIteratorIPNS0_4RailIdEEE11_getITablesEv, @function
+_ZN3x104lang12RailIteratorIPNS0_4RailIdEEE11_getITablesEv:
+.LFB4617:
+	.cfi_startproc
+	.cfi_personality 0x3,__gxx_personality_v0
+	movl	$_ZN3x104lang12RailIteratorIPNS0_4RailIdEEE8_itablesE, %eax
+	ret
+	.cfi_endproc
+.LFE4617:
+	.size	_ZN3x104lang12RailIteratorIPNS0_4RailIdEEE11_getITablesEv, .-_ZN3x104lang12RailIteratorIPNS0_4RailIdEEE11_getITablesEv
+	.section	.text._ZN3x104lang12RailIteratorIPNS0_4RailIdEEE21_get_serialization_idEv,"axG",@progbits,_ZN3x104lang12RailIteratorIPNS0_4RailIdEEE21_get_serialization_idEv,comdat
+	.align 2
+	.p2align 4,,15
+	.weak	_ZN3x104lang12RailIteratorIPNS0_4RailIdEEE21_get_serialization_idEv
+	.type	_ZN3x104lang12RailIteratorIPNS0_4RailIdEEE21_get_serialization_idEv, @function
+_ZN3x104lang12RailIteratorIPNS0_4RailIdEEE21_get_serialization_idEv:
+.LFB4619:
+	.cfi_startproc
+	.cfi_personality 0x3,__gxx_personality_v0
+	movzwl	_ZN3x104lang12RailIteratorIPNS0_4RailIdEEE17_serialization_idE(%rip), %eax
+	ret
+	.cfi_endproc
+.LFE4619:
+	.size	_ZN3x104lang12RailIteratorIPNS0_4RailIdEEE21_get_serialization_idEv, .-_ZN3x104lang12RailIteratorIPNS0_4RailIdEEE21_get_serialization_idEv
+	.section	.text._ZN3x104lang12RailIteratorIPNS0_4RailIdEEE4nextEv,"axG",@progbits,_ZN3x104lang12RailIteratorIPNS0_4RailIdEEE4nextEv,comdat
+	.align 2
+	.p2align 4,,15
+	.weak	_ZN3x104lang12RailIteratorIPNS0_4RailIdEEE4nextEv
+	.type	_ZN3x104lang12RailIteratorIPNS0_4RailIdEEE4nextEv, @function
+_ZN3x104lang12RailIteratorIPNS0_4RailIdEEE4nextEv:
+.LFB4621:
+	.cfi_startproc
+	.cfi_personality 0x3,__gxx_personality_v0
+	movq	16(%rdi), %rax
+	leaq	1(%rax), %rdx
+	movq	%rdx, 16(%rdi)
+	movq	8(%rdi), %rdx
+	movq	16(%rdx,%rax,8), %rax
+	ret
+	.cfi_endproc
+.LFE4621:
+	.size	_ZN3x104lang12RailIteratorIPNS0_4RailIdEEE4nextEv, .-_ZN3x104lang12RailIteratorIPNS0_4RailIdEEE4nextEv
+	.section	.text._ZN3x104lang12RailIteratorIPNS0_4RailIdEEE7hasNextEv,"axG",@progbits,_ZN3x104lang12RailIteratorIPNS0_4RailIdEEE7hasNextEv,comdat
+	.align 2
+	.p2align 4,,15
+	.weak	_ZN3x104lang12RailIteratorIPNS0_4RailIdEEE7hasNextEv
+	.type	_ZN3x104lang12RailIteratorIPNS0_4RailIdEEE7hasNextEv, @function
+_ZN3x104lang12RailIteratorIPNS0_4RailIdEEE7hasNextEv:
+.LFB4622:
+	.cfi_startproc
+	.cfi_personality 0x3,__gxx_personality_v0
+	movq	8(%rdi), %rax
+	movq	8(%rax), %rdx
+	cmpq	%rdx, 16(%rdi)
+	setl	%al
+	ret
+	.cfi_endproc
+.LFE4622:
+	.size	_ZN3x104lang12RailIteratorIPNS0_4RailIdEEE7hasNextEv, .-_ZN3x104lang12RailIteratorIPNS0_4RailIdEEE7hasNextEv
+	.section	.text._ZN3x104lang12RailIteratorIPNS0_4RailIdEEE56x10__lang__RailIterator____this__x10__lang__RailIteratorEv,"axG",@progbits,_ZN3x104lang12RailIteratorIPNS0_4RailIdEEE56x10__lang__RailIterator____this__x10__lang__RailIteratorEv,comdat
+	.align 2
+	.p2align 4,,15
+	.weak	_ZN3x104lang12RailIteratorIPNS0_4RailIdEEE56x10__lang__RailIterator____this__x10__lang__RailIteratorEv
+	.type	_ZN3x104lang12RailIteratorIPNS0_4RailIdEEE56x10__lang__RailIterator____this__x10__lang__RailIteratorEv, @function
+_ZN3x104lang12RailIteratorIPNS0_4RailIdEEE56x10__lang__RailIterator____this__x10__lang__RailIteratorEv:
+.LFB4623:
+	.cfi_startproc
+	.cfi_personality 0x3,__gxx_personality_v0
+	movq	%rdi, %rax
+	ret
+	.cfi_endproc
+.LFE4623:
+	.size	_ZN3x104lang12RailIteratorIPNS0_4RailIdEEE56x10__lang__RailIterator____this__x10__lang__RailIteratorEv, .-_ZN3x104lang12RailIteratorIPNS0_4RailIdEEE56x10__lang__RailIterator____this__x10__lang__RailIteratorEv
+	.section	.text._ZN3x104lang12RailIteratorIPNS0_4RailIdEEE41__fieldInitializers_x10_lang_RailIteratorEv,"axG",@progbits,_ZN3x104lang12RailIteratorIPNS0_4RailIdEEE41__fieldInitializers_x10_lang_RailIteratorEv,comdat
+	.align 2
+	.p2align 4,,15
+	.weak	_ZN3x104lang12RailIteratorIPNS0_4RailIdEEE41__fieldInitializers_x10_lang_RailIteratorEv
+	.type	_ZN3x104lang12RailIteratorIPNS0_4RailIdEEE41__fieldInitializers_x10_lang_RailIteratorEv, @function
+_ZN3x104lang12RailIteratorIPNS0_4RailIdEEE41__fieldInitializers_x10_lang_RailIteratorEv:
+.LFB4624:
+	.cfi_startproc
+	.cfi_personality 0x3,__gxx_personality_v0
+	movq	$0, 16(%rdi)
+	ret
+	.cfi_endproc
+.LFE4624:
+	.size	_ZN3x104lang12RailIteratorIPNS0_4RailIdEEE41__fieldInitializers_x10_lang_RailIteratorEv, .-_ZN3x104lang12RailIteratorIPNS0_4RailIdEEE41__fieldInitializers_x10_lang_RailIteratorEv
+	.section	.text._ZN3x104lang8X10Class8toStringEv,"axG",@progbits,_ZN3x104lang8X10Class8toStringEv,comdat
+	.align 2
+	.p2align 4,,15
+	.weak	_ZN3x104lang8X10Class8toStringEv
+	.type	_ZN3x104lang8X10Class8toStringEv, @function
+_ZN3x104lang8X10Class8toStringEv:
+.LFB1711:
+	.cfi_startproc
+	.cfi_personality 0x3,__gxx_personality_v0
+	jmp	_ZN6x10aux18identity_to_stringEPN3x104lang9ReferenceE
+	.cfi_endproc
+.LFE1711:
+	.size	_ZN3x104lang8X10Class8toStringEv, .-_ZN3x104lang8X10Class8toStringEv
+	.section	.text._ZN3x104lang7Closure8toStringEv,"axG",@progbits,_ZN3x104lang7Closure8toStringEv,comdat
+	.align 2
+	.p2align 4,,15
+	.weak	_ZN3x104lang7Closure8toStringEv
+	.type	_ZN3x104lang7Closure8toStringEv, @function
+_ZN3x104lang7Closure8toStringEv:
+.LFB2688:
+	.cfi_startproc
+	.cfi_personality 0x3,__gxx_personality_v0
+	jmp	_ZN6x10aux18identity_to_stringEPN3x104lang9ReferenceE
+	.cfi_endproc
+.LFE2688:
+	.size	_ZN3x104lang7Closure8toStringEv, .-_ZN3x104lang7Closure8toStringEv
+	.section	.text._ZN3x104lang6StringC2EPKc,"axG",@progbits,_ZN3x104lang6StringC5EPKc,comdat
+	.align 2
+	.p2align 4,,15
+	.weak	_ZN3x104lang6StringC2EPKc
+	.type	_ZN3x104lang6StringC2EPKc, @function
+_ZN3x104lang6StringC2EPKc:
+.LFB2293:
+	.cfi_startproc
+	.cfi_personality 0x3,__gxx_personality_v0
+	pushq	%rbx
+	.cfi_def_cfa_offset 16
+	.cfi_offset 3, -16
+	movq	%rdi, %rbx
+	movq	$_ZTVN3x104lang6StringE+16, (%rdi)
+	movq	%rsi, 8(%rdi)
+	movq	%rsi, %rdi
+	call	strlen
+	movq	%rax, 16(%rbx)
+	popq	%rbx
+	.cfi_def_cfa_offset 8
+	ret
+	.cfi_endproc
+.LFE2293:
+	.size	_ZN3x104lang6StringC2EPKc, .-_ZN3x104lang6StringC2EPKc
+	.weak	_ZN3x104lang6StringC1EPKc
+	.set	_ZN3x104lang6StringC1EPKc,_ZN3x104lang6StringC2EPKc
+	.section	.text._ZN6x10aux6getRTTIN3x104lang11VoidFun_0_0EEEPKNS_11RuntimeTypeEv,"axG",@progbits,_ZN6x10aux6getRTTIN3x104lang11VoidFun_0_0EEEPKNS_11RuntimeTypeEv,comdat
+	.p2align 4,,15
+	.weak	_ZN6x10aux6getRTTIN3x104lang11VoidFun_0_0EEEPKNS_11RuntimeTypeEv
+	.type	_ZN6x10aux6getRTTIN3x104lang11VoidFun_0_0EEEPKNS_11RuntimeTypeEv, @function
+_ZN6x10aux6getRTTIN3x104lang11VoidFun_0_0EEEPKNS_11RuntimeTypeEv:
+.LFB4267:
+	.cfi_startproc
+	.cfi_personality 0x3,__gxx_personality_v0
+	subq	$8, %rsp
+	.cfi_def_cfa_offset 16
+	cmpb	$0, _ZN3x104lang11VoidFun_0_03rttE+69(%rip)
+	jne	.L98
+	call	_ZN3x104lang11VoidFun_0_08_initRTTEv
+.L98:
+	movl	$_ZN3x104lang11VoidFun_0_03rttE, %eax
+	addq	$8, %rsp
+	.cfi_def_cfa_offset 8
+	ret
+	.cfi_endproc
+.LFE4267:
+	.size	_ZN6x10aux6getRTTIN3x104lang11VoidFun_0_0EEEPKNS_11RuntimeTypeEv, .-_ZN6x10aux6getRTTIN3x104lang11VoidFun_0_0EEEPKNS_11RuntimeTypeEv
+	.section	.text._ZN3x104lang4IBoxIdE8toStringEv,"axG",@progbits,_ZN3x104lang4IBoxIdE8toStringEv,comdat
+	.align 2
+	.p2align 4,,15
+	.weak	_ZN3x104lang4IBoxIdE8toStringEv
+	.type	_ZN3x104lang4IBoxIdE8toStringEv, @function
+_ZN3x104lang4IBoxIdE8toStringEv:
+.LFB4553:
+	.cfi_startproc
+	.cfi_personality 0x3,__gxx_personality_v0
+	movsd	8(%rdi), %xmm0
+	jmp	_ZN6x10aux9to_stringEd
+	.cfi_endproc
+.LFE4553:
+	.size	_ZN3x104lang4IBoxIdE8toStringEv, .-_ZN3x104lang4IBoxIdE8toStringEv
+	.section	.text._ZN3x104lang4IBoxIdE8hashCodeEv,"axG",@progbits,_ZN3x104lang4IBoxIdE8hashCodeEv,comdat
+	.align 2
+	.p2align 4,,15
+	.weak	_ZN3x104lang4IBoxIdE8hashCodeEv
+	.type	_ZN3x104lang4IBoxIdE8hashCodeEv, @function
+_ZN3x104lang4IBoxIdE8hashCodeEv:
+.LFB4552:
+	.cfi_startproc
+	.cfi_personality 0x3,__gxx_personality_v0
+	movsd	8(%rdi), %xmm0
+	jmp	_ZN6x10aux9hash_codeEd
+	.cfi_endproc
+.LFE4552:
+	.size	_ZN3x104lang4IBoxIdE8hashCodeEv, .-_ZN3x104lang4IBoxIdE8hashCodeEv
+	.section	.rodata.str1.1,"aMS",@progbits,1
+.LC2:
+	.string	"Trmm"
+	.text
+	.align 2
+	.p2align 4,,15
+.globl _ZN4Trmm8_initRTTEv
+	.type	_ZN4Trmm8_initRTTEv, @function
+_ZN4Trmm8_initRTTEv:
+.LFB4188:
+	.cfi_startproc
+	.cfi_personality 0x3,__gxx_personality_v0
+	movl	$_ZN4Trmm3rttE, %esi
+	subq	$24, %rsp
+	.cfi_def_cfa_offset 32
+	movq	%rsi, %rdi
+	call	_ZN6x10aux11RuntimeType12initStageOneEPKS0_
+	testb	%al, %al
+	jne	.L106
+	xorl	%r9d, %r9d
+	xorl	%r8d, %r8d
+	xorl	%ecx, %ecx
+	xorl	%edx, %edx
+	movl	$.LC2, %esi
+	movl	$_ZN4Trmm3rttE, %edi
+	movq	$0, 8(%rsp)
+	movq	$0, (%rsp)
+	call	_ZN6x10aux11RuntimeType12initStageTwoEPKcNS0_4KindEiPPKS0_iS6_PNS0_8VarianceE
+.L106:
+	addq	$24, %rsp
+	.cfi_def_cfa_offset 8
+	ret
+	.cfi_endproc
+.LFE4188:
+	.size	_ZN4Trmm8_initRTTEv, .-_ZN4Trmm8_initRTTEv
+	.section	.text._ZN6x10aux6getRTTIN3x104lang3AnyEEEPKNS_11RuntimeTypeEv,"axG",@progbits,_ZN6x10aux6getRTTIN3x104lang3AnyEEEPKNS_11RuntimeTypeEv,comdat
+	.p2align 4,,15
+	.weak	_ZN6x10aux6getRTTIN3x104lang3AnyEEEPKNS_11RuntimeTypeEv
+	.type	_ZN6x10aux6getRTTIN3x104lang3AnyEEEPKNS_11RuntimeTypeEv, @function
+_ZN6x10aux6getRTTIN3x104lang3AnyEEEPKNS_11RuntimeTypeEv:
+.LFB4495:
+	.cfi_startproc
+	.cfi_personality 0x3,__gxx_personality_v0
+	subq	$8, %rsp
+	.cfi_def_cfa_offset 16
+	cmpb	$0, _ZN3x104lang3Any3rttE+69(%rip)
+	jne	.L108
+	call	_ZN3x104lang3Any8_initRTTEv
+.L108:
+	movl	$_ZN3x104lang3Any3rttE, %eax
+	addq	$8, %rsp
+	.cfi_def_cfa_offset 8
+	ret
+	.cfi_endproc
+.LFE4495:
+	.size	_ZN6x10aux6getRTTIN3x104lang3AnyEEEPKNS_11RuntimeTypeEv, .-_ZN6x10aux6getRTTIN3x104lang3AnyEEEPKNS_11RuntimeTypeEv
+	.section	.rodata.str1.8
+	.align 8
+.LC3:
+	.string	"::x10::lang::RailIterator<TPMGL(T)>"
+	.text
+	.p2align 4,,15
+	.type	_Z41__static_initialization_and_destruction_2ii.clone.0, @function
+_Z41__static_initialization_and_destruction_2ii.clone.0:
+.LFB4659:
+	.cfi_startproc
+	.cfi_personality 0x3,__gxx_personality_v0
+	subq	$8, %rsp
+	.cfi_def_cfa_offset 16
+	cmpb	$0, _ZGVN3x104lang12RailIteratorIdE9_itable_0E(%rip)
+	jne	.L111
+	movb	$1, _ZGVN3x104lang12RailIteratorIdE9_itable_0E(%rip)
+	movq	$0, _ZN3x104lang12RailIteratorIdE9_itable_0E+8(%rip)
+	movq	$25, _ZN3x104lang12RailIteratorIdE9_itable_0E(%rip)
+	movq	$0, _ZN3x104lang12RailIteratorIdE9_itable_0E+24(%rip)
+	movq	$105, _ZN3x104lang12RailIteratorIdE9_itable_0E+16(%rip)
+	movq	$0, _ZN3x104lang12RailIteratorIdE9_itable_0E+40(%rip)
+	movq	$41, _ZN3x104lang12RailIteratorIdE9_itable_0E+32(%rip)
+	movq	$0, _ZN3x104lang12RailIteratorIdE9_itable_0E+56(%rip)
+	movq	$97, _ZN3x104lang12RailIteratorIdE9_itable_0E+48(%rip)
+	movq	$0, _ZN3x104lang12RailIteratorIdE9_itable_0E+72(%rip)
+	movq	$49, _ZN3x104lang12RailIteratorIdE9_itable_0E+64(%rip)
+	movq	$0, _ZN3x104lang12RailIteratorIdE9_itable_0E+88(%rip)
+	movq	$81, _ZN3x104lang12RailIteratorIdE9_itable_0E+80(%rip)
+	.p2align 4,,10
+	.p2align 3
+.L111:
+	cmpb	$0, _ZGVN3x104lang12RailIteratorIdE9_itable_1E(%rip)
+	jne	.L112
+	movb	$1, _ZGVN3x104lang12RailIteratorIdE9_itable_1E(%rip)
+	movq	$0, _ZN3x104lang12RailIteratorIdE9_itable_1E+8(%rip)
+	movq	$25, _ZN3x104lang12RailIteratorIdE9_itable_1E(%rip)
+	movq	$0, _ZN3x104lang12RailIteratorIdE9_itable_1E+24(%rip)
+	movq	$41, _ZN3x104lang12RailIteratorIdE9_itable_1E+16(%rip)
+	movq	$0, _ZN3x104lang12RailIteratorIdE9_itable_1E+40(%rip)
+	movq	$49, _ZN3x104lang12RailIteratorIdE9_itable_1E+32(%rip)
+	movq	$0, _ZN3x104lang12RailIteratorIdE9_itable_1E+56(%rip)
+	movq	$81, _ZN3x104lang12RailIteratorIdE9_itable_1E+48(%rip)
+.L112:
+	cmpb	$0, _ZGVN3x104lang12RailIteratorIdE8_itablesE(%rip)
+	jne	.L113
+	movb	$1, _ZGVN3x104lang12RailIteratorIdE8_itablesE(%rip)
+	movq	$0, _ZN3x104lang12RailIteratorIdE8_itablesE(%rip)
+	movq	$_ZN3x104lang12RailIteratorIdE9_itable_0E, _ZN3x104lang12RailIteratorIdE8_itablesE+8(%rip)
+	movq	$_ZN6x10aux6getRTTIN3x104lang8IteratorIdEEEEPKNS_11RuntimeTypeEv, _ZN3x104lang12RailIteratorIdE8_itablesE+16(%rip)
+	movq	$0, _ZN3x104lang12RailIteratorIdE8_itablesE+24(%rip)
+	movq	$_ZN3x104lang12RailIteratorIdE9_itable_1E, _ZN3x104lang12RailIteratorIdE8_itablesE+32(%rip)
+	movq	$_ZN6x10aux6getRTTIN3x104lang3AnyEEEPKNS_11RuntimeTypeEv, _ZN3x104lang12RailIteratorIdE8_itablesE+40(%rip)
+	movq	$0, _ZN3x104lang12RailIteratorIdE8_itablesE+48(%rip)
+	movq	$.LC3, _ZN3x104lang12RailIteratorIdE8_itablesE+56(%rip)
+	movq	$0, _ZN3x104lang12RailIteratorIdE8_itablesE+64(%rip)
+.L113:
+	cmpb	$0, _ZGVN3x104lang12RailIteratorIdE17_serialization_idE(%rip)
+	je	.L124
+.L114:
+	cmpb	$0, _ZGVN3x104lang12RailIteratorIPNS0_4RailIdEEE9_itable_0E(%rip)
+	jne	.L115
+	movb	$1, _ZGVN3x104lang12RailIteratorIPNS0_4RailIdEEE9_itable_0E(%rip)
+	movq	$0, _ZN3x104lang12RailIteratorIPNS0_4RailIdEEE9_itable_0E+8(%rip)
+	movq	$25, _ZN3x104lang12RailIteratorIPNS0_4RailIdEEE9_itable_0E(%rip)
+	movq	$0, _ZN3x104lang12RailIteratorIPNS0_4RailIdEEE9_itable_0E+24(%rip)
+	movq	$105, _ZN3x104lang12RailIteratorIPNS0_4RailIdEEE9_itable_0E+16(%rip)
+	movq	$0, _ZN3x104lang12RailIteratorIPNS0_4RailIdEEE9_itable_0E+40(%rip)
+	movq	$41, _ZN3x104lang12RailIteratorIPNS0_4RailIdEEE9_itable_0E+32(%rip)
+	movq	$0, _ZN3x104lang12RailIteratorIPNS0_4RailIdEEE9_itable_0E+56(%rip)
+	movq	$97, _ZN3x104lang12RailIteratorIPNS0_4RailIdEEE9_itable_0E+48(%rip)
+	movq	$0, _ZN3x104lang12RailIteratorIPNS0_4RailIdEEE9_itable_0E+72(%rip)
+	movq	$49, _ZN3x104lang12RailIteratorIPNS0_4RailIdEEE9_itable_0E+64(%rip)
+	movq	$0, _ZN3x104lang12RailIteratorIPNS0_4RailIdEEE9_itable_0E+88(%rip)
+	movq	$81, _ZN3x104lang12RailIteratorIPNS0_4RailIdEEE9_itable_0E+80(%rip)
+.L115:
+	cmpb	$0, _ZGVN3x104lang12RailIteratorIPNS0_4RailIdEEE9_itable_1E(%rip)
+	jne	.L116
+	movb	$1, _ZGVN3x104lang12RailIteratorIPNS0_4RailIdEEE9_itable_1E(%rip)
+	movq	$0, _ZN3x104lang12RailIteratorIPNS0_4RailIdEEE9_itable_1E+8(%rip)
+	movq	$25, _ZN3x104lang12RailIteratorIPNS0_4RailIdEEE9_itable_1E(%rip)
+	movq	$0, _ZN3x104lang12RailIteratorIPNS0_4RailIdEEE9_itable_1E+24(%rip)
+	movq	$41, _ZN3x104lang12RailIteratorIPNS0_4RailIdEEE9_itable_1E+16(%rip)
+	movq	$0, _ZN3x104lang12RailIteratorIPNS0_4RailIdEEE9_itable_1E+40(%rip)
+	movq	$49, _ZN3x104lang12RailIteratorIPNS0_4RailIdEEE9_itable_1E+32(%rip)
+	movq	$0, _ZN3x104lang12RailIteratorIPNS0_4RailIdEEE9_itable_1E+56(%rip)
+	movq	$81, _ZN3x104lang12RailIteratorIPNS0_4RailIdEEE9_itable_1E+48(%rip)
+.L116:
+	cmpb	$0, _ZGVN3x104lang12RailIteratorIPNS0_4RailIdEEE8_itablesE(%rip)
+	jne	.L117
+	movb	$1, _ZGVN3x104lang12RailIteratorIPNS0_4RailIdEEE8_itablesE(%rip)
+	movq	$0, _ZN3x104lang12RailIteratorIPNS0_4RailIdEEE8_itablesE(%rip)
+	movq	$_ZN3x104lang12RailIteratorIPNS0_4RailIdEEE9_itable_0E, _ZN3x104lang12RailIteratorIPNS0_4RailIdEEE8_itablesE+8(%rip)
+	movq	$_ZN6x10aux6getRTTIN3x104lang8IteratorIPNS2_4RailIdEEEEEEPKNS_11RuntimeTypeEv, _ZN3x104lang12RailIteratorIPNS0_4RailIdEEE8_itablesE+16(%rip)
+	movq	$0, _ZN3x104lang12RailIteratorIPNS0_4RailIdEEE8_itablesE+24(%rip)
+	movq	$_ZN3x104lang12RailIteratorIPNS0_4RailIdEEE9_itable_1E, _ZN3x104lang12RailIteratorIPNS0_4RailIdEEE8_itablesE+32(%rip)
+	movq	$_ZN6x10aux6getRTTIN3x104lang3AnyEEEPKNS_11RuntimeTypeEv, _ZN3x104lang12RailIteratorIPNS0_4RailIdEEE8_itablesE+40(%rip)
+	movq	$0, _ZN3x104lang12RailIteratorIPNS0_4RailIdEEE8_itablesE+48(%rip)
+	movq	$.LC3, _ZN3x104lang12RailIteratorIPNS0_4RailIdEEE8_itablesE+56(%rip)
+	movq	$0, _ZN3x104lang12RailIteratorIPNS0_4RailIdEEE8_itablesE+64(%rip)
+.L117:
+	cmpb	$0, _ZGVN3x104lang12RailIteratorIPNS0_4RailIdEEE17_serialization_idE(%rip)
+	je	.L125
+.L118:
+	cmpb	$0, _ZGVN3x104lang12RailIteratorIdE3rttE(%rip)
+	jne	.L119
+	movb	$1, _ZGVN3x104lang12RailIteratorIdE3rttE(%rip)
+	movq	$_ZTVN6x10aux11RuntimeTypeE+16, _ZN3x104lang12RailIteratorIdE3rttE(%rip)
+.L119:
+	cmpb	$0, _ZGVN3x104lang12RailIteratorIPNS0_4RailIdEEE3rttE(%rip)
+	jne	.L120
+	movb	$1, _ZGVN3x104lang12RailIteratorIPNS0_4RailIdEEE3rttE(%rip)
+	movq	$_ZTVN6x10aux11RuntimeTypeE+16, _ZN3x104lang12RailIteratorIPNS0_4RailIdEEE3rttE(%rip)
+.L120:
+	cmpb	$0, _ZGVN3x104lang8IteratorIdE3rttE(%rip)
+	jne	.L121
+	movb	$1, _ZGVN3x104lang8IteratorIdE3rttE(%rip)
+	movq	$_ZTVN6x10aux11RuntimeTypeE+16, _ZN3x104lang8IteratorIdE3rttE(%rip)
+.L121:
+	cmpb	$0, _ZGVN3x104lang8IteratorIPNS0_4RailIdEEE3rttE(%rip)
+	jne	.L123
+	movb	$1, _ZGVN3x104lang8IteratorIPNS0_4RailIdEEE3rttE(%rip)
+	movq	$_ZTVN6x10aux11RuntimeTypeE+16, _ZN3x104lang8IteratorIPNS0_4RailIdEEE3rttE(%rip)
+	.p2align 4,,10
+	.p2align 3
+.L123:
+	addq	$8, %rsp
+	.cfi_remember_state
+	.cfi_def_cfa_offset 8
+	ret
+	.p2align 4,,10
+	.p2align 3
+.L124:
+	.cfi_restore_state
+	movl	$_ZN3x104lang12RailIteratorIdE13_deserializerERN6x10aux22deserialization_bufferE, %edi
+	movb	$1, _ZGVN3x104lang12RailIteratorIdE17_serialization_idE(%rip)
+	call	_ZN6x10aux25DeserializationDispatcher15addDeserializerEPFPN3x104lang9ReferenceERNS_22deserialization_bufferEE
+	movw	%ax, _ZN3x104lang12RailIteratorIdE17_serialization_idE(%rip)
+	jmp	.L114
+	.p2align 4,,10
+	.p2align 3
+.L125:
+	movl	$_ZN3x104lang12RailIteratorIPNS0_4RailIdEEE13_deserializerERN6x10aux22deserialization_bufferE, %edi
+	movb	$1, _ZGVN3x104lang12RailIteratorIPNS0_4RailIdEEE17_serialization_idE(%rip)
+	call	_ZN6x10aux25DeserializationDispatcher15addDeserializerEPFPN3x104lang9ReferenceERNS_22deserialization_bufferEE
+	movw	%ax, _ZN3x104lang12RailIteratorIPNS0_4RailIdEEE17_serialization_idE(%rip)
+	jmp	.L118
+	.cfi_endproc
+.LFE4659:
+	.size	_Z41__static_initialization_and_destruction_2ii.clone.0, .-_Z41__static_initialization_and_destruction_2ii.clone.0
+	.section	.rodata.str1.1
+.LC4:
+	.string	"x10.lang.Rail[T]"
+	.text
+	.p2align 4,,15
+	.type	_Z41__static_initialization_and_destruction_1ii.clone.5, @function
+_Z41__static_initialization_and_destruction_1ii.clone.5:
+.LFB4664:
+	.cfi_startproc
+	.cfi_personality 0x3,__gxx_personality_v0
+	subq	$8, %rsp
+	.cfi_def_cfa_offset 16
+	cmpb	$0, _ZGVN3x104lang4RailIPNS1_IdEEE9_itable_0E(%rip)
+	jne	.L127
+	movb	$1, _ZGVN3x104lang4RailIPNS1_IdEEE9_itable_0E(%rip)
+	movq	$0, _ZN3x104lang4RailIPNS1_IdEEE9_itable_0E+8(%rip)
+	movq	$25, _ZN3x104lang4RailIPNS1_IdEEE9_itable_0E(%rip)
+	movq	$0, _ZN3x104lang4RailIPNS1_IdEEE9_itable_0E+24(%rip)
+	movq	$41, _ZN3x104lang4RailIPNS1_IdEEE9_itable_0E+16(%rip)
+	movq	$0, _ZN3x104lang4RailIPNS1_IdEEE9_itable_0E+40(%rip)
+	movq	$_ZN3x104lang4RailIPNS1_IdEEE8iteratorEv, _ZN3x104lang4RailIPNS1_IdEEE9_itable_0E+32(%rip)
+	movq	$0, _ZN3x104lang4RailIPNS1_IdEEE9_itable_0E+56(%rip)
+	movq	$49, _ZN3x104lang4RailIPNS1_IdEEE9_itable_0E+48(%rip)
+	movq	$0, _ZN3x104lang4RailIPNS1_IdEEE9_itable_0E+72(%rip)
+	movq	$81, _ZN3x104lang4RailIPNS1_IdEEE9_itable_0E+64(%rip)
+	.p2align 4,,10
+	.p2align 3
+.L127:
+	cmpb	$0, _ZGVN3x104lang4RailIPNS1_IdEEE9_itable_1E(%rip)
+	jne	.L128
+	movb	$1, _ZGVN3x104lang4RailIPNS1_IdEEE9_itable_1E(%rip)
+	movq	$0, _ZN3x104lang4RailIPNS1_IdEEE9_itable_1E+8(%rip)
+	movq	$25, _ZN3x104lang4RailIPNS1_IdEEE9_itable_1E(%rip)
+	movq	$0, _ZN3x104lang4RailIPNS1_IdEEE9_itable_1E+24(%rip)
+	movq	$41, _ZN3x104lang4RailIPNS1_IdEEE9_itable_1E+16(%rip)
+	movq	$0, _ZN3x104lang4RailIPNS1_IdEEE9_itable_1E+40(%rip)
+	movq	$_ZN3x104lang4RailIPNS1_IdEEE7__applyEl, _ZN3x104lang4RailIPNS1_IdEEE9_itable_1E+32(%rip)
+	movq	$0, _ZN3x104lang4RailIPNS1_IdEEE9_itable_1E+56(%rip)
+	movq	$49, _ZN3x104lang4RailIPNS1_IdEEE9_itable_1E+48(%rip)
+	movq	$0, _ZN3x104lang4RailIPNS1_IdEEE9_itable_1E+72(%rip)
+	movq	$81, _ZN3x104lang4RailIPNS1_IdEEE9_itable_1E+64(%rip)
+.L128:
+	cmpb	$0, _ZGVN3x104lang4RailIPNS1_IdEEE8_itablesE(%rip)
+	jne	.L129
+	movb	$1, _ZGVN3x104lang4RailIPNS1_IdEEE8_itablesE(%rip)
+	movq	$0, _ZN3x104lang4RailIPNS1_IdEEE8_itablesE(%rip)
+	movq	$_ZN3x104lang4RailIPNS1_IdEEE9_itable_0E, _ZN3x104lang4RailIPNS1_IdEEE8_itablesE+8(%rip)
+	movq	$_ZN6x10aux6getRTTIN3x104lang8IterableIPNS2_4RailIdEEEEEEPKNS_11RuntimeTypeEv, _ZN3x104lang4RailIPNS1_IdEEE8_itablesE+16(%rip)
+	movq	$0, _ZN3x104lang4RailIPNS1_IdEEE8_itablesE+24(%rip)
+	movq	$_ZN3x104lang4RailIPNS1_IdEEE9_itable_1E, _ZN3x104lang4RailIPNS1_IdEEE8_itablesE+32(%rip)
+	movq	$_ZN6x10aux6getRTTIN3x104lang7Fun_0_1IlPNS2_4RailIdEEEEEEPKNS_11RuntimeTypeEv, _ZN3x104lang4RailIPNS1_IdEEE8_itablesE+40(%rip)
+	movq	$0, _ZN3x104lang4RailIPNS1_IdEEE8_itablesE+48(%rip)
+	movq	$.LC4, _ZN3x104lang4RailIPNS1_IdEEE8_itablesE+56(%rip)
+	movq	$0, _ZN3x104lang4RailIPNS1_IdEEE8_itablesE+64(%rip)
+.L129:
+	cmpb	$0, _ZGVN3x104lang4RailIPNS1_IdEEE17_serialization_idE(%rip)
+	je	.L140
+.L130:
+	cmpb	$0, _ZGVN3x104lang4RailIdE9_itable_0E(%rip)
+	jne	.L131
+	movb	$1, _ZGVN3x104lang4RailIdE9_itable_0E(%rip)
+	movq	$0, _ZN3x104lang4RailIdE9_itable_0E+8(%rip)
+	movq	$25, _ZN3x104lang4RailIdE9_itable_0E(%rip)
+	movq	$0, _ZN3x104lang4RailIdE9_itable_0E+24(%rip)
+	movq	$41, _ZN3x104lang4RailIdE9_itable_0E+16(%rip)
+	movq	$0, _ZN3x104lang4RailIdE9_itable_0E+40(%rip)
+	movq	$_ZN3x104lang4RailIdE8iteratorEv, _ZN3x104lang4RailIdE9_itable_0E+32(%rip)
+	movq	$0, _ZN3x104lang4RailIdE9_itable_0E+56(%rip)
+	movq	$49, _ZN3x104lang4RailIdE9_itable_0E+48(%rip)
+	movq	$0, _ZN3x104lang4RailIdE9_itable_0E+72(%rip)
+	movq	$81, _ZN3x104lang4RailIdE9_itable_0E+64(%rip)
+.L131:
+	cmpb	$0, _ZGVN3x104lang4RailIdE9_itable_1E(%rip)
+	jne	.L132
+	movb	$1, _ZGVN3x104lang4RailIdE9_itable_1E(%rip)
+	movq	$0, _ZN3x104lang4RailIdE9_itable_1E+8(%rip)
+	movq	$25, _ZN3x104lang4RailIdE9_itable_1E(%rip)
+	movq	$0, _ZN3x104lang4RailIdE9_itable_1E+24(%rip)
+	movq	$41, _ZN3x104lang4RailIdE9_itable_1E+16(%rip)
+	movq	$0, _ZN3x104lang4RailIdE9_itable_1E+40(%rip)
+	movq	$_ZN3x104lang4RailIdE7__applyEl, _ZN3x104lang4RailIdE9_itable_1E+32(%rip)
+	movq	$0, _ZN3x104lang4RailIdE9_itable_1E+56(%rip)
+	movq	$49, _ZN3x104lang4RailIdE9_itable_1E+48(%rip)
+	movq	$0, _ZN3x104lang4RailIdE9_itable_1E+72(%rip)
+	movq	$81, _ZN3x104lang4RailIdE9_itable_1E+64(%rip)
+.L132:
+	cmpb	$0, _ZGVN3x104lang4RailIdE8_itablesE(%rip)
+	jne	.L133
+	movb	$1, _ZGVN3x104lang4RailIdE8_itablesE(%rip)
+	movq	$0, _ZN3x104lang4RailIdE8_itablesE(%rip)
+	movq	$_ZN3x104lang4RailIdE9_itable_0E, _ZN3x104lang4RailIdE8_itablesE+8(%rip)
+	movq	$_ZN6x10aux6getRTTIN3x104lang8IterableIdEEEEPKNS_11RuntimeTypeEv, _ZN3x104lang4RailIdE8_itablesE+16(%rip)
+	movq	$0, _ZN3x104lang4RailIdE8_itablesE+24(%rip)
+	movq	$_ZN3x104lang4RailIdE9_itable_1E, _ZN3x104lang4RailIdE8_itablesE+32(%rip)
+	movq	$_ZN6x10aux6getRTTIN3x104lang7Fun_0_1IldEEEEPKNS_11RuntimeTypeEv, _ZN3x104lang4RailIdE8_itablesE+40(%rip)
+	movq	$0, _ZN3x104lang4RailIdE8_itablesE+48(%rip)
+	movq	$.LC4, _ZN3x104lang4RailIdE8_itablesE+56(%rip)
+	movq	$0, _ZN3x104lang4RailIdE8_itablesE+64(%rip)
+.L133:
+	cmpb	$0, _ZGVN3x104lang4RailIdE17_serialization_idE(%rip)
+	je	.L141
+.L134:
+	cmpb	$0, _ZGVN3x104lang4IBoxIdE17_serialization_idE(%rip)
+	je	.L142
+.L135:
+	cmpb	$0, _ZGVN3x104lang4RailIPNS1_IdEEE3rttE(%rip)
+	jne	.L136
+	movb	$1, _ZGVN3x104lang4RailIPNS1_IdEEE3rttE(%rip)
+	movq	$_ZTVN6x10aux11RuntimeTypeE+16, _ZN3x104lang4RailIPNS1_IdEEE3rttE(%rip)
+.L136:
+	cmpb	$0, _ZGVN3x104lang8IterableIPNS0_4RailIdEEE3rttE(%rip)
+	jne	.L137
+	movb	$1, _ZGVN3x104lang8IterableIPNS0_4RailIdEEE3rttE(%rip)
+	movq	$_ZTVN6x10aux11RuntimeTypeE+16, _ZN3x104lang8IterableIPNS0_4RailIdEEE3rttE(%rip)
+.L137:
+	cmpb	$0, _ZGVN3x104lang7Fun_0_1IlPNS0_4RailIdEEE3rttE(%rip)
+	jne	.L139
+	movb	$1, _ZGVN3x104lang7Fun_0_1IlPNS0_4RailIdEEE3rttE(%rip)
+	movq	$_ZTVN6x10aux14RuntimeFunTypeE+16, _ZN3x104lang7Fun_0_1IlPNS0_4RailIdEEE3rttE(%rip)
+	.p2align 4,,10
+	.p2align 3
+.L139:
+	addq	$8, %rsp
+	.cfi_remember_state
+	.cfi_def_cfa_offset 8
+	ret
+	.p2align 4,,10
+	.p2align 3
+.L140:
+	.cfi_restore_state
+	movl	$_ZN3x104lang4RailIPNS1_IdEEE13_deserializerERN6x10aux22deserialization_bufferE, %edi
+	movb	$1, _ZGVN3x104lang4RailIPNS1_IdEEE17_serialization_idE(%rip)
+	call	_ZN6x10aux25DeserializationDispatcher15addDeserializerEPFPN3x104lang9ReferenceERNS_22deserialization_bufferEE
+	movw	%ax, _ZN3x104lang4RailIPNS1_IdEEE17_serialization_idE(%rip)
+	jmp	.L130
+	.p2align 4,,10
+	.p2align 3
+.L142:
+	movl	$_ZN3x104lang4IBoxIdE13_deserializerERN6x10aux22deserialization_bufferE, %edi
+	movb	$1, _ZGVN3x104lang4IBoxIdE17_serialization_idE(%rip)
+	call	_ZN6x10aux25DeserializationDispatcher15addDeserializerEPFPN3x104lang9ReferenceERNS_22deserialization_bufferEE
+	movw	%ax, _ZN3x104lang4IBoxIdE17_serialization_idE(%rip)
+	jmp	.L135
+	.p2align 4,,10
+	.p2align 3
+.L141:
+	movl	$_ZN3x104lang4RailIdE13_deserializerERN6x10aux22deserialization_bufferE, %edi
+	movb	$1, _ZGVN3x104lang4RailIdE17_serialization_idE(%rip)
+	call	_ZN6x10aux25DeserializationDispatcher15addDeserializerEPFPN3x104lang9ReferenceERNS_22deserialization_bufferEE
+	movw	%ax, _ZN3x104lang4RailIdE17_serialization_idE(%rip)
+	jmp	.L134
+	.cfi_endproc
+.LFE4664:
+	.size	_Z41__static_initialization_and_destruction_1ii.clone.5, .-_Z41__static_initialization_and_destruction_1ii.clone.5
+	.section	.rodata.str1.1
+.LC5:
+	.string	"MINI_DATASET"
+.LC6:
+	.string	"STANDARD_DATASET"
+.LC7:
+	.string	" (ms)"
+.LC8:
+	.string	"LARGE_DATASET"
+.LC9:
+	.string	"SMALL_DATASET"
+.LC10:
+	.string	"%0.2lf"
+.LC11:
+	.string	"\n"
+.LC12:
+	.string	"EXTRALARGE_DATASET"
+.LC13:
+	.string	"Elapsed time= "
+	.text
+	.p2align 4,,15
+	.type	_GLOBAL__I__ZN4Trmm6setPBsEl, @function
+_GLOBAL__I__ZN4Trmm6setPBsEl:
+.LFB4658:
+	.cfi_startproc
+	.cfi_personality 0x3,__gxx_personality_v0
+	subq	$8, %rsp
+	.cfi_def_cfa_offset 16
+	movl	$_ZStL8__ioinit, %edi
+	call	_ZNSt8ios_base4InitC1Ev
+	movl	$__dso_handle, %edx
+	movl	$_ZStL8__ioinit, %esi
+	movl	$_ZNSt8ios_base4InitD1Ev, %edi
+	call	__cxa_atexit
+	movl	$_ZN4Trmm13_deserializerERN6x10aux22deserialization_bufferE, %edi
+	call	_ZN6x10aux25DeserializationDispatcher15addDeserializerEPFPN3x104lang9ReferenceERNS_22deserialization_bufferEE
+	movl	$.LC5, %esi
+	movl	$_ZN12Trmm_Strings8sl__2763E, %edi
+	movw	%ax, _ZN4Trmm17_serialization_idE(%rip)
+	movq	$_ZTVN6x10aux11RuntimeTypeE+16, _ZN4Trmm3rttE(%rip)
+	call	_ZN3x104lang6StringC1EPKc
+	movl	$.LC6, %esi
+	movl	$_ZN12Trmm_Strings8sl__2761E, %edi
+	call	_ZN3x104lang6StringC1EPKc
+	movl	$.LC7, %esi
+	movl	$_ZN12Trmm_Strings8sl__2767E, %edi
+	call	_ZN3x104lang6StringC1EPKc
+	movl	$.LC8, %esi
+	movl	$_ZN12Trmm_Strings8sl__2765E, %edi
+	call	_ZN3x104lang6StringC1EPKc
+	movl	$.LC9, %esi
+	movl	$_ZN12Trmm_Strings8sl__2764E, %edi
+	call	_ZN3x104lang6StringC1EPKc
+	movl	$.LC10, %esi
+	movl	$_ZN12Trmm_Strings8sl__2759E, %edi
+	call	_ZN3x104lang6StringC1EPKc
+	movl	$.LC11, %esi
+	movl	$_ZN12Trmm_Strings8sl__2760E, %edi
+	call	_ZN3x104lang6StringC1EPKc
+	movl	$.LC12, %esi
+	movl	$_ZN12Trmm_Strings8sl__2762E, %edi
+	call	_ZN3x104lang6StringC1EPKc
+	movl	$.LC13, %esi
+	movl	$_ZN12Trmm_Strings8sl__2766E, %edi
+	call	_ZN3x104lang6StringC1EPKc
+	movl	$_ZN16Trmm__closure__112_deserializeERN6x10aux22deserialization_bufferE, %edi
+	movq	$0, _ZN16Trmm__closure__17_itableE+8(%rip)
+	movq	$25, _ZN16Trmm__closure__17_itableE(%rip)
+	movq	$0, _ZN16Trmm__closure__17_itableE+24(%rip)
+	movq	$41, _ZN16Trmm__closure__17_itableE+16(%rip)
+	movq	$0, _ZN16Trmm__closure__17_itableE+40(%rip)
+	movq	$_ZN16Trmm__closure__17__applyEv, _ZN16Trmm__closure__17_itableE+32(%rip)
+	movq	$0, _ZN16Trmm__closure__17_itableE+56(%rip)
+	movq	$49, _ZN16Trmm__closure__17_itableE+48(%rip)
+	movq	$0, _ZN16Trmm__closure__17_itableE+72(%rip)
+	movq	$89, _ZN16Trmm__closure__17_itableE+64(%rip)
+	movq	$0, _ZN16Trmm__closure__18_itablesE(%rip)
+	movq	$_ZN16Trmm__closure__17_itableE, _ZN16Trmm__closure__18_itablesE+8(%rip)
+	movq	$_ZN6x10aux6getRTTIN3x104lang11VoidFun_0_0EEEPKNS_11RuntimeTypeEv, _ZN16Trmm__closure__18_itablesE+16(%rip)
+	movq	$0, _ZN16Trmm__closure__18_itablesE+24(%rip)
+	movq	$0, _ZN16Trmm__closure__18_itablesE+32(%rip)
+	movq	$0, _ZN16Trmm__closure__18_itablesE+40(%rip)
+	call	_ZN6x10aux25DeserializationDispatcher15addDeserializerEPFPN3x104lang9ReferenceERNS_22deserialization_bufferEE
+	xorl	%r9d, %r9d
+	xorl	%r8d, %r8d
+	xorl	%ecx, %ecx
+	xorl	%edx, %edx
+	movl	$1, %esi
+	movl	$_ZN16Trmm__closure__112_deserializeERN6x10aux22deserialization_bufferE, %edi
+	movw	%ax, _ZN16Trmm__closure__117_serialization_idE(%rip)
+	call	_ZN6x10aux17NetworkDispatcher22addNetworkDeserializerEPFPN3x104lang9ReferenceERNS_22deserialization_bufferEENS_11ClosureKindEPFvS6_iRmSA_SA_SA_RPcSA_SC_EPFvS6_immmmSB_mSB_EPKcSI_
+	cmpb	$0, _ZGVN3x104lang4RailIdE3rttE(%rip)
+	movw	%ax, _ZN16Trmm__closure__111_network_idE(%rip)
+	jne	.L144
+	movb	$1, _ZGVN3x104lang4RailIdE3rttE(%rip)
+	movq	$_ZTVN6x10aux11RuntimeTypeE+16, _ZN3x104lang4RailIdE3rttE(%rip)
+.L144:
+	cmpb	$0, _ZGVN3x104lang8IterableIdE3rttE(%rip)
+	jne	.L145
+	movb	$1, _ZGVN3x104lang8IterableIdE3rttE(%rip)
+	movq	$_ZTVN6x10aux11RuntimeTypeE+16, _ZN3x104lang8IterableIdE3rttE(%rip)
+.L145:
+	cmpb	$0, _ZGVN3x104lang7Fun_0_1IldE3rttE(%rip)
+	jne	.L146
+	movb	$1, _ZGVN3x104lang7Fun_0_1IldE3rttE(%rip)
+	movq	$_ZTVN6x10aux14RuntimeFunTypeE+16, _ZN3x104lang7Fun_0_1IldE3rttE(%rip)
+.L146:
+	cmpb	$0, _ZGVN3x104util18HashMap__HashEntryIPNS_4lang3AnyES4_E3rttE(%rip)
+	jne	.L147
+	movb	$1, _ZGVN3x104util18HashMap__HashEntryIPNS_4lang3AnyES4_E3rttE(%rip)
+	movq	$_ZTVN6x10aux11RuntimeTypeE+16, _ZN3x104util18HashMap__HashEntryIPNS_4lang3AnyES4_E3rttE(%rip)
+.L147:
+	cmpb	$0, _ZGVN3x104util10Map__EntryIPNS_4lang3AnyES4_E3rttE(%rip)
+	jne	.L148
+	movb	$1, _ZGVN3x104util10Map__EntryIPNS_4lang3AnyES4_E3rttE(%rip)
+	movq	$_ZTVN6x10aux11RuntimeTypeE+16, _ZN3x104util10Map__EntryIPNS_4lang3AnyES4_E3rttE(%rip)
+.L148:
+	call	_Z41__static_initialization_and_destruction_1ii.clone.5
+	addq	$8, %rsp
+	.cfi_def_cfa_offset 8
+	jmp	_Z41__static_initialization_and_destruction_2ii.clone.0
+	.cfi_endproc
+.LFE4658:
+	.size	_GLOBAL__I__ZN4Trmm6setPBsEl, .-_GLOBAL__I__ZN4Trmm6setPBsEl
+	.section	.ctors,"aw",@progbits
+	.align 8
+	.quad	_GLOBAL__I__ZN4Trmm6setPBsEl
+	.section	.text._ZNK16Trmm__closure__15_typeEv,"axG",@progbits,_ZNK16Trmm__closure__15_typeEv,comdat
+	.align 2
+	.p2align 4,,15
+	.weak	_ZNK16Trmm__closure__15_typeEv
+	.type	_ZNK16Trmm__closure__15_typeEv, @function
+_ZNK16Trmm__closure__15_typeEv:
+.LFB4171:
+	.cfi_startproc
+	.cfi_personality 0x3,__gxx_personality_v0
+	subq	$8, %rsp
+	.cfi_def_cfa_offset 16
+	cmpb	$0, _ZN3x104lang11VoidFun_0_03rttE+69(%rip)
+	jne	.L151
+	call	_ZN3x104lang11VoidFun_0_08_initRTTEv
+.L151:
+	movl	$_ZN3x104lang11VoidFun_0_03rttE, %eax
+	addq	$8, %rsp
+	.cfi_def_cfa_offset 8
+	ret
+	.cfi_endproc
+.LFE4171:
+	.size	_ZNK16Trmm__closure__15_typeEv, .-_ZNK16Trmm__closure__15_typeEv
+	.section	.text._ZNK3x104lang4IBoxIdE5_typeEv,"axG",@progbits,_ZNK3x104lang4IBoxIdE5_typeEv,comdat
+	.align 2
+	.p2align 4,,15
+	.weak	_ZNK3x104lang4IBoxIdE5_typeEv
+	.type	_ZNK3x104lang4IBoxIdE5_typeEv, @function
+_ZNK3x104lang4IBoxIdE5_typeEv:
+.LFB4550:
+	.cfi_startproc
+	.cfi_personality 0x3,__gxx_personality_v0
+	subq	$8, %rsp
+	.cfi_def_cfa_offset 16
+	cmpb	$0, _ZN6x10aux11RuntimeType10DoubleTypeE+69(%rip)
+	jne	.L154
+	call	_ZN6x10aux11RuntimeType14initDoubleTypeEv
+.L154:
+	movl	$_ZN6x10aux11RuntimeType10DoubleTypeE, %eax
+	addq	$8, %rsp
+	.cfi_def_cfa_offset 8
+	ret
+	.cfi_endproc
+.LFE4550:
+	.size	_ZNK3x104lang4IBoxIdE5_typeEv, .-_ZNK3x104lang4IBoxIdE5_typeEv
+	.text
+	.align 2
+	.p2align 4,,15
+.globl _ZN4Trmm17_deserialize_bodyERN6x10aux22deserialization_bufferE
+	.type	_ZN4Trmm17_deserialize_bodyERN6x10aux22deserialization_bufferE, @function
+_ZN4Trmm17_deserialize_bodyERN6x10aux22deserialization_bufferE:
+.LFB4187:
+	.cfi_startproc
+	.cfi_personality 0x3,__gxx_personality_v0
+	movq	8(%rsi), %rax
+	movq	(%rax), %rdx
+	addq	$8, %rax
+	movq	%rax, 8(%rsi)
+	movq	%rdx, 8(%rdi)
+	ret
+	.cfi_endproc
+.LFE4187:
+	.size	_ZN4Trmm17_deserialize_bodyERN6x10aux22deserialization_bufferE, .-_ZN4Trmm17_deserialize_bodyERN6x10aux22deserialization_bufferE
+	.section	.text._ZN6x10aux6getRTTIN3x104lang7Fun_0_1IldEEEEPKNS_11RuntimeTypeEv,"axG",@progbits,_ZN6x10aux6getRTTIN3x104lang7Fun_0_1IldEEEEPKNS_11RuntimeTypeEv,comdat
+	.p2align 4,,15
+	.weak	_ZN6x10aux6getRTTIN3x104lang7Fun_0_1IldEEEEPKNS_11RuntimeTypeEv
+	.type	_ZN6x10aux6getRTTIN3x104lang7Fun_0_1IldEEEEPKNS_11RuntimeTypeEv, @function
+_ZN6x10aux6getRTTIN3x104lang7Fun_0_1IldEEEEPKNS_11RuntimeTypeEv:
+.LFB4502:
+	.cfi_startproc
+	.cfi_personality 0x3,__gxx_personality_v0
+	subq	$8, %rsp
+	.cfi_def_cfa_offset 16
+	cmpb	$0, _ZN3x104lang7Fun_0_1IldE3rttE+69(%rip)
+	je	.L163
+.L159:
+	movl	$_ZN3x104lang7Fun_0_1IldE3rttE, %eax
+	addq	$8, %rsp
+	.cfi_remember_state
+	.cfi_def_cfa_offset 8
+	ret
+	.p2align 4,,10
+	.p2align 3
+.L163:
+	.cfi_restore_state
+	movl	$_ZN3x104lang7Fun_0_1IvvE3rttE, %esi
+	movl	$_ZN3x104lang7Fun_0_1IldE3rttE, %edi
+	call	_ZN6x10aux11RuntimeType12initStageOneEPKS0_
+	testb	%al, %al
+	jne	.L159
+	cmpb	$0, _ZN6x10aux11RuntimeType10DoubleTypeE+69(%rip)
+	jne	.L160
+	call	_ZN6x10aux11RuntimeType14initDoubleTypeEv
+.L160:
+	cmpb	$0, _ZN6x10aux11RuntimeType8LongTypeE+69(%rip)
+	je	.L164
+.L161:
+	movl	$_ZN6x10aux11RuntimeType10DoubleTypeE, %edx
+	movl	$_ZN6x10aux11RuntimeType8LongTypeE, %esi
+	movl	$_ZN3x104lang7Fun_0_1IldE3rttE, %edi
+	call	_ZN3x104lang22_initRTTHelper_Fun_0_1EPN6x10aux11RuntimeTypeEPKS2_S5_
+	movl	$_ZN3x104lang7Fun_0_1IldE3rttE, %eax
+	addq	$8, %rsp
+	.cfi_remember_state
+	.cfi_def_cfa_offset 8
+	ret
+	.p2align 4,,10
+	.p2align 3
+.L164:
+	.cfi_restore_state
+	call	_ZN6x10aux11RuntimeType12initLongTypeEv
+	jmp	.L161
+	.cfi_endproc
+.LFE4502:
+	.size	_ZN6x10aux6getRTTIN3x104lang7Fun_0_1IldEEEEPKNS_11RuntimeTypeEv, .-_ZN6x10aux6getRTTIN3x104lang7Fun_0_1IldEEEEPKNS_11RuntimeTypeEv
+	.section	.rodata.str1.1
+.LC14:
+	.string	"x10.lang.Iterable"
+	.section	.text._ZN6x10aux6getRTTIN3x104lang8IterableIdEEEEPKNS_11RuntimeTypeEv,"axG",@progbits,_ZN6x10aux6getRTTIN3x104lang8IterableIdEEEEPKNS_11RuntimeTypeEv,comdat
+	.p2align 4,,15
+	.weak	_ZN6x10aux6getRTTIN3x104lang8IterableIdEEEEPKNS_11RuntimeTypeEv
+	.type	_ZN6x10aux6getRTTIN3x104lang8IterableIdEEEEPKNS_11RuntimeTypeEv, @function
+_ZN6x10aux6getRTTIN3x104lang8IterableIdEEEEPKNS_11RuntimeTypeEv:
+.LFB4501:
+	.cfi_startproc
+	.cfi_personality 0x3,__gxx_personality_v0
+	subq	$72, %rsp
+	.cfi_def_cfa_offset 80
+	cmpb	$0, _ZN3x104lang8IterableIdE3rttE+69(%rip)
+	je	.L170
+.L166:
+	movl	$_ZN3x104lang8IterableIdE3rttE, %eax
+	addq	$72, %rsp
+	.cfi_remember_state
+	.cfi_def_cfa_offset 8
+	ret
+	.p2align 4,,10
+	.p2align 3
+.L170:
+	.cfi_restore_state
+	movl	$_ZN3x104lang8IterableIvE3rttE, %esi
+	movl	$_ZN3x104lang8IterableIdE3rttE, %edi
+	call	_ZN6x10aux11RuntimeType12initStageOneEPKS0_
+	testb	%al, %al
+	jne	.L166
+	cmpb	$0, _ZN3x104lang3Any3rttE+69(%rip)
+	movq	$0, 32(%rsp)
+	jne	.L167
+	call	_ZN3x104lang3Any8_initRTTEv
+.L167:
+	cmpb	$0, _ZN6x10aux11RuntimeType10DoubleTypeE+69(%rip)
+	movq	$_ZN3x104lang3Any3rttE, 32(%rsp)
+	movq	$0, 16(%rsp)
+	jne	.L168
+	call	_ZN6x10aux11RuntimeType14initDoubleTypeEv
+.L168:
+	leaq	48(%rsp), %rax
+	leaq	32(%rsp), %r8
+	movl	$1, %r9d
+	movl	$1, %ecx
+	movl	$2, %edx
+	movl	$.LC14, %esi
+	movq	%rax, 8(%rsp)
+	leaq	16(%rsp), %rax
+	movl	$_ZN3x104lang8IterableIdE3rttE, %edi
+	movq	$_ZN6x10aux11RuntimeType10DoubleTypeE, 16(%rsp)
+	movl	$2, 48(%rsp)
+	movq	%rax, (%rsp)
+	call	_ZN6x10aux11RuntimeType12initStageTwoEPKcNS0_4KindEiPPKS0_iS6_PNS0_8VarianceE
+	movl	$_ZN3x104lang8IterableIdE3rttE, %eax
+	addq	$72, %rsp
+	.cfi_def_cfa_offset 8
+	ret
+	.cfi_endproc
+.LFE4501:
+	.size	_ZN6x10aux6getRTTIN3x104lang8IterableIdEEEEPKNS_11RuntimeTypeEv, .-_ZN6x10aux6getRTTIN3x104lang8IterableIdEEEEPKNS_11RuntimeTypeEv
+	.section	.rodata.str1.1
+.LC15:
+	.string	"x10.lang.Iterator"
+	.section	.text._ZN6x10aux6getRTTIN3x104lang8IteratorIdEEEEPKNS_11RuntimeTypeEv,"axG",@progbits,_ZN6x10aux6getRTTIN3x104lang8IteratorIdEEEEPKNS_11RuntimeTypeEv,comdat
+	.p2align 4,,15
+	.weak	_ZN6x10aux6getRTTIN3x104lang8IteratorIdEEEEPKNS_11RuntimeTypeEv
+	.type	_ZN6x10aux6getRTTIN3x104lang8IteratorIdEEEEPKNS_11RuntimeTypeEv, @function
+_ZN6x10aux6getRTTIN3x104lang8IteratorIdEEEEPKNS_11RuntimeTypeEv:
+.LFB4628:
+	.cfi_startproc
+	.cfi_personality 0x3,__gxx_personality_v0
+	subq	$72, %rsp
+	.cfi_def_cfa_offset 80
+	cmpb	$0, _ZN3x104lang8IteratorIdE3rttE+69(%rip)
+	je	.L176
+.L172:
+	movl	$_ZN3x104lang8IteratorIdE3rttE, %eax
+	addq	$72, %rsp
+	.cfi_remember_state
+	.cfi_def_cfa_offset 8
+	ret
+	.p2align 4,,10
+	.p2align 3
+.L176:
+	.cfi_restore_state
+	movl	$_ZN3x104lang8IteratorIvE3rttE, %esi
+	movl	$_ZN3x104lang8IteratorIdE3rttE, %edi
+	call	_ZN6x10aux11RuntimeType12initStageOneEPKS0_
+	testb	%al, %al
+	jne	.L172
+	cmpb	$0, _ZN3x104lang3Any3rttE+69(%rip)
+	movq	$0, 32(%rsp)
+	jne	.L173
+	call	_ZN3x104lang3Any8_initRTTEv
+.L173:
+	cmpb	$0, _ZN6x10aux11RuntimeType10DoubleTypeE+69(%rip)
+	movq	$_ZN3x104lang3Any3rttE, 32(%rsp)
+	movq	$0, 16(%rsp)
+	jne	.L174
+	call	_ZN6x10aux11RuntimeType14initDoubleTypeEv
+.L174:
+	leaq	48(%rsp), %rax
+	leaq	32(%rsp), %r8
+	movl	$1, %r9d
+	movl	$1, %ecx
+	movl	$2, %edx
+	movl	$.LC15, %esi
+	movq	%rax, 8(%rsp)
+	leaq	16(%rsp), %rax
+	movl	$_ZN3x104lang8IteratorIdE3rttE, %edi
+	movq	$_ZN6x10aux11RuntimeType10DoubleTypeE, 16(%rsp)
+	movl	$2, 48(%rsp)
+	movq	%rax, (%rsp)
+	call	_ZN6x10aux11RuntimeType12initStageTwoEPKcNS0_4KindEiPPKS0_iS6_PNS0_8VarianceE
+	movl	$_ZN3x104lang8IteratorIdE3rttE, %eax
+	addq	$72, %rsp
+	.cfi_def_cfa_offset 8
+	ret
+	.cfi_endproc
+.LFE4628:
+	.size	_ZN6x10aux6getRTTIN3x104lang8IteratorIdEEEEPKNS_11RuntimeTypeEv, .-_ZN6x10aux6getRTTIN3x104lang8IteratorIdEEEEPKNS_11RuntimeTypeEv
+	.section	.text._ZN3x104lang4IBoxIdE15_serialize_bodyERN6x10aux20serialization_bufferE,"axG",@progbits,_ZN3x104lang4IBoxIdE15_serialize_bodyERN6x10aux20serialization_bufferE,comdat
+	.align 2
+	.p2align 4,,15
+	.weak	_ZN3x104lang4IBoxIdE15_serialize_bodyERN6x10aux20serialization_bufferE
+	.type	_ZN3x104lang4IBoxIdE15_serialize_bodyERN6x10aux20serialization_bufferE, @function
+_ZN3x104lang4IBoxIdE15_serialize_bodyERN6x10aux20serialization_bufferE:
+.LFB4555:
+	.cfi_startproc
+	.cfi_personality 0x3,__gxx_personality_v0
+	movq	%rbx, -16(%rsp)
+	movq	%rbp, -8(%rsp)
+	subq	$24, %rsp
+	.cfi_def_cfa_offset 32
+	.cfi_offset 6, -16
+	.cfi_offset 3, -24
+	movq	16(%rsi), %rax
+	movq	%rdi, %rbx
+	movq	%rsi, %rbp
+	leaq	8(%rax), %rdx
+	cmpq	%rdx, 8(%rsi)
+	ja	.L178
+	movq	%rsi, %rdi
+	call	_ZN6x10aux20serialization_buffer4growEv
+	movq	16(%rbp), %rax
+.L178:
+	movq	8(%rbx), %rdx
+	movq	%rdx, (%rax)
+	addq	$8, 16(%rbp)
+	movq	8(%rsp), %rbx
+	movq	16(%rsp), %rbp
+	addq	$24, %rsp
+	.cfi_def_cfa_offset 8
+	ret
+	.cfi_endproc
+.LFE4555:
+	.size	_ZN3x104lang4IBoxIdE15_serialize_bodyERN6x10aux20serialization_bufferE, .-_ZN3x104lang4IBoxIdE15_serialize_bodyERN6x10aux20serialization_bufferE
+	.section	.text._ZN3x104lang4RailIPNS1_IdEEE15_serialize_bodyERN6x10aux20serialization_bufferE,"axG",@progbits,_ZN3x104lang4RailIPNS1_IdEEE15_serialize_bodyERN6x10aux20serialization_bufferE,comdat
+	.align 2
+	.p2align 4,,15
+	.weak	_ZN3x104lang4RailIPNS1_IdEEE15_serialize_bodyERN6x10aux20serialization_bufferE
+	.type	_ZN3x104lang4RailIPNS1_IdEEE15_serialize_bodyERN6x10aux20serialization_bufferE, @function
+_ZN3x104lang4RailIPNS1_IdEEE15_serialize_bodyERN6x10aux20serialization_bufferE:
+.LFB4544:
+	.cfi_startproc
+	.cfi_personality 0x3,__gxx_personality_v0
+	pushq	%r14
+	.cfi_def_cfa_offset 16
+	.cfi_offset 14, -16
+	pushq	%r13
+	.cfi_def_cfa_offset 24
+	.cfi_offset 13, -24
+	movq	%rdi, %r13
+	pushq	%r12
+	.cfi_def_cfa_offset 32
+	.cfi_offset 12, -32
+	movq	%rsi, %r12
+	pushq	%rbp
+	.cfi_def_cfa_offset 40
+	.cfi_offset 6, -40
+	pushq	%rbx
+	.cfi_def_cfa_offset 48
+	.cfi_offset 3, -48
+	subq	$16, %rsp
+	.cfi_def_cfa_offset 64
+	movq	16(%rsi), %rax
+	leaq	8(%rax), %rdx
+	cmpq	%rdx, 8(%rsi)
+	ja	.L181
+	movq	%rsi, %rdi
+	call	_ZN6x10aux20serialization_buffer4growEv
+	movq	16(%r12), %rax
+.L181:
+	movq	8(%r13), %rdx
+	movq	%rdx, (%rax)
+	addq	$8, 16(%r12)
+	cmpq	$0, 8(%r13)
+	jle	.L188
+	leaq	24(%r12), %r14
+	xorl	%ebx, %ebx
+	jmp	.L187
+	.p2align 4,,10
+	.p2align 3
+.L183:
+	movq	%rbp, %rsi
+	movq	%r12, %rdi
+	addq	$1, %rbx
+	call	_ZN6x10aux20serialization_buffer19serialize_referenceERS0_PN3x104lang9ReferenceE
+	cmpq	%rbx, 8(%r13)
+	jle	.L188
+.L187:
+	movq	16(%r13,%rbx,8), %rbp
+	testq	%rbp, %rbp
+	je	.L183
+	movq	%rbp, %rsi
+	movq	%r14, %rdi
+	call	_ZN6x10aux8addr_map9_positionEPKv
+	testl	%eax, %eax
+	je	.L183
+	movq	16(%r12), %rdx
+	leaq	2(%rdx), %rcx
+	cmpq	%rcx, 8(%r12)
+	ja	.L184
+	movq	%r12, %rdi
+	movl	%eax, 8(%rsp)
+	call	_ZN6x10aux20serialization_buffer4growEv
+	movq	16(%r12), %rdx
+	movl	8(%rsp), %eax
+.L184:
+	movw	$-1, (%rdx)
+	movq	16(%r12), %rcx
+	leaq	2(%rcx), %rdx
+	addq	$6, %rcx
+	cmpq	%rcx, 8(%r12)
+	movq	%rdx, 16(%r12)
+	ja	.L185
+	movq	%r12, %rdi
+	movl	%eax, 8(%rsp)
+	call	_ZN6x10aux20serialization_buffer4growEv
+	movq	16(%r12), %rdx
+	movl	8(%rsp), %eax
+.L185:
+	movl	%eax, (%rdx)
+	addq	$1, %rbx
+	addq	$4, 16(%r12)
+	cmpq	%rbx, 8(%r13)
+	jg	.L187
+	.p2align 4,,10
+	.p2align 3
+.L188:
+	addq	$16, %rsp
+	.cfi_def_cfa_offset 48
+	popq	%rbx
+	.cfi_def_cfa_offset 40
+	popq	%rbp
+	.cfi_def_cfa_offset 32
+	popq	%r12
+	.cfi_def_cfa_offset 24
+	popq	%r13
+	.cfi_def_cfa_offset 16
+	popq	%r14
+	.cfi_def_cfa_offset 8
+	ret
+	.cfi_endproc
+.LFE4544:
+	.size	_ZN3x104lang4RailIPNS1_IdEEE15_serialize_bodyERN6x10aux20serialization_bufferE, .-_ZN3x104lang4RailIPNS1_IdEEE15_serialize_bodyERN6x10aux20serialization_bufferE
+	.section	.text._ZN3x104lang4RailIdE15_serialize_bodyERN6x10aux20serialization_bufferE,"axG",@progbits,_ZN3x104lang4RailIdE15_serialize_bodyERN6x10aux20serialization_bufferE,comdat
+	.align 2
+	.p2align 4,,15
+	.weak	_ZN3x104lang4RailIdE15_serialize_bodyERN6x10aux20serialization_bufferE
+	.type	_ZN3x104lang4RailIdE15_serialize_bodyERN6x10aux20serialization_bufferE, @function
+_ZN3x104lang4RailIdE15_serialize_bodyERN6x10aux20serialization_bufferE:
+.LFB3976:
+	.cfi_startproc
+	.cfi_personality 0x3,__gxx_personality_v0
+	movq	%rbx, -24(%rsp)
+	movq	%r12, -8(%rsp)
+	movq	%rsi, %rbx
+	.cfi_offset 12, -16
+	.cfi_offset 3, -32
+	movq	%rbp, -16(%rsp)
+	subq	$24, %rsp
+	.cfi_def_cfa_offset 32
+	.cfi_offset 6, -24
+	movq	16(%rsi), %rax
+	movq	%rdi, %r12
+	movq	8(%rdi), %rbp
+	leaq	8(%rax), %rdx
+	cmpq	%rdx, 8(%rsi)
+	ja	.L191
+	movq	%rsi, %rdi
+	call	_ZN6x10aux20serialization_buffer4growEv
+	movq	16(%rbx), %rax
+.L191:
+	movq	%rbp, (%rax)
+	movq	16(%rbx), %rdi
+	salq	$3, %rbp
+	addq	$8, %rdi
+	leaq	(%rdi,%rbp), %rax
+	cmpq	%rax, 8(%rbx)
+	movq	%rdi, 16(%rbx)
+	ja	.L192
+	subq	(%rbx), %rdi
+	leaq	(%rdi,%rbp), %rsi
+	movq	%rbx, %rdi
+	call	_ZN6x10aux20serialization_buffer4growEm
+	movq	16(%rbx), %rdi
+.L192:
+	leaq	16(%r12), %rsi
+	movq	%rbp, %rdx
+	call	memcpy
+	addq	%rbp, 16(%rbx)
+	movq	16(%rsp), %r12
+	movq	(%rsp), %rbx
+	movq	8(%rsp), %rbp
+	addq	$24, %rsp
+	.cfi_def_cfa_offset 8
+	ret
+	.cfi_endproc
+.LFE3976:
+	.size	_ZN3x104lang4RailIdE15_serialize_bodyERN6x10aux20serialization_bufferE, .-_ZN3x104lang4RailIdE15_serialize_bodyERN6x10aux20serialization_bufferE
+	.text
+	.align 2
+	.p2align 4,,15
+.globl _ZN4Trmm15_serialize_bodyERN6x10aux20serialization_bufferE
+	.type	_ZN4Trmm15_serialize_bodyERN6x10aux20serialization_bufferE, @function
+_ZN4Trmm15_serialize_bodyERN6x10aux20serialization_bufferE:
+.LFB4185:
+	.cfi_startproc
+	.cfi_personality 0x3,__gxx_personality_v0
+	movq	%rbx, -16(%rsp)
+	movq	%rbp, -8(%rsp)
+	subq	$24, %rsp
+	.cfi_def_cfa_offset 32
+	.cfi_offset 6, -16
+	.cfi_offset 3, -24
+	movq	16(%rsi), %rax
+	movq	%rdi, %rbx
+	movq	%rsi, %rbp
+	leaq	8(%rax), %rdx
+	cmpq	%rdx, 8(%rsi)
+	ja	.L195
+	movq	%rsi, %rdi
+	call	_ZN6x10aux20serialization_buffer4growEv
+	movq	16(%rbp), %rax
+.L195:
+	movq	8(%rbx), %rdx
+	movq	%rdx, (%rax)
+	addq	$8, 16(%rbp)
+	movq	8(%rsp), %rbx
+	movq	16(%rsp), %rbp
+	addq	$24, %rsp
+	.cfi_def_cfa_offset 8
+	ret
+	.cfi_endproc
+.LFE4185:
+	.size	_ZN4Trmm15_serialize_bodyERN6x10aux20serialization_bufferE, .-_ZN4Trmm15_serialize_bodyERN6x10aux20serialization_bufferE
+	.section	.text._ZNK4Trmm5_typeEv,"axG",@progbits,_ZNK4Trmm5_typeEv,comdat
+	.align 2
+	.p2align 4,,15
+	.weak	_ZNK4Trmm5_typeEv
+	.type	_ZNK4Trmm5_typeEv, @function
+_ZNK4Trmm5_typeEv:
+.LFB1904:
+	.cfi_startproc
+	.cfi_personality 0x3,__gxx_personality_v0
+	subq	$24, %rsp
+	.cfi_def_cfa_offset 32
+	cmpb	$0, _ZN4Trmm3rttE+69(%rip)
+	je	.L200
+.L198:
+	movl	$_ZN4Trmm3rttE, %eax
+	addq	$24, %rsp
+	.cfi_remember_state
+	.cfi_def_cfa_offset 8
+	ret
+	.p2align 4,,10
+	.p2align 3
+.L200:
+	.cfi_restore_state
+	movl	$_ZN4Trmm3rttE, %esi
+	movq	%rsi, %rdi
+	call	_ZN6x10aux11RuntimeType12initStageOneEPKS0_
+	testb	%al, %al
+	jne	.L198
+	xorl	%r9d, %r9d
+	xorl	%r8d, %r8d
+	xorl	%ecx, %ecx
+	xorl	%edx, %edx
+	movl	$.LC2, %esi
+	movl	$_ZN4Trmm3rttE, %edi
+	movq	$0, 8(%rsp)
+	movq	$0, (%rsp)
+	call	_ZN6x10aux11RuntimeType12initStageTwoEPKcNS0_4KindEiPPKS0_iS6_PNS0_8VarianceE
+	movl	$_ZN4Trmm3rttE, %eax
+	addq	$24, %rsp
+	.cfi_def_cfa_offset 8
+	ret
+	.cfi_endproc
+.LFE1904:
+	.size	_ZNK4Trmm5_typeEv, .-_ZNK4Trmm5_typeEv
+.globl _Unwind_Resume
+	.text
+	.align 2
+	.p2align 4,,15
+.globl _ZN4Trmm11kernel_trmmEldPN3x104lang4RailIPNS2_IdEEEES6_
+	.type	_ZN4Trmm11kernel_trmmEldPN3x104lang4RailIPNS2_IdEEEES6_, @function
+_ZN4Trmm11kernel_trmmEldPN3x104lang4RailIPNS2_IdEEEES6_:
+.LFB4176:
+	.cfi_startproc
+	.cfi_personality 0x3,__gxx_personality_v0
+	.cfi_lsda 0x3,.LLSDA4176
+	pushq	%r15
+	.cfi_def_cfa_offset 16
+	.cfi_offset 15, -16
+	pushq	%r14
+	.cfi_def_cfa_offset 24
+	.cfi_offset 14, -24
+	pushq	%r13
+	.cfi_def_cfa_offset 32
+	.cfi_offset 13, -32
+	pushq	%r12
+	.cfi_def_cfa_offset 40
+	.cfi_offset 12, -40
+	movq	%rdx, %r12
+	pushq	%rbp
+	.cfi_def_cfa_offset 48
+	.cfi_offset 6, -48
+	movq	%rcx, %rbp
+	pushq	%rbx
+	.cfi_def_cfa_offset 56
+	.cfi_offset 3, -56
+	subq	$72, %rsp
+	.cfi_def_cfa_offset 128
+	cmpq	$1, %rsi
+	movq	%rsi, 24(%rsp)
+	movsd	%xmm0, 16(%rsp)
+	jle	.L220
+	movq	%rsi, %rax
+	leaq	56(%rsp), %r13
+	leaq	48(%rsp), %r14
+	addq	%rax, %rax
+	movq	$1, 56(%rsp)
+	movl	$1, %edx
+	leaq	-2(%rax), %rbx
+	movq	%rax, 32(%rsp)
+	movq	%rbx, 40(%rsp)
+.L219:
+	movq	40(%rsp), %rax
+	movq	$0, 48(%rsp)
+	addq	%rdx, %rax
+	testq	%rax, %rax
+	jle	.L203
+	.p2align 4,,10
+	.p2align 3
+.L224:
+.LEHB0:
+	call	_ZN3x104lang7Runtime17ensureNotInAtomicEv
+	call	_ZN3x104lang7Runtime11startFinishEv
+.LEHE0:
+	movq	%rax, %r15
+	movq	48(%rsp), %rax
+	testq	%rax, %rax
+	js	.L229
+	leaq	1(%rax), %rdx
+	movq	%rdx, %rcx
+	sarq	%rcx
+.L205:
+	movq	%rdx, %rbx
+	subq	24(%rsp), %rbx
+	cmpq	%rbx, %rcx
+	jle	.L226
+	testq	%rax, %rax
+	js	.L230
+	movq	%rdx, %rbx
+	sarq	%rbx
+	jmp	.L226
+	.p2align 4,,10
+	.p2align 3
+.L209:
+	leaq	-1(%rdx), %rcx
+	sarq	%rcx
+.L210:
+	cmpq	%rax, %rcx
+	jge	.L211
+	testq	%rdx, %rdx
+	jle	.L231
+	leaq	-1(%rdx), %rax
+	sarq	%rax
+.L211:
+	cmpq	%rax, %rbx
+	jg	.L214
+.L213:
+	movl	$56, %edi
+	call	malloc
+	testq	%rax, %rax
+	je	.L232
+	movq	$_ZTV16Trmm__closure__1+16, (%rax)
+	movq	%rbp, 8(%rax)
+	movq	%rax, %rdi
+	movq	%r13, 16(%rax)
+	movq	%r14, 24(%rax)
+	movq	%rbx, 32(%rax)
+	movsd	16(%rsp), %xmm0
+	movq	%r12, 48(%rax)
+	movsd	%xmm0, 40(%rax)
+.LEHB1:
+	call	_ZN3x104lang7Runtime8runAsyncEPNS0_11VoidFun_0_0E
+.LEHE1:
+	movq	48(%rsp), %rax
+	addq	$1, %rbx
+.L226:
+	movq	%rax, %rdx
+	addq	56(%rsp), %rdx
+	testq	%rdx, %rdx
+	jg	.L209
+	leaq	-2(%rdx), %rcx
+	movq	%rcx, %rsi
+	shrq	$63, %rsi
+	leaq	(%rsi,%rcx), %rcx
+	sarq	%rcx
+	jmp	.L210
+	.p2align 4,,10
+	.p2align 3
+.L231:
+	subq	$2, %rdx
+	movq	%rdx, %rax
+	shrq	$63, %rax
+	addq	%rdx, %rax
+	sarq	%rax
+	cmpq	%rax, %rbx
+	jle	.L213
+	.p2align 4,,10
+	.p2align 3
+.L214:
+	movq	%r15, %rdi
+.LEHB2:
+	call	_ZN3x104lang7Runtime10stopFinishEPNS0_11FinishStateE
+.LEHE2:
+	movq	56(%rsp), %rdx
+	movq	32(%rsp), %rbx
+	movq	48(%rsp), %rax
+	leaq	-2(%rbx,%rdx), %rcx
+	addq	$1, %rax
+	cmpq	%rax, %rcx
+	movq	%rax, 48(%rsp)
+	jg	.L224
+.L203:
+	addq	$1, %rdx
+	cmpq	%rdx, 24(%rsp)
+	jle	.L220
+	movq	%rdx, 56(%rsp)
+	jmp	.L219
+.L229:
+	movq	%rax, %rcx
+	leaq	1(%rax), %rdx
+	shrq	$63, %rcx
+	addq	%rax, %rcx
+	sarq	%rcx
+	jmp	.L205
+.L230:
+	movq	%rax, %rbx
+	shrq	$63, %rbx
+	addq	%rax, %rbx
+	sarq	%rbx
+	jmp	.L226
+.L232:
+	movl	$56, %edi
+.LEHB3:
+	call	_ZN6x10aux9reportOOMEm
+.LEHE3:
+.L220:
+	addq	$72, %rsp
+	.cfi_remember_state
+	.cfi_def_cfa_offset 56
+	popq	%rbx
+	.cfi_def_cfa_offset 48
+	popq	%rbp
+	.cfi_def_cfa_offset 40
+	popq	%r12
+	.cfi_def_cfa_offset 32
+	popq	%r13
+	.cfi_def_cfa_offset 24
+	popq	%r14
+	.cfi_def_cfa_offset 16
+	popq	%r15
+	.cfi_def_cfa_offset 8
+	ret
+.L223:
+	.cfi_restore_state
+	cmpq	$1, %rdx
+	movq	%rax, %rdi
+	je	.L215
+.L228:
+.LEHB4:
+	call	_Unwind_Resume
+.LEHE4:
+.L215:
+	call	__cxa_begin_catch
+	movq	%rax, %rdi
+.LEHB5:
+	call	_ZN3x104lang7Runtime13pushExceptionEPNS0_16CheckedThrowableE
+.LEHE5:
+.LEHB6:
+	call	__cxa_end_catch
+.LEHE6:
+	.p2align 4,,2
+	jmp	.L214
+.L222:
+.L217:
+	movq	%rax, 8(%rsp)
+	call	__cxa_end_catch
+	movq	8(%rsp), %rdi
+	jmp	.L228
+	.cfi_endproc
+.LFE4176:
+	.size	_ZN4Trmm11kernel_trmmEldPN3x104lang4RailIPNS2_IdEEEES6_, .-_ZN4Trmm11kernel_trmmEldPN3x104lang4RailIPNS2_IdEEEES6_
+.globl __gxx_personality_v0
+	.section	.gcc_except_table,"a",@progbits
+	.align 4
+.LLSDA4176:
+	.byte	0xff
+	.byte	0x3
+	.uleb128 .LLSDATT4176-.LLSDATTD4176
+.LLSDATTD4176:
+	.byte	0x1
+	.uleb128 .LLSDACSE4176-.LLSDACSB4176
+.LLSDACSB4176:
+	.uleb128 .LEHB0-.LFB4176
+	.uleb128 .LEHE0-.LEHB0
+	.uleb128 0x0
+	.uleb128 0x0
+	.uleb128 .LEHB1-.LFB4176
+	.uleb128 .LEHE1-.LEHB1
+	.uleb128 .L223-.LFB4176
+	.uleb128 0x1
+	.uleb128 .LEHB2-.LFB4176
+	.uleb128 .LEHE2-.LEHB2
+	.uleb128 0x0
+	.uleb128 0x0
+	.uleb128 .LEHB3-.LFB4176
+	.uleb128 .LEHE3-.LEHB3
+	.uleb128 .L223-.LFB4176
+	.uleb128 0x1
+	.uleb128 .LEHB4-.LFB4176
+	.uleb128 .LEHE4-.LEHB4
+	.uleb128 0x0
+	.uleb128 0x0
+	.uleb128 .LEHB5-.LFB4176
+	.uleb128 .LEHE5-.LEHB5
+	.uleb128 .L222-.LFB4176
+	.uleb128 0x0
+	.uleb128 .LEHB6-.LFB4176
+	.uleb128 .LEHE6-.LEHB6
+	.uleb128 0x0
+	.uleb128 0x0
+.LLSDACSE4176:
+	.byte	0x1
+	.byte	0x0
+	.align 4
+	.long	_ZTIPN3x104lang16CheckedThrowableE
+.LLSDATT4176:
+	.text
+	.section	.text._ZN3x104lang4IBoxIdE13_deserializerERN6x10aux22deserialization_bufferE,"axG",@progbits,_ZN3x104lang4IBoxIdE13_deserializerERN6x10aux22deserialization_bufferE,comdat
+	.p2align 4,,15
+	.weak	_ZN3x104lang4IBoxIdE13_deserializerERN6x10aux22deserialization_bufferE
+	.type	_ZN3x104lang4IBoxIdE13_deserializerERN6x10aux22deserialization_bufferE, @function
+_ZN3x104lang4IBoxIdE13_deserializerERN6x10aux22deserialization_bufferE:
+.LFB4578:
+	.cfi_startproc
+	.cfi_personality 0x3,__gxx_personality_v0
+	movq	%rbx, -16(%rsp)
+	movq	%rbp, -8(%rsp)
+	subq	$24, %rsp
+	.cfi_def_cfa_offset 32
+	.cfi_offset 6, -16
+	.cfi_offset 3, -24
+	movq	%rdi, %rbp
+	movl	$16, %edi
+	call	malloc
+	testq	%rax, %rax
+	movq	%rax, %rbx
+	je	.L236
+	leaq	16(%rbp), %rdi
+	movq	%rax, %rsi
+	call	_ZN6x10aux8addr_map9_positionEPKv
+	movq	8(%rbp), %rax
+	movq	(%rax), %rdx
+	addq	$8, %rax
+	movq	%rax, 8(%rbp)
+	movq	$_ZTVN3x104lang4IBoxIdEE+16, (%rbx)
+	movq	%rbx, %rax
+	movq	16(%rsp), %rbp
+	movq	%rdx, 8(%rbx)
+	movq	8(%rsp), %rbx
+	addq	$24, %rsp
+	.cfi_remember_state
+	.cfi_def_cfa_offset 8
+	ret
+.L236:
+	.cfi_restore_state
+	movl	$16, %edi
+	call	_ZN6x10aux9reportOOMEm
+	.cfi_endproc
+.LFE4578:
+	.size	_ZN3x104lang4IBoxIdE13_deserializerERN6x10aux22deserialization_bufferE, .-_ZN3x104lang4IBoxIdE13_deserializerERN6x10aux22deserialization_bufferE
+	.section	.text._ZN3x104lang4RailIdE13_deserializerERN6x10aux22deserialization_bufferE,"axG",@progbits,_ZN3x104lang4RailIdE13_deserializerERN6x10aux22deserialization_bufferE,comdat
+	.align 2
+	.p2align 4,,15
+	.weak	_ZN3x104lang4RailIdE13_deserializerERN6x10aux22deserialization_bufferE
+	.type	_ZN3x104lang4RailIdE13_deserializerERN6x10aux22deserialization_bufferE, @function
+_ZN3x104lang4RailIdE13_deserializerERN6x10aux22deserialization_bufferE:
+.LFB4576:
+	.cfi_startproc
+	.cfi_personality 0x3,__gxx_personality_v0
+	movq	%rbp, -24(%rsp)
+	movq	%rbx, -32(%rsp)
+	movq	%rdi, %rbp
+	.cfi_offset 3, -40
+	.cfi_offset 6, -32
+	movq	%r12, -16(%rsp)
+	movq	%r13, -8(%rsp)
+	subq	$40, %rsp
+	.cfi_def_cfa_offset 48
+	.cfi_offset 13, -16
+	.cfi_offset 12, -24
+	cmpb	$0, _ZN6x10aux11RuntimeType10DoubleTypeE+69(%rip)
+	jne	.L238
+	call	_ZN6x10aux11RuntimeType14initDoubleTypeEv
+.L238:
+	movq	8(%rbp), %rax
+	movq	(%rax), %r12
+	addq	$8, %rax
+	movq	%rax, 8(%rbp)
+	leaq	-1(%r12), %rax
+	testq	%r12, %r12
+	cmovle	%r12, %rax
+	leaq	24(,%rax,8), %r13
+	movq	%r13, %rdi
+	call	malloc
+	testq	%r13, %r13
+	movq	%rax, %rbx
+	jne	.L244
+.L241:
+	testq	%rbx, %rbx
+	je	.L242
+	movq	$_ZTVN3x104lang4RailIdEE+16, (%rbx)
+	movq	%r12, 8(%rbx)
+.L242:
+	leaq	16(%rbp), %rdi
+	movq	%rbx, %rsi
+	call	_ZN6x10aux8addr_map9_positionEPKv
+	movq	8(%rbx), %r12
+	movq	8(%rbp), %rsi
+	leaq	16(%rbx), %rdi
+	salq	$3, %r12
+	movq	%r12, %rdx
+	call	memcpy
+	addq	%r12, 8(%rbp)
+	movq	%rbx, %rax
+	movq	8(%rsp), %rbx
+	movq	16(%rsp), %rbp
+	movq	24(%rsp), %r12
+	movq	32(%rsp), %r13
+	addq	$40, %rsp
+	.cfi_remember_state
+	.cfi_def_cfa_offset 8
+	ret
+.L244:
+	.cfi_restore_state
+	testq	%rax, %rax
+	jne	.L241
+	movq	%r13, %rdi
+	call	_ZN6x10aux9reportOOMEm
+	.cfi_endproc
+.LFE4576:
+	.size	_ZN3x104lang4RailIdE13_deserializerERN6x10aux22deserialization_bufferE, .-_ZN3x104lang4RailIdE13_deserializerERN6x10aux22deserialization_bufferE
+	.section	.rodata.str1.1
+.LC16:
+	.string	"["
+.LC17:
+	.string	","
+.LC18:
+	.string	"%s"
+.LC19:
+	.string	"...(omitted %lld elements"
+.LC20:
+	.string	"]"
+	.section	.text._ZN3x104lang4RailIPNS1_IdEEE8toStringEv,"axG",@progbits,_ZN3x104lang4RailIPNS1_IdEEE8toStringEv,comdat
+	.align 2
+	.p2align 4,,15
+	.weak	_ZN3x104lang4RailIPNS1_IdEEE8toStringEv
+	.type	_ZN3x104lang4RailIPNS1_IdEEE8toStringEv, @function
+_ZN3x104lang4RailIPNS1_IdEEE8toStringEv:
+.LFB4542:
+	.cfi_startproc
+	.cfi_personality 0x3,__gxx_personality_v0
+	movq	%rbx, -32(%rsp)
+	movq	%rbp, -24(%rsp)
+	xorl	%eax, %eax
+	movq	%r12, -16(%rsp)
+	movq	%r13, -8(%rsp)
+	subq	$40, %rsp
+	.cfi_def_cfa_offset 48
+	.cfi_offset 13, -16
+	.cfi_offset 12, -24
+	.cfi_offset 6, -32
+	.cfi_offset 3, -40
+	movq	%rdi, %r13
+	movl	$.LC16, %edi
+	movl	$10, %ebx
+	call	_ZN6x10aux12alloc_printfEPKcz
+	movq	8(%r13), %rdx
+	movq	%rax, %rbp
+	cmpq	$10, %rdx
+	cmovle	%rdx, %rbx
+	xorl	%r12d, %r12d
+	testq	%rbx, %rbx
+	jg	.L247
+.L246:
+	cmpq	%rdx, %rbx
+	jge	.L249
+	movq	%rbp, %rdi
+	subq	%rbx, %rdx
+	movl	$.LC19, %esi
+	xorl	%eax, %eax
+	call	_ZN6x10aux14realloc_printfEPcPKcz
+	movq	%rax, %rbp
+.L249:
+	movq	%rbp, %rdi
+	movl	$.LC20, %esi
+	xorl	%eax, %eax
+	call	_ZN6x10aux14realloc_printfEPcPKcz
+	movl	$24, %edi
+	movq	%rax, %rbp
+	call	malloc
+	testq	%rax, %rax
+	movq	%rax, %rbx
+	je	.L252
+	movq	$_ZTVN3x104lang6StringE+16, (%rax)
+	movq	$0, 8(%rax)
+	movq	%rbp, %rsi
+	movq	%rax, %rdi
+	movl	$1, %edx
+	call	_ZN3x104lang6String12_constructorEPKcb
+	movq	%rbx, %rax
+	movq	16(%rsp), %rbp
+	movq	8(%rsp), %rbx
+	movq	24(%rsp), %r12
+	movq	32(%rsp), %r13
+	addq	$40, %rsp
+	.cfi_remember_state
+	.cfi_def_cfa_offset 8
+	ret
+	.p2align 4,,10
+	.p2align 3
+.L248:
+	.cfi_restore_state
+	movq	%rbp, %rdi
+	movl	$.LC17, %esi
+	xorl	%eax, %eax
+	call	_ZN6x10aux14realloc_printfEPcPKcz
+	movq	%rax, %rbp
+.L247:
+	movq	16(%r13,%r12,8), %rdi
+	addq	$1, %r12
+	movq	(%rdi), %rax
+	call	*48(%rax)
+	movq	8(%rax), %rdx
+	movq	%rbp, %rdi
+	xorl	%eax, %eax
+	movl	$.LC18, %esi
+	call	_ZN6x10aux14realloc_printfEPcPKcz
+	cmpq	%r12, %rbx
+	movq	%rax, %rbp
+	jg	.L248
+	movq	8(%r13), %rdx
+	jmp	.L246
+.L252:
+	movl	$24, %edi
+	call	_ZN6x10aux9reportOOMEm
+	.cfi_endproc
+.LFE4542:
+	.size	_ZN3x104lang4RailIPNS1_IdEEE8toStringEv, .-_ZN3x104lang4RailIPNS1_IdEEE8toStringEv
+	.text
+	.align 2
+	.p2align 4,,15
+.globl _ZN4Trmm11print_arrayElPN3x104lang4RailIPNS2_IdEEEE
+	.type	_ZN4Trmm11print_arrayElPN3x104lang4RailIPNS2_IdEEEE, @function
+_ZN4Trmm11print_arrayElPN3x104lang4RailIPNS2_IdEEEE:
+.LFB4175:
+	.cfi_startproc
+	.cfi_personality 0x3,__gxx_personality_v0
+	movq	%rbp, -40(%rsp)
+	movq	%r12, -32(%rsp)
+	xorl	%r12d, %r12d
+	.cfi_offset 12, -40
+	.cfi_offset 6, -48
+	movq	%r13, -24(%rsp)
+	movq	%r15, -8(%rsp)
+	xorl	%r13d, %r13d
+	.cfi_offset 15, -16
+	.cfi_offset 13, -32
+	movq	%rbx, -48(%rsp)
+	movq	%r14, -16(%rsp)
+	subq	$88, %rsp
+	.cfi_def_cfa_offset 96
+	.cfi_offset 14, -24
+	.cfi_offset 3, -56
+	testq	%rsi, %rsi
+	movq	%rsi, %rbp
+	movq	%rdx, 16(%rsp)
+	movabsq	$7378697629483820647, %r15
+	jg	.L255
+.L254:
+	movl	_ZN3x102io7Console16x10__ERR__statusE(%rip), %eax
+	cmpl	$2, %eax
+	je	.L261
+	call	_ZN3x102io7Console14x10__ERR__initEv
+.L261:
+	movq	_ZN3x102io7Console8x10__ERRE(%rip), %rdi
+	movq	40(%rsp), %rbx
+	movl	$_ZN12Trmm_Strings8sl__2760E, %esi
+	movq	48(%rsp), %rbp
+	movq	56(%rsp), %r12
+	movq	64(%rsp), %r13
+	movq	72(%rsp), %r14
+	movq	(%rdi), %rax
+	movq	80(%rsp), %r15
+	movq	336(%rax), %rax
+	addq	$88, %rsp
+	.cfi_remember_state
+	.cfi_def_cfa_offset 8
+	jmp	*%rax
+	.p2align 4,,10
+	.p2align 3
+.L266:
+	.cfi_restore_state
+	movl	_ZN3x102io7Console16x10__ERR__statusE(%rip), %eax
+	cmpl	$2, %eax
+	je	.L259
+	call	_ZN3x102io7Console14x10__ERR__initEv
+.L259:
+	movq	_ZN3x102io7Console8x10__ERRE(%rip), %rdi
+	addq	$1, %rbx
+	movl	$_ZN12Trmm_Strings8sl__2760E, %esi
+	movq	(%rdi), %rax
+	call	*336(%rax)
+	cmpq	%rbx, %rbp
+	jg	.L260
+.L267:
+	addq	$1, %r12
+	addq	%rbp, %r13
+	cmpq	%r12, %rbp
+	jle	.L254
+.L255:
+	xorl	%ebx, %ebx
+.L260:
+	movl	_ZN3x102io7Console16x10__ERR__statusE(%rip), %eax
+	cmpl	$2, %eax
+	je	.L256
+	call	_ZN3x102io7Console14x10__ERR__initEv
+.L256:
+	movq	_ZN3x102io7Console8x10__ERRE(%rip), %r14
+	movq	16(%rsp), %rdx
+	movl	$16, %edi
+	movq	(%r14), %rax
+	movq	344(%rax), %rax
+	movq	%rax, 24(%rsp)
+	movq	16(%rdx,%r12,8), %rax
+	movq	16(%rax,%rbx,8), %rcx
+	movq	%rcx, 8(%rsp)
+	call	malloc
+	testq	%rax, %rax
+	movq	8(%rsp), %rcx
+	je	.L265
+	movq	%rcx, 8(%rax)
+	movq	%rax, %rdx
+	movq	$_ZTVN3x104lang4IBoxIdEE+16, (%rax)
+	movl	$_ZN12Trmm_Strings8sl__2759E, %esi
+	movq	%r14, %rdi
+	call	*24(%rsp)
+	leaq	0(%r13,%rbx), %rcx
+	movq	%rcx, %rax
+	imulq	%r15
+	movq	%rcx, %rax
+	sarq	$63, %rax
+	sarq	$3, %rdx
+	subq	%rax, %rdx
+	leaq	(%rdx,%rdx,4), %rax
+	salq	$2, %rax
+	cmpq	%rax, %rcx
+	je	.L266
+	addq	$1, %rbx
+	cmpq	%rbx, %rbp
+	jg	.L260
+	jmp	.L267
+.L265:
+	movl	$16, %edi
+	call	_ZN6x10aux9reportOOMEm
+	.cfi_endproc
+.LFE4175:
+	.size	_ZN4Trmm11print_arrayElPN3x104lang4RailIPNS2_IdEEEE, .-_ZN4Trmm11print_arrayElPN3x104lang4RailIPNS2_IdEEEE
+	.align 2
+	.p2align 4,,15
+.globl _ZN4Trmm5_makeEv
+	.type	_ZN4Trmm5_makeEv, @function
+_ZN4Trmm5_makeEv:
+.LFB4183:
+	.cfi_startproc
+	.cfi_personality 0x3,__gxx_personality_v0
+	subq	$8, %rsp
+	.cfi_def_cfa_offset 16
+	movl	$16, %edi
+	call	malloc
+	testq	%rax, %rax
+	je	.L272
+	movq	$_ZTV4Trmm+16, (%rax)
+	movq	$0, 8(%rax)
+	addq	$8, %rsp
+	.cfi_remember_state
+	.cfi_def_cfa_offset 8
+	ret
+.L272:
+	.cfi_restore_state
+	movl	$16, %edi
+	call	_ZN6x10aux9reportOOMEm
+	.cfi_endproc
+.LFE4183:
+	.size	_ZN4Trmm5_makeEv, .-_ZN4Trmm5_makeEv
+	.section	.text._ZN3x104lang4RailIPNS1_IdEEE8iteratorEv,"axG",@progbits,_ZN3x104lang4RailIPNS1_IdEEE8iteratorEv,comdat
+	.align 2
+	.p2align 4,,15
+	.weak	_ZN3x104lang4RailIPNS1_IdEEE8iteratorEv
+	.type	_ZN3x104lang4RailIPNS1_IdEEE8iteratorEv, @function
+_ZN3x104lang4RailIPNS1_IdEEE8iteratorEv:
+.LFB4556:
+	.cfi_startproc
+	.cfi_personality 0x3,__gxx_personality_v0
+	pushq	%rbx
+	.cfi_def_cfa_offset 16
+	.cfi_offset 3, -16
+	movq	%rdi, %rbx
+	movl	$24, %edi
+	call	malloc
+	testq	%rax, %rax
+	je	.L277
+	movq	$_ZTVN3x104lang12RailIteratorIPNS0_4RailIdEEEE+16, (%rax)
+	movq	%rbx, 8(%rax)
+	movq	$0, 16(%rax)
+	popq	%rbx
+	.cfi_remember_state
+	.cfi_def_cfa_offset 8
+	ret
+.L277:
+	.cfi_restore_state
+	movl	$24, %edi
+	call	_ZN6x10aux9reportOOMEm
+	.cfi_endproc
+.LFE4556:
+	.size	_ZN3x104lang4RailIPNS1_IdEEE8iteratorEv, .-_ZN3x104lang4RailIPNS1_IdEEE8iteratorEv
+	.section	.text._ZN3x104lang4RailIdE8iteratorEv,"axG",@progbits,_ZN3x104lang4RailIdE8iteratorEv,comdat
+	.align 2
+	.p2align 4,,15
+	.weak	_ZN3x104lang4RailIdE8iteratorEv
+	.type	_ZN3x104lang4RailIdE8iteratorEv, @function
+_ZN3x104lang4RailIdE8iteratorEv:
+.LFB4569:
+	.cfi_startproc
+	.cfi_personality 0x3,__gxx_personality_v0
+	pushq	%rbx
+	.cfi_def_cfa_offset 16
+	.cfi_offset 3, -16
+	movq	%rdi, %rbx
+	movl	$24, %edi
+	call	malloc
+	testq	%rax, %rax
+	je	.L282
+	movq	$_ZTVN3x104lang12RailIteratorIdEE+16, (%rax)
+	movq	%rbx, 8(%rax)
+	movq	$0, 16(%rax)
+	popq	%rbx
+	.cfi_remember_state
+	.cfi_def_cfa_offset 8
+	ret
+.L282:
+	.cfi_restore_state
+	movl	$24, %edi
+	call	_ZN6x10aux9reportOOMEm
+	.cfi_endproc
+.LFE4569:
+	.size	_ZN3x104lang4RailIdE8iteratorEv, .-_ZN3x104lang4RailIdE8iteratorEv
+	.section	.text._ZN3x104lang12RailIteratorIdE13_deserializerERN6x10aux22deserialization_bufferE,"axG",@progbits,_ZN3x104lang12RailIteratorIdE13_deserializerERN6x10aux22deserialization_bufferE,comdat
+	.align 2
+	.p2align 4,,15
+	.weak	_ZN3x104lang12RailIteratorIdE13_deserializerERN6x10aux22deserialization_bufferE
+	.type	_ZN3x104lang12RailIteratorIdE13_deserializerERN6x10aux22deserialization_bufferE, @function
+_ZN3x104lang12RailIteratorIdE13_deserializerERN6x10aux22deserialization_bufferE:
+.LFB4633:
+	.cfi_startproc
+	.cfi_personality 0x3,__gxx_personality_v0
+	movq	%rbx, -24(%rsp)
+	movq	%rbp, -16(%rsp)
+	movq	%rdi, %rbp
+	.cfi_offset 6, -24
+	.cfi_offset 3, -32
+	movq	%r12, -8(%rsp)
+	movl	$24, %edi
+	subq	$24, %rsp
+	.cfi_def_cfa_offset 32
+	.cfi_offset 12, -16
+	call	malloc
+	testq	%rax, %rax
+	movq	%rax, %rbx
+	je	.L289
+	leaq	16(%rbp), %r12
+	movq	$0, 8(%rax)
+	movq	$0, 16(%rax)
+	movq	$_ZTVN3x104lang12RailIteratorIdEE+16, (%rax)
+	movq	%rax, %rsi
+	movq	%r12, %rdi
+	call	_ZN6x10aux8addr_map9_positionEPKv
+	movq	8(%rbp), %rax
+	movzwl	(%rax), %edx
+	cmpw	$-1, %dx
+	je	.L290
+	movq	%rbp, %rdi
+	call	_ZN6x10aux22deserialization_buffer21deserialize_referenceERS0_
+.L287:
+	movq	%rax, 8(%rbx)
+	movq	8(%rbp), %rax
+	movq	(%rax), %rdx
+	addq	$8, %rax
+	movq	%rax, 8(%rbp)
+	movq	%rbx, %rax
+	movq	8(%rsp), %rbp
+	movq	16(%rsp), %r12
+	movq	%rdx, 16(%rbx)
+	movq	(%rsp), %rbx
+	addq	$24, %rsp
+	.cfi_remember_state
+	.cfi_def_cfa_offset 8
+	ret
+	.p2align 4,,10
+	.p2align 3
+.L290:
+	.cfi_restore_state
+	leaq	2(%rax), %rdx
+	movq	%r12, %rdi
+	movq	%rdx, 8(%rbp)
+	movl	2(%rax), %esi
+	addq	$6, %rax
+	movq	%rax, 8(%rbp)
+	call	_ZN6x10aux8addr_map4_getEi
+	jmp	.L287
+.L289:
+	movl	$24, %edi
+	call	_ZN6x10aux9reportOOMEm
+	.cfi_endproc
+.LFE4633:
+	.size	_ZN3x104lang12RailIteratorIdE13_deserializerERN6x10aux22deserialization_bufferE, .-_ZN3x104lang12RailIteratorIdE13_deserializerERN6x10aux22deserialization_bufferE
+	.section	.text._ZN3x104lang4RailIdE8toStringEv,"axG",@progbits,_ZN3x104lang4RailIdE8toStringEv,comdat
+	.align 2
+	.p2align 4,,15
+	.weak	_ZN3x104lang4RailIdE8toStringEv
+	.type	_ZN3x104lang4RailIdE8toStringEv, @function
+_ZN3x104lang4RailIdE8toStringEv:
+.LFB4547:
+	.cfi_startproc
+	.cfi_personality 0x3,__gxx_personality_v0
+	pushq	%r12
+	.cfi_def_cfa_offset 16
+	.cfi_offset 12, -16
+	xorl	%eax, %eax
+	movq	%rdi, %r12
+	movl	$.LC16, %edi
+	pushq	%rbp
+	.cfi_def_cfa_offset 24
+	.cfi_offset 6, -24
+	pushq	%rbx
+	.cfi_def_cfa_offset 32
+	.cfi_offset 3, -32
+	movl	$10, %ebx
+	subq	$16, %rsp
+	.cfi_def_cfa_offset 48
+	call	_ZN6x10aux12alloc_printfEPKcz
+	movq	8(%r12), %rdx
+	movq	%rax, %rdi
+	cmpq	$10, %rdx
+	cmovle	%rdx, %rbx
+	xorl	%ebp, %ebp
+	testq	%rbx, %rbx
+	jg	.L293
+.L292:
+	cmpq	%rdx, %rbx
+	jge	.L295
+	subq	%rbx, %rdx
+	movl	$.LC19, %esi
+	xorl	%eax, %eax
+	call	_ZN6x10aux14realloc_printfEPcPKcz
+	movq	%rax, %rdi
+.L295:
+	movl	$.LC20, %esi
+	xorl	%eax, %eax
+	call	_ZN6x10aux14realloc_printfEPcPKcz
+	movl	$24, %edi
+	movq	%rax, %rbp
+	call	malloc
+	testq	%rax, %rax
+	movq	%rax, %rbx
+	je	.L298
+	movq	$_ZTVN3x104lang6StringE+16, (%rax)
+	movq	$0, 8(%rax)
+	movq	%rbp, %rsi
+	movq	%rax, %rdi
+	movl	$1, %edx
+	call	_ZN3x104lang6String12_constructorEPKcb
+	addq	$16, %rsp
+	.cfi_remember_state
+	.cfi_def_cfa_offset 32
+	movq	%rbx, %rax
+	popq	%rbx
+	.cfi_def_cfa_offset 24
+	popq	%rbp
+	.cfi_def_cfa_offset 16
+	popq	%r12
+	.cfi_def_cfa_offset 8
+	ret
+	.p2align 4,,10
+	.p2align 3
+.L294:
+	.cfi_restore_state
+	movl	$.LC17, %esi
+	xorl	%eax, %eax
+	call	_ZN6x10aux14realloc_printfEPcPKcz
+	movq	%rax, %rdi
+.L293:
+	movsd	16(%r12,%rbp,8), %xmm0
+	movq	%rdi, 8(%rsp)
+	addq	$1, %rbp
+	call	_ZN6x10aux9to_stringEd
+	movq	8(%rsp), %rdi
+	movq	8(%rax), %rdx
+	movl	$.LC18, %esi
+	xorl	%eax, %eax
+	call	_ZN6x10aux14realloc_printfEPcPKcz
+	cmpq	%rbp, %rbx
+	movq	%rax, %rdi
+	jg	.L294
+	movq	8(%r12), %rdx
+	jmp	.L292
+.L298:
+	movl	$24, %edi
+	call	_ZN6x10aux9reportOOMEm
+	.cfi_endproc
+.LFE4547:
+	.size	_ZN3x104lang4RailIdE8toStringEv, .-_ZN3x104lang4RailIdE8toStringEv
+	.section	.text._ZN3x104lang12RailIteratorIPNS0_4RailIdEEE15_serialize_bodyERN6x10aux20serialization_bufferE,"axG",@progbits,_ZN3x104lang12RailIteratorIPNS0_4RailIdEEE15_serialize_bodyERN6x10aux20serialization_bufferE,comdat
+	.align 2
+	.p2align 4,,15
+	.weak	_ZN3x104lang12RailIteratorIPNS0_4RailIdEEE15_serialize_bodyERN6x10aux20serialization_bufferE
+	.type	_ZN3x104lang12RailIteratorIPNS0_4RailIdEEE15_serialize_bodyERN6x10aux20serialization_bufferE, @function
+_ZN3x104lang12RailIteratorIPNS0_4RailIdEEE15_serialize_bodyERN6x10aux20serialization_bufferE:
+.LFB4620:
+	.cfi_startproc
+	.cfi_personality 0x3,__gxx_personality_v0
+	movq	%rbx, -24(%rsp)
+	movq	%r12, -8(%rsp)
+	movq	%rsi, %rbx
+	.cfi_offset 12, -16
+	.cfi_offset 3, -32
+	movq	%rbp, -16(%rsp)
+	subq	$40, %rsp
+	.cfi_def_cfa_offset 48
+	.cfi_offset 6, -24
+	movq	8(%rdi), %rbp
+	movq	%rdi, %r12
+	testq	%rbp, %rbp
+	je	.L300
+	leaq	24(%rsi), %rdi
+	movq	%rbp, %rsi
+	call	_ZN6x10aux8addr_map9_positionEPKv
+	testl	%eax, %eax
+	jne	.L306
+.L300:
+	movq	%rbp, %rsi
+	movq	%rbx, %rdi
+	call	_ZN6x10aux20serialization_buffer19serialize_referenceERS0_PN3x104lang9ReferenceE
+	movq	16(%rbx), %rax
+.L303:
+	leaq	8(%rax), %rdx
+	cmpq	%rdx, 8(%rbx)
+	ja	.L304
+	movq	%rbx, %rdi
+	call	_ZN6x10aux20serialization_buffer4growEv
+	movq	16(%rbx), %rax
+.L304:
+	movq	16(%r12), %rdx
+	movq	%rdx, (%rax)
+	addq	$8, 16(%rbx)
+	movq	24(%rsp), %rbp
+	movq	16(%rsp), %rbx
+	movq	32(%rsp), %r12
+	addq	$40, %rsp
+	.cfi_remember_state
+	.cfi_def_cfa_offset 8
+	ret
+	.p2align 4,,10
+	.p2align 3
+.L306:
+	.cfi_restore_state
+	movq	16(%rbx), %rdx
+	leaq	2(%rdx), %rcx
+	cmpq	%rcx, 8(%rbx)
+	ja	.L301
+	movq	%rbx, %rdi
+	movl	%eax, 8(%rsp)
+	call	_ZN6x10aux20serialization_buffer4growEv
+	movq	16(%rbx), %rdx
+	movl	8(%rsp), %eax
+.L301:
+	movw	$-1, (%rdx)
+	movq	16(%rbx), %rcx
+	leaq	2(%rcx), %rdx
+	addq	$6, %rcx
+	cmpq	%rcx, 8(%rbx)
+	movq	%rdx, 16(%rbx)
+	ja	.L302
+	movq	%rbx, %rdi
+	movl	%eax, 8(%rsp)
+	call	_ZN6x10aux20serialization_buffer4growEv
+	movq	16(%rbx), %rdx
+	movl	8(%rsp), %eax
+.L302:
+	movl	%eax, (%rdx)
+	movq	16(%rbx), %rax
+	addq	$4, %rax
+	movq	%rax, 16(%rbx)
+	jmp	.L303
+	.cfi_endproc
+.LFE4620:
+	.size	_ZN3x104lang12RailIteratorIPNS0_4RailIdEEE15_serialize_bodyERN6x10aux20serialization_bufferE, .-_ZN3x104lang12RailIteratorIPNS0_4RailIdEEE15_serialize_bodyERN6x10aux20serialization_bufferE
+	.section	.text._ZN3x104lang12RailIteratorIdE15_serialize_bodyERN6x10aux20serialization_bufferE,"axG",@progbits,_ZN3x104lang12RailIteratorIdE15_serialize_bodyERN6x10aux20serialization_bufferE,comdat
+	.align 2
+	.p2align 4,,15
+	.weak	_ZN3x104lang12RailIteratorIdE15_serialize_bodyERN6x10aux20serialization_bufferE
+	.type	_ZN3x104lang12RailIteratorIdE15_serialize_bodyERN6x10aux20serialization_bufferE, @function
+_ZN3x104lang12RailIteratorIdE15_serialize_bodyERN6x10aux20serialization_bufferE:
+.LFB4612:
+	.cfi_startproc
+	.cfi_personality 0x3,__gxx_personality_v0
+	movq	%rbx, -24(%rsp)
+	movq	%r12, -8(%rsp)
+	movq	%rsi, %rbx
+	.cfi_offset 12, -16
+	.cfi_offset 3, -32
+	movq	%rbp, -16(%rsp)
+	subq	$40, %rsp
+	.cfi_def_cfa_offset 48
+	.cfi_offset 6, -24
+	movq	8(%rdi), %rbp
+	movq	%rdi, %r12
+	testq	%rbp, %rbp
+	je	.L308
+	leaq	24(%rsi), %rdi
+	movq	%rbp, %rsi
+	call	_ZN6x10aux8addr_map9_positionEPKv
+	testl	%eax, %eax
+	jne	.L314
+.L308:
+	movq	%rbp, %rsi
+	movq	%rbx, %rdi
+	call	_ZN6x10aux20serialization_buffer19serialize_referenceERS0_PN3x104lang9ReferenceE
+	movq	16(%rbx), %rax
+.L311:
+	leaq	8(%rax), %rdx
+	cmpq	%rdx, 8(%rbx)
+	ja	.L312
+	movq	%rbx, %rdi
+	call	_ZN6x10aux20serialization_buffer4growEv
+	movq	16(%rbx), %rax
+.L312:
+	movq	16(%r12), %rdx
+	movq	%rdx, (%rax)
+	addq	$8, 16(%rbx)
+	movq	24(%rsp), %rbp
+	movq	16(%rsp), %rbx
+	movq	32(%rsp), %r12
+	addq	$40, %rsp
+	.cfi_remember_state
+	.cfi_def_cfa_offset 8
+	ret
+	.p2align 4,,10
+	.p2align 3
+.L314:
+	.cfi_restore_state
+	movq	16(%rbx), %rdx
+	leaq	2(%rdx), %rcx
+	cmpq	%rcx, 8(%rbx)
+	ja	.L309
+	movq	%rbx, %rdi
+	movl	%eax, 8(%rsp)
+	call	_ZN6x10aux20serialization_buffer4growEv
+	movq	16(%rbx), %rdx
+	movl	8(%rsp), %eax
+.L309:
+	movw	$-1, (%rdx)
+	movq	16(%rbx), %rcx
+	leaq	2(%rcx), %rdx
+	addq	$6, %rcx
+	cmpq	%rcx, 8(%rbx)
+	movq	%rdx, 16(%rbx)
+	ja	.L310
+	movq	%rbx, %rdi
+	movl	%eax, 8(%rsp)
+	call	_ZN6x10aux20serialization_buffer4growEv
+	movq	16(%rbx), %rdx
+	movl	8(%rsp), %eax
+.L310:
+	movl	%eax, (%rdx)
+	movq	16(%rbx), %rax
+	addq	$4, %rax
+	movq	%rax, 16(%rbx)
+	jmp	.L311
+	.cfi_endproc
+.LFE4612:
+	.size	_ZN3x104lang12RailIteratorIdE15_serialize_bodyERN6x10aux20serialization_bufferE, .-_ZN3x104lang12RailIteratorIdE15_serialize_bodyERN6x10aux20serialization_bufferE
+	.section	.text._ZN16Trmm__closure__112_deserializeERN6x10aux22deserialization_bufferE,"axG",@progbits,_ZN16Trmm__closure__112_deserializeERN6x10aux22deserialization_bufferE,comdat
+	.p2align 4,,15
+	.weak	_ZN16Trmm__closure__112_deserializeERN6x10aux22deserialization_bufferE
+	.type	_ZN16Trmm__closure__112_deserializeERN6x10aux22deserialization_bufferE, @function
+_ZN16Trmm__closure__112_deserializeERN6x10aux22deserialization_bufferE:
+.LFB4166:
+	.cfi_startproc
+	.cfi_personality 0x3,__gxx_personality_v0
+	movq	%rbx, -48(%rsp)
+	movq	%rbp, -40(%rsp)
+	movq	%rdi, %rbp
+	.cfi_offset 6, -48
+	.cfi_offset 3, -56
+	movq	%r12, -32(%rsp)
+	movq	%r13, -24(%rsp)
+	movl	$56, %edi
+	movq	%r14, -16(%rsp)
+	movq	%r15, -8(%rsp)
+	subq	$72, %rsp
+	.cfi_def_cfa_offset 80
+	.cfi_offset 15, -16
+	.cfi_offset 14, -24
+	.cfi_offset 13, -32
+	.cfi_offset 12, -40
+	call	malloc
+	testq	%rax, %rax
+	movq	%rax, %rbx
+	je	.L329
+	testb	$1, %al
+	movq	%rax, %rdi
+	movl	$56, %edx
+	jne	.L330
+	testb	$2, %dil
+	jne	.L331
+.L318:
+	testb	$4, %dil
+	jne	.L332
+.L319:
+	movl	%edx, %ecx
+	xorl	%eax, %eax
+	shrl	$3, %ecx
+	testb	$4, %dl
+	mov	%ecx, %ecx
+	rep stosq
+	jne	.L333
+	testb	$2, %dl
+	jne	.L334
+.L321:
+	andl	$1, %edx
+	jne	.L335
+.L322:
+	leaq	16(%rbp), %r12
+	movq	%rbx, %rsi
+	movq	%r12, %rdi
+	call	_ZN6x10aux8addr_map9_positionEPKv
+	movq	8(%rbp), %rax
+	movzwl	(%rax), %edx
+	cmpw	$-1, %dx
+	je	.L336
+	movq	%rbp, %rdi
+	call	_ZN6x10aux22deserialization_buffer21deserialize_referenceERS0_
+	movq	%rax, 8(%rsp)
+.L324:
+	movq	8(%rbp), %rax
+	movq	(%rax), %rdx
+	movq	%rdx, (%rsp)
+	leaq	8(%rax), %rdx
+	movq	%rdx, 8(%rbp)
+	leaq	16(%rax), %rdx
+	movq	8(%rax), %r15
+	movq	%rdx, 8(%rbp)
+	leaq	24(%rax), %rdx
+	movq	16(%rax), %r14
+	movq	%rdx, 8(%rbp)
+	leaq	32(%rax), %rdx
+	movq	24(%rax), %r13
+	movq	%rdx, 8(%rbp)
+	movzwl	32(%rax), %ecx
+	cmpw	$-1, %cx
+	je	.L337
+	movq	%rbp, %rdi
+	call	_ZN6x10aux22deserialization_buffer21deserialize_referenceERS0_
+.L326:
+	testq	%rbx, %rbx
+	je	.L327
+	movq	8(%rsp), %rdx
+	movq	$_ZTV16Trmm__closure__1+16, (%rbx)
+	movq	%r15, 24(%rbx)
+	movq	%r14, 32(%rbx)
+	movq	%r13, 40(%rbx)
+	movq	%rax, 48(%rbx)
+	movq	%rdx, 8(%rbx)
+	movq	(%rsp), %rdx
+	movq	%rdx, 16(%rbx)
+.L327:
+	movq	%rbx, %rax
+	movq	32(%rsp), %rbp
+	movq	24(%rsp), %rbx
+	movq	40(%rsp), %r12
+	movq	48(%rsp), %r13
+	movq	56(%rsp), %r14
+	movq	64(%rsp), %r15
+	addq	$72, %rsp
+	.cfi_remember_state
+	.cfi_def_cfa_offset 8
+	ret
+	.p2align 4,,10
+	.p2align 3
+.L335:
+	.cfi_restore_state
+	movb	$0, (%rdi)
+	jmp	.L322
+	.p2align 4,,10
+	.p2align 3
+.L334:
+	movw	$0, (%rdi)
+	addq	$2, %rdi
+	andl	$1, %edx
+	je	.L322
+	jmp	.L335
+	.p2align 4,,10
+	.p2align 3
+.L333:
+	movl	$0, (%rdi)
+	addq	$4, %rdi
+	testb	$2, %dl
+	je	.L321
+	jmp	.L334
+	.p2align 4,,10
+	.p2align 3
+.L337:
+	leaq	34(%rax), %rdx
+	movq	%r12, %rdi
+	movq	%rdx, 8(%rbp)
+	movl	34(%rax), %esi
+	addq	$38, %rax
+	movq	%rax, 8(%rbp)
+	call	_ZN6x10aux8addr_map4_getEi
+	jmp	.L326
+	.p2align 4,,10
+	.p2align 3
+.L336:
+	leaq	2(%rax), %rdx
+	movq	%r12, %rdi
+	movq	%rdx, 8(%rbp)
+	movl	2(%rax), %esi
+	addq	$6, %rax
+	movq	%rax, 8(%rbp)
+	call	_ZN6x10aux8addr_map4_getEi
+	movq	%rax, 8(%rsp)
+	jmp	.L324
+	.p2align 4,,10
+	.p2align 3
+.L332:
+	movl	$0, (%rdi)
+	subl	$4, %edx
+	addq	$4, %rdi
+	jmp	.L319
+	.p2align 4,,10
+	.p2align 3
+.L330:
+	leaq	1(%rax), %rdi
+	movb	$0, (%rax)
+	movb	$55, %dl
+	testb	$2, %dil
+	je	.L318
+	.p2align 4,,10
+	.p2align 3
+.L331:
+	movw	$0, (%rdi)
+	subl	$2, %edx
+	addq	$2, %rdi
+	jmp	.L318
+.L329:
+	movl	$56, %edi
+	call	_ZN6x10aux9reportOOMEm
+	.cfi_endproc
+.LFE4166:
+	.size	_ZN16Trmm__closure__112_deserializeERN6x10aux22deserialization_bufferE, .-_ZN16Trmm__closure__112_deserializeERN6x10aux22deserialization_bufferE
+	.section	.text._ZN3x104lang12RailIteratorIPNS0_4RailIdEEE13_deserializerERN6x10aux22deserialization_bufferE,"axG",@progbits,_ZN3x104lang12RailIteratorIPNS0_4RailIdEEE13_deserializerERN6x10aux22deserialization_bufferE,comdat
+	.align 2
+	.p2align 4,,15
+	.weak	_ZN3x104lang12RailIteratorIPNS0_4RailIdEEE13_deserializerERN6x10aux22deserialization_bufferE
+	.type	_ZN3x104lang12RailIteratorIPNS0_4RailIdEEE13_deserializerERN6x10aux22deserialization_bufferE, @function
+_ZN3x104lang12RailIteratorIPNS0_4RailIdEEE13_deserializerERN6x10aux22deserialization_bufferE:
+.LFB4642:
+	.cfi_startproc
+	.cfi_personality 0x3,__gxx_personality_v0
+	movq	%rbx, -24(%rsp)
+	movq	%rbp, -16(%rsp)
+	movq	%rdi, %rbp
+	.cfi_offset 6, -24
+	.cfi_offset 3, -32
+	movq	%r12, -8(%rsp)
+	movl	$24, %edi
+	subq	$24, %rsp
+	.cfi_def_cfa_offset 32
+	.cfi_offset 12, -16
+	call	malloc
+	testq	%rax, %rax
+	movq	%rax, %rbx
+	je	.L344
+	leaq	16(%rbp), %r12
+	movq	$0, 8(%rax)
+	movq	$0, 16(%rax)
+	movq	$_ZTVN3x104lang12RailIteratorIPNS0_4RailIdEEEE+16, (%rax)
+	movq	%rax, %rsi
+	movq	%r12, %rdi
+	call	_ZN6x10aux8addr_map9_positionEPKv
+	movq	8(%rbp), %rax
+	movzwl	(%rax), %edx
+	cmpw	$-1, %dx
+	je	.L345
+	movq	%rbp, %rdi
+	call	_ZN6x10aux22deserialization_buffer21deserialize_referenceERS0_
+.L342:
+	movq	%rax, 8(%rbx)
+	movq	8(%rbp), %rax
+	movq	(%rax), %rdx
+	addq	$8, %rax
+	movq	%rax, 8(%rbp)
+	movq	%rbx, %rax
+	movq	8(%rsp), %rbp
+	movq	16(%rsp), %r12
+	movq	%rdx, 16(%rbx)
+	movq	(%rsp), %rbx
+	addq	$24, %rsp
+	.cfi_remember_state
+	.cfi_def_cfa_offset 8
+	ret
+	.p2align 4,,10
+	.p2align 3
+.L345:
+	.cfi_restore_state
+	leaq	2(%rax), %rdx
+	movq	%r12, %rdi
+	movq	%rdx, 8(%rbp)
+	movl	2(%rax), %esi
+	addq	$6, %rax
+	movq	%rax, 8(%rbp)
+	call	_ZN6x10aux8addr_map4_getEi
+	jmp	.L342
+.L344:
+	movl	$24, %edi
+	call	_ZN6x10aux9reportOOMEm
+	.cfi_endproc
+.LFE4642:
+	.size	_ZN3x104lang12RailIteratorIPNS0_4RailIdEEE13_deserializerERN6x10aux22deserialization_bufferE, .-_ZN3x104lang12RailIteratorIPNS0_4RailIdEEE13_deserializerERN6x10aux22deserialization_bufferE
+	.text
+	.align 2
+	.p2align 4,,15
+.globl _ZN4Trmm13_deserializerERN6x10aux22deserialization_bufferE
+	.type	_ZN4Trmm13_deserializerERN6x10aux22deserialization_bufferE, @function
+_ZN4Trmm13_deserializerERN6x10aux22deserialization_bufferE:
+.LFB4186:
+	.cfi_startproc
+	.cfi_personality 0x3,__gxx_personality_v0
+	movq	%rbx, -16(%rsp)
+	movq	%rbp, -8(%rsp)
+	subq	$24, %rsp
+	.cfi_def_cfa_offset 32
+	.cfi_offset 6, -16
+	.cfi_offset 3, -24
+	movq	%rdi, %rbp
+	movl	$16, %edi
+	call	malloc
+	testq	%rax, %rax
+	movq	%rax, %rbx
+	je	.L350
+	leaq	16(%rbp), %rdi
+	movq	$0, 8(%rax)
+	movq	$_ZTV4Trmm+16, (%rax)
+	movq	%rax, %rsi
+	call	_ZN6x10aux8addr_map9_positionEPKv
+	movq	8(%rbp), %rax
+	movq	(%rax), %rdx
+	addq	$8, %rax
+	movq	%rax, 8(%rbp)
+	movq	%rbx, %rax
+	movq	16(%rsp), %rbp
+	movq	%rdx, 8(%rbx)
+	movq	8(%rsp), %rbx
+	addq	$24, %rsp
+	.cfi_remember_state
+	.cfi_def_cfa_offset 8
+	ret
+.L350:
+	.cfi_restore_state
+	movl	$16, %edi
+	call	_ZN6x10aux9reportOOMEm
+	.cfi_endproc
+.LFE4186:
+	.size	_ZN4Trmm13_deserializerERN6x10aux22deserialization_bufferE, .-_ZN4Trmm13_deserializerERN6x10aux22deserialization_bufferE
+	.section	.text._ZN16Trmm__closure__115_serialize_bodyERN6x10aux20serialization_bufferE,"axG",@progbits,_ZN16Trmm__closure__115_serialize_bodyERN6x10aux20serialization_bufferE,comdat
+	.align 2
+	.p2align 4,,15
+	.weak	_ZN16Trmm__closure__115_serialize_bodyERN6x10aux20serialization_bufferE
+	.type	_ZN16Trmm__closure__115_serialize_bodyERN6x10aux20serialization_bufferE, @function
+_ZN16Trmm__closure__115_serialize_bodyERN6x10aux20serialization_bufferE:
+.LFB4165:
+	.cfi_startproc
+	.cfi_personality 0x3,__gxx_personality_v0
+	pushq	%r12
+	.cfi_def_cfa_offset 16
+	.cfi_offset 12, -16
+	pushq	%rbp
+	.cfi_def_cfa_offset 24
+	.cfi_offset 6, -24
+	movq	%rdi, %rbp
+	pushq	%rbx
+	.cfi_def_cfa_offset 32
+	.cfi_offset 3, -32
+	movq	%rsi, %rbx
+	subq	$16, %rsp
+	.cfi_def_cfa_offset 48
+	movq	8(%rdi), %r12
+	testq	%r12, %r12
+	je	.L352
+	leaq	24(%rsi), %rdi
+	movq	%r12, %rsi
+	call	_ZN6x10aux8addr_map9_positionEPKv
+	testl	%eax, %eax
+	jne	.L365
+.L352:
+	movq	%r12, %rsi
+	movq	%rbx, %rdi
+	call	_ZN6x10aux20serialization_buffer19serialize_referenceERS0_PN3x104lang9ReferenceE
+	movq	16(%rbx), %rax
+.L355:
+	leaq	8(%rax), %rdx
+	cmpq	%rdx, 8(%rbx)
+	movq	16(%rbp), %r12
+	ja	.L356
+	movq	%rbx, %rdi
+	call	_ZN6x10aux20serialization_buffer4growEv
+	movq	16(%rbx), %rax
+.L356:
+	movq	%r12, (%rax)
+	movq	16(%rbx), %rdx
+	movq	24(%rbp), %r12
+	leaq	8(%rdx), %rax
+	addq	$16, %rdx
+	cmpq	%rdx, 8(%rbx)
+	movq	%rax, 16(%rbx)
+	ja	.L357
+	movq	%rbx, %rdi
+	call	_ZN6x10aux20serialization_buffer4growEv
+	movq	16(%rbx), %rax
+.L357:
+	movq	%r12, (%rax)
+	movq	16(%rbx), %rdx
+	leaq	8(%rdx), %rax
+	addq	$16, %rdx
+	cmpq	%rdx, 8(%rbx)
+	movq	%rax, 16(%rbx)
+	ja	.L358
+	movq	%rbx, %rdi
+	call	_ZN6x10aux20serialization_buffer4growEv
+	movq	16(%rbx), %rax
+.L358:
+	movq	32(%rbp), %rdx
+	movq	%rdx, (%rax)
+	movq	16(%rbx), %rdx
+	leaq	8(%rdx), %rax
+	addq	$16, %rdx
+	cmpq	%rdx, 8(%rbx)
+	movq	%rax, 16(%rbx)
+	ja	.L359
+	movq	%rbx, %rdi
+	call	_ZN6x10aux20serialization_buffer4growEv
+	movq	16(%rbx), %rax
+.L359:
+	movq	40(%rbp), %rdx
+	movq	%rdx, (%rax)
+	movq	48(%rbp), %rbp
+	addq	$8, 16(%rbx)
+	testq	%rbp, %rbp
+	je	.L360
+	leaq	24(%rbx), %rdi
+	movq	%rbp, %rsi
+	call	_ZN6x10aux8addr_map9_positionEPKv
+	testl	%eax, %eax
+	jne	.L366
+.L360:
+	addq	$16, %rsp
+	.cfi_remember_state
+	.cfi_def_cfa_offset 32
+	movq	%rbx, %rdi
+	movq	%rbp, %rsi
+	popq	%rbx
+	.cfi_def_cfa_offset 24
+	popq	%rbp
+	.cfi_def_cfa_offset 16
+	popq	%r12
+	.cfi_def_cfa_offset 8
+	jmp	_ZN6x10aux20serialization_buffer19serialize_referenceERS0_PN3x104lang9ReferenceE
+	.p2align 4,,10
+	.p2align 3
+.L365:
+	.cfi_restore_state
+	movq	16(%rbx), %rdx
+	leaq	2(%rdx), %rcx
+	cmpq	%rcx, 8(%rbx)
+	ja	.L353
+	movq	%rbx, %rdi
+	movl	%eax, 8(%rsp)
+	call	_ZN6x10aux20serialization_buffer4growEv
+	movq	16(%rbx), %rdx
+	movl	8(%rsp), %eax
+.L353:
+	movw	$-1, (%rdx)
+	movq	16(%rbx), %rcx
+	leaq	2(%rcx), %rdx
+	addq	$6, %rcx
+	cmpq	%rcx, 8(%rbx)
+	movq	%rdx, 16(%rbx)
+	ja	.L354
+	movq	%rbx, %rdi
+	movl	%eax, 8(%rsp)
+	call	_ZN6x10aux20serialization_buffer4growEv
+	movq	16(%rbx), %rdx
+	movl	8(%rsp), %eax
+.L354:
+	movl	%eax, (%rdx)
+	movq	16(%rbx), %rax
+	addq	$4, %rax
+	movq	%rax, 16(%rbx)
+	jmp	.L355
+	.p2align 4,,10
+	.p2align 3
+.L366:
+	movq	16(%rbx), %rdx
+	leaq	2(%rdx), %rcx
+	cmpq	%rcx, 8(%rbx)
+	ja	.L361
+	movq	%rbx, %rdi
+	movl	%eax, 8(%rsp)
+	call	_ZN6x10aux20serialization_buffer4growEv
+	movq	16(%rbx), %rdx
+	movl	8(%rsp), %eax
+.L361:
+	movw	$-1, (%rdx)
+	movq	16(%rbx), %rcx
+	leaq	2(%rcx), %rdx
+	addq	$6, %rcx
+	cmpq	%rcx, 8(%rbx)
+	movq	%rdx, 16(%rbx)
+	ja	.L362
+	movq	%rbx, %rdi
+	movl	%eax, 8(%rsp)
+	call	_ZN6x10aux20serialization_buffer4growEv
+	movq	16(%rbx), %rdx
+	movl	8(%rsp), %eax
+.L362:
+	movl	%eax, (%rdx)
+	addq	$4, 16(%rbx)
+	addq	$16, %rsp
+	.cfi_def_cfa_offset 32
+	popq	%rbx
+	.cfi_def_cfa_offset 24
+	popq	%rbp
+	.cfi_def_cfa_offset 16
+	popq	%r12
+	.cfi_def_cfa_offset 8
+	ret
+	.cfi_endproc
+.LFE4165:
+	.size	_ZN16Trmm__closure__115_serialize_bodyERN6x10aux20serialization_bufferE, .-_ZN16Trmm__closure__115_serialize_bodyERN6x10aux20serialization_bufferE
+	.section	.rodata.str1.1
+.LC21:
+	.string	"x10.lang.RailIterator"
+	.section	.text._ZNK3x104lang12RailIteratorIdE5_typeEv,"axG",@progbits,_ZNK3x104lang12RailIteratorIdE5_typeEv,comdat
+	.align 2
+	.p2align 4,,15
+	.weak	_ZNK3x104lang12RailIteratorIdE5_typeEv
+	.type	_ZNK3x104lang12RailIteratorIdE5_typeEv, @function
+_ZNK3x104lang12RailIteratorIdE5_typeEv:
+.LFB4610:
+	.cfi_startproc
+	.cfi_personality 0x3,__gxx_personality_v0
+	subq	$120, %rsp
+	.cfi_def_cfa_offset 128
+	cmpb	$0, _ZN3x104lang12RailIteratorIdE3rttE+69(%rip)
+	je	.L374
+.L368:
+	movl	$_ZN3x104lang12RailIteratorIdE3rttE, %eax
+	addq	$120, %rsp
+	.cfi_remember_state
+	.cfi_def_cfa_offset 8
+	ret
+	.p2align 4,,10
+	.p2align 3
+.L374:
+	.cfi_restore_state
+	movl	$_ZN3x104lang12RailIteratorIvE3rttE, %esi
+	movl	$_ZN3x104lang12RailIteratorIdE3rttE, %edi
+	call	_ZN6x10aux11RuntimeType12initStageOneEPKS0_
+	testb	%al, %al
+	jne	.L368
+	cmpb	$0, _ZN3x104lang8IteratorIdE3rttE+69(%rip)
+	movq	$0, 64(%rsp)
+	je	.L375
+.L369:
+	cmpb	$0, _ZN6x10aux11RuntimeType10DoubleTypeE+69(%rip)
+	movq	$_ZN3x104lang8IteratorIdE3rttE, 64(%rsp)
+	movq	$0, 48(%rsp)
+	jne	.L372
+	call	_ZN6x10aux11RuntimeType14initDoubleTypeEv
+.L372:
+	leaq	96(%rsp), %rax
+	leaq	64(%rsp), %r8
+	movl	$1, %r9d
+	movl	$1, %ecx
+	xorl	%edx, %edx
+	movl	$.LC21, %esi
+	movq	%rax, 8(%rsp)
+	leaq	48(%rsp), %rax
+	movl	$_ZN3x104lang12RailIteratorIdE3rttE, %edi
+	movq	$_ZN6x10aux11RuntimeType10DoubleTypeE, 48(%rsp)
+	movl	$2, 96(%rsp)
+	movq	%rax, (%rsp)
+	call	_ZN6x10aux11RuntimeType12initStageTwoEPKcNS0_4KindEiPPKS0_iS6_PNS0_8VarianceE
+	movl	$_ZN3x104lang12RailIteratorIdE3rttE, %eax
+	addq	$120, %rsp
+	.cfi_remember_state
+	.cfi_def_cfa_offset 8
+	ret
+	.p2align 4,,10
+	.p2align 3
+.L375:
+	.cfi_restore_state
+	movl	$_ZN3x104lang8IteratorIvE3rttE, %esi
+	movl	$_ZN3x104lang8IteratorIdE3rttE, %edi
+	call	_ZN6x10aux11RuntimeType12initStageOneEPKS0_
+	testb	%al, %al
+	jne	.L369
+	cmpb	$0, _ZN3x104lang3Any3rttE+69(%rip)
+	movq	$0, 32(%rsp)
+	jne	.L370
+	call	_ZN3x104lang3Any8_initRTTEv
+.L370:
+	cmpb	$0, _ZN6x10aux11RuntimeType10DoubleTypeE+69(%rip)
+	movq	$_ZN3x104lang3Any3rttE, 32(%rsp)
+	movq	$0, 16(%rsp)
+	jne	.L371
+	call	_ZN6x10aux11RuntimeType14initDoubleTypeEv
+.L371:
+	leaq	80(%rsp), %rax
+	leaq	32(%rsp), %r8
+	movl	$1, %r9d
+	movl	$1, %ecx
+	movl	$2, %edx
+	movl	$.LC15, %esi
+	movq	%rax, 8(%rsp)
+	leaq	16(%rsp), %rax
+	movl	$_ZN3x104lang8IteratorIdE3rttE, %edi
+	movq	$_ZN6x10aux11RuntimeType10DoubleTypeE, 16(%rsp)
+	movl	$2, 80(%rsp)
+	movq	%rax, (%rsp)
+	call	_ZN6x10aux11RuntimeType12initStageTwoEPKcNS0_4KindEiPPKS0_iS6_PNS0_8VarianceE
+	jmp	.L369
+	.cfi_endproc
+.LFE4610:
+	.size	_ZNK3x104lang12RailIteratorIdE5_typeEv, .-_ZNK3x104lang12RailIteratorIdE5_typeEv
+	.section	.rodata.str1.1
+.LC22:
+	.string	"x10.lang.Rail"
+	.section	.text._ZN3x104lang4RailIdE6getRTTEv,"axG",@progbits,_ZN3x104lang4RailIdE6getRTTEv,comdat
+	.p2align 4,,15
+	.weak	_ZN3x104lang4RailIdE6getRTTEv
+	.type	_ZN3x104lang4RailIdE6getRTTEv, @function
+_ZN3x104lang4RailIdE6getRTTEv:
+.LFB4456:
+	.cfi_startproc
+	.cfi_personality 0x3,__gxx_personality_v0
+	subq	$120, %rsp
+	.cfi_def_cfa_offset 128
+	cmpb	$0, _ZN3x104lang4RailIdE3rttE+69(%rip)
+	je	.L386
+.L377:
+	movl	$_ZN3x104lang4RailIdE3rttE, %eax
+	addq	$120, %rsp
+	.cfi_remember_state
+	.cfi_def_cfa_offset 8
+	ret
+	.p2align 4,,10
+	.p2align 3
+.L386:
+	.cfi_restore_state
+	movl	$_ZN3x104lang4RailIvE3rttE, %esi
+	movl	$_ZN3x104lang4RailIdE3rttE, %edi
+	call	_ZN6x10aux11RuntimeType12initStageOneEPKS0_
+	testb	%al, %al
+	jne	.L377
+	cmpb	$0, _ZN3x104lang8IterableIdE3rttE+69(%rip)
+	movq	$0, 16(%rsp)
+	movq	$0, 24(%rsp)
+	je	.L387
+.L378:
+	cmpb	$0, _ZN3x104lang7Fun_0_1IldE3rttE+69(%rip)
+	movq	$_ZN3x104lang8IterableIdE3rttE, 16(%rsp)
+	je	.L388
+.L381:
+	cmpb	$0, _ZN6x10aux11RuntimeType10DoubleTypeE+69(%rip)
+	movq	$_ZN3x104lang7Fun_0_1IldE3rttE, 24(%rsp)
+	movq	$0, 64(%rsp)
+	jne	.L384
+	call	_ZN6x10aux11RuntimeType14initDoubleTypeEv
+.L384:
+	leaq	96(%rsp), %rax
+	leaq	16(%rsp), %r8
+	movl	$1, %r9d
+	movl	$2, %ecx
+	xorl	%edx, %edx
+	movl	$.LC22, %esi
+	movq	%rax, 8(%rsp)
+	leaq	64(%rsp), %rax
+	movl	$_ZN3x104lang4RailIdE3rttE, %edi
+	movq	$_ZN6x10aux11RuntimeType10DoubleTypeE, 64(%rsp)
+	movl	$2, 96(%rsp)
+	movq	%rax, (%rsp)
+	call	_ZN6x10aux11RuntimeType12initStageTwoEPKcNS0_4KindEiPPKS0_iS6_PNS0_8VarianceE
+	movl	$_ZN3x104lang4RailIdE3rttE, %eax
+	addq	$120, %rsp
+	.cfi_remember_state
+	.cfi_def_cfa_offset 8
+	ret
+	.p2align 4,,10
+	.p2align 3
+.L388:
+	.cfi_restore_state
+	movl	$_ZN3x104lang7Fun_0_1IvvE3rttE, %esi
+	movl	$_ZN3x104lang7Fun_0_1IldE3rttE, %edi
+	call	_ZN6x10aux11RuntimeType12initStageOneEPKS0_
+	testb	%al, %al
+	jne	.L381
+	cmpb	$0, _ZN6x10aux11RuntimeType10DoubleTypeE+69(%rip)
+	jne	.L382
+	call	_ZN6x10aux11RuntimeType14initDoubleTypeEv
+.L382:
+	cmpb	$0, _ZN6x10aux11RuntimeType8LongTypeE+69(%rip)
+	je	.L389
+.L383:
+	movl	$_ZN6x10aux11RuntimeType10DoubleTypeE, %edx
+	movl	$_ZN6x10aux11RuntimeType8LongTypeE, %esi
+	movl	$_ZN3x104lang7Fun_0_1IldE3rttE, %edi
+	call	_ZN3x104lang22_initRTTHelper_Fun_0_1EPN6x10aux11RuntimeTypeEPKS2_S5_
+	jmp	.L381
+	.p2align 4,,10
+	.p2align 3
+.L387:
+	movl	$_ZN3x104lang8IterableIvE3rttE, %esi
+	movl	$_ZN3x104lang8IterableIdE3rttE, %edi
+	call	_ZN6x10aux11RuntimeType12initStageOneEPKS0_
+	testb	%al, %al
+	jne	.L378
+	cmpb	$0, _ZN3x104lang3Any3rttE+69(%rip)
+	movq	$0, 48(%rsp)
+	jne	.L379
+	call	_ZN3x104lang3Any8_initRTTEv
+.L379:
+	cmpb	$0, _ZN6x10aux11RuntimeType10DoubleTypeE+69(%rip)
+	movq	$_ZN3x104lang3Any3rttE, 48(%rsp)
+	movq	$0, 32(%rsp)
+	jne	.L380
+	call	_ZN6x10aux11RuntimeType14initDoubleTypeEv
+.L380:
+	leaq	80(%rsp), %rax
+	leaq	48(%rsp), %r8
+	movl	$1, %r9d
+	movl	$1, %ecx
+	movl	$2, %edx
+	movl	$.LC14, %esi
+	movq	%rax, 8(%rsp)
+	leaq	32(%rsp), %rax
+	movl	$_ZN3x104lang8IterableIdE3rttE, %edi
+	movq	$_ZN6x10aux11RuntimeType10DoubleTypeE, 32(%rsp)
+	movl	$2, 80(%rsp)
+	movq	%rax, (%rsp)
+	call	_ZN6x10aux11RuntimeType12initStageTwoEPKcNS0_4KindEiPPKS0_iS6_PNS0_8VarianceE
+	jmp	.L378
+.L389:
+	call	_ZN6x10aux11RuntimeType12initLongTypeEv
+	.p2align 4,,8
+	jmp	.L383
+	.cfi_endproc
+.LFE4456:
+	.size	_ZN3x104lang4RailIdE6getRTTEv, .-_ZN3x104lang4RailIdE6getRTTEv
+	.section	.text._ZNK3x104lang4RailIdE5_typeEv,"axG",@progbits,_ZNK3x104lang4RailIdE5_typeEv,comdat
+	.align 2
+	.p2align 4,,15
+	.weak	_ZNK3x104lang4RailIdE5_typeEv
+	.type	_ZNK3x104lang4RailIdE5_typeEv, @function
+_ZNK3x104lang4RailIdE5_typeEv:
+.LFB4546:
+	.cfi_startproc
+	.cfi_personality 0x3,__gxx_personality_v0
+	subq	$120, %rsp
+	.cfi_def_cfa_offset 128
+	cmpb	$0, _ZN3x104lang4RailIdE3rttE+69(%rip)
+	je	.L400
+.L391:
+	movl	$_ZN3x104lang4RailIdE3rttE, %eax
+	addq	$120, %rsp
+	.cfi_remember_state
+	.cfi_def_cfa_offset 8
+	ret
+	.p2align 4,,10
+	.p2align 3
+.L400:
+	.cfi_restore_state
+	movl	$_ZN3x104lang4RailIvE3rttE, %esi
+	movl	$_ZN3x104lang4RailIdE3rttE, %edi
+	call	_ZN6x10aux11RuntimeType12initStageOneEPKS0_
+	testb	%al, %al
+	jne	.L391
+	cmpb	$0, _ZN3x104lang8IterableIdE3rttE+69(%rip)
+	movq	$0, 16(%rsp)
+	movq	$0, 24(%rsp)
+	je	.L401
+.L392:
+	cmpb	$0, _ZN3x104lang7Fun_0_1IldE3rttE+69(%rip)
+	movq	$_ZN3x104lang8IterableIdE3rttE, 16(%rsp)
+	je	.L402
+.L395:
+	cmpb	$0, _ZN6x10aux11RuntimeType10DoubleTypeE+69(%rip)
+	movq	$_ZN3x104lang7Fun_0_1IldE3rttE, 24(%rsp)
+	movq	$0, 64(%rsp)
+	jne	.L398
+	call	_ZN6x10aux11RuntimeType14initDoubleTypeEv
+.L398:
+	leaq	96(%rsp), %rax
+	leaq	16(%rsp), %r8
+	movl	$1, %r9d
+	movl	$2, %ecx
+	xorl	%edx, %edx
+	movl	$.LC22, %esi
+	movq	%rax, 8(%rsp)
+	leaq	64(%rsp), %rax
+	movl	$_ZN3x104lang4RailIdE3rttE, %edi
+	movq	$_ZN6x10aux11RuntimeType10DoubleTypeE, 64(%rsp)
+	movl	$2, 96(%rsp)
+	movq	%rax, (%rsp)
+	call	_ZN6x10aux11RuntimeType12initStageTwoEPKcNS0_4KindEiPPKS0_iS6_PNS0_8VarianceE
+	movl	$_ZN3x104lang4RailIdE3rttE, %eax
+	addq	$120, %rsp
+	.cfi_remember_state
+	.cfi_def_cfa_offset 8
+	ret
+	.p2align 4,,10
+	.p2align 3
+.L402:
+	.cfi_restore_state
+	movl	$_ZN3x104lang7Fun_0_1IvvE3rttE, %esi
+	movl	$_ZN3x104lang7Fun_0_1IldE3rttE, %edi
+	call	_ZN6x10aux11RuntimeType12initStageOneEPKS0_
+	testb	%al, %al
+	jne	.L395
+	cmpb	$0, _ZN6x10aux11RuntimeType10DoubleTypeE+69(%rip)
+	jne	.L396
+	call	_ZN6x10aux11RuntimeType14initDoubleTypeEv
+.L396:
+	cmpb	$0, _ZN6x10aux11RuntimeType8LongTypeE+69(%rip)
+	je	.L403
+.L397:
+	movl	$_ZN6x10aux11RuntimeType10DoubleTypeE, %edx
+	movl	$_ZN6x10aux11RuntimeType8LongTypeE, %esi
+	movl	$_ZN3x104lang7Fun_0_1IldE3rttE, %edi
+	call	_ZN3x104lang22_initRTTHelper_Fun_0_1EPN6x10aux11RuntimeTypeEPKS2_S5_
+	jmp	.L395
+	.p2align 4,,10
+	.p2align 3
+.L401:
+	movl	$_ZN3x104lang8IterableIvE3rttE, %esi
+	movl	$_ZN3x104lang8IterableIdE3rttE, %edi
+	call	_ZN6x10aux11RuntimeType12initStageOneEPKS0_
+	testb	%al, %al
+	jne	.L392
+	cmpb	$0, _ZN3x104lang3Any3rttE+69(%rip)
+	movq	$0, 48(%rsp)
+	jne	.L393
+	call	_ZN3x104lang3Any8_initRTTEv
+.L393:
+	cmpb	$0, _ZN6x10aux11RuntimeType10DoubleTypeE+69(%rip)
+	movq	$_ZN3x104lang3Any3rttE, 48(%rsp)
+	movq	$0, 32(%rsp)
+	jne	.L394
+	call	_ZN6x10aux11RuntimeType14initDoubleTypeEv
+.L394:
+	leaq	80(%rsp), %rax
+	leaq	48(%rsp), %r8
+	movl	$1, %r9d
+	movl	$1, %ecx
+	movl	$2, %edx
+	movl	$.LC14, %esi
+	movq	%rax, 8(%rsp)
+	leaq	32(%rsp), %rax
+	movl	$_ZN3x104lang8IterableIdE3rttE, %edi
+	movq	$_ZN6x10aux11RuntimeType10DoubleTypeE, 32(%rsp)
+	movl	$2, 80(%rsp)
+	movq	%rax, (%rsp)
+	call	_ZN6x10aux11RuntimeType12initStageTwoEPKcNS0_4KindEiPPKS0_iS6_PNS0_8VarianceE
+	jmp	.L392
+.L403:
+	call	_ZN6x10aux11RuntimeType12initLongTypeEv
+	.p2align 4,,8
+	jmp	.L397
+	.cfi_endproc
+.LFE4546:
+	.size	_ZNK3x104lang4RailIdE5_typeEv, .-_ZNK3x104lang4RailIdE5_typeEv
+	.section	.text._ZN3x104lang4RailIPNS1_IdEEE13_deserializerERN6x10aux22deserialization_bufferE,"axG",@progbits,_ZN3x104lang4RailIPNS1_IdEEE13_deserializerERN6x10aux22deserialization_bufferE,comdat
+	.align 2
+	.p2align 4,,15
+	.weak	_ZN3x104lang4RailIPNS1_IdEEE13_deserializerERN6x10aux22deserialization_bufferE
+	.type	_ZN3x104lang4RailIPNS1_IdEEE13_deserializerERN6x10aux22deserialization_bufferE, @function
+_ZN3x104lang4RailIPNS1_IdEEE13_deserializerERN6x10aux22deserialization_bufferE:
+.LFB4567:
+	.cfi_startproc
+	.cfi_personality 0x3,__gxx_personality_v0
+	movq	%rbx, -32(%rsp)
+	movq	%rbp, -24(%rsp)
+	movq	%rdi, %rbx
+	.cfi_offset 6, -32
+	.cfi_offset 3, -40
+	movq	%r12, -16(%rsp)
+	movq	%r13, -8(%rsp)
+	subq	$152, %rsp
+	.cfi_def_cfa_offset 160
+	.cfi_offset 13, -16
+	.cfi_offset 12, -24
+	cmpb	$0, _ZN3x104lang4RailIdE3rttE+69(%rip)
+	je	.L423
+.L405:
+	movq	8(%rbx), %rax
+	movq	(%rax), %r12
+	addq	$8, %rax
+	movq	%rax, 8(%rbx)
+	leaq	-1(%r12), %rax
+	testq	%r12, %r12
+	cmovle	%r12, %rax
+	leaq	24(,%rax,8), %r13
+	movq	%r13, %rdi
+	call	malloc
+	testq	%r13, %r13
+	movq	%rax, %rbp
+	jne	.L424
+.L415:
+	testq	%rbp, %rbp
+	je	.L416
+	movq	$_ZTVN3x104lang4RailIPNS1_IdEEEE+16, 0(%rbp)
+	movq	%r12, 8(%rbp)
+.L416:
+	leaq	16(%rbx), %r13
+	movq	%rbp, %rsi
+	movq	%r13, %rdi
+	call	_ZN6x10aux8addr_map9_positionEPKv
+	cmpq	$0, 8(%rbp)
+	jle	.L417
+	xorl	%r12d, %r12d
+.L420:
+	movq	8(%rbx), %rax
+	movzwl	(%rax), %edx
+	cmpw	$-1, %dx
+	je	.L425
+	movq	%rbx, %rdi
+	call	_ZN6x10aux22deserialization_buffer21deserialize_referenceERS0_
+.L419:
+	movq	%rax, 16(%rbp,%r12,8)
+	addq	$1, %r12
+	cmpq	8(%rbp), %r12
+	jl	.L420
+.L417:
+	movq	%rbp, %rax
+	movq	120(%rsp), %rbx
+	movq	128(%rsp), %rbp
+	movq	136(%rsp), %r12
+	movq	144(%rsp), %r13
+	addq	$152, %rsp
+	.cfi_remember_state
+	.cfi_def_cfa_offset 8
+	ret
+	.p2align 4,,10
+	.p2align 3
+.L423:
+	.cfi_restore_state
+	movl	$_ZN3x104lang4RailIvE3rttE, %esi
+	movl	$_ZN3x104lang4RailIdE3rttE, %edi
+	call	_ZN6x10aux11RuntimeType12initStageOneEPKS0_
+	testb	%al, %al
+	jne	.L405
+	cmpb	$0, _ZN3x104lang8IterableIdE3rttE+69(%rip)
+	movq	$0, 16(%rsp)
+	movq	$0, 24(%rsp)
+	je	.L426
+.L406:
+	cmpb	$0, _ZN3x104lang7Fun_0_1IldE3rttE+69(%rip)
+	movq	$_ZN3x104lang8IterableIdE3rttE, 16(%rsp)
+	je	.L427
+.L409:
+	cmpb	$0, _ZN6x10aux11RuntimeType10DoubleTypeE+69(%rip)
+	movq	$_ZN3x104lang7Fun_0_1IldE3rttE, 24(%rsp)
+	movq	$0, 64(%rsp)
+	jne	.L412
+	call	_ZN6x10aux11RuntimeType14initDoubleTypeEv
+.L412:
+	leaq	96(%rsp), %rax
+	leaq	16(%rsp), %r8
+	movl	$1, %r9d
+	movl	$2, %ecx
+	xorl	%edx, %edx
+	movl	$.LC22, %esi
+	movq	%rax, 8(%rsp)
+	leaq	64(%rsp), %rax
+	movl	$_ZN3x104lang4RailIdE3rttE, %edi
+	movq	$_ZN6x10aux11RuntimeType10DoubleTypeE, 64(%rsp)
+	movl	$2, 96(%rsp)
+	movq	%rax, (%rsp)
+	call	_ZN6x10aux11RuntimeType12initStageTwoEPKcNS0_4KindEiPPKS0_iS6_PNS0_8VarianceE
+	jmp	.L405
+	.p2align 4,,10
+	.p2align 3
+.L425:
+	leaq	2(%rax), %rdx
+	movq	%r13, %rdi
+	movq	%rdx, 8(%rbx)
+	movl	2(%rax), %esi
+	addq	$6, %rax
+	movq	%rax, 8(%rbx)
+	call	_ZN6x10aux8addr_map4_getEi
+	jmp	.L419
+	.p2align 4,,10
+	.p2align 3
+.L427:
+	movl	$_ZN3x104lang7Fun_0_1IvvE3rttE, %esi
+	movl	$_ZN3x104lang7Fun_0_1IldE3rttE, %edi
+	call	_ZN6x10aux11RuntimeType12initStageOneEPKS0_
+	testb	%al, %al
+	jne	.L409
+	cmpb	$0, _ZN6x10aux11RuntimeType10DoubleTypeE+69(%rip)
+	jne	.L410
+	call	_ZN6x10aux11RuntimeType14initDoubleTypeEv
+.L410:
+	cmpb	$0, _ZN6x10aux11RuntimeType8LongTypeE+69(%rip)
+	je	.L428
+.L411:
+	movl	$_ZN6x10aux11RuntimeType10DoubleTypeE, %edx
+	movl	$_ZN6x10aux11RuntimeType8LongTypeE, %esi
+	movl	$_ZN3x104lang7Fun_0_1IldE3rttE, %edi
+	call	_ZN3x104lang22_initRTTHelper_Fun_0_1EPN6x10aux11RuntimeTypeEPKS2_S5_
+	jmp	.L409
+	.p2align 4,,10
+	.p2align 3
+.L426:
+	movl	$_ZN3x104lang8IterableIvE3rttE, %esi
+	movl	$_ZN3x104lang8IterableIdE3rttE, %edi
+	call	_ZN6x10aux11RuntimeType12initStageOneEPKS0_
+	testb	%al, %al
+	jne	.L406
+	cmpb	$0, _ZN3x104lang3Any3rttE+69(%rip)
+	movq	$0, 48(%rsp)
+	jne	.L407
+	call	_ZN3x104lang3Any8_initRTTEv
+.L407:
+	cmpb	$0, _ZN6x10aux11RuntimeType10DoubleTypeE+69(%rip)
+	movq	$_ZN3x104lang3Any3rttE, 48(%rsp)
+	movq	$0, 32(%rsp)
+	jne	.L408
+	call	_ZN6x10aux11RuntimeType14initDoubleTypeEv
+.L408:
+	leaq	80(%rsp), %rax
+	leaq	48(%rsp), %r8
+	movl	$1, %r9d
+	movl	$1, %ecx
+	movl	$2, %edx
+	movl	$.LC14, %esi
+	movq	%rax, 8(%rsp)
+	leaq	32(%rsp), %rax
+	movl	$_ZN3x104lang8IterableIdE3rttE, %edi
+	movq	$_ZN6x10aux11RuntimeType10DoubleTypeE, 32(%rsp)
+	movl	$2, 80(%rsp)
+	movq	%rax, (%rsp)
+	call	_ZN6x10aux11RuntimeType12initStageTwoEPKcNS0_4KindEiPPKS0_iS6_PNS0_8VarianceE
+	jmp	.L406
+.L428:
+	call	_ZN6x10aux11RuntimeType12initLongTypeEv
+	.p2align 4,,8
+	jmp	.L411
+.L424:
+	testq	%rax, %rax
+	.p2align 4,,5
+	jne	.L415
+	movq	%r13, %rdi
+	.p2align 4,,5
+	call	_ZN6x10aux9reportOOMEm
+	.cfi_endproc
+.LFE4567:
+	.size	_ZN3x104lang4RailIPNS1_IdEEE13_deserializerERN6x10aux22deserialization_bufferE, .-_ZN3x104lang4RailIPNS1_IdEEE13_deserializerERN6x10aux22deserialization_bufferE
+	.text
+	.align 2
+	.p2align 4,,15
+.globl _ZN4Trmm4mainEPN3x104lang4RailIPNS1_6StringEEE
+	.type	_ZN4Trmm4mainEPN3x104lang4RailIPNS1_6StringEEE, @function
+_ZN4Trmm4mainEPN3x104lang4RailIPNS1_6StringEEE:
+.LFB4177:
+	.cfi_startproc
+	.cfi_personality 0x3,__gxx_personality_v0
+	pushq	%r15
+	.cfi_def_cfa_offset 16
+	.cfi_offset 15, -16
+	pushq	%r14
+	.cfi_def_cfa_offset 24
+	.cfi_offset 14, -24
+	pushq	%r13
+	.cfi_def_cfa_offset 32
+	.cfi_offset 13, -32
+	pushq	%r12
+	.cfi_def_cfa_offset 40
+	.cfi_offset 12, -40
+	pushq	%rbp
+	.cfi_def_cfa_offset 48
+	.cfi_offset 6, -48
+	movl	$_ZN12Trmm_Strings8sl__2761E, %ebp
+	pushq	%rbx
+	.cfi_def_cfa_offset 56
+	.cfi_offset 3, -56
+	subq	$152, %rsp
+	.cfi_def_cfa_offset 208
+	cmpq	$0, 8(%rdi)
+	je	.L431
+	movq	16(%rdi), %rbp
+.L431:
+	movq	0(%rbp), %rax
+	movl	$_ZN12Trmm_Strings8sl__2762E, %esi
+	movq	%rbp, %rdi
+	movl	$4000, %ebx
+	call	*24(%rax)
+	testb	%al, %al
+	je	.L476
+.L433:
+	movl	$16, %edi
+	call	malloc
+	testq	%rax, %rax
+	movq	%rax, %rbp
+	je	.L477
+	movq	$_ZTV4Trmm+16, (%rax)
+	movq	$0, 8(%rax)
+	movq	%rbx, %rsi
+	movq	%rax, %rdi
+	call	*_ZTV4Trmm+112(%rip)
+	cmpb	$0, _ZN6x10aux11RuntimeType10DoubleTypeE+69(%rip)
+	jne	.L440
+	call	_ZN6x10aux11RuntimeType14initDoubleTypeEv
+.L440:
+	movl	$24, %edi
+	call	malloc
+	testq	%rax, %rax
+	movq	%rax, %r14
+	je	.L478
+	movq	$_ZTVN3x104lang4RailIdEE+16, (%rax)
+	movq	$1, 8(%rax)
+	movq	$0, 16(%rax)
+	cmpb	$0, _ZN3x104lang4RailIdE3rttE+69(%rip)
+	je	.L479
+.L442:
+	leaq	16(,%rbx,8), %rax
+	testq	%rbx, %rbx
+	movl	$24, %r12d
+	cmovne	%rax, %r12
+	movq	%r12, %rdi
+	call	malloc
+	testq	%rax, %rax
+	movq	%rax, %r13
+	je	.L480
+	movq	$_ZTVN3x104lang4RailIPNS1_IdEEEE+16, (%rax)
+	movq	%rbx, 8(%rax)
+	leaq	0(,%rbx,8), %rax
+	leaq	16(%r13), %rdi
+	xorl	%esi, %esi
+	movq	%rax, %rdx
+	movq	%rax, 32(%rsp)
+	call	memset
+	testq	%rbx, %rbx
+	je	.L453
+	leaq	16(,%rbx,8), %rax
+	xorl	%r15d, %r15d
+	movq	%rax, 24(%rsp)
+.L456:
+	cmpb	$0, _ZN6x10aux11RuntimeType10DoubleTypeE+69(%rip)
+	jne	.L454
+	call	_ZN6x10aux11RuntimeType14initDoubleTypeEv
+.L454:
+	movq	24(%rsp), %rdi
+	call	malloc
+	testq	%rax, %rax
+	movq	%rax, %r12
+	je	.L481
+	movq	$_ZTVN3x104lang4RailIdEE+16, (%rax)
+	movq	%rbx, 8(%rax)
+	leaq	16(%rax), %rdi
+	movq	32(%rsp), %rdx
+	xorl	%esi, %esi
+	call	memset
+	movq	%r12, 16(%r13,%r15,8)
+	addq	$1, %r15
+	cmpq	%r15, %rbx
+	jg	.L456
+.L453:
+	cmpb	$0, _ZN3x104lang4RailIdE3rttE+69(%rip)
+	je	.L482
+.L457:
+	leaq	16(,%rbx,8), %rax
+	testq	%rbx, %rbx
+	movl	$24, %r15d
+	cmovne	%rax, %r15
+	movq	%r15, %rdi
+	call	malloc
+	testq	%rax, %rax
+	movq	%rax, %r12
+	je	.L483
+	movq	$_ZTVN3x104lang4RailIPNS1_IdEEEE+16, (%rax)
+	movq	%rbx, 8(%rax)
+	leaq	16(%rax), %rdi
+	movq	32(%rsp), %rdx
+	xorl	%esi, %esi
+	call	memset
+	testq	%rbx, %rbx
+	je	.L468
+	leaq	16(,%rbx,8), %rax
+	movq	$0, 24(%rsp)
+	movq	%rax, 40(%rsp)
+.L471:
+	cmpb	$0, _ZN6x10aux11RuntimeType10DoubleTypeE+69(%rip)
+	jne	.L469
+	call	_ZN6x10aux11RuntimeType14initDoubleTypeEv
+.L469:
+	movq	40(%rsp), %rdi
+	call	malloc
+	testq	%rax, %rax
+	movq	%rax, %r15
+	je	.L484
+	movq	$_ZTVN3x104lang4RailIdEE+16, (%rax)
+	movq	%rbx, 8(%rax)
+	leaq	16(%rax), %rdi
+	movq	32(%rsp), %rdx
+	xorl	%esi, %esi
+	call	memset
+	movq	24(%rsp), %rax
+	movq	%r15, 16(%r12,%rax,8)
+	addq	$1, %rax
+	cmpq	%rax, %rbx
+	movq	%rax, 24(%rsp)
+	jg	.L471
+.L468:
+	movq	0(%rbp), %rax
+	movq	%r12, %r8
+	movq	%r13, %rcx
+	movq	%r14, %rdx
+	movq	%rbx, %rsi
+	movq	%rbp, %rdi
+	call	*104(%rax)
+	call	_ZN3x104lang14RuntimeNatives17currentTimeMillisEv
+	movq	%rax, %r15
+	movq	0(%rbp), %rax
+	movq	%r12, %rcx
+	movsd	16(%r14), %xmm0
+	movq	%r13, %rdx
+	movq	%rbx, %rsi
+	movq	%rbp, %rdi
+	call	*120(%rax)
+	call	_ZN3x104lang14RuntimeNatives17currentTimeMillisEv
+	movq	%rax, %r12
+	movl	_ZN3x102io7Console16x10__OUT__statusE(%rip), %eax
+	cmpl	$2, %eax
+	je	.L472
+	call	_ZN3x102io7Console14x10__OUT__initEv
+.L472:
+	movq	_ZN3x102io7Console8x10__OUTE(%rip), %rbx
+	movq	%r12, %rsi
+	movl	$_ZN12Trmm_Strings8sl__2766E, %edi
+	subq	%r15, %rsi
+	movq	(%rbx), %rax
+	movq	336(%rax), %rbp
+	call	_ZN3x104lang6String6__plusEPS1_l
+	movl	$_ZN12Trmm_Strings8sl__2767E, %esi
+	movq	%rax, %rdi
+	call	_ZN3x104lang6String6__plusEPS1_S2_
+	movq	%rbx, %rdi
+	movq	%rax, %rsi
+	call	*%rbp
+	addq	$152, %rsp
+	.cfi_remember_state
+	.cfi_def_cfa_offset 56
+	popq	%rbx
+	.cfi_def_cfa_offset 48
+	popq	%rbp
+	.cfi_def_cfa_offset 40
+	popq	%r12
+	.cfi_def_cfa_offset 32
+	popq	%r13
+	.cfi_def_cfa_offset 24
+	popq	%r14
+	.cfi_def_cfa_offset 16
+	popq	%r15
+	.cfi_def_cfa_offset 8
+	ret
+	.p2align 4,,10
+	.p2align 3
+.L479:
+	.cfi_restore_state
+	movl	$_ZN3x104lang4RailIvE3rttE, %esi
+	movl	$_ZN3x104lang4RailIdE3rttE, %edi
+	call	_ZN6x10aux11RuntimeType12initStageOneEPKS0_
+	testb	%al, %al
+	jne	.L442
+	cmpb	$0, _ZN3x104lang8IterableIdE3rttE+69(%rip)
+	movq	$0, 48(%rsp)
+	movq	$0, 56(%rsp)
+	je	.L485
+.L443:
+	cmpb	$0, _ZN3x104lang7Fun_0_1IldE3rttE+69(%rip)
+	movq	$_ZN3x104lang8IterableIdE3rttE, 48(%rsp)
+	je	.L486
+.L446:
+	cmpb	$0, _ZN6x10aux11RuntimeType10DoubleTypeE+69(%rip)
+	movq	$_ZN3x104lang7Fun_0_1IldE3rttE, 56(%rsp)
+	movq	$0, 64(%rsp)
+	jne	.L449
+	call	_ZN6x10aux11RuntimeType14initDoubleTypeEv
+.L449:
+	leaq	112(%rsp), %rax
+	leaq	48(%rsp), %r8
+	movl	$1, %r9d
+	movl	$2, %ecx
+	xorl	%edx, %edx
+	movl	$.LC22, %esi
+	movq	%rax, 8(%rsp)
+	leaq	64(%rsp), %rax
+	movl	$_ZN3x104lang4RailIdE3rttE, %edi
+	movq	$_ZN6x10aux11RuntimeType10DoubleTypeE, 64(%rsp)
+	movl	$2, 112(%rsp)
+	movq	%rax, (%rsp)
+	call	_ZN6x10aux11RuntimeType12initStageTwoEPKcNS0_4KindEiPPKS0_iS6_PNS0_8VarianceE
+	jmp	.L442
+	.p2align 4,,10
+	.p2align 3
+.L482:
+	movl	$_ZN3x104lang4RailIvE3rttE, %esi
+	movl	$_ZN3x104lang4RailIdE3rttE, %edi
+	call	_ZN6x10aux11RuntimeType12initStageOneEPKS0_
+	testb	%al, %al
+	jne	.L457
+	cmpb	$0, _ZN3x104lang8IterableIdE3rttE+69(%rip)
+	movq	$0, 48(%rsp)
+	movq	$0, 56(%rsp)
+	je	.L487
+.L458:
+	cmpb	$0, _ZN3x104lang7Fun_0_1IldE3rttE+69(%rip)
+	movq	$_ZN3x104lang8IterableIdE3rttE, 48(%rsp)
+	je	.L488
+.L461:
+	cmpb	$0, _ZN6x10aux11RuntimeType10DoubleTypeE+69(%rip)
+	movq	$_ZN3x104lang7Fun_0_1IldE3rttE, 56(%rsp)
+	movq	$0, 96(%rsp)
+	jne	.L464
+	call	_ZN6x10aux11RuntimeType14initDoubleTypeEv
+.L464:
+	leaq	128(%rsp), %rax
+	leaq	48(%rsp), %r8
+	movl	$1, %r9d
+	movl	$2, %ecx
+	xorl	%edx, %edx
+	movl	$.LC22, %esi
+	movq	%rax, 8(%rsp)
+	leaq	96(%rsp), %rax
+	movl	$_ZN3x104lang4RailIdE3rttE, %edi
+	movq	$_ZN6x10aux11RuntimeType10DoubleTypeE, 96(%rsp)
+	movl	$2, 128(%rsp)
+	movq	%rax, (%rsp)
+	call	_ZN6x10aux11RuntimeType12initStageTwoEPKcNS0_4KindEiPPKS0_iS6_PNS0_8VarianceE
+	jmp	.L457
+	.p2align 4,,10
+	.p2align 3
+.L476:
+	movq	0(%rbp), %rax
+	movl	$_ZN12Trmm_Strings8sl__2761E, %esi
+	movq	%rbp, %rdi
+	movw	$1024, %bx
+	call	*24(%rax)
+	testb	%al, %al
+	jne	.L433
+	movq	0(%rbp), %rax
+	movl	$_ZN12Trmm_Strings8sl__2763E, %esi
+	movq	%rbp, %rdi
+	movw	$32, %bx
+	call	*24(%rax)
+	testb	%al, %al
+	jne	.L433
+	movq	0(%rbp), %rax
+	movl	$_ZN12Trmm_Strings8sl__2764E, %esi
+	movq	%rbp, %rdi
+	movb	$-128, %bl
+	call	*24(%rax)
+	testb	%al, %al
+	jne	.L433
+	movq	0(%rbp), %rax
+	movl	$_ZN12Trmm_Strings8sl__2765E, %esi
+	movq	%rbp, %rdi
+	call	*24(%rax)
+	cmpb	$1, %al
+	sbbq	%rbx, %rbx
+	notq	%rbx
+	andl	$2000, %ebx
+	jmp	.L433
+	.p2align 4,,10
+	.p2align 3
+.L488:
+	movl	$_ZN3x104lang7Fun_0_1IvvE3rttE, %esi
+	movl	$_ZN3x104lang7Fun_0_1IldE3rttE, %edi
+	call	_ZN6x10aux11RuntimeType12initStageOneEPKS0_
+	testb	%al, %al
+	jne	.L461
+	cmpb	$0, _ZN6x10aux11RuntimeType10DoubleTypeE+69(%rip)
+	jne	.L462
+	call	_ZN6x10aux11RuntimeType14initDoubleTypeEv
+.L462:
+	cmpb	$0, _ZN6x10aux11RuntimeType8LongTypeE+69(%rip)
+	je	.L489
+.L463:
+	movl	$_ZN6x10aux11RuntimeType10DoubleTypeE, %edx
+	movl	$_ZN6x10aux11RuntimeType8LongTypeE, %esi
+	movl	$_ZN3x104lang7Fun_0_1IldE3rttE, %edi
+	call	_ZN3x104lang22_initRTTHelper_Fun_0_1EPN6x10aux11RuntimeTypeEPKS2_S5_
+	jmp	.L461
+	.p2align 4,,10
+	.p2align 3
+.L487:
+	movl	$_ZN3x104lang8IterableIvE3rttE, %esi
+	movl	$_ZN3x104lang8IterableIdE3rttE, %edi
+	call	_ZN6x10aux11RuntimeType12initStageOneEPKS0_
+	testb	%al, %al
+	jne	.L458
+	cmpb	$0, _ZN3x104lang3Any3rttE+69(%rip)
+	movq	$0, 80(%rsp)
+	jne	.L459
+	call	_ZN3x104lang3Any8_initRTTEv
+.L459:
+	cmpb	$0, _ZN6x10aux11RuntimeType10DoubleTypeE+69(%rip)
+	movq	$_ZN3x104lang3Any3rttE, 80(%rsp)
+	movq	$0, 64(%rsp)
+	jne	.L460
+	call	_ZN6x10aux11RuntimeType14initDoubleTypeEv
+.L460:
+	leaq	112(%rsp), %rax
+	leaq	80(%rsp), %r8
+	movl	$1, %r9d
+	movl	$1, %ecx
+	movl	$2, %edx
+	movl	$.LC14, %esi
+	movq	%rax, 8(%rsp)
+	leaq	64(%rsp), %rax
+	movl	$_ZN3x104lang8IterableIdE3rttE, %edi
+	movq	$_ZN6x10aux11RuntimeType10DoubleTypeE, 64(%rsp)
+	movl	$2, 112(%rsp)
+	movq	%rax, (%rsp)
+	call	_ZN6x10aux11RuntimeType12initStageTwoEPKcNS0_4KindEiPPKS0_iS6_PNS0_8VarianceE
+	jmp	.L458
+	.p2align 4,,10
+	.p2align 3
+.L486:
+	movl	$_ZN3x104lang7Fun_0_1IvvE3rttE, %esi
+	movl	$_ZN3x104lang7Fun_0_1IldE3rttE, %edi
+	call	_ZN6x10aux11RuntimeType12initStageOneEPKS0_
+	testb	%al, %al
+	jne	.L446
+	cmpb	$0, _ZN6x10aux11RuntimeType10DoubleTypeE+69(%rip)
+	jne	.L447
+	call	_ZN6x10aux11RuntimeType14initDoubleTypeEv
+.L447:
+	cmpb	$0, _ZN6x10aux11RuntimeType8LongTypeE+69(%rip)
+	je	.L490
+.L448:
+	movl	$_ZN6x10aux11RuntimeType10DoubleTypeE, %edx
+	movl	$_ZN6x10aux11RuntimeType8LongTypeE, %esi
+	movl	$_ZN3x104lang7Fun_0_1IldE3rttE, %edi
+	call	_ZN3x104lang22_initRTTHelper_Fun_0_1EPN6x10aux11RuntimeTypeEPKS2_S5_
+	jmp	.L446
+	.p2align 4,,10
+	.p2align 3
+.L485:
+	movl	$_ZN3x104lang8IterableIvE3rttE, %esi
+	movl	$_ZN3x104lang8IterableIdE3rttE, %edi
+	call	_ZN6x10aux11RuntimeType12initStageOneEPKS0_
+	testb	%al, %al
+	jne	.L443
+	cmpb	$0, _ZN3x104lang3Any3rttE+69(%rip)
+	movq	$0, 80(%rsp)
+	jne	.L444
+	call	_ZN3x104lang3Any8_initRTTEv
+.L444:
+	cmpb	$0, _ZN6x10aux11RuntimeType10DoubleTypeE+69(%rip)
+	movq	$_ZN3x104lang3Any3rttE, 80(%rsp)
+	movq	$0, 96(%rsp)
+	jne	.L445
+	call	_ZN6x10aux11RuntimeType14initDoubleTypeEv
+.L445:
+	leaq	128(%rsp), %rax
+	leaq	80(%rsp), %r8
+	movl	$1, %r9d
+	movl	$1, %ecx
+	movl	$2, %edx
+	movl	$.LC14, %esi
+	movq	%rax, 8(%rsp)
+	leaq	96(%rsp), %rax
+	movl	$_ZN3x104lang8IterableIdE3rttE, %edi
+	movq	$_ZN6x10aux11RuntimeType10DoubleTypeE, 96(%rsp)
+	movl	$2, 128(%rsp)
+	movq	%rax, (%rsp)
+	call	_ZN6x10aux11RuntimeType12initStageTwoEPKcNS0_4KindEiPPKS0_iS6_PNS0_8VarianceE
+	jmp	.L443
+.L490:
+	call	_ZN6x10aux11RuntimeType12initLongTypeEv
+	.p2align 4,,8
+	jmp	.L448
+.L489:
+	.p2align 4,,8
+	call	_ZN6x10aux11RuntimeType12initLongTypeEv
+	.p2align 4,,8
+	jmp	.L463
+.L478:
+	movl	$24, %edi
+	call	_ZN6x10aux9reportOOMEm
+.L480:
+	movq	%r12, %rdi
+	call	_ZN6x10aux9reportOOMEm
+.L481:
+	movq	24(%rsp), %rdi
+	call	_ZN6x10aux9reportOOMEm
+.L484:
+	movq	40(%rsp), %rdi
+	call	_ZN6x10aux9reportOOMEm
+.L483:
+	movq	%r15, %rdi
+	call	_ZN6x10aux9reportOOMEm
+.L477:
+	movl	$16, %edi
+	call	_ZN6x10aux9reportOOMEm
+	.cfi_endproc
+.LFE4177:
+	.size	_ZN4Trmm4mainEPN3x104lang4RailIPNS1_6StringEEE, .-_ZN4Trmm4mainEPN3x104lang4RailIPNS1_6StringEEE
+	.section	.text._ZN6x10aux6getRTTIN3x104lang7Fun_0_1IlPNS2_4RailIdEEEEEEPKNS_11RuntimeTypeEv,"axG",@progbits,_ZN6x10aux6getRTTIN3x104lang7Fun_0_1IlPNS2_4RailIdEEEEEEPKNS_11RuntimeTypeEv,comdat
+	.p2align 4,,15
+	.weak	_ZN6x10aux6getRTTIN3x104lang7Fun_0_1IlPNS2_4RailIdEEEEEEPKNS_11RuntimeTypeEv
+	.type	_ZN6x10aux6getRTTIN3x104lang7Fun_0_1IlPNS2_4RailIdEEEEEEPKNS_11RuntimeTypeEv, @function
+_ZN6x10aux6getRTTIN3x104lang7Fun_0_1IlPNS2_4RailIdEEEEEEPKNS_11RuntimeTypeEv:
+.LFB4564:
+	.cfi_startproc
+	.cfi_personality 0x3,__gxx_personality_v0
+	subq	$120, %rsp
+	.cfi_def_cfa_offset 128
+	cmpb	$0, _ZN3x104lang7Fun_0_1IlPNS0_4RailIdEEE3rttE+69(%rip)
+	je	.L503
+.L492:
+	movl	$_ZN3x104lang7Fun_0_1IlPNS0_4RailIdEEE3rttE, %eax
+	addq	$120, %rsp
+	.cfi_remember_state
+	.cfi_def_cfa_offset 8
+	ret
+	.p2align 4,,10
+	.p2align 3
+.L503:
+	.cfi_restore_state
+	movl	$_ZN3x104lang7Fun_0_1IvvE3rttE, %esi
+	movl	$_ZN3x104lang7Fun_0_1IlPNS0_4RailIdEEE3rttE, %edi
+	call	_ZN6x10aux11RuntimeType12initStageOneEPKS0_
+	testb	%al, %al
+	jne	.L492
+	cmpb	$0, _ZN3x104lang4RailIdE3rttE+69(%rip)
+	je	.L504
+.L493:
+	cmpb	$0, _ZN6x10aux11RuntimeType8LongTypeE+69(%rip)
+	je	.L505
+.L501:
+	movl	$_ZN3x104lang4RailIdE3rttE, %edx
+	movl	$_ZN6x10aux11RuntimeType8LongTypeE, %esi
+	movl	$_ZN3x104lang7Fun_0_1IlPNS0_4RailIdEEE3rttE, %edi
+	call	_ZN3x104lang22_initRTTHelper_Fun_0_1EPN6x10aux11RuntimeTypeEPKS2_S5_
+	movl	$_ZN3x104lang7Fun_0_1IlPNS0_4RailIdEEE3rttE, %eax
+	addq	$120, %rsp
+	.cfi_remember_state
+	.cfi_def_cfa_offset 8
+	ret
+	.p2align 4,,10
+	.p2align 3
+.L504:
+	.cfi_restore_state
+	movl	$_ZN3x104lang4RailIvE3rttE, %esi
+	movl	$_ZN3x104lang4RailIdE3rttE, %edi
+	call	_ZN6x10aux11RuntimeType12initStageOneEPKS0_
+	testb	%al, %al
+	jne	.L493
+	cmpb	$0, _ZN3x104lang8IterableIdE3rttE+69(%rip)
+	movq	$0, 16(%rsp)
+	movq	$0, 24(%rsp)
+	je	.L506
+.L494:
+	cmpb	$0, _ZN3x104lang7Fun_0_1IldE3rttE+69(%rip)
+	movq	$_ZN3x104lang8IterableIdE3rttE, 16(%rsp)
+	je	.L507
+.L497:
+	cmpb	$0, _ZN6x10aux11RuntimeType10DoubleTypeE+69(%rip)
+	movq	$_ZN3x104lang7Fun_0_1IldE3rttE, 24(%rsp)
+	movq	$0, 64(%rsp)
+	jne	.L500
+	call	_ZN6x10aux11RuntimeType14initDoubleTypeEv
+.L500:
+	leaq	96(%rsp), %rax
+	leaq	16(%rsp), %r8
+	movl	$1, %r9d
+	movl	$2, %ecx
+	xorl	%edx, %edx
+	movl	$.LC22, %esi
+	movq	%rax, 8(%rsp)
+	leaq	64(%rsp), %rax
+	movl	$_ZN3x104lang4RailIdE3rttE, %edi
+	movq	$_ZN6x10aux11RuntimeType10DoubleTypeE, 64(%rsp)
+	movl	$2, 96(%rsp)
+	movq	%rax, (%rsp)
+	call	_ZN6x10aux11RuntimeType12initStageTwoEPKcNS0_4KindEiPPKS0_iS6_PNS0_8VarianceE
+	jmp	.L493
+	.p2align 4,,10
+	.p2align 3
+.L505:
+	call	_ZN6x10aux11RuntimeType12initLongTypeEv
+	.p2align 4,,8
+	jmp	.L501
+.L507:
+	movl	$_ZN3x104lang7Fun_0_1IvvE3rttE, %esi
+	movl	$_ZN3x104lang7Fun_0_1IldE3rttE, %edi
+	call	_ZN6x10aux11RuntimeType12initStageOneEPKS0_
+	testb	%al, %al
+	jne	.L497
+	cmpb	$0, _ZN6x10aux11RuntimeType10DoubleTypeE+69(%rip)
+	jne	.L498
+	call	_ZN6x10aux11RuntimeType14initDoubleTypeEv
+.L498:
+	cmpb	$0, _ZN6x10aux11RuntimeType8LongTypeE+69(%rip)
+	je	.L508
+.L499:
+	movl	$_ZN6x10aux11RuntimeType10DoubleTypeE, %edx
+	movl	$_ZN6x10aux11RuntimeType8LongTypeE, %esi
+	movl	$_ZN3x104lang7Fun_0_1IldE3rttE, %edi
+	call	_ZN3x104lang22_initRTTHelper_Fun_0_1EPN6x10aux11RuntimeTypeEPKS2_S5_
+	jmp	.L497
+.L506:
+	movl	$_ZN3x104lang8IterableIvE3rttE, %esi
+	movl	$_ZN3x104lang8IterableIdE3rttE, %edi
+	call	_ZN6x10aux11RuntimeType12initStageOneEPKS0_
+	testb	%al, %al
+	jne	.L494
+	cmpb	$0, _ZN3x104lang3Any3rttE+69(%rip)
+	movq	$0, 48(%rsp)
+	jne	.L495
+	call	_ZN3x104lang3Any8_initRTTEv
+.L495:
+	cmpb	$0, _ZN6x10aux11RuntimeType10DoubleTypeE+69(%rip)
+	movq	$_ZN3x104lang3Any3rttE, 48(%rsp)
+	movq	$0, 32(%rsp)
+	jne	.L496
+	call	_ZN6x10aux11RuntimeType14initDoubleTypeEv
+.L496:
+	leaq	80(%rsp), %rax
+	leaq	48(%rsp), %r8
+	movl	$1, %r9d
+	movl	$1, %ecx
+	movl	$2, %edx
+	movl	$.LC14, %esi
+	movq	%rax, 8(%rsp)
+	leaq	32(%rsp), %rax
+	movl	$_ZN3x104lang8IterableIdE3rttE, %edi
+	movq	$_ZN6x10aux11RuntimeType10DoubleTypeE, 32(%rsp)
+	movl	$2, 80(%rsp)
+	movq	%rax, (%rsp)
+	call	_ZN6x10aux11RuntimeType12initStageTwoEPKcNS0_4KindEiPPKS0_iS6_PNS0_8VarianceE
+	jmp	.L494
+.L508:
+	call	_ZN6x10aux11RuntimeType12initLongTypeEv
+	.p2align 4,,8
+	jmp	.L499
+	.cfi_endproc
+.LFE4564:
+	.size	_ZN6x10aux6getRTTIN3x104lang7Fun_0_1IlPNS2_4RailIdEEEEEEPKNS_11RuntimeTypeEv, .-_ZN6x10aux6getRTTIN3x104lang7Fun_0_1IlPNS2_4RailIdEEEEEEPKNS_11RuntimeTypeEv
+	.section	.text._ZN6x10aux6getRTTIN3x104lang8IterableIPNS2_4RailIdEEEEEEPKNS_11RuntimeTypeEv,"axG",@progbits,_ZN6x10aux6getRTTIN3x104lang8IterableIPNS2_4RailIdEEEEEEPKNS_11RuntimeTypeEv,comdat
+	.p2align 4,,15
+	.weak	_ZN6x10aux6getRTTIN3x104lang8IterableIPNS2_4RailIdEEEEEEPKNS_11RuntimeTypeEv
+	.type	_ZN6x10aux6getRTTIN3x104lang8IterableIPNS2_4RailIdEEEEEEPKNS_11RuntimeTypeEv, @function
+_ZN6x10aux6getRTTIN3x104lang8IterableIPNS2_4RailIdEEEEEEPKNS_11RuntimeTypeEv:
+.LFB4560:
+	.cfi_startproc
+	.cfi_personality 0x3,__gxx_personality_v0
+	subq	$168, %rsp
+	.cfi_def_cfa_offset 176
+	cmpb	$0, _ZN3x104lang8IterableIPNS0_4RailIdEEE3rttE+69(%rip)
+	je	.L521
+.L510:
+	movl	$_ZN3x104lang8IterableIPNS0_4RailIdEEE3rttE, %eax
+	addq	$168, %rsp
+	.cfi_remember_state
+	.cfi_def_cfa_offset 8
+	ret
+	.p2align 4,,10
+	.p2align 3
+.L521:
+	.cfi_restore_state
+	movl	$_ZN3x104lang8IterableIvE3rttE, %esi
+	movl	$_ZN3x104lang8IterableIPNS0_4RailIdEEE3rttE, %edi
+	call	_ZN6x10aux11RuntimeType12initStageOneEPKS0_
+	testb	%al, %al
+	jne	.L510
+	cmpb	$0, _ZN3x104lang3Any3rttE+69(%rip)
+	movq	$0, 96(%rsp)
+	jne	.L511
+	call	_ZN3x104lang3Any8_initRTTEv
+.L511:
+	cmpb	$0, _ZN3x104lang4RailIdE3rttE+69(%rip)
+	movq	$_ZN3x104lang3Any3rttE, 96(%rsp)
+	movq	$0, 80(%rsp)
+	je	.L522
+.L512:
+	leaq	144(%rsp), %rax
+	leaq	96(%rsp), %r8
+	movl	$1, %r9d
+	movl	$1, %ecx
+	movl	$2, %edx
+	movl	$.LC14, %esi
+	movq	%rax, 8(%rsp)
+	leaq	80(%rsp), %rax
+	movl	$_ZN3x104lang8IterableIPNS0_4RailIdEEE3rttE, %edi
+	movq	$_ZN3x104lang4RailIdE3rttE, 80(%rsp)
+	movl	$2, 144(%rsp)
+	movq	%rax, (%rsp)
+	call	_ZN6x10aux11RuntimeType12initStageTwoEPKcNS0_4KindEiPPKS0_iS6_PNS0_8VarianceE
+	movl	$_ZN3x104lang8IterableIPNS0_4RailIdEEE3rttE, %eax
+	addq	$168, %rsp
+	.cfi_remember_state
+	.cfi_def_cfa_offset 8
+	ret
+	.p2align 4,,10
+	.p2align 3
+.L522:
+	.cfi_restore_state
+	movl	$_ZN3x104lang4RailIvE3rttE, %esi
+	movl	$_ZN3x104lang4RailIdE3rttE, %edi
+	call	_ZN6x10aux11RuntimeType12initStageOneEPKS0_
+	testb	%al, %al
+	jne	.L512
+	cmpb	$0, _ZN3x104lang8IterableIdE3rttE+69(%rip)
+	movq	$0, 16(%rsp)
+	movq	$0, 24(%rsp)
+	je	.L523
+.L513:
+	cmpb	$0, _ZN3x104lang7Fun_0_1IldE3rttE+69(%rip)
+	movq	$_ZN3x104lang8IterableIdE3rttE, 16(%rsp)
+	je	.L524
+.L516:
+	cmpb	$0, _ZN6x10aux11RuntimeType10DoubleTypeE+69(%rip)
+	movq	$_ZN3x104lang7Fun_0_1IldE3rttE, 24(%rsp)
+	movq	$0, 64(%rsp)
+	jne	.L519
+	call	_ZN6x10aux11RuntimeType14initDoubleTypeEv
+.L519:
+	leaq	128(%rsp), %rax
+	leaq	16(%rsp), %r8
+	movl	$1, %r9d
+	movl	$2, %ecx
+	xorl	%edx, %edx
+	movl	$.LC22, %esi
+	movq	%rax, 8(%rsp)
+	leaq	64(%rsp), %rax
+	movl	$_ZN3x104lang4RailIdE3rttE, %edi
+	movq	$_ZN6x10aux11RuntimeType10DoubleTypeE, 64(%rsp)
+	movl	$2, 128(%rsp)
+	movq	%rax, (%rsp)
+	call	_ZN6x10aux11RuntimeType12initStageTwoEPKcNS0_4KindEiPPKS0_iS6_PNS0_8VarianceE
+	jmp	.L512
+.L524:
+	movl	$_ZN3x104lang7Fun_0_1IvvE3rttE, %esi
+	movl	$_ZN3x104lang7Fun_0_1IldE3rttE, %edi
+	call	_ZN6x10aux11RuntimeType12initStageOneEPKS0_
+	testb	%al, %al
+	jne	.L516
+	cmpb	$0, _ZN6x10aux11RuntimeType10DoubleTypeE+69(%rip)
+	jne	.L517
+	call	_ZN6x10aux11RuntimeType14initDoubleTypeEv
+.L517:
+	cmpb	$0, _ZN6x10aux11RuntimeType8LongTypeE+69(%rip)
+	je	.L525
+.L518:
+	movl	$_ZN6x10aux11RuntimeType10DoubleTypeE, %edx
+	movl	$_ZN6x10aux11RuntimeType8LongTypeE, %esi
+	movl	$_ZN3x104lang7Fun_0_1IldE3rttE, %edi
+	call	_ZN3x104lang22_initRTTHelper_Fun_0_1EPN6x10aux11RuntimeTypeEPKS2_S5_
+	jmp	.L516
+.L523:
+	movl	$_ZN3x104lang8IterableIvE3rttE, %esi
+	movl	$_ZN3x104lang8IterableIdE3rttE, %edi
+	call	_ZN6x10aux11RuntimeType12initStageOneEPKS0_
+	testb	%al, %al
+	jne	.L513
+	cmpb	$0, _ZN3x104lang3Any3rttE+69(%rip)
+	movq	$0, 48(%rsp)
+	jne	.L514
+	call	_ZN3x104lang3Any8_initRTTEv
+.L514:
+	cmpb	$0, _ZN6x10aux11RuntimeType10DoubleTypeE+69(%rip)
+	movq	$_ZN3x104lang3Any3rttE, 48(%rsp)
+	movq	$0, 32(%rsp)
+	jne	.L515
+	call	_ZN6x10aux11RuntimeType14initDoubleTypeEv
+.L515:
+	leaq	112(%rsp), %rax
+	leaq	48(%rsp), %r8
+	movl	$1, %r9d
+	movl	$1, %ecx
+	movl	$2, %edx
+	movl	$.LC14, %esi
+	movq	%rax, 8(%rsp)
+	leaq	32(%rsp), %rax
+	movl	$_ZN3x104lang8IterableIdE3rttE, %edi
+	movq	$_ZN6x10aux11RuntimeType10DoubleTypeE, 32(%rsp)
+	movl	$2, 112(%rsp)
+	movq	%rax, (%rsp)
+	call	_ZN6x10aux11RuntimeType12initStageTwoEPKcNS0_4KindEiPPKS0_iS6_PNS0_8VarianceE
+	jmp	.L513
+.L525:
+	call	_ZN6x10aux11RuntimeType12initLongTypeEv
+	.p2align 4,,8
+	jmp	.L518
+	.cfi_endproc
+.LFE4560:
+	.size	_ZN6x10aux6getRTTIN3x104lang8IterableIPNS2_4RailIdEEEEEEPKNS_11RuntimeTypeEv, .-_ZN6x10aux6getRTTIN3x104lang8IterableIPNS2_4RailIdEEEEEEPKNS_11RuntimeTypeEv
+	.section	.text._ZN6x10aux6getRTTIN3x104lang8IteratorIPNS2_4RailIdEEEEEEPKNS_11RuntimeTypeEv,"axG",@progbits,_ZN6x10aux6getRTTIN3x104lang8IteratorIPNS2_4RailIdEEEEEEPKNS_11RuntimeTypeEv,comdat
+	.p2align 4,,15
+	.weak	_ZN6x10aux6getRTTIN3x104lang8IteratorIPNS2_4RailIdEEEEEEPKNS_11RuntimeTypeEv
+	.type	_ZN6x10aux6getRTTIN3x104lang8IteratorIPNS2_4RailIdEEEEEEPKNS_11RuntimeTypeEv, @function
+_ZN6x10aux6getRTTIN3x104lang8IteratorIPNS2_4RailIdEEEEEEPKNS_11RuntimeTypeEv:
+.LFB4637:
+	.cfi_startproc
+	.cfi_personality 0x3,__gxx_personality_v0
+	subq	$168, %rsp
+	.cfi_def_cfa_offset 176
+	cmpb	$0, _ZN3x104lang8IteratorIPNS0_4RailIdEEE3rttE+69(%rip)
+	je	.L538
+.L527:
+	movl	$_ZN3x104lang8IteratorIPNS0_4RailIdEEE3rttE, %eax
+	addq	$168, %rsp
+	.cfi_remember_state
+	.cfi_def_cfa_offset 8
+	ret
+	.p2align 4,,10
+	.p2align 3
+.L538:
+	.cfi_restore_state
+	movl	$_ZN3x104lang8IteratorIvE3rttE, %esi
+	movl	$_ZN3x104lang8IteratorIPNS0_4RailIdEEE3rttE, %edi
+	call	_ZN6x10aux11RuntimeType12initStageOneEPKS0_
+	testb	%al, %al
+	jne	.L527
+	cmpb	$0, _ZN3x104lang3Any3rttE+69(%rip)
+	movq	$0, 96(%rsp)
+	jne	.L528
+	call	_ZN3x104lang3Any8_initRTTEv
+.L528:
+	cmpb	$0, _ZN3x104lang4RailIdE3rttE+69(%rip)
+	movq	$_ZN3x104lang3Any3rttE, 96(%rsp)
+	movq	$0, 80(%rsp)
+	je	.L539
+.L529:
+	leaq	144(%rsp), %rax
+	leaq	96(%rsp), %r8
+	movl	$1, %r9d
+	movl	$1, %ecx
+	movl	$2, %edx
+	movl	$.LC15, %esi
+	movq	%rax, 8(%rsp)
+	leaq	80(%rsp), %rax
+	movl	$_ZN3x104lang8IteratorIPNS0_4RailIdEEE3rttE, %edi
+	movq	$_ZN3x104lang4RailIdE3rttE, 80(%rsp)
+	movl	$2, 144(%rsp)
+	movq	%rax, (%rsp)
+	call	_ZN6x10aux11RuntimeType12initStageTwoEPKcNS0_4KindEiPPKS0_iS6_PNS0_8VarianceE
+	movl	$_ZN3x104lang8IteratorIPNS0_4RailIdEEE3rttE, %eax
+	addq	$168, %rsp
+	.cfi_remember_state
+	.cfi_def_cfa_offset 8
+	ret
+	.p2align 4,,10
+	.p2align 3
+.L539:
+	.cfi_restore_state
+	movl	$_ZN3x104lang4RailIvE3rttE, %esi
+	movl	$_ZN3x104lang4RailIdE3rttE, %edi
+	call	_ZN6x10aux11RuntimeType12initStageOneEPKS0_
+	testb	%al, %al
+	jne	.L529
+	cmpb	$0, _ZN3x104lang8IterableIdE3rttE+69(%rip)
+	movq	$0, 16(%rsp)
+	movq	$0, 24(%rsp)
+	je	.L540
+.L530:
+	cmpb	$0, _ZN3x104lang7Fun_0_1IldE3rttE+69(%rip)
+	movq	$_ZN3x104lang8IterableIdE3rttE, 16(%rsp)
+	je	.L541
+.L533:
+	cmpb	$0, _ZN6x10aux11RuntimeType10DoubleTypeE+69(%rip)
+	movq	$_ZN3x104lang7Fun_0_1IldE3rttE, 24(%rsp)
+	movq	$0, 64(%rsp)
+	jne	.L536
+	call	_ZN6x10aux11RuntimeType14initDoubleTypeEv
+.L536:
+	leaq	128(%rsp), %rax
+	leaq	16(%rsp), %r8
+	movl	$1, %r9d
+	movl	$2, %ecx
+	xorl	%edx, %edx
+	movl	$.LC22, %esi
+	movq	%rax, 8(%rsp)
+	leaq	64(%rsp), %rax
+	movl	$_ZN3x104lang4RailIdE3rttE, %edi
+	movq	$_ZN6x10aux11RuntimeType10DoubleTypeE, 64(%rsp)
+	movl	$2, 128(%rsp)
+	movq	%rax, (%rsp)
+	call	_ZN6x10aux11RuntimeType12initStageTwoEPKcNS0_4KindEiPPKS0_iS6_PNS0_8VarianceE
+	jmp	.L529
+.L541:
+	movl	$_ZN3x104lang7Fun_0_1IvvE3rttE, %esi
+	movl	$_ZN3x104lang7Fun_0_1IldE3rttE, %edi
+	call	_ZN6x10aux11RuntimeType12initStageOneEPKS0_
+	testb	%al, %al
+	jne	.L533
+	cmpb	$0, _ZN6x10aux11RuntimeType10DoubleTypeE+69(%rip)
+	jne	.L534
+	call	_ZN6x10aux11RuntimeType14initDoubleTypeEv
+.L534:
+	cmpb	$0, _ZN6x10aux11RuntimeType8LongTypeE+69(%rip)
+	je	.L542
+.L535:
+	movl	$_ZN6x10aux11RuntimeType10DoubleTypeE, %edx
+	movl	$_ZN6x10aux11RuntimeType8LongTypeE, %esi
+	movl	$_ZN3x104lang7Fun_0_1IldE3rttE, %edi
+	call	_ZN3x104lang22_initRTTHelper_Fun_0_1EPN6x10aux11RuntimeTypeEPKS2_S5_
+	jmp	.L533
+.L540:
+	movl	$_ZN3x104lang8IterableIvE3rttE, %esi
+	movl	$_ZN3x104lang8IterableIdE3rttE, %edi
+	call	_ZN6x10aux11RuntimeType12initStageOneEPKS0_
+	testb	%al, %al
+	jne	.L530
+	cmpb	$0, _ZN3x104lang3Any3rttE+69(%rip)
+	movq	$0, 48(%rsp)
+	jne	.L531
+	call	_ZN3x104lang3Any8_initRTTEv
+.L531:
+	cmpb	$0, _ZN6x10aux11RuntimeType10DoubleTypeE+69(%rip)
+	movq	$_ZN3x104lang3Any3rttE, 48(%rsp)
+	movq	$0, 32(%rsp)
+	jne	.L532
+	call	_ZN6x10aux11RuntimeType14initDoubleTypeEv
+.L532:
+	leaq	112(%rsp), %rax
+	leaq	48(%rsp), %r8
+	movl	$1, %r9d
+	movl	$1, %ecx
+	movl	$2, %edx
+	movl	$.LC14, %esi
+	movq	%rax, 8(%rsp)
+	leaq	32(%rsp), %rax
+	movl	$_ZN3x104lang8IterableIdE3rttE, %edi
+	movq	$_ZN6x10aux11RuntimeType10DoubleTypeE, 32(%rsp)
+	movl	$2, 112(%rsp)
+	movq	%rax, (%rsp)
+	call	_ZN6x10aux11RuntimeType12initStageTwoEPKcNS0_4KindEiPPKS0_iS6_PNS0_8VarianceE
+	jmp	.L530
+.L542:
+	call	_ZN6x10aux11RuntimeType12initLongTypeEv
+	.p2align 4,,8
+	jmp	.L535
+	.cfi_endproc
+.LFE4637:
+	.size	_ZN6x10aux6getRTTIN3x104lang8IteratorIPNS2_4RailIdEEEEEEPKNS_11RuntimeTypeEv, .-_ZN6x10aux6getRTTIN3x104lang8IteratorIPNS2_4RailIdEEEEEEPKNS_11RuntimeTypeEv
+	.section	.text._ZNK3x104lang12RailIteratorIPNS0_4RailIdEEE5_typeEv,"axG",@progbits,_ZNK3x104lang12RailIteratorIPNS0_4RailIdEEE5_typeEv,comdat
+	.align 2
+	.p2align 4,,15
+	.weak	_ZNK3x104lang12RailIteratorIPNS0_4RailIdEEE5_typeEv
+	.type	_ZNK3x104lang12RailIteratorIPNS0_4RailIdEEE5_typeEv, @function
+_ZNK3x104lang12RailIteratorIPNS0_4RailIdEEE5_typeEv:
+.LFB4618:
+	.cfi_startproc
+	.cfi_personality 0x3,__gxx_personality_v0
+	subq	$168, %rsp
+	.cfi_def_cfa_offset 176
+	cmpb	$0, _ZN3x104lang12RailIteratorIPNS0_4RailIdEEE3rttE+69(%rip)
+	je	.L556
+.L544:
+	movl	$_ZN3x104lang12RailIteratorIPNS0_4RailIdEEE3rttE, %eax
+	addq	$168, %rsp
+	.cfi_remember_state
+	.cfi_def_cfa_offset 8
+	ret
+	.p2align 4,,10
+	.p2align 3
+.L556:
+	.cfi_restore_state
+	movl	$_ZN3x104lang12RailIteratorIvE3rttE, %esi
+	movl	$_ZN3x104lang12RailIteratorIPNS0_4RailIdEEE3rttE, %edi
+	call	_ZN6x10aux11RuntimeType12initStageOneEPKS0_
+	testb	%al, %al
+	jne	.L544
+	cmpb	$0, _ZN3x104lang8IteratorIPNS0_4RailIdEEE3rttE+69(%rip)
+	movq	$0, 96(%rsp)
+	je	.L557
+.L545:
+	cmpb	$0, _ZN3x104lang4RailIdE3rttE+69(%rip)
+	movq	$_ZN3x104lang8IteratorIPNS0_4RailIdEEE3rttE, 96(%rsp)
+	movq	$0, 80(%rsp)
+	je	.L558
+.L547:
+	leaq	144(%rsp), %rax
+	leaq	96(%rsp), %r8
+	movl	$1, %r9d
+	movl	$1, %ecx
+	xorl	%edx, %edx
+	movl	$.LC21, %esi
+	movq	%rax, 8(%rsp)
+	leaq	80(%rsp), %rax
+	movl	$_ZN3x104lang12RailIteratorIPNS0_4RailIdEEE3rttE, %edi
+	movq	$_ZN3x104lang4RailIdE3rttE, 80(%rsp)
+	movl	$2, 144(%rsp)
+	movq	%rax, (%rsp)
+	call	_ZN6x10aux11RuntimeType12initStageTwoEPKcNS0_4KindEiPPKS0_iS6_PNS0_8VarianceE
+	movl	$_ZN3x104lang12RailIteratorIPNS0_4RailIdEEE3rttE, %eax
+	addq	$168, %rsp
+	.cfi_remember_state
+	.cfi_def_cfa_offset 8
+	ret
+	.p2align 4,,10
+	.p2align 3
+.L557:
+	.cfi_restore_state
+	movl	$_ZN3x104lang8IteratorIvE3rttE, %esi
+	movl	$_ZN3x104lang8IteratorIPNS0_4RailIdEEE3rttE, %edi
+	call	_ZN6x10aux11RuntimeType12initStageOneEPKS0_
+	testb	%al, %al
+	jne	.L545
+	cmpb	$0, _ZN3x104lang3Any3rttE+69(%rip)
+	movq	$0, 48(%rsp)
+	jne	.L546
+	call	_ZN3x104lang3Any8_initRTTEv
+.L546:
+	movq	$_ZN3x104lang3Any3rttE, 48(%rsp)
+	movq	$0, 64(%rsp)
+	call	_ZN3x104lang4RailIdE6getRTTEv
+	movq	%rax, 64(%rsp)
+	leaq	128(%rsp), %rax
+	leaq	48(%rsp), %r8
+	movl	$1, %r9d
+	movl	$1, %ecx
+	movl	$2, %edx
+	movq	%rax, 8(%rsp)
+	leaq	64(%rsp), %rax
+	movl	$.LC15, %esi
+	movl	$_ZN3x104lang8IteratorIPNS0_4RailIdEEE3rttE, %edi
+	movl	$2, 128(%rsp)
+	movq	%rax, (%rsp)
+	call	_ZN6x10aux11RuntimeType12initStageTwoEPKcNS0_4KindEiPPKS0_iS6_PNS0_8VarianceE
+	jmp	.L545
+	.p2align 4,,10
+	.p2align 3
+.L558:
+	movl	$_ZN3x104lang4RailIvE3rttE, %esi
+	movl	$_ZN3x104lang4RailIdE3rttE, %edi
+	call	_ZN6x10aux11RuntimeType12initStageOneEPKS0_
+	testb	%al, %al
+	jne	.L547
+	cmpb	$0, _ZN3x104lang8IterableIdE3rttE+69(%rip)
+	movq	$0, 16(%rsp)
+	movq	$0, 24(%rsp)
+	je	.L559
+.L548:
+	cmpb	$0, _ZN3x104lang7Fun_0_1IldE3rttE+69(%rip)
+	movq	$_ZN3x104lang8IterableIdE3rttE, 16(%rsp)
+	je	.L560
+.L551:
+	cmpb	$0, _ZN6x10aux11RuntimeType10DoubleTypeE+69(%rip)
+	movq	$_ZN3x104lang7Fun_0_1IldE3rttE, 24(%rsp)
+	movq	$0, 64(%rsp)
+	jne	.L554
+	call	_ZN6x10aux11RuntimeType14initDoubleTypeEv
+.L554:
+	leaq	128(%rsp), %rax
+	leaq	16(%rsp), %r8
+	movl	$1, %r9d
+	movl	$2, %ecx
+	xorl	%edx, %edx
+	movl	$.LC22, %esi
+	movq	%rax, 8(%rsp)
+	leaq	64(%rsp), %rax
+	movl	$_ZN3x104lang4RailIdE3rttE, %edi
+	movq	$_ZN6x10aux11RuntimeType10DoubleTypeE, 64(%rsp)
+	movl	$2, 128(%rsp)
+	movq	%rax, (%rsp)
+	call	_ZN6x10aux11RuntimeType12initStageTwoEPKcNS0_4KindEiPPKS0_iS6_PNS0_8VarianceE
+	jmp	.L547
+.L560:
+	movl	$_ZN3x104lang7Fun_0_1IvvE3rttE, %esi
+	movl	$_ZN3x104lang7Fun_0_1IldE3rttE, %edi
+	call	_ZN6x10aux11RuntimeType12initStageOneEPKS0_
+	testb	%al, %al
+	jne	.L551
+	cmpb	$0, _ZN6x10aux11RuntimeType10DoubleTypeE+69(%rip)
+	jne	.L552
+	call	_ZN6x10aux11RuntimeType14initDoubleTypeEv
+.L552:
+	cmpb	$0, _ZN6x10aux11RuntimeType8LongTypeE+69(%rip)
+	je	.L561
+.L553:
+	movl	$_ZN6x10aux11RuntimeType10DoubleTypeE, %edx
+	movl	$_ZN6x10aux11RuntimeType8LongTypeE, %esi
+	movl	$_ZN3x104lang7Fun_0_1IldE3rttE, %edi
+	call	_ZN3x104lang22_initRTTHelper_Fun_0_1EPN6x10aux11RuntimeTypeEPKS2_S5_
+	jmp	.L551
+.L559:
+	movl	$_ZN3x104lang8IterableIvE3rttE, %esi
+	movl	$_ZN3x104lang8IterableIdE3rttE, %edi
+	call	_ZN6x10aux11RuntimeType12initStageOneEPKS0_
+	testb	%al, %al
+	jne	.L548
+	cmpb	$0, _ZN3x104lang3Any3rttE+69(%rip)
+	movq	$0, 48(%rsp)
+	jne	.L549
+	call	_ZN3x104lang3Any8_initRTTEv
+.L549:
+	cmpb	$0, _ZN6x10aux11RuntimeType10DoubleTypeE+69(%rip)
+	movq	$_ZN3x104lang3Any3rttE, 48(%rsp)
+	movq	$0, 32(%rsp)
+	jne	.L550
+	call	_ZN6x10aux11RuntimeType14initDoubleTypeEv
+.L550:
+	leaq	112(%rsp), %rax
+	leaq	48(%rsp), %r8
+	movl	$1, %r9d
+	movl	$1, %ecx
+	movl	$2, %edx
+	movl	$.LC14, %esi
+	movq	%rax, 8(%rsp)
+	leaq	32(%rsp), %rax
+	movl	$_ZN3x104lang8IterableIdE3rttE, %edi
+	movq	$_ZN6x10aux11RuntimeType10DoubleTypeE, 32(%rsp)
+	movl	$2, 112(%rsp)
+	movq	%rax, (%rsp)
+	call	_ZN6x10aux11RuntimeType12initStageTwoEPKcNS0_4KindEiPPKS0_iS6_PNS0_8VarianceE
+	jmp	.L548
+.L561:
+	call	_ZN6x10aux11RuntimeType12initLongTypeEv
+	.p2align 4,,8
+	jmp	.L553
+	.cfi_endproc
+.LFE4618:
+	.size	_ZNK3x104lang12RailIteratorIPNS0_4RailIdEEE5_typeEv, .-_ZNK3x104lang12RailIteratorIPNS0_4RailIdEEE5_typeEv
+	.section	.text._ZNK3x104lang4RailIPNS1_IdEEE5_typeEv,"axG",@progbits,_ZNK3x104lang4RailIPNS1_IdEEE5_typeEv,comdat
+	.align 2
+	.p2align 4,,15
+	.weak	_ZNK3x104lang4RailIPNS1_IdEEE5_typeEv
+	.type	_ZNK3x104lang4RailIPNS1_IdEEE5_typeEv, @function
+_ZNK3x104lang4RailIPNS1_IdEEE5_typeEv:
+.LFB4541:
+	.cfi_startproc
+	.cfi_personality 0x3,__gxx_personality_v0
+	subq	$184, %rsp
+	.cfi_def_cfa_offset 192
+	cmpb	$0, _ZN3x104lang4RailIPNS1_IdEEE3rttE+69(%rip)
+	je	.L577
+.L563:
+	movl	$_ZN3x104lang4RailIPNS1_IdEEE3rttE, %eax
+	addq	$184, %rsp
+	.cfi_remember_state
+	.cfi_def_cfa_offset 8
+	ret
+	.p2align 4,,10
+	.p2align 3
+.L577:
+	.cfi_restore_state
+	movl	$_ZN3x104lang4RailIvE3rttE, %esi
+	movl	$_ZN3x104lang4RailIPNS1_IdEEE3rttE, %edi
+	call	_ZN6x10aux11RuntimeType12initStageOneEPKS0_
+	testb	%al, %al
+	jne	.L563
+	cmpb	$0, _ZN3x104lang8IterableIPNS0_4RailIdEEE3rttE+69(%rip)
+	movq	$0, 48(%rsp)
+	movq	$0, 56(%rsp)
+	je	.L578
+.L564:
+	cmpb	$0, _ZN3x104lang7Fun_0_1IlPNS0_4RailIdEEE3rttE+69(%rip)
+	movq	$_ZN3x104lang8IterableIPNS0_4RailIdEEE3rttE, 48(%rsp)
+	je	.L579
+.L566:
+	cmpb	$0, _ZN3x104lang4RailIdE3rttE+69(%rip)
+	movq	$_ZN3x104lang7Fun_0_1IlPNS0_4RailIdEEE3rttE, 56(%rsp)
+	movq	$0, 112(%rsp)
+	je	.L580
+.L568:
+	leaq	160(%rsp), %rax
+	leaq	48(%rsp), %r8
+	movl	$1, %r9d
+	movl	$2, %ecx
+	xorl	%edx, %edx
+	movl	$.LC22, %esi
+	movq	%rax, 8(%rsp)
+	leaq	112(%rsp), %rax
+	movl	$_ZN3x104lang4RailIPNS1_IdEEE3rttE, %edi
+	movq	$_ZN3x104lang4RailIdE3rttE, 112(%rsp)
+	movl	$2, 160(%rsp)
+	movq	%rax, (%rsp)
+	call	_ZN6x10aux11RuntimeType12initStageTwoEPKcNS0_4KindEiPPKS0_iS6_PNS0_8VarianceE
+	movl	$_ZN3x104lang4RailIPNS1_IdEEE3rttE, %eax
+	addq	$184, %rsp
+	.cfi_remember_state
+	.cfi_def_cfa_offset 8
+	ret
+	.p2align 4,,10
+	.p2align 3
+.L578:
+	.cfi_restore_state
+	movl	$_ZN3x104lang8IterableIvE3rttE, %esi
+	movl	$_ZN3x104lang8IterableIPNS0_4RailIdEEE3rttE, %edi
+	call	_ZN6x10aux11RuntimeType12initStageOneEPKS0_
+	testb	%al, %al
+	jne	.L564
+	cmpb	$0, _ZN3x104lang3Any3rttE+69(%rip)
+	movq	$0, 80(%rsp)
+	jne	.L565
+	call	_ZN3x104lang3Any8_initRTTEv
+.L565:
+	movq	$_ZN3x104lang3Any3rttE, 80(%rsp)
+	movq	$0, 96(%rsp)
+	call	_ZN3x104lang4RailIdE6getRTTEv
+	movq	%rax, 96(%rsp)
+	leaq	144(%rsp), %rax
+	leaq	80(%rsp), %r8
+	movl	$1, %r9d
+	movl	$1, %ecx
+	movl	$2, %edx
+	movq	%rax, 8(%rsp)
+	leaq	96(%rsp), %rax
+	movl	$.LC14, %esi
+	movl	$_ZN3x104lang8IterableIPNS0_4RailIdEEE3rttE, %edi
+	movl	$2, 144(%rsp)
+	movq	%rax, (%rsp)
+	call	_ZN6x10aux11RuntimeType12initStageTwoEPKcNS0_4KindEiPPKS0_iS6_PNS0_8VarianceE
+	jmp	.L564
+	.p2align 4,,10
+	.p2align 3
+.L580:
+	movl	$_ZN3x104lang4RailIvE3rttE, %esi
+	movl	$_ZN3x104lang4RailIdE3rttE, %edi
+	call	_ZN6x10aux11RuntimeType12initStageOneEPKS0_
+	testb	%al, %al
+	jne	.L568
+	cmpb	$0, _ZN3x104lang8IterableIdE3rttE+69(%rip)
+	movq	$0, 32(%rsp)
+	movq	$0, 40(%rsp)
+	je	.L581
+.L569:
+	cmpb	$0, _ZN3x104lang7Fun_0_1IldE3rttE+69(%rip)
+	movq	$_ZN3x104lang8IterableIdE3rttE, 32(%rsp)
+	je	.L582
+.L572:
+	cmpb	$0, _ZN6x10aux11RuntimeType10DoubleTypeE+69(%rip)
+	movq	$_ZN3x104lang7Fun_0_1IldE3rttE, 40(%rsp)
+	movq	$0, 96(%rsp)
+	jne	.L575
+	call	_ZN6x10aux11RuntimeType14initDoubleTypeEv
+.L575:
+	leaq	144(%rsp), %rax
+	leaq	32(%rsp), %r8
+	movl	$1, %r9d
+	movl	$2, %ecx
+	xorl	%edx, %edx
+	movl	$.LC22, %esi
+	movq	%rax, 8(%rsp)
+	leaq	96(%rsp), %rax
+	movl	$_ZN3x104lang4RailIdE3rttE, %edi
+	movq	$_ZN6x10aux11RuntimeType10DoubleTypeE, 96(%rsp)
+	movl	$2, 144(%rsp)
+	movq	%rax, (%rsp)
+	call	_ZN6x10aux11RuntimeType12initStageTwoEPKcNS0_4KindEiPPKS0_iS6_PNS0_8VarianceE
+	jmp	.L568
+	.p2align 4,,10
+	.p2align 3
+.L579:
+	movl	$_ZN3x104lang7Fun_0_1IvvE3rttE, %esi
+	movl	$_ZN3x104lang7Fun_0_1IlPNS0_4RailIdEEE3rttE, %edi
+	call	_ZN6x10aux11RuntimeType12initStageOneEPKS0_
+	testb	%al, %al
+	jne	.L566
+	call	_ZN3x104lang4RailIdE6getRTTEv
+	cmpb	$0, _ZN6x10aux11RuntimeType8LongTypeE+69(%rip)
+	je	.L583
+.L567:
+	movq	%rax, %rdx
+	movl	$_ZN6x10aux11RuntimeType8LongTypeE, %esi
+	movl	$_ZN3x104lang7Fun_0_1IlPNS0_4RailIdEEE3rttE, %edi
+	call	_ZN3x104lang22_initRTTHelper_Fun_0_1EPN6x10aux11RuntimeTypeEPKS2_S5_
+	jmp	.L566
+.L582:
+	movl	$_ZN3x104lang7Fun_0_1IvvE3rttE, %esi
+	movl	$_ZN3x104lang7Fun_0_1IldE3rttE, %edi
+	call	_ZN6x10aux11RuntimeType12initStageOneEPKS0_
+	testb	%al, %al
+	jne	.L572
+	cmpb	$0, _ZN6x10aux11RuntimeType10DoubleTypeE+69(%rip)
+	jne	.L573
+	call	_ZN6x10aux11RuntimeType14initDoubleTypeEv
+.L573:
+	cmpb	$0, _ZN6x10aux11RuntimeType8LongTypeE+69(%rip)
+	je	.L584
+.L574:
+	movl	$_ZN6x10aux11RuntimeType10DoubleTypeE, %edx
+	movl	$_ZN6x10aux11RuntimeType8LongTypeE, %esi
+	movl	$_ZN3x104lang7Fun_0_1IldE3rttE, %edi
+	call	_ZN3x104lang22_initRTTHelper_Fun_0_1EPN6x10aux11RuntimeTypeEPKS2_S5_
+	jmp	.L572
+.L581:
+	movl	$_ZN3x104lang8IterableIvE3rttE, %esi
+	movl	$_ZN3x104lang8IterableIdE3rttE, %edi
+	call	_ZN6x10aux11RuntimeType12initStageOneEPKS0_
+	testb	%al, %al
+	jne	.L569
+	cmpb	$0, _ZN3x104lang3Any3rttE+69(%rip)
+	movq	$0, 80(%rsp)
+	jne	.L570
+	call	_ZN3x104lang3Any8_initRTTEv
+.L570:
+	cmpb	$0, _ZN6x10aux11RuntimeType10DoubleTypeE+69(%rip)
+	movq	$_ZN3x104lang3Any3rttE, 80(%rsp)
+	movq	$0, 64(%rsp)
+	jne	.L571
+	call	_ZN6x10aux11RuntimeType14initDoubleTypeEv
+.L571:
+	leaq	128(%rsp), %rax
+	leaq	80(%rsp), %r8
+	movl	$1, %r9d
+	movl	$1, %ecx
+	movl	$2, %edx
+	movl	$.LC14, %esi
+	movq	%rax, 8(%rsp)
+	leaq	64(%rsp), %rax
+	movl	$_ZN3x104lang8IterableIdE3rttE, %edi
+	movq	$_ZN6x10aux11RuntimeType10DoubleTypeE, 64(%rsp)
+	movl	$2, 128(%rsp)
+	movq	%rax, (%rsp)
+	call	_ZN6x10aux11RuntimeType12initStageTwoEPKcNS0_4KindEiPPKS0_iS6_PNS0_8VarianceE
+	jmp	.L569
+.L583:
+	movq	%rax, 24(%rsp)
+	call	_ZN6x10aux11RuntimeType12initLongTypeEv
+	movq	24(%rsp), %rax
+	jmp	.L567
+.L584:
+	call	_ZN6x10aux11RuntimeType12initLongTypeEv
+	.p2align 4,,3
+	jmp	.L574
+	.cfi_endproc
+.LFE4541:
+	.size	_ZNK3x104lang4RailIPNS1_IdEEE5_typeEv, .-_ZNK3x104lang4RailIPNS1_IdEEE5_typeEv
+.globl _ZN4Trmm17_serialization_idE
+	.bss
+	.align 2
+	.type	_ZN4Trmm17_serialization_idE, @object
+	.size	_ZN4Trmm17_serialization_idE, 2
+_ZN4Trmm17_serialization_idE:
+	.zero	2
+.globl _ZN4Trmm3rttE
+	.align 32
+	.type	_ZN4Trmm3rttE, @object
+	.size	_ZN4Trmm3rttE, 72
+_ZN4Trmm3rttE:
+	.zero	72
+.globl _ZN12Trmm_Strings8sl__2763E
+	.align 16
+	.type	_ZN12Trmm_Strings8sl__2763E, @object
+	.size	_ZN12Trmm_Strings8sl__2763E, 24
+_ZN12Trmm_Strings8sl__2763E:
+	.zero	24
+.globl _ZN12Trmm_Strings8sl__2761E
+	.align 16
+	.type	_ZN12Trmm_Strings8sl__2761E, @object
+	.size	_ZN12Trmm_Strings8sl__2761E, 24
+_ZN12Trmm_Strings8sl__2761E:
+	.zero	24
+.globl _ZN12Trmm_Strings8sl__2767E
+	.align 16
+	.type	_ZN12Trmm_Strings8sl__2767E, @object
+	.size	_ZN12Trmm_Strings8sl__2767E, 24
+_ZN12Trmm_Strings8sl__2767E:
+	.zero	24
+.globl _ZN12Trmm_Strings8sl__2765E
+	.align 16
+	.type	_ZN12Trmm_Strings8sl__2765E, @object
+	.size	_ZN12Trmm_Strings8sl__2765E, 24
+_ZN12Trmm_Strings8sl__2765E:
+	.zero	24
+.globl _ZN12Trmm_Strings8sl__2764E
+	.align 16
+	.type	_ZN12Trmm_Strings8sl__2764E, @object
+	.size	_ZN12Trmm_Strings8sl__2764E, 24
+_ZN12Trmm_Strings8sl__2764E:
+	.zero	24
+.globl _ZN12Trmm_Strings8sl__2759E
+	.align 16
+	.type	_ZN12Trmm_Strings8sl__2759E, @object
+	.size	_ZN12Trmm_Strings8sl__2759E, 24
+_ZN12Trmm_Strings8sl__2759E:
+	.zero	24
+.globl _ZN12Trmm_Strings8sl__2760E
+	.align 16
+	.type	_ZN12Trmm_Strings8sl__2760E, @object
+	.size	_ZN12Trmm_Strings8sl__2760E, 24
+_ZN12Trmm_Strings8sl__2760E:
+	.zero	24
+.globl _ZN12Trmm_Strings8sl__2762E
+	.align 16
+	.type	_ZN12Trmm_Strings8sl__2762E, @object
+	.size	_ZN12Trmm_Strings8sl__2762E, 24
+_ZN12Trmm_Strings8sl__2762E:
+	.zero	24
+.globl _ZN12Trmm_Strings8sl__2766E
+	.align 16
+	.type	_ZN12Trmm_Strings8sl__2766E, @object
+	.size	_ZN12Trmm_Strings8sl__2766E, 24
+_ZN12Trmm_Strings8sl__2766E:
+	.zero	24
+.globl _ZN16Trmm__closure__17_itableE
+	.align 32
+	.type	_ZN16Trmm__closure__17_itableE, @object
+	.size	_ZN16Trmm__closure__17_itableE, 80
+_ZN16Trmm__closure__17_itableE:
+	.zero	80
+.globl _ZN16Trmm__closure__18_itablesE
+	.align 32
+	.type	_ZN16Trmm__closure__18_itablesE, @object
+	.size	_ZN16Trmm__closure__18_itablesE, 48
+_ZN16Trmm__closure__18_itablesE:
+	.zero	48
+.globl _ZN16Trmm__closure__117_serialization_idE
+	.align 2
+	.type	_ZN16Trmm__closure__117_serialization_idE, @object
+	.size	_ZN16Trmm__closure__117_serialization_idE, 2
+_ZN16Trmm__closure__117_serialization_idE:
+	.zero	2
+.globl _ZN16Trmm__closure__111_network_idE
+	.align 2
+	.type	_ZN16Trmm__closure__111_network_idE, @object
+	.size	_ZN16Trmm__closure__111_network_idE, 2
+_ZN16Trmm__closure__111_network_idE:
+	.zero	2
+	.weak	_ZTV4Trmm
+	.section	.rodata._ZTV4Trmm,"aG",@progbits,_ZTV4Trmm,comdat
+	.align 32
+	.type	_ZTV4Trmm, @object
+	.size	_ZTV4Trmm, 160
+_ZTV4Trmm:
+	.quad	0
+	.quad	_ZTI4Trmm
+	.quad	_ZN3x104lang8X10Class11_getITablesEv
+	.quad	_ZNK4Trmm5_typeEv
+	.quad	_ZN3x104lang9Reference9_isMortalEv
+	.quad	_ZN3x104lang8X10Class6equalsEPNS0_3AnyE
+	.quad	_ZN3x104lang8X10Class14_struct_equalsEPNS0_9ReferenceE
+	.quad	_ZN3x104lang8X10Class8hashCodeEv
+	.quad	_ZN3x104lang8X10Class8toStringEv
+	.quad	_ZN4Trmm21_get_serialization_idEv
+	.quad	_ZN4Trmm15_serialize_bodyERN6x10aux20serialization_bufferE
+	.quad	_ZN3x104lang9Reference15_get_network_idEv
+	.quad	_ZN3x104lang8X10Class8typeNameEv
+	.quad	_ZN3x104lang8X10Class11_destructorEv
+	.quad	_ZN4Trmm6setPBsEl
+	.quad	_ZN4Trmm10init_arrayElPN3x104lang4RailIdEEPNS2_IS4_EES6_
+	.quad	_ZN4Trmm11print_arrayElPN3x104lang4RailIPNS2_IdEEEE
+	.quad	_ZN4Trmm11kernel_trmmEldPN3x104lang4RailIPNS2_IdEEEES6_
+	.quad	_ZN4Trmm18Trmm____this__TrmmEv
+	.quad	_ZN4Trmm24__fieldInitializers_TrmmEv
+	.weak	_ZTS4Trmm
+	.section	.rodata._ZTS4Trmm,"aG",@progbits,_ZTS4Trmm,comdat
+	.type	_ZTS4Trmm, @object
+	.size	_ZTS4Trmm, 6
+_ZTS4Trmm:
+	.string	"4Trmm"
+	.weak	_ZTI4Trmm
+	.section	.rodata._ZTI4Trmm,"aG",@progbits,_ZTI4Trmm,comdat
+	.align 16
+	.type	_ZTI4Trmm, @object
+	.size	_ZTI4Trmm, 24
+_ZTI4Trmm:
+	.quad	_ZTVN10__cxxabiv120__si_class_type_infoE+16
+	.quad	_ZTS4Trmm
+	.quad	_ZTIN3x104lang8X10ClassE
+	.weak	_ZGVN3x104lang4RailIdE3rttE
+	.section	.bss._ZGVN3x104lang4RailIdE3rttE,"awG",@nobits,_ZGVN3x104lang4RailIdE3rttE,comdat
+	.align 8
+	.type	_ZGVN3x104lang4RailIdE3rttE, @gnu_unique_object
+	.size	_ZGVN3x104lang4RailIdE3rttE, 8
+_ZGVN3x104lang4RailIdE3rttE:
+	.zero	8
+	.weak	_ZGVN3x104lang8IterableIdE3rttE
+	.section	.bss._ZGVN3x104lang8IterableIdE3rttE,"awG",@nobits,_ZGVN3x104lang8IterableIdE3rttE,comdat
+	.align 8
+	.type	_ZGVN3x104lang8IterableIdE3rttE, @gnu_unique_object
+	.size	_ZGVN3x104lang8IterableIdE3rttE, 8
+_ZGVN3x104lang8IterableIdE3rttE:
+	.zero	8
+	.weak	_ZGVN3x104lang7Fun_0_1IldE3rttE
+	.section	.bss._ZGVN3x104lang7Fun_0_1IldE3rttE,"awG",@nobits,_ZGVN3x104lang7Fun_0_1IldE3rttE,comdat
+	.align 8
+	.type	_ZGVN3x104lang7Fun_0_1IldE3rttE, @gnu_unique_object
+	.size	_ZGVN3x104lang7Fun_0_1IldE3rttE, 8
+_ZGVN3x104lang7Fun_0_1IldE3rttE:
+	.zero	8
+	.weak	_ZGVN3x104util18HashMap__HashEntryIPNS_4lang3AnyES4_E3rttE
+	.section	.bss._ZGVN3x104util18HashMap__HashEntryIPNS_4lang3AnyES4_E3rttE,"awG",@nobits,_ZGVN3x104util18HashMap__HashEntryIPNS_4lang3AnyES4_E3rttE,comdat
+	.align 8
+	.type	_ZGVN3x104util18HashMap__HashEntryIPNS_4lang3AnyES4_E3rttE, @gnu_unique_object
+	.size	_ZGVN3x104util18HashMap__HashEntryIPNS_4lang3AnyES4_E3rttE, 8
+_ZGVN3x104util18HashMap__HashEntryIPNS_4lang3AnyES4_E3rttE:
+	.zero	8
+	.weak	_ZGVN3x104util10Map__EntryIPNS_4lang3AnyES4_E3rttE
+	.section	.bss._ZGVN3x104util10Map__EntryIPNS_4lang3AnyES4_E3rttE,"awG",@nobits,_ZGVN3x104util10Map__EntryIPNS_4lang3AnyES4_E3rttE,comdat
+	.align 8
+	.type	_ZGVN3x104util10Map__EntryIPNS_4lang3AnyES4_E3rttE, @gnu_unique_object
+	.size	_ZGVN3x104util10Map__EntryIPNS_4lang3AnyES4_E3rttE, 8
+_ZGVN3x104util10Map__EntryIPNS_4lang3AnyES4_E3rttE:
+	.zero	8
+	.weak	_ZGVN3x104lang4RailIPNS1_IdEEE9_itable_0E
+	.section	.bss._ZGVN3x104lang4RailIPNS1_IdEEE9_itable_0E,"awG",@nobits,_ZGVN3x104lang4RailIPNS1_IdEEE9_itable_0E,comdat
+	.align 8
+	.type	_ZGVN3x104lang4RailIPNS1_IdEEE9_itable_0E, @gnu_unique_object
+	.size	_ZGVN3x104lang4RailIPNS1_IdEEE9_itable_0E, 8
+_ZGVN3x104lang4RailIPNS1_IdEEE9_itable_0E:
+	.zero	8
+	.weak	_ZGVN3x104lang4RailIPNS1_IdEEE9_itable_1E
+	.section	.bss._ZGVN3x104lang4RailIPNS1_IdEEE9_itable_1E,"awG",@nobits,_ZGVN3x104lang4RailIPNS1_IdEEE9_itable_1E,comdat
+	.align 8
+	.type	_ZGVN3x104lang4RailIPNS1_IdEEE9_itable_1E, @gnu_unique_object
+	.size	_ZGVN3x104lang4RailIPNS1_IdEEE9_itable_1E, 8
+_ZGVN3x104lang4RailIPNS1_IdEEE9_itable_1E:
+	.zero	8
+	.weak	_ZGVN3x104lang4RailIPNS1_IdEEE8_itablesE
+	.section	.bss._ZGVN3x104lang4RailIPNS1_IdEEE8_itablesE,"awG",@nobits,_ZGVN3x104lang4RailIPNS1_IdEEE8_itablesE,comdat
+	.align 8
+	.type	_ZGVN3x104lang4RailIPNS1_IdEEE8_itablesE, @gnu_unique_object
+	.size	_ZGVN3x104lang4RailIPNS1_IdEEE8_itablesE, 8
+_ZGVN3x104lang4RailIPNS1_IdEEE8_itablesE:
+	.zero	8
+	.weak	_ZGVN3x104lang4RailIPNS1_IdEEE17_serialization_idE
+	.section	.bss._ZGVN3x104lang4RailIPNS1_IdEEE17_serialization_idE,"awG",@nobits,_ZGVN3x104lang4RailIPNS1_IdEEE17_serialization_idE,comdat
+	.align 8
+	.type	_ZGVN3x104lang4RailIPNS1_IdEEE17_serialization_idE, @gnu_unique_object
+	.size	_ZGVN3x104lang4RailIPNS1_IdEEE17_serialization_idE, 8
+_ZGVN3x104lang4RailIPNS1_IdEEE17_serialization_idE:
+	.zero	8
+	.weak	_ZGVN3x104lang4RailIdE9_itable_0E
+	.section	.bss._ZGVN3x104lang4RailIdE9_itable_0E,"awG",@nobits,_ZGVN3x104lang4RailIdE9_itable_0E,comdat
+	.align 8
+	.type	_ZGVN3x104lang4RailIdE9_itable_0E, @gnu_unique_object
+	.size	_ZGVN3x104lang4RailIdE9_itable_0E, 8
+_ZGVN3x104lang4RailIdE9_itable_0E:
+	.zero	8
+	.weak	_ZGVN3x104lang4RailIdE9_itable_1E
+	.section	.bss._ZGVN3x104lang4RailIdE9_itable_1E,"awG",@nobits,_ZGVN3x104lang4RailIdE9_itable_1E,comdat
+	.align 8
+	.type	_ZGVN3x104lang4RailIdE9_itable_1E, @gnu_unique_object
+	.size	_ZGVN3x104lang4RailIdE9_itable_1E, 8
+_ZGVN3x104lang4RailIdE9_itable_1E:
+	.zero	8
+	.weak	_ZGVN3x104lang4RailIdE8_itablesE
+	.section	.bss._ZGVN3x104lang4RailIdE8_itablesE,"awG",@nobits,_ZGVN3x104lang4RailIdE8_itablesE,comdat
+	.align 8
+	.type	_ZGVN3x104lang4RailIdE8_itablesE, @gnu_unique_object
+	.size	_ZGVN3x104lang4RailIdE8_itablesE, 8
+_ZGVN3x104lang4RailIdE8_itablesE:
+	.zero	8
+	.weak	_ZGVN3x104lang4RailIdE17_serialization_idE
+	.section	.bss._ZGVN3x104lang4RailIdE17_serialization_idE,"awG",@nobits,_ZGVN3x104lang4RailIdE17_serialization_idE,comdat
+	.align 8
+	.type	_ZGVN3x104lang4RailIdE17_serialization_idE, @gnu_unique_object
+	.size	_ZGVN3x104lang4RailIdE17_serialization_idE, 8
+_ZGVN3x104lang4RailIdE17_serialization_idE:
+	.zero	8
+	.weak	_ZGVN3x104lang4IBoxIdE17_serialization_idE
+	.section	.bss._ZGVN3x104lang4IBoxIdE17_serialization_idE,"awG",@nobits,_ZGVN3x104lang4IBoxIdE17_serialization_idE,comdat
+	.align 8
+	.type	_ZGVN3x104lang4IBoxIdE17_serialization_idE, @gnu_unique_object
+	.size	_ZGVN3x104lang4IBoxIdE17_serialization_idE, 8
+_ZGVN3x104lang4IBoxIdE17_serialization_idE:
+	.zero	8
+	.weak	_ZGVN3x104lang4RailIPNS1_IdEEE3rttE
+	.section	.bss._ZGVN3x104lang4RailIPNS1_IdEEE3rttE,"awG",@nobits,_ZGVN3x104lang4RailIPNS1_IdEEE3rttE,comdat
+	.align 8
+	.type	_ZGVN3x104lang4RailIPNS1_IdEEE3rttE, @gnu_unique_object
+	.size	_ZGVN3x104lang4RailIPNS1_IdEEE3rttE, 8
+_ZGVN3x104lang4RailIPNS1_IdEEE3rttE:
+	.zero	8
+	.weak	_ZGVN3x104lang8IterableIPNS0_4RailIdEEE3rttE
+	.section	.bss._ZGVN3x104lang8IterableIPNS0_4RailIdEEE3rttE,"awG",@nobits,_ZGVN3x104lang8IterableIPNS0_4RailIdEEE3rttE,comdat
+	.align 8
+	.type	_ZGVN3x104lang8IterableIPNS0_4RailIdEEE3rttE, @gnu_unique_object
+	.size	_ZGVN3x104lang8IterableIPNS0_4RailIdEEE3rttE, 8
+_ZGVN3x104lang8IterableIPNS0_4RailIdEEE3rttE:
+	.zero	8
+	.weak	_ZGVN3x104lang7Fun_0_1IlPNS0_4RailIdEEE3rttE
+	.section	.bss._ZGVN3x104lang7Fun_0_1IlPNS0_4RailIdEEE3rttE,"awG",@nobits,_ZGVN3x104lang7Fun_0_1IlPNS0_4RailIdEEE3rttE,comdat
+	.align 8
+	.type	_ZGVN3x104lang7Fun_0_1IlPNS0_4RailIdEEE3rttE, @gnu_unique_object
+	.size	_ZGVN3x104lang7Fun_0_1IlPNS0_4RailIdEEE3rttE, 8
+_ZGVN3x104lang7Fun_0_1IlPNS0_4RailIdEEE3rttE:
+	.zero	8
+	.weak	_ZGVN3x104lang12RailIteratorIdE9_itable_0E
+	.section	.bss._ZGVN3x104lang12RailIteratorIdE9_itable_0E,"awG",@nobits,_ZGVN3x104lang12RailIteratorIdE9_itable_0E,comdat
+	.align 8
+	.type	_ZGVN3x104lang12RailIteratorIdE9_itable_0E, @gnu_unique_object
+	.size	_ZGVN3x104lang12RailIteratorIdE9_itable_0E, 8
+_ZGVN3x104lang12RailIteratorIdE9_itable_0E:
+	.zero	8
+	.weak	_ZGVN3x104lang12RailIteratorIdE9_itable_1E
+	.section	.bss._ZGVN3x104lang12RailIteratorIdE9_itable_1E,"awG",@nobits,_ZGVN3x104lang12RailIteratorIdE9_itable_1E,comdat
+	.align 8
+	.type	_ZGVN3x104lang12RailIteratorIdE9_itable_1E, @gnu_unique_object
+	.size	_ZGVN3x104lang12RailIteratorIdE9_itable_1E, 8
+_ZGVN3x104lang12RailIteratorIdE9_itable_1E:
+	.zero	8
+	.weak	_ZGVN3x104lang12RailIteratorIdE8_itablesE
+	.section	.bss._ZGVN3x104lang12RailIteratorIdE8_itablesE,"awG",@nobits,_ZGVN3x104lang12RailIteratorIdE8_itablesE,comdat
+	.align 8
+	.type	_ZGVN3x104lang12RailIteratorIdE8_itablesE, @gnu_unique_object
+	.size	_ZGVN3x104lang12RailIteratorIdE8_itablesE, 8
+_ZGVN3x104lang12RailIteratorIdE8_itablesE:
+	.zero	8
+	.weak	_ZGVN3x104lang12RailIteratorIdE17_serialization_idE
+	.section	.bss._ZGVN3x104lang12RailIteratorIdE17_serialization_idE,"awG",@nobits,_ZGVN3x104lang12RailIteratorIdE17_serialization_idE,comdat
+	.align 8
+	.type	_ZGVN3x104lang12RailIteratorIdE17_serialization_idE, @gnu_unique_object
+	.size	_ZGVN3x104lang12RailIteratorIdE17_serialization_idE, 8
+_ZGVN3x104lang12RailIteratorIdE17_serialization_idE:
+	.zero	8
+	.weak	_ZGVN3x104lang12RailIteratorIPNS0_4RailIdEEE9_itable_0E
+	.section	.bss._ZGVN3x104lang12RailIteratorIPNS0_4RailIdEEE9_itable_0E,"awG",@nobits,_ZGVN3x104lang12RailIteratorIPNS0_4RailIdEEE9_itable_0E,comdat
+	.align 8
+	.type	_ZGVN3x104lang12RailIteratorIPNS0_4RailIdEEE9_itable_0E, @gnu_unique_object
+	.size	_ZGVN3x104lang12RailIteratorIPNS0_4RailIdEEE9_itable_0E, 8
+_ZGVN3x104lang12RailIteratorIPNS0_4RailIdEEE9_itable_0E:
+	.zero	8
+	.weak	_ZGVN3x104lang12RailIteratorIPNS0_4RailIdEEE9_itable_1E
+	.section	.bss._ZGVN3x104lang12RailIteratorIPNS0_4RailIdEEE9_itable_1E,"awG",@nobits,_ZGVN3x104lang12RailIteratorIPNS0_4RailIdEEE9_itable_1E,comdat
+	.align 8
+	.type	_ZGVN3x104lang12RailIteratorIPNS0_4RailIdEEE9_itable_1E, @gnu_unique_object
+	.size	_ZGVN3x104lang12RailIteratorIPNS0_4RailIdEEE9_itable_1E, 8
+_ZGVN3x104lang12RailIteratorIPNS0_4RailIdEEE9_itable_1E:
+	.zero	8
+	.weak	_ZGVN3x104lang12RailIteratorIPNS0_4RailIdEEE8_itablesE
+	.section	.bss._ZGVN3x104lang12RailIteratorIPNS0_4RailIdEEE8_itablesE,"awG",@nobits,_ZGVN3x104lang12RailIteratorIPNS0_4RailIdEEE8_itablesE,comdat
+	.align 8
+	.type	_ZGVN3x104lang12RailIteratorIPNS0_4RailIdEEE8_itablesE, @gnu_unique_object
+	.size	_ZGVN3x104lang12RailIteratorIPNS0_4RailIdEEE8_itablesE, 8
+_ZGVN3x104lang12RailIteratorIPNS0_4RailIdEEE8_itablesE:
+	.zero	8
+	.weak	_ZGVN3x104lang12RailIteratorIPNS0_4RailIdEEE17_serialization_idE
+	.section	.bss._ZGVN3x104lang12RailIteratorIPNS0_4RailIdEEE17_serialization_idE,"awG",@nobits,_ZGVN3x104lang12RailIteratorIPNS0_4RailIdEEE17_serialization_idE,comdat
+	.align 8
+	.type	_ZGVN3x104lang12RailIteratorIPNS0_4RailIdEEE17_serialization_idE, @gnu_unique_object
+	.size	_ZGVN3x104lang12RailIteratorIPNS0_4RailIdEEE17_serialization_idE, 8
+_ZGVN3x104lang12RailIteratorIPNS0_4RailIdEEE17_serialization_idE:
+	.zero	8
+	.weak	_ZGVN3x104lang12RailIteratorIdE3rttE
+	.section	.bss._ZGVN3x104lang12RailIteratorIdE3rttE,"awG",@nobits,_ZGVN3x104lang12RailIteratorIdE3rttE,comdat
+	.align 8
+	.type	_ZGVN3x104lang12RailIteratorIdE3rttE, @gnu_unique_object
+	.size	_ZGVN3x104lang12RailIteratorIdE3rttE, 8
+_ZGVN3x104lang12RailIteratorIdE3rttE:
+	.zero	8
+	.weak	_ZGVN3x104lang12RailIteratorIPNS0_4RailIdEEE3rttE
+	.section	.bss._ZGVN3x104lang12RailIteratorIPNS0_4RailIdEEE3rttE,"awG",@nobits,_ZGVN3x104lang12RailIteratorIPNS0_4RailIdEEE3rttE,comdat
+	.align 8
+	.type	_ZGVN3x104lang12RailIteratorIPNS0_4RailIdEEE3rttE, @gnu_unique_object
+	.size	_ZGVN3x104lang12RailIteratorIPNS0_4RailIdEEE3rttE, 8
+_ZGVN3x104lang12RailIteratorIPNS0_4RailIdEEE3rttE:
+	.zero	8
+	.weak	_ZGVN3x104lang8IteratorIdE3rttE
+	.section	.bss._ZGVN3x104lang8IteratorIdE3rttE,"awG",@nobits,_ZGVN3x104lang8IteratorIdE3rttE,comdat
+	.align 8
+	.type	_ZGVN3x104lang8IteratorIdE3rttE, @gnu_unique_object
+	.size	_ZGVN3x104lang8IteratorIdE3rttE, 8
+_ZGVN3x104lang8IteratorIdE3rttE:
+	.zero	8
+	.weak	_ZGVN3x104lang8IteratorIPNS0_4RailIdEEE3rttE
+	.section	.bss._ZGVN3x104lang8IteratorIPNS0_4RailIdEEE3rttE,"awG",@nobits,_ZGVN3x104lang8IteratorIPNS0_4RailIdEEE3rttE,comdat
+	.align 8
+	.type	_ZGVN3x104lang8IteratorIPNS0_4RailIdEEE3rttE, @gnu_unique_object
+	.size	_ZGVN3x104lang8IteratorIPNS0_4RailIdEEE3rttE, 8
+_ZGVN3x104lang8IteratorIPNS0_4RailIdEEE3rttE:
+	.zero	8
+	.local	_ZStL8__ioinit
+	.comm	_ZStL8__ioinit,1,1
+	.weak	_ZN3x104lang4RailIdE3rttE
+	.section	.bss._ZN3x104lang4RailIdE3rttE,"awG",@nobits,_ZN3x104lang4RailIdE3rttE,comdat
+	.align 32
+	.type	_ZN3x104lang4RailIdE3rttE, @gnu_unique_object
+	.size	_ZN3x104lang4RailIdE3rttE, 72
+_ZN3x104lang4RailIdE3rttE:
+	.zero	72
+	.weak	_ZN3x104lang8IterableIdE3rttE
+	.section	.bss._ZN3x104lang8IterableIdE3rttE,"awG",@nobits,_ZN3x104lang8IterableIdE3rttE,comdat
+	.align 32
+	.type	_ZN3x104lang8IterableIdE3rttE, @gnu_unique_object
+	.size	_ZN3x104lang8IterableIdE3rttE, 72
+_ZN3x104lang8IterableIdE3rttE:
+	.zero	72
+	.weak	_ZN3x104lang7Fun_0_1IldE3rttE
+	.section	.bss._ZN3x104lang7Fun_0_1IldE3rttE,"awG",@nobits,_ZN3x104lang7Fun_0_1IldE3rttE,comdat
+	.align 32
+	.type	_ZN3x104lang7Fun_0_1IldE3rttE, @gnu_unique_object
+	.size	_ZN3x104lang7Fun_0_1IldE3rttE, 72
+_ZN3x104lang7Fun_0_1IldE3rttE:
+	.zero	72
+	.weak	_ZN3x104util18HashMap__HashEntryIPNS_4lang3AnyES4_E3rttE
+	.section	.bss._ZN3x104util18HashMap__HashEntryIPNS_4lang3AnyES4_E3rttE,"awG",@nobits,_ZN3x104util18HashMap__HashEntryIPNS_4lang3AnyES4_E3rttE,comdat
+	.align 32
+	.type	_ZN3x104util18HashMap__HashEntryIPNS_4lang3AnyES4_E3rttE, @gnu_unique_object
+	.size	_ZN3x104util18HashMap__HashEntryIPNS_4lang3AnyES4_E3rttE, 72
+_ZN3x104util18HashMap__HashEntryIPNS_4lang3AnyES4_E3rttE:
+	.zero	72
+	.weak	_ZN3x104util10Map__EntryIPNS_4lang3AnyES4_E3rttE
+	.section	.bss._ZN3x104util10Map__EntryIPNS_4lang3AnyES4_E3rttE,"awG",@nobits,_ZN3x104util10Map__EntryIPNS_4lang3AnyES4_E3rttE,comdat
+	.align 32
+	.type	_ZN3x104util10Map__EntryIPNS_4lang3AnyES4_E3rttE, @gnu_unique_object
+	.size	_ZN3x104util10Map__EntryIPNS_4lang3AnyES4_E3rttE, 72
+_ZN3x104util10Map__EntryIPNS_4lang3AnyES4_E3rttE:
+	.zero	72
+	.weak	_ZTVN3x104lang9ReferenceE
+	.section	.rodata._ZTVN3x104lang9ReferenceE,"aG",@progbits,_ZTVN3x104lang9ReferenceE,comdat
+	.align 32
+	.type	_ZTVN3x104lang9ReferenceE, @object
+	.size	_ZTVN3x104lang9ReferenceE, 96
+_ZTVN3x104lang9ReferenceE:
+	.quad	0
+	.quad	_ZTIN3x104lang9ReferenceE
+	.quad	__cxa_pure_virtual
+	.quad	__cxa_pure_virtual
+	.quad	_ZN3x104lang9Reference9_isMortalEv
+	.quad	_ZN3x104lang9Reference6equalsEPNS0_3AnyE
+	.quad	_ZN3x104lang9Reference14_struct_equalsEPS1_
+	.quad	__cxa_pure_virtual
+	.quad	__cxa_pure_virtual
+	.quad	__cxa_pure_virtual
+	.quad	__cxa_pure_virtual
+	.quad	_ZN3x104lang9Reference15_get_network_idEv
+	.weak	_ZTIN3x104lang9ReferenceE
+	.section	.rodata._ZTIN3x104lang9ReferenceE,"aG",@progbits,_ZTIN3x104lang9ReferenceE,comdat
+	.align 16
+	.type	_ZTIN3x104lang9ReferenceE, @object
+	.size	_ZTIN3x104lang9ReferenceE, 16
+_ZTIN3x104lang9ReferenceE:
+	.quad	_ZTVN10__cxxabiv117__class_type_infoE+16
+	.quad	_ZTSN3x104lang9ReferenceE
+	.weak	_ZTSN3x104lang9ReferenceE
+	.section	.rodata._ZTSN3x104lang9ReferenceE,"aG",@progbits,_ZTSN3x104lang9ReferenceE,comdat
+	.align 16
+	.type	_ZTSN3x104lang9ReferenceE, @object
+	.size	_ZTSN3x104lang9ReferenceE, 22
+_ZTSN3x104lang9ReferenceE:
+	.string	"N3x104lang9ReferenceE"
+	.weak	_ZTV16Trmm__closure__1
+	.section	.rodata._ZTV16Trmm__closure__1,"aG",@progbits,_ZTV16Trmm__closure__1,comdat
+	.align 32
+	.type	_ZTV16Trmm__closure__1, @object
+	.size	_ZTV16Trmm__closure__1, 112
+_ZTV16Trmm__closure__1:
+	.quad	0
+	.quad	_ZTI16Trmm__closure__1
+	.quad	_ZN16Trmm__closure__111_getITablesEv
+	.quad	_ZNK16Trmm__closure__15_typeEv
+	.quad	_ZN3x104lang9Reference9_isMortalEv
+	.quad	_ZN3x104lang9Reference6equalsEPNS0_3AnyE
+	.quad	_ZN3x104lang9Reference14_struct_equalsEPS1_
+	.quad	_ZN3x104lang7Closure8hashCodeEv
+	.quad	_ZN3x104lang7Closure8toStringEv
+	.quad	_ZN16Trmm__closure__121_get_serialization_idEv
+	.quad	_ZN16Trmm__closure__115_serialize_bodyERN6x10aux20serialization_bufferE
+	.quad	_ZN16Trmm__closure__115_get_network_idEv
+	.quad	_ZN16Trmm__closure__114toNativeStringEv
+	.quad	_ZN3x104lang7Closure8typeNameEv
+	.weak	_ZTI16Trmm__closure__1
+	.section	.rodata._ZTI16Trmm__closure__1,"aG",@progbits,_ZTI16Trmm__closure__1,comdat
+	.align 16
+	.type	_ZTI16Trmm__closure__1, @object
+	.size	_ZTI16Trmm__closure__1, 24
+_ZTI16Trmm__closure__1:
+	.quad	_ZTVN10__cxxabiv120__si_class_type_infoE+16
+	.quad	_ZTS16Trmm__closure__1
+	.quad	_ZTIN3x104lang7ClosureE
+	.weak	_ZTS16Trmm__closure__1
+	.section	.rodata._ZTS16Trmm__closure__1,"aG",@progbits,_ZTS16Trmm__closure__1,comdat
+	.align 16
+	.type	_ZTS16Trmm__closure__1, @object
+	.size	_ZTS16Trmm__closure__1, 19
+_ZTS16Trmm__closure__1:
+	.string	"16Trmm__closure__1"
+	.weak	_ZN3x104lang4RailIPNS1_IdEEE9_itable_0E
+	.section	.bss._ZN3x104lang4RailIPNS1_IdEEE9_itable_0E,"awG",@nobits,_ZN3x104lang4RailIPNS1_IdEEE9_itable_0E,comdat
+	.align 32
+	.type	_ZN3x104lang4RailIPNS1_IdEEE9_itable_0E, @gnu_unique_object
+	.size	_ZN3x104lang4RailIPNS1_IdEEE9_itable_0E, 80
+_ZN3x104lang4RailIPNS1_IdEEE9_itable_0E:
+	.zero	80
+	.weak	_ZN3x104lang4RailIPNS1_IdEEE9_itable_1E
+	.section	.bss._ZN3x104lang4RailIPNS1_IdEEE9_itable_1E,"awG",@nobits,_ZN3x104lang4RailIPNS1_IdEEE9_itable_1E,comdat
+	.align 32
+	.type	_ZN3x104lang4RailIPNS1_IdEEE9_itable_1E, @gnu_unique_object
+	.size	_ZN3x104lang4RailIPNS1_IdEEE9_itable_1E, 80
+_ZN3x104lang4RailIPNS1_IdEEE9_itable_1E:
+	.zero	80
+	.weak	_ZN3x104lang4RailIPNS1_IdEEE8_itablesE
+	.section	.bss._ZN3x104lang4RailIPNS1_IdEEE8_itablesE,"awG",@nobits,_ZN3x104lang4RailIPNS1_IdEEE8_itablesE,comdat
+	.align 32
+	.type	_ZN3x104lang4RailIPNS1_IdEEE8_itablesE, @gnu_unique_object
+	.size	_ZN3x104lang4RailIPNS1_IdEEE8_itablesE, 72
+_ZN3x104lang4RailIPNS1_IdEEE8_itablesE:
+	.zero	72
+	.weak	_ZN3x104lang4RailIPNS1_IdEEE17_serialization_idE
+	.section	.bss._ZN3x104lang4RailIPNS1_IdEEE17_serialization_idE,"awG",@nobits,_ZN3x104lang4RailIPNS1_IdEEE17_serialization_idE,comdat
+	.align 2
+	.type	_ZN3x104lang4RailIPNS1_IdEEE17_serialization_idE, @gnu_unique_object
+	.size	_ZN3x104lang4RailIPNS1_IdEEE17_serialization_idE, 2
+_ZN3x104lang4RailIPNS1_IdEEE17_serialization_idE:
+	.zero	2
+	.weak	_ZN3x104lang4RailIdE9_itable_0E
+	.section	.bss._ZN3x104lang4RailIdE9_itable_0E,"awG",@nobits,_ZN3x104lang4RailIdE9_itable_0E,comdat
+	.align 32
+	.type	_ZN3x104lang4RailIdE9_itable_0E, @gnu_unique_object
+	.size	_ZN3x104lang4RailIdE9_itable_0E, 80
+_ZN3x104lang4RailIdE9_itable_0E:
+	.zero	80
+	.weak	_ZN3x104lang4RailIdE9_itable_1E
+	.section	.bss._ZN3x104lang4RailIdE9_itable_1E,"awG",@nobits,_ZN3x104lang4RailIdE9_itable_1E,comdat
+	.align 32
+	.type	_ZN3x104lang4RailIdE9_itable_1E, @gnu_unique_object
+	.size	_ZN3x104lang4RailIdE9_itable_1E, 80
+_ZN3x104lang4RailIdE9_itable_1E:
+	.zero	80
+	.weak	_ZN3x104lang4RailIdE8_itablesE
+	.section	.bss._ZN3x104lang4RailIdE8_itablesE,"awG",@nobits,_ZN3x104lang4RailIdE8_itablesE,comdat
+	.align 32
+	.type	_ZN3x104lang4RailIdE8_itablesE, @gnu_unique_object
+	.size	_ZN3x104lang4RailIdE8_itablesE, 72
+_ZN3x104lang4RailIdE8_itablesE:
+	.zero	72
+	.weak	_ZN3x104lang4RailIdE17_serialization_idE
+	.section	.bss._ZN3x104lang4RailIdE17_serialization_idE,"awG",@nobits,_ZN3x104lang4RailIdE17_serialization_idE,comdat
+	.align 2
+	.type	_ZN3x104lang4RailIdE17_serialization_idE, @gnu_unique_object
+	.size	_ZN3x104lang4RailIdE17_serialization_idE, 2
+_ZN3x104lang4RailIdE17_serialization_idE:
+	.zero	2
+	.weak	_ZN3x104lang4IBoxIdE17_serialization_idE
+	.section	.bss._ZN3x104lang4IBoxIdE17_serialization_idE,"awG",@nobits,_ZN3x104lang4IBoxIdE17_serialization_idE,comdat
+	.align 2
+	.type	_ZN3x104lang4IBoxIdE17_serialization_idE, @gnu_unique_object
+	.size	_ZN3x104lang4IBoxIdE17_serialization_idE, 2
+_ZN3x104lang4IBoxIdE17_serialization_idE:
+	.zero	2
+	.weak	_ZN3x104lang4RailIPNS1_IdEEE3rttE
+	.section	.bss._ZN3x104lang4RailIPNS1_IdEEE3rttE,"awG",@nobits,_ZN3x104lang4RailIPNS1_IdEEE3rttE,comdat
+	.align 32
+	.type	_ZN3x104lang4RailIPNS1_IdEEE3rttE, @gnu_unique_object
+	.size	_ZN3x104lang4RailIPNS1_IdEEE3rttE, 72
+_ZN3x104lang4RailIPNS1_IdEEE3rttE:
+	.zero	72
+	.weak	_ZN3x104lang8IterableIPNS0_4RailIdEEE3rttE
+	.section	.bss._ZN3x104lang8IterableIPNS0_4RailIdEEE3rttE,"awG",@nobits,_ZN3x104lang8IterableIPNS0_4RailIdEEE3rttE,comdat
+	.align 32
+	.type	_ZN3x104lang8IterableIPNS0_4RailIdEEE3rttE, @gnu_unique_object
+	.size	_ZN3x104lang8IterableIPNS0_4RailIdEEE3rttE, 72
+_ZN3x104lang8IterableIPNS0_4RailIdEEE3rttE:
+	.zero	72
+	.weak	_ZN3x104lang7Fun_0_1IlPNS0_4RailIdEEE3rttE
+	.section	.bss._ZN3x104lang7Fun_0_1IlPNS0_4RailIdEEE3rttE,"awG",@nobits,_ZN3x104lang7Fun_0_1IlPNS0_4RailIdEEE3rttE,comdat
+	.align 32
+	.type	_ZN3x104lang7Fun_0_1IlPNS0_4RailIdEEE3rttE, @gnu_unique_object
+	.size	_ZN3x104lang7Fun_0_1IlPNS0_4RailIdEEE3rttE, 72
+_ZN3x104lang7Fun_0_1IlPNS0_4RailIdEEE3rttE:
+	.zero	72
+	.weak	_ZTVN3x104lang4IBoxIdEE
+	.section	.rodata._ZTVN3x104lang4IBoxIdEE,"aG",@progbits,_ZTVN3x104lang4IBoxIdEE,comdat
+	.align 32
+	.type	_ZTVN3x104lang4IBoxIdEE, @object
+	.size	_ZTVN3x104lang4IBoxIdEE, 96
+_ZTVN3x104lang4IBoxIdEE:
+	.quad	0
+	.quad	_ZTIN3x104lang4IBoxIdEE
+	.quad	_ZN3x104lang4IBoxIdE11_getITablesEv
+	.quad	_ZNK3x104lang4IBoxIdE5_typeEv
+	.quad	_ZN3x104lang9Reference9_isMortalEv
+	.quad	_ZN3x104lang9Reference6equalsEPNS0_3AnyE
+	.quad	_ZN3x104lang4IBoxIdE14_struct_equalsEPNS0_9ReferenceE
+	.quad	_ZN3x104lang4IBoxIdE8hashCodeEv
+	.quad	_ZN3x104lang4IBoxIdE8toStringEv
+	.quad	_ZN3x104lang4IBoxIdE21_get_serialization_idEv
+	.quad	_ZN3x104lang4IBoxIdE15_serialize_bodyERN6x10aux20serialization_bufferE
+	.quad	_ZN3x104lang9Reference15_get_network_idEv
+	.weak	_ZTIN3x104lang4IBoxIdEE
+	.section	.rodata._ZTIN3x104lang4IBoxIdEE,"aG",@progbits,_ZTIN3x104lang4IBoxIdEE,comdat
+	.align 16
+	.type	_ZTIN3x104lang4IBoxIdEE, @object
+	.size	_ZTIN3x104lang4IBoxIdEE, 24
+_ZTIN3x104lang4IBoxIdEE:
+	.quad	_ZTVN10__cxxabiv120__si_class_type_infoE+16
+	.quad	_ZTSN3x104lang4IBoxIdEE
+	.quad	_ZTIN3x104lang9ReferenceE
+	.weak	_ZTSN3x104lang4IBoxIdEE
+	.section	.rodata._ZTSN3x104lang4IBoxIdEE,"aG",@progbits,_ZTSN3x104lang4IBoxIdEE,comdat
+	.align 16
+	.type	_ZTSN3x104lang4IBoxIdEE, @object
+	.size	_ZTSN3x104lang4IBoxIdEE, 20
+_ZTSN3x104lang4IBoxIdEE:
+	.string	"N3x104lang4IBoxIdEE"
+	.weak	_ZTVN3x104lang4RailIdEE
+	.section	.rodata._ZTVN3x104lang4RailIdEE,"aG",@progbits,_ZTVN3x104lang4RailIdEE,comdat
+	.align 32
+	.type	_ZTVN3x104lang4RailIdEE, @object
+	.size	_ZTVN3x104lang4RailIdEE, 112
+_ZTVN3x104lang4RailIdEE:
+	.quad	0
+	.quad	_ZTIN3x104lang4RailIdEE
+	.quad	_ZN3x104lang4RailIdE11_getITablesEv
+	.quad	_ZNK3x104lang4RailIdE5_typeEv
+	.quad	_ZN3x104lang9Reference9_isMortalEv
+	.quad	_ZN3x104lang8X10Class6equalsEPNS0_3AnyE
+	.quad	_ZN3x104lang8X10Class14_struct_equalsEPNS0_9ReferenceE
+	.quad	_ZN3x104lang8X10Class8hashCodeEv
+	.quad	_ZN3x104lang4RailIdE8toStringEv
+	.quad	_ZN3x104lang4RailIdE21_get_serialization_idEv
+	.quad	_ZN3x104lang4RailIdE15_serialize_bodyERN6x10aux20serialization_bufferE
+	.quad	_ZN3x104lang9Reference15_get_network_idEv
+	.quad	_ZN3x104lang8X10Class8typeNameEv
+	.quad	_ZN3x104lang8X10Class11_destructorEv
+	.weak	_ZTIN3x104lang4RailIdEE
+	.section	.rodata._ZTIN3x104lang4RailIdEE,"aG",@progbits,_ZTIN3x104lang4RailIdEE,comdat
+	.align 16
+	.type	_ZTIN3x104lang4RailIdEE, @object
+	.size	_ZTIN3x104lang4RailIdEE, 24
+_ZTIN3x104lang4RailIdEE:
+	.quad	_ZTVN10__cxxabiv120__si_class_type_infoE+16
+	.quad	_ZTSN3x104lang4RailIdEE
+	.quad	_ZTIN3x104lang8X10ClassE
+	.weak	_ZTSN3x104lang4RailIdEE
+	.section	.rodata._ZTSN3x104lang4RailIdEE,"aG",@progbits,_ZTSN3x104lang4RailIdEE,comdat
+	.align 16
+	.type	_ZTSN3x104lang4RailIdEE, @object
+	.size	_ZTSN3x104lang4RailIdEE, 20
+_ZTSN3x104lang4RailIdEE:
+	.string	"N3x104lang4RailIdEE"
+	.weak	_ZTVN3x104lang12RailIteratorIdEE
+	.section	.rodata._ZTVN3x104lang12RailIteratorIdEE,"aG",@progbits,_ZTVN3x104lang12RailIteratorIdEE,comdat
+	.align 32
+	.type	_ZTVN3x104lang12RailIteratorIdEE, @object
+	.size	_ZTVN3x104lang12RailIteratorIdEE, 144
+_ZTVN3x104lang12RailIteratorIdEE:
+	.quad	0
+	.quad	_ZTIN3x104lang12RailIteratorIdEE
+	.quad	_ZN3x104lang12RailIteratorIdE11_getITablesEv
+	.quad	_ZNK3x104lang12RailIteratorIdE5_typeEv
+	.quad	_ZN3x104lang9Reference9_isMortalEv
+	.quad	_ZN3x104lang8X10Class6equalsEPNS0_3AnyE
+	.quad	_ZN3x104lang8X10Class14_struct_equalsEPNS0_9ReferenceE
+	.quad	_ZN3x104lang8X10Class8hashCodeEv
+	.quad	_ZN3x104lang8X10Class8toStringEv
+	.quad	_ZN3x104lang12RailIteratorIdE21_get_serialization_idEv
+	.quad	_ZN3x104lang12RailIteratorIdE15_serialize_bodyERN6x10aux20serialization_bufferE
+	.quad	_ZN3x104lang9Reference15_get_network_idEv
+	.quad	_ZN3x104lang8X10Class8typeNameEv
+	.quad	_ZN3x104lang8X10Class11_destructorEv
+	.quad	_ZN3x104lang12RailIteratorIdE4nextEv
+	.quad	_ZN3x104lang12RailIteratorIdE7hasNextEv
+	.quad	_ZN3x104lang12RailIteratorIdE56x10__lang__RailIterator____this__x10__lang__RailIteratorEv
+	.quad	_ZN3x104lang12RailIteratorIdE41__fieldInitializers_x10_lang_RailIteratorEv
+	.weak	_ZTIN3x104lang12RailIteratorIdEE
+	.section	.rodata._ZTIN3x104lang12RailIteratorIdEE,"aG",@progbits,_ZTIN3x104lang12RailIteratorIdEE,comdat
+	.align 16
+	.type	_ZTIN3x104lang12RailIteratorIdEE, @object
+	.size	_ZTIN3x104lang12RailIteratorIdEE, 24
+_ZTIN3x104lang12RailIteratorIdEE:
+	.quad	_ZTVN10__cxxabiv120__si_class_type_infoE+16
+	.quad	_ZTSN3x104lang12RailIteratorIdEE
+	.quad	_ZTIN3x104lang8X10ClassE
+	.weak	_ZTSN3x104lang12RailIteratorIdEE
+	.section	.rodata._ZTSN3x104lang12RailIteratorIdEE,"aG",@progbits,_ZTSN3x104lang12RailIteratorIdEE,comdat
+	.align 16
+	.type	_ZTSN3x104lang12RailIteratorIdEE, @object
+	.size	_ZTSN3x104lang12RailIteratorIdEE, 29
+_ZTSN3x104lang12RailIteratorIdEE:
+	.string	"N3x104lang12RailIteratorIdEE"
+	.weak	_ZN3x104lang12RailIteratorIdE17_serialization_idE
+	.section	.bss._ZN3x104lang12RailIteratorIdE17_serialization_idE,"awG",@nobits,_ZN3x104lang12RailIteratorIdE17_serialization_idE,comdat
+	.align 2
+	.type	_ZN3x104lang12RailIteratorIdE17_serialization_idE, @gnu_unique_object
+	.size	_ZN3x104lang12RailIteratorIdE17_serialization_idE, 2
+_ZN3x104lang12RailIteratorIdE17_serialization_idE:
+	.zero	2
+	.weak	_ZN3x104lang12RailIteratorIdE3rttE
+	.section	.bss._ZN3x104lang12RailIteratorIdE3rttE,"awG",@nobits,_ZN3x104lang12RailIteratorIdE3rttE,comdat
+	.align 32
+	.type	_ZN3x104lang12RailIteratorIdE3rttE, @gnu_unique_object
+	.size	_ZN3x104lang12RailIteratorIdE3rttE, 72
+_ZN3x104lang12RailIteratorIdE3rttE:
+	.zero	72
+	.weak	_ZN3x104lang8IteratorIdE3rttE
+	.section	.bss._ZN3x104lang8IteratorIdE3rttE,"awG",@nobits,_ZN3x104lang8IteratorIdE3rttE,comdat
+	.align 32
+	.type	_ZN3x104lang8IteratorIdE3rttE, @gnu_unique_object
+	.size	_ZN3x104lang8IteratorIdE3rttE, 72
+_ZN3x104lang8IteratorIdE3rttE:
+	.zero	72
+	.weak	_ZN3x104lang12RailIteratorIdE8_itablesE
+	.section	.bss._ZN3x104lang12RailIteratorIdE8_itablesE,"awG",@nobits,_ZN3x104lang12RailIteratorIdE8_itablesE,comdat
+	.align 32
+	.type	_ZN3x104lang12RailIteratorIdE8_itablesE, @gnu_unique_object
+	.size	_ZN3x104lang12RailIteratorIdE8_itablesE, 72
+_ZN3x104lang12RailIteratorIdE8_itablesE:
+	.zero	72
+	.weak	_ZTVN3x104lang4RailIPNS1_IdEEEE
+	.section	.rodata._ZTVN3x104lang4RailIPNS1_IdEEEE,"aG",@progbits,_ZTVN3x104lang4RailIPNS1_IdEEEE,comdat
+	.align 32
+	.type	_ZTVN3x104lang4RailIPNS1_IdEEEE, @object
+	.size	_ZTVN3x104lang4RailIPNS1_IdEEEE, 112
+_ZTVN3x104lang4RailIPNS1_IdEEEE:
+	.quad	0
+	.quad	_ZTIN3x104lang4RailIPNS1_IdEEEE
+	.quad	_ZN3x104lang4RailIPNS1_IdEEE11_getITablesEv
+	.quad	_ZNK3x104lang4RailIPNS1_IdEEE5_typeEv
+	.quad	_ZN3x104lang9Reference9_isMortalEv
+	.quad	_ZN3x104lang8X10Class6equalsEPNS0_3AnyE
+	.quad	_ZN3x104lang8X10Class14_struct_equalsEPNS0_9ReferenceE
+	.quad	_ZN3x104lang8X10Class8hashCodeEv
+	.quad	_ZN3x104lang4RailIPNS1_IdEEE8toStringEv
+	.quad	_ZN3x104lang4RailIPNS1_IdEEE21_get_serialization_idEv
+	.quad	_ZN3x104lang4RailIPNS1_IdEEE15_serialize_bodyERN6x10aux20serialization_bufferE
+	.quad	_ZN3x104lang9Reference15_get_network_idEv
+	.quad	_ZN3x104lang8X10Class8typeNameEv
+	.quad	_ZN3x104lang8X10Class11_destructorEv
+	.weak	_ZTIN3x104lang4RailIPNS1_IdEEEE
+	.section	.rodata._ZTIN3x104lang4RailIPNS1_IdEEEE,"aG",@progbits,_ZTIN3x104lang4RailIPNS1_IdEEEE,comdat
+	.align 16
+	.type	_ZTIN3x104lang4RailIPNS1_IdEEEE, @object
+	.size	_ZTIN3x104lang4RailIPNS1_IdEEEE, 24
+_ZTIN3x104lang4RailIPNS1_IdEEEE:
+	.quad	_ZTVN10__cxxabiv120__si_class_type_infoE+16
+	.quad	_ZTSN3x104lang4RailIPNS1_IdEEEE
+	.quad	_ZTIN3x104lang8X10ClassE
+	.weak	_ZTSN3x104lang4RailIPNS1_IdEEEE
+	.section	.rodata._ZTSN3x104lang4RailIPNS1_IdEEEE,"aG",@progbits,_ZTSN3x104lang4RailIPNS1_IdEEEE,comdat
+	.align 16
+	.type	_ZTSN3x104lang4RailIPNS1_IdEEEE, @object
+	.size	_ZTSN3x104lang4RailIPNS1_IdEEEE, 28
+_ZTSN3x104lang4RailIPNS1_IdEEEE:
+	.string	"N3x104lang4RailIPNS1_IdEEEE"
+	.weak	_ZTVN3x104lang12RailIteratorIPNS0_4RailIdEEEE
+	.section	.rodata._ZTVN3x104lang12RailIteratorIPNS0_4RailIdEEEE,"aG",@progbits,_ZTVN3x104lang12RailIteratorIPNS0_4RailIdEEEE,comdat
+	.align 32
+	.type	_ZTVN3x104lang12RailIteratorIPNS0_4RailIdEEEE, @object
+	.size	_ZTVN3x104lang12RailIteratorIPNS0_4RailIdEEEE, 144
+_ZTVN3x104lang12RailIteratorIPNS0_4RailIdEEEE:
+	.quad	0
+	.quad	_ZTIN3x104lang12RailIteratorIPNS0_4RailIdEEEE
+	.quad	_ZN3x104lang12RailIteratorIPNS0_4RailIdEEE11_getITablesEv
+	.quad	_ZNK3x104lang12RailIteratorIPNS0_4RailIdEEE5_typeEv
+	.quad	_ZN3x104lang9Reference9_isMortalEv
+	.quad	_ZN3x104lang8X10Class6equalsEPNS0_3AnyE
+	.quad	_ZN3x104lang8X10Class14_struct_equalsEPNS0_9ReferenceE
+	.quad	_ZN3x104lang8X10Class8hashCodeEv
+	.quad	_ZN3x104lang8X10Class8toStringEv
+	.quad	_ZN3x104lang12RailIteratorIPNS0_4RailIdEEE21_get_serialization_idEv
+	.quad	_ZN3x104lang12RailIteratorIPNS0_4RailIdEEE15_serialize_bodyERN6x10aux20serialization_bufferE
+	.quad	_ZN3x104lang9Reference15_get_network_idEv
+	.quad	_ZN3x104lang8X10Class8typeNameEv
+	.quad	_ZN3x104lang8X10Class11_destructorEv
+	.quad	_ZN3x104lang12RailIteratorIPNS0_4RailIdEEE4nextEv
+	.quad	_ZN3x104lang12RailIteratorIPNS0_4RailIdEEE7hasNextEv
+	.quad	_ZN3x104lang12RailIteratorIPNS0_4RailIdEEE56x10__lang__RailIterator____this__x10__lang__RailIteratorEv
+	.quad	_ZN3x104lang12RailIteratorIPNS0_4RailIdEEE41__fieldInitializers_x10_lang_RailIteratorEv
+	.weak	_ZTIN3x104lang12RailIteratorIPNS0_4RailIdEEEE
+	.section	.rodata._ZTIN3x104lang12RailIteratorIPNS0_4RailIdEEEE,"aG",@progbits,_ZTIN3x104lang12RailIteratorIPNS0_4RailIdEEEE,comdat
+	.align 16
+	.type	_ZTIN3x104lang12RailIteratorIPNS0_4RailIdEEEE, @object
+	.size	_ZTIN3x104lang12RailIteratorIPNS0_4RailIdEEEE, 24
+_ZTIN3x104lang12RailIteratorIPNS0_4RailIdEEEE:
+	.quad	_ZTVN10__cxxabiv120__si_class_type_infoE+16
+	.quad	_ZTSN3x104lang12RailIteratorIPNS0_4RailIdEEEE
+	.quad	_ZTIN3x104lang8X10ClassE
+	.weak	_ZTSN3x104lang12RailIteratorIPNS0_4RailIdEEEE
+	.section	.rodata._ZTSN3x104lang12RailIteratorIPNS0_4RailIdEEEE,"aG",@progbits,_ZTSN3x104lang12RailIteratorIPNS0_4RailIdEEEE,comdat
+	.align 32
+	.type	_ZTSN3x104lang12RailIteratorIPNS0_4RailIdEEEE, @object
+	.size	_ZTSN3x104lang12RailIteratorIPNS0_4RailIdEEEE, 42
+_ZTSN3x104lang12RailIteratorIPNS0_4RailIdEEEE:
+	.string	"N3x104lang12RailIteratorIPNS0_4RailIdEEEE"
+	.weak	_ZN3x104lang12RailIteratorIPNS0_4RailIdEEE17_serialization_idE
+	.section	.bss._ZN3x104lang12RailIteratorIPNS0_4RailIdEEE17_serialization_idE,"awG",@nobits,_ZN3x104lang12RailIteratorIPNS0_4RailIdEEE17_serialization_idE,comdat
+	.align 2
+	.type	_ZN3x104lang12RailIteratorIPNS0_4RailIdEEE17_serialization_idE, @gnu_unique_object
+	.size	_ZN3x104lang12RailIteratorIPNS0_4RailIdEEE17_serialization_idE, 2
+_ZN3x104lang12RailIteratorIPNS0_4RailIdEEE17_serialization_idE:
+	.zero	2
+	.weak	_ZN3x104lang12RailIteratorIPNS0_4RailIdEEE3rttE
+	.section	.bss._ZN3x104lang12RailIteratorIPNS0_4RailIdEEE3rttE,"awG",@nobits,_ZN3x104lang12RailIteratorIPNS0_4RailIdEEE3rttE,comdat
+	.align 32
+	.type	_ZN3x104lang12RailIteratorIPNS0_4RailIdEEE3rttE, @gnu_unique_object
+	.size	_ZN3x104lang12RailIteratorIPNS0_4RailIdEEE3rttE, 72
+_ZN3x104lang12RailIteratorIPNS0_4RailIdEEE3rttE:
+	.zero	72
+	.weak	_ZN3x104lang8IteratorIPNS0_4RailIdEEE3rttE
+	.section	.bss._ZN3x104lang8IteratorIPNS0_4RailIdEEE3rttE,"awG",@nobits,_ZN3x104lang8IteratorIPNS0_4RailIdEEE3rttE,comdat
+	.align 32
+	.type	_ZN3x104lang8IteratorIPNS0_4RailIdEEE3rttE, @gnu_unique_object
+	.size	_ZN3x104lang8IteratorIPNS0_4RailIdEEE3rttE, 72
+_ZN3x104lang8IteratorIPNS0_4RailIdEEE3rttE:
+	.zero	72
+	.weak	_ZN3x104lang12RailIteratorIPNS0_4RailIdEEE8_itablesE
+	.section	.bss._ZN3x104lang12RailIteratorIPNS0_4RailIdEEE8_itablesE,"awG",@nobits,_ZN3x104lang12RailIteratorIPNS0_4RailIdEEE8_itablesE,comdat
+	.align 32
+	.type	_ZN3x104lang12RailIteratorIPNS0_4RailIdEEE8_itablesE, @gnu_unique_object
+	.size	_ZN3x104lang12RailIteratorIPNS0_4RailIdEEE8_itablesE, 72
+_ZN3x104lang12RailIteratorIPNS0_4RailIdEEE8_itablesE:
+	.zero	72
+	.weak	_ZN3x104lang12RailIteratorIdE9_itable_0E
+	.section	.bss._ZN3x104lang12RailIteratorIdE9_itable_0E,"awG",@nobits,_ZN3x104lang12RailIteratorIdE9_itable_0E,comdat
+	.align 32
+	.type	_ZN3x104lang12RailIteratorIdE9_itable_0E, @gnu_unique_object
+	.size	_ZN3x104lang12RailIteratorIdE9_itable_0E, 96
+_ZN3x104lang12RailIteratorIdE9_itable_0E:
+	.zero	96
+	.weak	_ZN3x104lang12RailIteratorIdE9_itable_1E
+	.section	.bss._ZN3x104lang12RailIteratorIdE9_itable_1E,"awG",@nobits,_ZN3x104lang12RailIteratorIdE9_itable_1E,comdat
+	.align 32
+	.type	_ZN3x104lang12RailIteratorIdE9_itable_1E, @gnu_unique_object
+	.size	_ZN3x104lang12RailIteratorIdE9_itable_1E, 64
+_ZN3x104lang12RailIteratorIdE9_itable_1E:
+	.zero	64
+	.weak	_ZN3x104lang12RailIteratorIPNS0_4RailIdEEE9_itable_0E
+	.section	.bss._ZN3x104lang12RailIteratorIPNS0_4RailIdEEE9_itable_0E,"awG",@nobits,_ZN3x104lang12RailIteratorIPNS0_4RailIdEEE9_itable_0E,comdat
+	.align 32
+	.type	_ZN3x104lang12RailIteratorIPNS0_4RailIdEEE9_itable_0E, @gnu_unique_object
+	.size	_ZN3x104lang12RailIteratorIPNS0_4RailIdEEE9_itable_0E, 96
+_ZN3x104lang12RailIteratorIPNS0_4RailIdEEE9_itable_0E:
+	.zero	96
+	.weak	_ZN3x104lang12RailIteratorIPNS0_4RailIdEEE9_itable_1E
+	.section	.bss._ZN3x104lang12RailIteratorIPNS0_4RailIdEEE9_itable_1E,"awG",@nobits,_ZN3x104lang12RailIteratorIPNS0_4RailIdEEE9_itable_1E,comdat
+	.align 32
+	.type	_ZN3x104lang12RailIteratorIPNS0_4RailIdEEE9_itable_1E, @gnu_unique_object
+	.size	_ZN3x104lang12RailIteratorIPNS0_4RailIdEEE9_itable_1E, 64
+_ZN3x104lang12RailIteratorIPNS0_4RailIdEEE9_itable_1E:
+	.zero	64
+	.weak	_ZTIPN3x104lang16CheckedThrowableE
+	.section	.rodata._ZTIPN3x104lang16CheckedThrowableE,"aG",@progbits,_ZTIPN3x104lang16CheckedThrowableE,comdat
+	.align 32
+	.type	_ZTIPN3x104lang16CheckedThrowableE, @object
+	.size	_ZTIPN3x104lang16CheckedThrowableE, 32
+_ZTIPN3x104lang16CheckedThrowableE:
+	.quad	_ZTVN10__cxxabiv119__pointer_type_infoE+16
+	.quad	_ZTSPN3x104lang16CheckedThrowableE
+	.long	0
+	.zero	4
+	.quad	_ZTIN3x104lang16CheckedThrowableE
+	.weak	_ZTSPN3x104lang16CheckedThrowableE
+	.section	.rodata._ZTSPN3x104lang16CheckedThrowableE,"aG",@progbits,_ZTSPN3x104lang16CheckedThrowableE,comdat
+	.align 16
+	.type	_ZTSPN3x104lang16CheckedThrowableE, @object
+	.size	_ZTSPN3x104lang16CheckedThrowableE, 31
+_ZTSPN3x104lang16CheckedThrowableE:
+	.string	"PN3x104lang16CheckedThrowableE"
+	.weakref	_ZL20__gthrw_pthread_oncePiPFvvE,pthread_once
+	.weakref	_ZL27__gthrw_pthread_getspecificj,pthread_getspecific
+	.weakref	_ZL27__gthrw_pthread_setspecificjPKv,pthread_setspecific
+	.weakref	_ZL22__gthrw_pthread_createPmPK14pthread_attr_tPFPvS3_ES3_,pthread_create
+	.weakref	_ZL20__gthrw_pthread_joinmPPv,pthread_join
+	.weakref	_ZL21__gthrw_pthread_equalmm,pthread_equal
+	.weakref	_ZL20__gthrw_pthread_selfv,pthread_self
+	.weakref	_ZL22__gthrw_pthread_detachm,pthread_detach
+	.weakref	_ZL22__gthrw_pthread_cancelm,pthread_cancel
+	.weakref	_ZL19__gthrw_sched_yieldv,sched_yield
+	.weakref	_ZL26__gthrw_pthread_mutex_lockP15pthread_mutex_t,pthread_mutex_lock
+	.weakref	_ZL29__gthrw_pthread_mutex_trylockP15pthread_mutex_t,pthread_mutex_trylock
+	.weakref	_ZL31__gthrw_pthread_mutex_timedlockP15pthread_mutex_tPK8timespec,pthread_mutex_timedlock
+	.weakref	_ZL28__gthrw_pthread_mutex_unlockP15pthread_mutex_t,pthread_mutex_unlock
+	.weakref	_ZL26__gthrw_pthread_mutex_initP15pthread_mutex_tPK19pthread_mutexattr_t,pthread_mutex_init
+	.weakref	_ZL29__gthrw_pthread_mutex_destroyP15pthread_mutex_t,pthread_mutex_destroy
+	.weakref	_ZL30__gthrw_pthread_cond_broadcastP14pthread_cond_t,pthread_cond_broadcast
+	.weakref	_ZL27__gthrw_pthread_cond_signalP14pthread_cond_t,pthread_cond_signal
+	.weakref	_ZL25__gthrw_pthread_cond_waitP14pthread_cond_tP15pthread_mutex_t,pthread_cond_wait
+	.weakref	_ZL30__gthrw_pthread_cond_timedwaitP14pthread_cond_tP15pthread_mutex_tPK8timespec,pthread_cond_timedwait
+	.weakref	_ZL28__gthrw_pthread_cond_destroyP14pthread_cond_t,pthread_cond_destroy
+	.weakref	_ZL26__gthrw_pthread_key_createPjPFvPvE,pthread_key_create
+	.weakref	_ZL26__gthrw_pthread_key_deletej,pthread_key_delete
+	.weakref	_ZL30__gthrw_pthread_mutexattr_initP19pthread_mutexattr_t,pthread_mutexattr_init
+	.weakref	_ZL33__gthrw_pthread_mutexattr_settypeP19pthread_mutexattr_ti,pthread_mutexattr_settype
+	.weakref	_ZL33__gthrw_pthread_mutexattr_destroyP19pthread_mutexattr_t,pthread_mutexattr_destroy
+	.ident	"GCC: (GNU) 4.4.5 20110214 (Red Hat 4.4.5-6)"
+	.section	.note.GNU-stack,"",@progbits

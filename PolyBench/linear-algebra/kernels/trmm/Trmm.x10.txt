@@ -1,0 +1,69 @@
+<<<< /home/horiih/polybench-x10/polybench-x10-time/linear-algebra/kernels/trmm/Trmm.x10 >>>>
+import x10.compiler.Ifdef;
+import x10.array.Array_2;
+import x10.array.Array_3;
+
+public class Trmm {
+    var _PB_NI:x10.lang.Long = 0L;
+    
+    def setPBs(ni:x10.lang.Long):void { _PB_NI = ni; }
+    
+    def init_array(ni:x10.lang.Long, alpha:x10.lang.Rail[x10.lang.Double],
+                   A:x10.array.Array_2[x10.lang.Double], B:x10.array.Array_2[x10.lang.Double]):
+      void {
+        alpha(0L) = x10.lang.Double.implicit_operator_as(32412L);
+        for (var i:x10.lang.Long = 0L; i < ni; i++) {
+            for (var j:x10.lang.Long = 0L; j < ni; j++) {
+                A(i,
+                  j) = ((((x10.lang.Double.implicit_operator_as(i))) *
+                         x10.lang.Double.implicit_operator_as(j))) /
+                  x10.lang.Double.implicit_operator_as(ni);
+                B(i,
+                  j) = ((((x10.lang.Double.implicit_operator_as(i))) *
+                         x10.lang.Double.implicit_operator_as(j))) /
+                  x10.lang.Double.implicit_operator_as(ni);
+            }
+        }
+    }
+    
+    def print_array(ni:x10.lang.Long, B:x10.array.Array_2[x10.lang.Double]):void {
+        for (var i:x10.lang.Long = 0L; i < ni; i++) {
+            for (var j:x10.lang.Long = 0L; j < ni; j++) {
+                x10.io.Console.ERR.printf("%0.2lf ", i()j );
+                if (((i * ni + j)) % 20L == 0L) { x10.io.Console.ERR.printf("\n"); }
+            }
+        }
+        x10.io.Console.ERR.printf("\n");
+    }
+    
+    def kernel_trmm(ni:x10.lang.Long, alpha:x10.lang.Double, A:x10.array.Array_2[x10.lang.Double],
+                    B:x10.array.Array_2[x10.lang.Double]):void {
+        for (var i:x10.lang.Long = 1L; i < ni; i++) {
+            for (var j:x10.lang.Long = 0L; j < ni; j++) {
+                for (var k:x10.lang.Long = 0L; k < i; k++) { B(i, j) += alpha * i()k  * j()k ; }
+            }
+        }
+    }
+    
+    public static def main(args:x10.lang.Rail[x10.lang.String]):void {
+        var NI:x10.lang.Long = 0L;
+        val trmm:Trmm = new Trmm();
+        var ni:x10.lang.Long = NI;
+        trmm.setPBs(ni);
+        val alpha:x10.lang.Rail[x10.lang.Double] = new x10.lang.Rail[x10.lang.Double](1L);
+        val A:x10.array.Array_2[x10.lang.Double] = new x10.array.Array_2[x10.lang.Double](ni, ni);
+        val B:x10.array.Array_2[x10.lang.Double] = new x10.array.Array_2[x10.lang.Double](ni, ni);
+        trmm.init_array(ni, alpha, A, B);
+        val t1:x10.lang.Long = x10.lang.System.currentTimeMillis();
+        trmm.kernel_trmm(ni, alpha.operator()(0L), A, B);
+        val t2:x10.lang.Long = x10.lang.System.currentTimeMillis();
+        x10.io.Console.OUT.printf("Elapsed time= " + ((t2 - t1)) + " (ms)");
+    }
+    
+    @x10.compiler.Synthetic final public def Trmm$$this$Trmm():Trmm { return Trmm.this; }
+    
+    public def this() {
+        ;
+        
+    }
+}

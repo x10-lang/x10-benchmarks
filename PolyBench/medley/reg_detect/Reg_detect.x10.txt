@@ -1,0 +1,167 @@
+<<<< /home/horiih/polybench-running-set/polybench-x10-time/medley/reg_detect/Reg_detect.x10 >>>>
+public class Reg_detect {
+    var _PB_NITER:x10.lang.Long = 0L;
+    var _PB_LENGTH:x10.lang.Long = 0L;
+    var _PB_MAXGRID:x10.lang.Long = 0L;
+    
+    def setPBs(niter:x10.lang.Long, length:x10.lang.Long, maxgrid:x10.lang.Long):void {
+        _PB_NITER = niter;
+        _PB_LENGTH = length;
+        _PB_MAXGRID = maxgrid;
+    }
+    
+    def init_array(maxgrid:x10.lang.Long, sum_tang:x10.lang.Rail[x10.lang.Rail[x10.lang.Long]],
+                   mean:x10.lang.Rail[x10.lang.Rail[x10.lang.Long]],
+                   path:x10.lang.Rail[x10.lang.Rail[x10.lang.Long]]):void {
+        for (var i:x10.lang.Long = 0L; i < maxgrid; i++) {
+            for (var j:x10.lang.Long = 0L; j < maxgrid; j++) {
+                sum_tang.operator()(i)(j) = ((((x10.lang.Long) ((i + 1L)))) * ((j + 1L)));
+                mean.operator()(i)(j) = (((((x10.lang.Long) i)) - j)) / maxgrid;
+                path.operator()(i)(j) = (((((x10.lang.Long) i)) * ((j - 1L)))) / maxgrid;
+            }
+        }
+    }
+    
+    def print_array(maxgrid:x10.lang.Long, path:x10.lang.Rail[x10.lang.Rail[x10.lang.Long]]):void {
+        for (var i:x10.lang.Long = 0L; i < maxgrid; i++) {
+            for (var j:x10.lang.Long = 0L; j < maxgrid; j++) {
+                x10.io.Console.ERR.printf("%d ", path.operator()(i).operator()(j));
+                if (((i * maxgrid + j)) % 20L == 0L) { x10.io.Console.ERR.printf("\n"); }
+            }
+        }
+        x10.io.Console.ERR.printf("\n");
+    }
+    
+    def kernel_reg_detect(niter:x10.lang.Long, maxgrid:x10.lang.Long, length:x10.lang.Long,
+                          sum_tang:x10.lang.Rail[x10.lang.Rail[x10.lang.Long]],
+                          mean:x10.lang.Rail[x10.lang.Rail[x10.lang.Long]],
+                          path:x10.lang.Rail[x10.lang.Rail[x10.lang.Long]],
+                          diff:x10.lang.Rail[x10.lang.Rail[x10.lang.Rail[x10.lang.Long]]],
+                          sum_diff:x10.lang.Rail[x10.lang.Rail[x10.lang.Rail[x10.lang.Long]]]):
+      void {
+        for (var t:x10.lang.Long = 0L; t < niter; t++) {
+            for (var j:x10.lang.Long = 0L; j <= maxgrid - 1L; j++) {
+                for (var i:x10.lang.Long = j; i <= maxgrid - 1L; i++) {
+                    for (var cnt:x10.lang.Long = 0L; cnt <= length - 1L; cnt++) {
+                        diff.operator()(j).operator()(i)(cnt) = sum_tang.operator()(j).operator()(
+                                                                  i);
+                    }
+                }
+            }
+            for (var j:x10.lang.Long = 0L; j <= maxgrid - 1L; j++) {
+                for (var i:x10.lang.Long = j; i <= maxgrid - 1L; i++) {
+                    sum_diff.operator()(j).operator()(i)(0L) = diff.operator()(j).operator()(i).
+                                                                 operator()(
+                                                                 0L);
+                    for (var cnt:x10.lang.Long = 1L; cnt <= length - 1L; cnt++) {
+                        sum_diff.operator()(j).operator()(i)(cnt) = sum_diff.operator()(j).
+                                                                      operator()(
+                                                                      i).
+                                                                      operator()(
+                                                                      cnt - 1L) +
+                                                             diff.operator()(j).operator()(i).
+                                                               operator()(
+                                                               cnt);
+                    }
+                    mean.operator()(j)(i) = sum_diff.operator()(j).operator()(i).operator()(length -
+                                                                                            1L);
+                }
+            }
+            for (var i:x10.lang.Long = 0L; i <= maxgrid - 1L; i++) {
+                path.operator()(0L)(i) = mean.operator()(0L).operator()(i);
+            }
+            for (var j:x10.lang.Long = 1L; j <= maxgrid - 1L; j++) {
+                for (var i:x10.lang.Long = j; i <= maxgrid - 1L; i++) {
+                    path.operator()(j)(i) = path.operator()(j - 1L).operator()(i - 1L) +
+                                       mean.operator()(j).operator()(i);
+                }
+            }
+        }
+    }
+    
+    public static def main(args:x10.lang.Rail[x10.lang.String]):void {
+        var NITER:x10.lang.Long = 0L;
+        var LENGTH:x10.lang.Long = 0L;
+        var MAXGRID:x10.lang.Long = 0L;
+        val dataset:x10.lang.String = args.size == 0L ? "STANDARD_DATASET" : args.operator()(0L);
+        if (dataset.equals("EXTRALARGE_DATASET")) {
+            NITER = 10000L;
+            LENGTH = 500L;
+            MAXGRID = 12L;
+        } else {
+            if (dataset.equals("STANDARD_DATASET")) {
+                NITER = 10000L;
+                LENGTH = 64L;
+                MAXGRID = 6L;
+            } else {
+                if (dataset.equals("MINI_DATASET")) {
+                    NITER = 10L;
+                    LENGTH = 32L;
+                    MAXGRID = 2L;
+                } else {
+                    if (dataset.equals("SMALL_DATASET")) {
+                        NITER = 100L;
+                        LENGTH = 50L;
+                        MAXGRID = 6L;
+                    } else {
+                        if (dataset.equals("LARGE_DATASET")) {
+                            NITER = 1000L;
+                            LENGTH = 500L;
+                            MAXGRID = 12L;
+                        }
+                    }
+                }
+            }
+        }
+        val reg_detect:Reg_detect = new Reg_detect();
+        var niter:x10.lang.Long = NITER;
+        var maxgrid:x10.lang.Long = MAXGRID;
+        var length:x10.lang.Long = LENGTH;
+        reg_detect.setPBs(niter, length, maxgrid);
+        val sum_tang:x10.lang.Rail[x10.lang.Rail[x10.lang.Long]] =
+          new x10.lang.Rail[x10.lang.Rail[x10.lang.Long]](maxgrid);
+        for (var i1:x10.lang.Long = 0L; i1 < maxgrid; ++i1) {
+            sum_tang(i1) = new x10.lang.Rail[x10.lang.Long](maxgrid);
+        }
+        val mean:x10.lang.Rail[x10.lang.Rail[x10.lang.Long]] =
+          new x10.lang.Rail[x10.lang.Rail[x10.lang.Long]](maxgrid);
+        for (var i1:x10.lang.Long = 0L; i1 < maxgrid; ++i1) {
+            mean(i1) = new x10.lang.Rail[x10.lang.Long](maxgrid);
+        }
+        val path:x10.lang.Rail[x10.lang.Rail[x10.lang.Long]] =
+          new x10.lang.Rail[x10.lang.Rail[x10.lang.Long]](maxgrid);
+        for (var i1:x10.lang.Long = 0L; i1 < maxgrid; ++i1) {
+            path(i1) = new x10.lang.Rail[x10.lang.Long](maxgrid);
+        }
+        val diff:x10.lang.Rail[x10.lang.Rail[x10.lang.Rail[x10.lang.Long]]] =
+          new x10.lang.Rail[x10.lang.Rail[x10.lang.Rail[x10.lang.Long]]](maxgrid);
+        for (var i1:x10.lang.Long = 0L; i1 < maxgrid; ++i1) {
+            diff(i1) = new x10.lang.Rail[x10.lang.Rail[x10.lang.Long]](maxgrid);
+            for (var i2:x10.lang.Long = 0L; i2 < length; ++i2) {
+                diff.operator()(i1)(i2) = new x10.lang.Rail[x10.lang.Long](length);
+            }
+        }
+        val sum_diff:x10.lang.Rail[x10.lang.Rail[x10.lang.Rail[x10.lang.Long]]] =
+          new x10.lang.Rail[x10.lang.Rail[x10.lang.Rail[x10.lang.Long]]](maxgrid);
+        for (var i1:x10.lang.Long = 0L; i1 < maxgrid; ++i1) {
+            sum_diff(i1) = new x10.lang.Rail[x10.lang.Rail[x10.lang.Long]](maxgrid);
+            for (var i2:x10.lang.Long = 0L; i2 < length; ++i2) {
+                sum_diff.operator()(i1)(i2) = new x10.lang.Rail[x10.lang.Long](length);
+            }
+        }
+        reg_detect.init_array(maxgrid, sum_tang, mean, path);
+        val t1:x10.lang.Long = x10.lang.System.currentTimeMillis();
+        reg_detect.kernel_reg_detect(niter, maxgrid, length, sum_tang, mean, path, diff, sum_diff);
+        val t2:x10.lang.Long = x10.lang.System.currentTimeMillis();
+        x10.io.Console.OUT.printf("Elapsed time= " + ((t2 - t1)) + " (ms)");
+    }
+    
+    @x10.compiler.Synthetic final public def Reg_detect$$this$Reg_detect():Reg_detect {
+        return Reg_detect.this;
+    }
+    
+    public def this() {
+        ;
+        
+    }
+}
