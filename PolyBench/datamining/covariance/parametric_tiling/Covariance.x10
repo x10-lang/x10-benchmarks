@@ -51,17 +51,48 @@ public class Covariance {
   }  /* Main computational kernel. The whole function will be timed,
      including the call and return. */
     def kernel_covariance(m : long, n : long, float_n : double, data : Array_2[double], symmat : Array_2[double], mean : Rail[double])  {
-        {
+            var i : long;
+            var j : long;
+            var j1 : long;
+            var j2 : long;
             {
-                var ___pace_tile_sizes : Rail[long] = new Rail[Long](2L);
-                Pace_tiling_api.PACETileSizeVectorInit(___pace_tile_sizes,2,3);
-                var c1 : long;
-                var c1t1 : long;
+                var ___pace_tile_sizes : Rail[long] = new Rail[Long](3L);
+                Pace_tiling_api.PACETileSizeVectorInit(___pace_tile_sizes,3,2);
+                var c3 : long;
                 var c2 : long;
-                var T1c2 : float = (___pace_tile_sizes(0L)) as float;
-                var T1c1 : float = (___pace_tile_sizes(1L)) as float;
+                var c1 : long;
                 var c2t1 : long;
+                var T1c1 : float = (___pace_tile_sizes(2L)) as float;
+                var T1c3 : float = (___pace_tile_sizes(0L)) as float;
+                var c3t1 : long;
+                var T1c2 : float = (___pace_tile_sizes(1L)) as float;
+                var c1t1 : long;
                 if ((m >= 1)) {
+                    {
+                        var tmpLb : long;
+                        var tmpUb : long;
+                        tmpLb = (Math.round(((-1 + (1 / T1c1))) as double)) as long;
+                        tmpUb = (Math.round((((m * (1 / T1c1)) + ((1 / T1c1) * -1))) as double)) as long;
+                        {
+                            val T1c2_3 = T1c2;
+                            val T1c1_2 = T1c1;
+                            val tmpUb_1 = tmpUb;
+                            val tmpLb_0 = tmpLb;
+                            Foreach.block(tmpLb_0,tmpUb_1,(var c1t1 : long) => {
+                                var c2 : long;
+                                var c1 : long;
+                                var c2t1 : long;
+                                for (c2t1 = (Math.round(((((c1t1 * (T1c1_2 / T1c2_3)) + -1) + (1 / T1c2_3))) as double)) as long; (c2t1 <= (Math.round((((m * (1 / T1c2_3)) + ((1 / T1c2_3) * -1))) as double)) as long); ++c2t1) {
+                                    for (c1 = ((c1t1 * T1c1_2) > 0 ? ((c1t1 * T1c1_2)) as long : (0) as long); (c1 <= (((c1t1 * T1c1_2) + (T1c1_2 + -1)) < (m + -1) ? (((c1t1 * T1c1_2) + (T1c1_2 + -1))) as long : ((m + -1)) as long)); c1++) {
+                                        for (c2 = ((c2t1 * T1c2_3) > c1 ? ((c2t1 * T1c2_3)) as long : (c1) as long); (c2 <= (((c2t1 * T1c2_3) + (T1c2_3 + -1)) < (m + -1) ? (((c2t1 * T1c2_3) + (T1c2_3 + -1))) as long : ((m + -1)) as long)); c2++) {
+                                            symmat(c1,c2) = 0.0;
+                                        }
+                                    }
+                                }
+                            }
+);
+                        }
+                    }
                     for (c1 = 0; (c1 <= (m + -1)); c1++) {
                         mean(c1) = 0.0;
                     }
@@ -77,8 +108,8 @@ public class Covariance {
                                 val tmpUb_1 = tmpUb;
                                 val tmpLb_0 = tmpLb;
                                 Foreach.block(tmpLb_0,tmpUb_1,(var c1t1 : long) => {
-                                    var c1 : long;
                                     var c2 : long;
+                                    var c1 : long;
                                     var c2t1 : long;
                                     for (c2t1 = (Math.round(((-1 + (1 / T1c2_2))) as double)) as long; (c2t1 <= (Math.round((((n * (1 / T1c2_2)) + ((1 / T1c2_2) * -1))) as double)) as long); ++c2t1) {
                                         for (c1 = ((c1t1 * T1c1_3) > 0 ? ((c1t1 * T1c1_3)) as long : (0) as long); (c1 <= (((c1t1 * T1c1_3) + (T1c1_3 + -1)) < (m + -1) ? (((c1t1 * T1c1_3) + (T1c1_3 + -1))) as long : ((m + -1)) as long)); c1++) {
@@ -106,8 +137,8 @@ public class Covariance {
                             val tmpUb_1 = tmpUb;
                             val tmpLb_0 = tmpLb;
                             Foreach.block(tmpLb_0,tmpUb_1,(var c1t1 : long) => {
-                                var c1 : long;
                                 var c2 : long;
+                                var c1 : long;
                                 var c2t1 : long;
                                 for (c2t1 = (Math.round(((-1 + (1 / T1c2_2))) as double)) as long; (c2t1 <= (Math.round((((m * (1 / T1c2_2)) + ((1 / T1c2_2) * -1))) as double)) as long); ++c2t1) {
                                     for (c1 = ((c1t1 * T1c1_3) > 0 ? ((c1t1 * T1c1_3)) as long : (0) as long); (c1 <= (((c1t1 * T1c1_3) + (T1c1_3 + -1)) < (n + -1) ? (((c1t1 * T1c1_3) + (T1c1_3 + -1))) as long : ((n + -1)) as long)); c1++) {
@@ -120,22 +151,73 @@ public class Covariance {
 );
                         }
                     }
-                }
-            }
-            for (var j1 : long = 0L; j1 < m; j1++) {
-                for (var j2 : long = j1; j2 < m; j2++) {
-                    var ___pace_tile_sizes : Rail[long] = new Rail[Long](0L);
-                    Pace_tiling_api.PACETileSizeVectorInit(___pace_tile_sizes,0,2);
-                    var c3 : long;
-                    symmat(j1,j2) = 0.0;
-                    for (c3 = 0; (c3 <= (n + -1)); c3++) {
-                        symmat(j1,j2) += data(c3,j1) * data(c3,j2);
+                    if ((n >= 1)) {
+                        {
+                            var tmpLb : long;
+                            var tmpUb : long;
+                            tmpLb = (Math.round(((-1 + (1 / T1c1))) as double)) as long;
+                            tmpUb = (Math.round((((m * (1 / T1c1)) + ((1 / T1c1) * -1))) as double)) as long;
+                            {
+                                val T1c3_4 = T1c3;
+                                val T1c2_3 = T1c2;
+                                val T1c1_2 = T1c1;
+                                val tmpUb_1 = tmpUb;
+                                val tmpLb_0 = tmpLb;
+                                Foreach.block(tmpLb_0,tmpUb_1,(var c1t1 : long) => {
+                                    var c3 : long;
+                                    var c2 : long;
+                                    var c1 : long;
+                                    var c2t1 : long;
+                                    var c3t1 : long;
+                                    for (c2t1 = (Math.round(((((c1t1 * (T1c1_2 / T1c2_3)) + -1) + (1 / T1c2_3))) as double)) as long; (c2t1 <= (Math.round((((m * (1 / T1c2_3)) + ((1 / T1c2_3) * -1))) as double)) as long); ++c2t1) {
+                                        for (c3t1 = (Math.round(((-1 + (1 / T1c3_4))) as double)) as long; (c3t1 <= (Math.round((((n * (1 / T1c3_4)) + ((1 / T1c3_4) * -1))) as double)) as long); ++c3t1) {
+                                            for (c1 = ((c1t1 * T1c1_2) > 0 ? ((c1t1 * T1c1_2)) as long : (0) as long); (c1 <= (((c1t1 * T1c1_2) + (T1c1_2 + -1)) < (m + -1) ? (((c1t1 * T1c1_2) + (T1c1_2 + -1))) as long : ((m + -1)) as long)); c1++) {
+                                                for (c2 = ((c2t1 * T1c2_3) > c1 ? ((c2t1 * T1c2_3)) as long : (c1) as long); (c2 <= (((c2t1 * T1c2_3) + (T1c2_3 + -1)) < (m + -1) ? (((c2t1 * T1c2_3) + (T1c2_3 + -1))) as long : ((m + -1)) as long)); c2++) {
+                                                    for (c3 = ((c3t1 * T1c3_4) > 0 ? ((c3t1 * T1c3_4)) as long : (0) as long); (c3 <= (((c3t1 * T1c3_4) + (T1c3_4 + -1)) < (n + -1) ? (((c3t1 * T1c3_4) + (T1c3_4 + -1))) as long : ((n + -1)) as long)); c3++) {
+                                                        symmat(c1,c2) += data(c3,c1) * data(c3,c2);
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+);
+                            }
+                        }
                     }
-                    symmat(j2,j1) = symmat(j1,j2);
+                    {
+                        var tmpLb : long;
+                        var tmpUb : long;
+                        tmpLb = (Math.round(((-1 + (1 / T1c1))) as double)) as long;
+                        tmpUb = (Math.round((((m * (1 / T1c1)) + ((1 / T1c1) * -1))) as double)) as long;
+                        {
+                            val T1c2_3 = T1c2;
+                            val T1c1_2 = T1c1;
+                            val tmpUb_1 = tmpUb;
+                            val tmpLb_0 = tmpLb;
+                            Foreach.block(tmpLb_0,tmpUb_1,(var c1t1 : long) => {
+                                var c3 : long;
+                                var c2 : long;
+                                var c1 : long;
+                                var c2t1 : long;
+                                var c3t1 : long;
+                                for (c2t1 = (Math.round(((((c1t1 * (T1c1_2 / T1c2_3)) + -1) + (1 / T1c2_3))) as double)) as long; (c2t1 <= (Math.round((((m * (1 / T1c2_3)) + ((1 / T1c2_3) * -1))) as double)) as long); ++c2t1) {
+                                    for (c1 = ((c1t1 * T1c1_2) > 0 ? ((c1t1 * T1c1_2)) as long : (0) as long); (c1 <= (((c1t1 * T1c1_2) + (T1c1_2 + -1)) < (m + -1) ? (((c1t1 * T1c1_2) + (T1c1_2 + -1))) as long : ((m + -1)) as long)); c1++) {
+                                        for (c2 = ((c2t1 * T1c2_3) > c1 ? ((c2t1 * T1c2_3)) as long : (c1) as long); (c2 <= (((c2t1 * T1c2_3) + (T1c2_3 + -1)) < (m + -1) ? (((c2t1 * T1c2_3) + (T1c2_3 + -1))) as long : ((m + -1)) as long)); c2++) {
+                                            symmat(c2,c1) = symmat(c1,c2);
+                                        }
+                                    }
+                                }
+                            }
+);
+                        }
+                    }
                 }
             }
-        }
-    }  public static def main(args : Rail[String])
+
+    }  
+
+  public static def main(args : Rail[String])
   {
     var M : Long = 0;
     var N : Long = 0;

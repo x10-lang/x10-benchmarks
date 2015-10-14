@@ -52,39 +52,70 @@ public class Covariance {
      including the call and return. */
     def kernel_covariance(m : long, n : long, float_n : double, data : Array_2[double], symmat : Array_2[double], mean : Rail[double])  {
         {
+
+            var i : long;
+            var j : long;
+            var j1 : long;
+            var j2 : long;
             {
-                var c2 : long;
+                var c6 : long;
                 var c1 : long;
-                var c4 : long;
                 var c3 : long;
+                var c2 : long;
+                var c4 : long;
+                var c5 : long;
                 if ((m >= 1)) {
                     {
-                        Foreach.block(0,((m + -1) * 256 < 0 ? (256 < 0 ?  -(( -((m + -1)) + 256 + 1) / 256) :  -(( -((m + -1)) + 256 - 1) / 256)) : (m + -1) / 256),(var c1 : long) => {
+                        Foreach.block(0,((m + -1) * 32 < 0 ? (32 < 0 ?  -(( -((m + -1)) + 32 + 1) / 32) :  -(( -((m + -1)) + 32 - 1) / 32)) : (m + -1) / 32),(var c1 : long) => {
+                            var c6 : long;
+                            var c3 : long;
                             var c2 : long;
                             var c4 : long;
-                            var c3 : long;
+                            var c5 : long;
+                            for (c2 = c1; (c2 <= ((m + -1) * 32 < 0 ? (32 < 0 ?  -(( -((m + -1)) + 32 + 1) / 32) :  -(( -((m + -1)) + 32 - 1) / 32)) : (m + -1) / 32)); c2++) {
+                                for (c5 = (32 * c2); (c5 <= (((32 * c2) + 31) < (m + -1) ? (((32 * c2) + 31)) as long : ((m + -1)) as long)); c5++) {
 @x10.compiler.Native("c++", "#pragma ivdep"){}
 @x10.compiler.Native("c++", "#pragma vector always"){}
 @x10.compiler.Native("c++", "#pragma simd"){}
-                            for (c4 = (256 * c1); (c4 <= (((256 * c1) + 255) < (m + -1) ? (((256 * c1) + 255)) as long : ((m + -1)) as long)); c4++) {
-                                mean(c4) = 0.0;
+                                    for (c6 = (32 * c1); (c6 <= (c5 < ((32 * c1) + 31) ? (c5) as long : (((32 * c1) + 31)) as long)); c6++) {
+                                        symmat(c6,c5) = 0.0;
+                                    }
+                                }
+                            }
+                        }
+);
+                    }
+                    {
+                        Foreach.block(0,((m + -1) * 32 < 0 ? (32 < 0 ?  -(( -((m + -1)) + 32 + 1) / 32) :  -(( -((m + -1)) + 32 - 1) / 32)) : (m + -1) / 32),(var c1 : long) => {
+                            var c6 : long;
+                            var c3 : long;
+                            var c2 : long;
+                            var c4 : long;
+                            var c5 : long;
+@x10.compiler.Native("c++", "#pragma ivdep"){}
+@x10.compiler.Native("c++", "#pragma vector always"){}
+@x10.compiler.Native("c++", "#pragma simd"){}
+                            for (c6 = (32 * c1); (c6 <= (((32 * c1) + 31) < (m + -1) ? (((32 * c1) + 31)) as long : ((m + -1)) as long)); c6++) {
+                                mean(c6) = 0.0;
                             }
                         }
 );
                     }
                     if ((n >= 1)) {
                         {
-                            Foreach.block(0,((m + -1) * 256 < 0 ? (256 < 0 ?  -(( -((m + -1)) + 256 + 1) / 256) :  -(( -((m + -1)) + 256 - 1) / 256)) : (m + -1) / 256),(var c1 : long) => {
+                            Foreach.block(0,((m + -1) * 32 < 0 ? (32 < 0 ?  -(( -((m + -1)) + 32 + 1) / 32) :  -(( -((m + -1)) + 32 - 1) / 32)) : (m + -1) / 32),(var c1 : long) => {
+                                var c6 : long;
+                                var c3 : long;
                                 var c2 : long;
                                 var c4 : long;
-                                var c3 : long;
-                                for (c2 = 0; (c2 <= ((n + -1) * 256 < 0 ? (256 < 0 ?  -(( -((n + -1)) + 256 + 1) / 256) :  -(( -((n + -1)) + 256 - 1) / 256)) : (n + -1) / 256)); c2++) {
-                                    for (c3 = (256 * c2); (c3 <= (((256 * c2) + 255) < (n + -1) ? (((256 * c2) + 255)) as long : ((n + -1)) as long)); c3++) {
+                                var c5 : long;
+                                for (c2 = 0; (c2 <= ((n + -1) * 32 < 0 ? (32 < 0 ?  -(( -((n + -1)) + 32 + 1) / 32) :  -(( -((n + -1)) + 32 - 1) / 32)) : (n + -1) / 32)); c2++) {
+                                    for (c5 = (32 * c2); (c5 <= (((32 * c2) + 31) < (n + -1) ? (((32 * c2) + 31)) as long : ((n + -1)) as long)); c5++) {
 @x10.compiler.Native("c++", "#pragma ivdep"){}
 @x10.compiler.Native("c++", "#pragma vector always"){}
 @x10.compiler.Native("c++", "#pragma simd"){}
-                                        for (c4 = (256 * c1); (c4 <= (((256 * c1) + 255) < (m + -1) ? (((256 * c1) + 255)) as long : ((m + -1)) as long)); c4++) {
-                                            mean(c4) += data(c3,c4);
+                                        for (c6 = (32 * c1); (c6 <= (((32 * c1) + 31) < (m + -1) ? (((32 * c1) + 31)) as long : ((m + -1)) as long)); c6++) {
+                                            mean(c6) += data(c5,c6);
                                         }
                                     }
                                 }
@@ -93,31 +124,81 @@ public class Covariance {
                         }
                     }
                     {
-                        Foreach.block(0,((m + -1) * 256 < 0 ? (256 < 0 ?  -(( -((m + -1)) + 256 + 1) / 256) :  -(( -((m + -1)) + 256 - 1) / 256)) : (m + -1) / 256),(var c1 : long) => {
+                        Foreach.block(0,((m + -1) * 32 < 0 ? (32 < 0 ?  -(( -((m + -1)) + 32 + 1) / 32) :  -(( -((m + -1)) + 32 - 1) / 32)) : (m + -1) / 32),(var c1 : long) => {
+                            var c6 : long;
+                            var c3 : long;
                             var c2 : long;
                             var c4 : long;
-                            var c3 : long;
+                            var c5 : long;
 @x10.compiler.Native("c++", "#pragma ivdep"){}
 @x10.compiler.Native("c++", "#pragma vector always"){}
 @x10.compiler.Native("c++", "#pragma simd"){}
-                            for (c4 = (256 * c1); (c4 <= (((256 * c1) + 255) < (m + -1) ? (((256 * c1) + 255)) as long : ((m + -1)) as long)); c4++) {
-                                mean(c4) /= float_n;
+                            for (c6 = (32 * c1); (c6 <= (((32 * c1) + 31) < (m + -1) ? (((32 * c1) + 31)) as long : ((m + -1)) as long)); c6++) {
+                                mean(c6) /= float_n;
                             }
                         }
 );
                     }
                     {
-                        Foreach.block(0,((n + -1) * 256 < 0 ? (256 < 0 ?  -(( -((n + -1)) + 256 + 1) / 256) :  -(( -((n + -1)) + 256 - 1) / 256)) : (n + -1) / 256),(var c1 : long) => {
+                        Foreach.block(0,((n + -1) * 32 < 0 ? (32 < 0 ?  -(( -((n + -1)) + 32 + 1) / 32) :  -(( -((n + -1)) + 32 - 1) / 32)) : (n + -1) / 32),(var c1 : long) => {
+                            var c6 : long;
+                            var c3 : long;
                             var c2 : long;
                             var c4 : long;
-                            var c3 : long;
-                            for (c2 = 0; (c2 <= ((m + -1) * 256 < 0 ? (256 < 0 ?  -(( -((m + -1)) + 256 + 1) / 256) :  -(( -((m + -1)) + 256 - 1) / 256)) : (m + -1) / 256)); c2++) {
-                                for (c3 = (256 * c2); (c3 <= (((256 * c2) + 255) < (m + -1) ? (((256 * c2) + 255)) as long : ((m + -1)) as long)); c3++) {
+                            var c5 : long;
+                            for (c2 = 0; (c2 <= ((m + -1) * 32 < 0 ? (32 < 0 ?  -(( -((m + -1)) + 32 + 1) / 32) :  -(( -((m + -1)) + 32 - 1) / 32)) : (m + -1) / 32)); c2++) {
+                                for (c5 = (32 * c2); (c5 <= (((32 * c2) + 31) < (m + -1) ? (((32 * c2) + 31)) as long : ((m + -1)) as long)); c5++) {
 @x10.compiler.Native("c++", "#pragma ivdep"){}
 @x10.compiler.Native("c++", "#pragma vector always"){}
 @x10.compiler.Native("c++", "#pragma simd"){}
-                                    for (c4 = (256 * c1); (c4 <= (((256 * c1) + 255) < (n + -1) ? (((256 * c1) + 255)) as long : ((n + -1)) as long)); c4++) {
-                                        data(c4,c3) -= mean(c3);
+                                    for (c6 = (32 * c1); (c6 <= (((32 * c1) + 31) < (n + -1) ? (((32 * c1) + 31)) as long : ((n + -1)) as long)); c6++) {
+                                        data(c6,c5) -= mean(c5);
+                                    }
+                                }
+                            }
+                        }
+);
+                    }
+                    if ((n >= 1)) {
+                        {
+                            Foreach.block(0,((m + -1) * 32 < 0 ? (32 < 0 ?  -(( -((m + -1)) + 32 + 1) / 32) :  -(( -((m + -1)) + 32 - 1) / 32)) : (m + -1) / 32),(var c1 : long) => {
+                                var c6 : long;
+                                var c3 : long;
+                                var c2 : long;
+                                var c4 : long;
+                                var c5 : long;
+                                for (c2 = c1; (c2 <= ((m + -1) * 32 < 0 ? (32 < 0 ?  -(( -((m + -1)) + 32 + 1) / 32) :  -(( -((m + -1)) + 32 - 1) / 32)) : (m + -1) / 32)); c2++) {
+                                    for (c3 = 0; (c3 <= ((n + -1) * 32 < 0 ? (32 < 0 ?  -(( -((n + -1)) + 32 + 1) / 32) :  -(( -((n + -1)) + 32 - 1) / 32)) : (n + -1) / 32)); c3++) {
+                                        for (c4 = (32 * c3); (c4 <= (((32 * c3) + 31) < (n + -1) ? (((32 * c3) + 31)) as long : ((n + -1)) as long)); c4++) {
+                                            for (c5 = (32 * c2); (c5 <= (((32 * c2) + 31) < (m + -1) ? (((32 * c2) + 31)) as long : ((m + -1)) as long)); c5++) {
+@x10.compiler.Native("c++", "#pragma ivdep"){}
+@x10.compiler.Native("c++", "#pragma vector always"){}
+@x10.compiler.Native("c++", "#pragma simd"){}
+                                                for (c6 = (32 * c1); (c6 <= (c5 < ((32 * c1) + 31) ? (c5) as long : (((32 * c1) + 31)) as long)); c6++) {
+                                                    symmat(c6,c5) += data(c4,c6) * data(c4,c5);
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+);
+                        }
+                    }
+                    {
+                        Foreach.block(0,((m + -1) * 32 < 0 ? (32 < 0 ?  -(( -((m + -1)) + 32 + 1) / 32) :  -(( -((m + -1)) + 32 - 1) / 32)) : (m + -1) / 32),(var c1 : long) => {
+                            var c6 : long;
+                            var c3 : long;
+                            var c2 : long;
+                            var c4 : long;
+                            var c5 : long;
+                            for (c2 = c1; (c2 <= ((m + -1) * 32 < 0 ? (32 < 0 ?  -(( -((m + -1)) + 32 + 1) / 32) :  -(( -((m + -1)) + 32 - 1) / 32)) : (m + -1) / 32)); c2++) {
+                                for (c5 = (32 * c2); (c5 <= (((32 * c2) + 31) < (m + -1) ? (((32 * c2) + 31)) as long : ((m + -1)) as long)); c5++) {
+@x10.compiler.Native("c++", "#pragma ivdep"){}
+@x10.compiler.Native("c++", "#pragma vector always"){}
+@x10.compiler.Native("c++", "#pragma simd"){}
+                                    for (c6 = (32 * c1); (c6 <= (c5 < ((32 * c1) + 31) ? (c5) as long : (((32 * c1) + 31)) as long)); c6++) {
+                                        symmat(c5,c6) = symmat(c6,c5);
                                     }
                                 }
                             }
@@ -126,18 +207,10 @@ public class Covariance {
                     }
                 }
             }
-            for (var j1 : long = 0L; j1 < m; j1++) {
-                for (var j2 : long = j1; j2 < m; j2++) {
-                    var c4 : long;
-                    symmat(j1,j2) = 0.0;
-                    for (c4 = 0; (c4 <= (n + -1)); c4++) {
-                        symmat(j1,j2) += data(c4,j1) * data(c4,j2);
-                    }
-                    symmat(j2,j1) = symmat(j1,j2);
-                }
-            }
         }
-    }  public static def main(args : Rail[String])
+    }  
+
+  public static def main(args : Rail[String])
   {
     var M : Long = 0;
     var N : Long = 0;

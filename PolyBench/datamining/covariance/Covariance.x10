@@ -51,38 +51,43 @@ public class Covariance {
   }  /* Main computational kernel. The whole function will be timed,
      including the call and return. */
   def kernel_covariance(m : Long,
-  n : Long,
-  		       float_n : Double,
-  		       data : Array_2[Double],
-  		       symmat : Array_2[Double],
-  		       mean : Rail[Double])
+                        n : Long,
+                        float_n : Double,
+                        data : Array_2[Double],
+                        symmat : Array_2[Double],
+                        mean : Rail[Double])
   {
-  
+    var i : Long;
+    var j : Long;
+    var j1 : Long;
+    var j2 : Long;
     /* Determine mean of column vectors of input data matrix */
-    for (var j : Long = 0; j < m; j++)
+    for (j = 0; j < m; j++)
       {
         mean(j) = 0.0;
-        for (var i : Long = 0; i < n; i++)
+        for (i = 0; i < n; i++)
           mean(j) += data(i,j);
         mean(j) /= float_n;
       }
-  
+
     /* Center the column vectors. */
-    for (var i : Long = 0; i < n; i++)
-      for (var j : Long = 0; j < m; j++)
+    for (i = 0; i < n; i++)
+      for (j = 0; j < m; j++)
         data(i,j) -= mean(j);
-  
+
     /* Calculate the m * m covariance matrix. */
-    for (var j1 : Long = 0; j1 < m; j1++)
-      for (var j2 : Long = j1; j2 < m; j2++)
+    for (j1 = 0; j1 < m; j1++)
+      for (j2 = j1; j2 < m; j2++)
         {
           symmat(j1,j2) = 0.0;
-          for (var i : Long = 0; i < n; i++)
-  	  symmat(j1,j2) += data(i,j1) * data(i,j2);
+          for (i = 0; i < n; i++)
+          symmat(j1,j2) += data(i,j1) * data(i,j2);
           symmat(j2,j1) = symmat(j1,j2);
         }
   
-  }  public static def main(args : Rail[String])
+  }  
+
+  public static def  main(args : Rail[String])
   {
     var M : Long = 0;
     var N : Long = 0;
