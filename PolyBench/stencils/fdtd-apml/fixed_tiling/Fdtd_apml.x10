@@ -94,42 +94,126 @@ public class Fdtd_apml {
   	if ((i * cxm + j) % 20 == 0) Console.ERR.printf("\n");
         }
     Console.ERR.printf("\n");
-  }  /* Main computational kernel. The whole function will be timed,
+  }  
+
+  /* Main computational kernel. The whole function will be timed,
      including the call and return. */
-    def kernel_fdtd_apml(cz : long, cxm : long, cym : long, mui : double, ch : double, Ax : Array_2[double], Ry : Array_2[double], clf : Array_2[double], tmp : Array_2[double], Bza : Array_3[double], Ex : Array_3[double], Ey : Array_3[double], Hz : Array_3[double], czm : Rail[double], czp : Rail[double], cxmh : Rail[double], cxph : Rail[double], cymh : Rail[double], cyph : Rail[double])  {
-        {
-            for (var iz : long = 0L; iz < cz; iz++) {
-                for (var iy : long = 0L; iy < cym; iy++) {
-                    {
+  def kernel_fdtd_apml(cz : long, cxm : long, cym : long, mui : double, ch : double, Ax : Array_2[double], Ry : Array_2[double], clf : Array_2[double], tmp : Array_2[double], Bza : Array_3[double], Ex : Array_3[double], Ey : Array_3[double], Hz : Array_3[double], czm : Rail[double], czp : Rail[double], cxmh : Rail[double], cxph : Rail[double], cymh : Rail[double], cyph : Rail[double])  {
+        var c1 : long;
+        var c2 : long;
+        var c3 : long;
+        var c4 : long;
+        var c5 : long;
+        var c6 : long;
+        if (((cym >= 1) && (cz >= 1))) {
+            if ((cxm >= 1)) {
+                {
+                    Foreach.block(0,((cz + -1) * 32 < 0 ? (32 < 0 ?  -(( -((cz + -1)) + 32 + 1) / 32) :  -(( -((cz + -1)) + 32 - 1) / 32)) : (cz + -1) / 32),(var c1 : long) => {
+                        var c2 : long;
+                        var c3 : long;
                         var c4 : long;
-                        for (c4 = 0; (c4 <= (cxm + -1)); c4++) {
-                            clf(iz,iy) = Ex(iz,iy,c4) - Ex(iz,iy + 1L,c4) + Ey(iz,iy,c4 + 1L) - Ey(iz,iy,c4);
-                            tmp(iz,iy) = (cymh(iy) / cyph(iy)) * Bza(iz,iy,c4) - (ch / cyph(iy)) * clf(iz,iy);
-                            Hz(iz,iy,c4) = (cxmh(c4) / cxph(c4)) * Hz(iz,iy,c4) + (mui * czp(iz) / cxph(c4)) * tmp(iz,iy) - (mui * czm(iz) / cxph(c4)) * Bza(iz,iy,c4);
-                            Bza(iz,iy,c4) = tmp(iz,iy);
+                        var c5 : long;
+                        var c6 : long;
+                        for (c2 = 0; (c2 <= ((cym + -1) * 32 < 0 ? (32 < 0 ?  -(( -((cym + -1)) + 32 + 1) / 32) :  -(( -((cym + -1)) + 32 - 1) / 32)) : (cym + -1) / 32)); c2++) {
+                            for (c3 = 0; (c3 <= ((cxm + -1) * 32 < 0 ? (32 < 0 ?  -(( -((cxm + -1)) + 32 + 1) / 32) :  -(( -((cxm + -1)) + 32 - 1) / 32)) : (cxm + -1) / 32)); c3++) {
+                                for (c4 = (32 * c3); (c4 <= (((32 * c3) + 31) < (cxm + -1) ? (((32 * c3) + 31)) as long : ((cxm + -1)) as long)); c4++) {
+                                    for (c5 = (32 * c2); (c5 <= (((32 * c2) + 31) < (cym + -1) ? (((32 * c2) + 31)) as long : ((cym + -1)) as long)); c5++) {
+@x10.compiler.Native("c++", "#pragma ivdep"){}
+@x10.compiler.Native("c++", "#pragma vector always"){}
+@x10.compiler.Native("c++", "#pragma simd"){}
+                                        for (c6 = (32 * c1); (c6 <= (((32 * c1) + 31) < (cz + -1) ? (((32 * c1) + 31)) as long : ((cz + -1)) as long)); c6++) {
+                                            clf(c6,c5) = Ex(c6,c5,c4) - Ex(c6,c5 + 1L,c4) + Ey(c6,c5,c4 + 1L) - Ey(c6,c5,c4);
+                                            tmp(c6,c5) = (cymh(c5) / cyph(c5)) * Bza(c6,c5,c4) - (ch / cyph(c5)) * clf(c6,c5);
+                                            Hz(c6,c5,c4) = (cxmh(c4) / cxph(c4)) * Hz(c6,c5,c4) + (mui * czp(c6) / cxph(c4)) * tmp(c6,c5) - (mui * czm(c6) / cxph(c4)) * Bza(c6,c5,c4);
+                                            Bza(c6,c5,c4) = tmp(c6,c5);
+                                        }
+                                    }
+                                }
+                            }
                         }
-                        clf(iz,iy) = Ex(iz,iy,cxm) - Ex(iz,iy + 1L,cxm) + Ry(iz,iy) - Ey(iz,iy,cxm);
                     }
-                    tmp(iz,iy) = (cymh(iy) / cyph(iy)) * Bza(iz,iy,Fdtd_apml.this._PB_CXM) - (ch / cyph(iy)) * clf(iz,iy);
-                    {
-                        var c10 : long;
-                        Hz(iz,iy,cxm) = (cxmh(cxm) / cxph(cxm)) * Hz(iz,iy,cxm) + (mui * czp(iz) / cxph(cxm)) * tmp(iz,iy) - (mui * czm(iz) / cxph(cxm)) * Bza(iz,iy,cxm);
-                        Bza(iz,iy,cxm) = tmp(iz,iy);
-                        for (c10 = 0; (c10 <= (cxm + -1)); c10++) {
-                            clf(iz,iy) = Ex(iz,cym,c10) - Ax(iz,c10) + Ey(iz,cym,c10 + 1L) - Ey(iz,cym,c10);
-                            tmp(iz,iy) = (cymh(cym) / cyph(iy)) * Bza(iz,iy,c10) - (ch / cyph(iy)) * clf(iz,iy);
-                            Hz(iz,cym,c10) = (cxmh(c10) / cxph(c10)) * Hz(iz,cym,c10) + (mui * czp(iz) / cxph(c10)) * tmp(iz,iy) - (mui * czm(iz) / cxph(c10)) * Bza(iz,cym,c10);
-                            Bza(iz,cym,c10) = tmp(iz,iy);
-                        }
-                        clf(iz,iy) = Ex(iz,cym,cxm) - Ax(iz,cxm) + Ry(iz,cym) - Ey(iz,cym,cxm);
-                        tmp(iz,iy) = (cymh(cym) / cyph(cym)) * Bza(iz,cym,cxm) - (ch / cyph(cym)) * clf(iz,iy);
-                        Hz(iz,cym,cxm) = (cxmh(cxm) / cxph(cxm)) * Hz(iz,cym,cxm) + (mui * czp(iz) / cxph(cxm)) * tmp(iz,iy) - (mui * czm(iz) / cxph(cxm)) * Bza(iz,cym,cxm);
-                        Bza(iz,cym,cxm) = tmp(iz,iy);
-                    }
+);
                 }
             }
+            {
+                Foreach.block(0,((cz + -1) * 32 < 0 ? (32 < 0 ?  -(( -((cz + -1)) + 32 + 1) / 32) :  -(( -((cz + -1)) + 32 - 1) / 32)) : (cz + -1) / 32),(var c1 : long) => {
+                    var c2 : long;
+                    var c3 : long;
+                    var c4 : long;
+                    var c5 : long;
+                    var c6 : long;
+                    for (c2 = 0; (c2 <= ((cym + -1) * 32 < 0 ? (32 < 0 ?  -(( -((cym + -1)) + 32 + 1) / 32) :  -(( -((cym + -1)) + 32 - 1) / 32)) : (cym + -1) / 32)); c2++) {
+                        for (c5 = (32 * c2); (c5 <= (((32 * c2) + 31) < (cym + -1) ? (((32 * c2) + 31)) as long : ((cym + -1)) as long)); c5++) {
+@x10.compiler.Native("c++", "#pragma ivdep"){}
+@x10.compiler.Native("c++", "#pragma vector always"){}
+@x10.compiler.Native("c++", "#pragma simd"){}
+                            for (c6 = (32 * c1); (c6 <= (((32 * c1) + 31) < (cz + -1) ? (((32 * c1) + 31)) as long : ((cz + -1)) as long)); c6++) {
+                                clf(c6,c5) = Ex(c6,c5,cxm) - Ex(c6,c5 + 1L,cxm) + Ry(c6,c5) - Ey(c6,c5,cxm);
+                                tmp(c6,c5) = (cymh(c5) / cyph(c5)) * Bza(c6,c5,cxm) - (ch / cyph(c5)) * clf(c6,c5);
+                                Hz(c6,c5,cxm) = (cxmh(cxm) / cxph(cxm)) * Hz(c6,c5,cxm) + (mui * czp(c6) / cxph(cxm)) * tmp(c6,c5) - (mui * czm(c6) / cxph(cxm)) * Bza(c6,c5,cxm);
+                                Bza(c6,c5,cxm) = tmp(c6,c5);
+                            }
+                        }
+                    }
+                }
+);
+            }
+            if ((cxm >= 1)) {
+                {
+                    Foreach.block(0,((cz + -1) * 32 < 0 ? (32 < 0 ?  -(( -((cz + -1)) + 32 + 1) / 32) :  -(( -((cz + -1)) + 32 - 1) / 32)) : (cz + -1) / 32),(var c1 : long) => {
+                        var c2 : long;
+                        var c3 : long;
+                        var c4 : long;
+                        var c5 : long;
+                        var c6 : long;
+                        for (c2 = 0; (c2 <= ((cym + -1) * 32 < 0 ? (32 < 0 ?  -(( -((cym + -1)) + 32 + 1) / 32) :  -(( -((cym + -1)) + 32 - 1) / 32)) : (cym + -1) / 32)); c2++) {
+                            for (c3 = 0; (c3 <= ((cxm + -1) * 32 < 0 ? (32 < 0 ?  -(( -((cxm + -1)) + 32 + 1) / 32) :  -(( -((cxm + -1)) + 32 - 1) / 32)) : (cxm + -1) / 32)); c3++) {
+                                for (c4 = (32 * c3); (c4 <= (((32 * c3) + 31) < (cxm + -1) ? (((32 * c3) + 31)) as long : ((cxm + -1)) as long)); c4++) {
+                                    for (c5 = (32 * c2); (c5 <= (((32 * c2) + 31) < (cym + -1) ? (((32 * c2) + 31)) as long : ((cym + -1)) as long)); c5++) {
+@x10.compiler.Native("c++", "#pragma ivdep"){}
+@x10.compiler.Native("c++", "#pragma vector always"){}
+@x10.compiler.Native("c++", "#pragma simd"){}
+                                        for (c6 = (32 * c1); (c6 <= (((32 * c1) + 31) < (cz + -1) ? (((32 * c1) + 31)) as long : ((cz + -1)) as long)); c6++) {
+                                            clf(c6,c5) = Ex(c6,cym,c4) - Ax(c6,c4) + Ey(c6,cym,c4 + 1L) - Ey(c6,cym,c4);
+                                            tmp(c6,c5) = (cymh(cym) / cyph(c5)) * Bza(c6,c5,c4) - (ch / cyph(c5)) * clf(c6,c5);
+                                            Hz(c6,cym,c4) = (cxmh(c4) / cxph(c4)) * Hz(c6,cym,c4) + (mui * czp(c6) / cxph(c4)) * tmp(c6,c5) - (mui * czm(c6) / cxph(c4)) * Bza(c6,cym,c4);
+                                            Bza(c6,cym,c4) = tmp(c6,c5);
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+);
+                }
+            }
+            {
+                Foreach.block(0,((cz + -1) * 32 < 0 ? (32 < 0 ?  -(( -((cz + -1)) + 32 + 1) / 32) :  -(( -((cz + -1)) + 32 - 1) / 32)) : (cz + -1) / 32),(var c1 : long) => {
+                    var c2 : long;
+                    var c3 : long;
+                    var c4 : long;
+                    var c5 : long;
+                    var c6 : long;
+                    for (c2 = 0; (c2 <= ((cym + -1) * 32 < 0 ? (32 < 0 ?  -(( -((cym + -1)) + 32 + 1) / 32) :  -(( -((cym + -1)) + 32 - 1) / 32)) : (cym + -1) / 32)); c2++) {
+                        for (c5 = (32 * c2); (c5 <= (((32 * c2) + 31) < (cym + -1) ? (((32 * c2) + 31)) as long : ((cym + -1)) as long)); c5++) {
+@x10.compiler.Native("c++", "#pragma ivdep"){}
+@x10.compiler.Native("c++", "#pragma vector always"){}
+@x10.compiler.Native("c++", "#pragma simd"){}
+                            for (c6 = (32 * c1); (c6 <= (((32 * c1) + 31) < (cz + -1) ? (((32 * c1) + 31)) as long : ((cz + -1)) as long)); c6++) {
+                                clf(c6,c5) = Ex(c6,cym,cxm) - Ax(c6,cxm) + Ry(c6,cym) - Ey(c6,cym,cxm);
+                                tmp(c6,c5) = (cymh(cym) / cyph(cym)) * Bza(c6,cym,cxm) - (ch / cyph(cym)) * clf(c6,c5);
+                                Hz(c6,cym,cxm) = (cxmh(cxm) / cxph(cxm)) * Hz(c6,cym,cxm) + (mui * czp(c6) / cxph(cxm)) * tmp(c6,c5) - (mui * czm(c6) / cxph(cxm)) * Bza(c6,cym,cxm);
+                                Bza(c6,cym,cxm) = tmp(c6,c5);
+                            }
+                        }
+                    }
+                }
+);
+            }
         }
-    }  public static def main(args : Rail[String])
+    }  
+
+  public static def main(args : Rail[String])
   {
     var CZ : Long = 0;
     var CXM : Long = 0;

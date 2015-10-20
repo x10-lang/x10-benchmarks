@@ -94,46 +94,162 @@ public class Fdtd_apml {
   	if ((i * cxm + j) % 20 == 0) Console.ERR.printf("\n");
         }
     Console.ERR.printf("\n");
-  }  /* Main computational kernel. The whole function will be timed,
+  }  
+
+  /* Main computational kernel. The whole function will be timed,
      including the call and return. */
-    def kernel_fdtd_apml(cz : long, cxm : long, cym : long, mui : double, ch : double, Ax : Array_2[double], Ry : Array_2[double], clf : Array_2[double], tmp : Array_2[double], Bza : Array_3[double], Ex : Array_3[double], Ey : Array_3[double], Hz : Array_3[double], czm : Rail[double], czp : Rail[double], cxmh : Rail[double], cxph : Rail[double], cymh : Rail[double], cyph : Rail[double])  {
-        {
-            for (var iz : long = 0L; iz < cz; iz++) {
-                for (var iy : long = 0L; iy < cym; iy++) {
+  def kernel_fdtd_apml(cz : long, cxm : long, cym : long, mui : double, ch : double, Ax : Array_2[double], Ry : Array_2[double], clf : Array_2[double], tmp : Array_2[double], Bza : Array_3[double], Ex : Array_3[double], Ey : Array_3[double], Hz : Array_3[double], czm : Rail[double], czp : Rail[double], cxmh : Rail[double], cxph : Rail[double], cymh : Rail[double], cyph : Rail[double])  {
+        var ___pace_tile_sizes : Rail[long] = new Rail[Long](3L);
+        Pace_tiling_api.PACETileSizeVectorInit(___pace_tile_sizes,3,1);
+        var c1t1 : long;
+        var T1c3 : float = (___pace_tile_sizes(0L)) as float;
+        var T1c2 : float = (___pace_tile_sizes(1L)) as float;
+        var c3t1 : long;
+        var T1c1 : float = (___pace_tile_sizes(2L)) as float;
+        var c2t1 : long;
+        var c1 : long;
+        var c2 : long;
+        var c3 : long;
+        if (((cym >= 1) && (cz >= 1))) {
+            if ((cxm >= 1)) {
+                {
+                    var tmpLb : long;
+                    var tmpUb : long;
+                    tmpLb = (Math.round(((-1 + (1 / T1c1))) as double)) as long;
+                    tmpUb = (Math.round((((cz * (1 / T1c1)) + ((1 / T1c1) * -1))) as double)) as long;
                     {
-                        var ___pace_tile_sizes : Rail[long] = new Rail[Long](0L);
-                        Pace_tiling_api.PACETileSizeVectorInit(___pace_tile_sizes,0,2);
-                        var c3 : long;
-                        for (c3 = 0; (c3 <= (cxm + -1)); c3++) {
-                            clf(iz,iy) = Ex(iz,iy,c3) - Ex(iz,iy + 1L,c3) + Ey(iz,iy,c3 + 1L) - Ey(iz,iy,c3);
-                            tmp(iz,iy) = (cymh(iy) / cyph(iy)) * Bza(iz,iy,c3) - (ch / cyph(iy)) * clf(iz,iy);
-                            Hz(iz,iy,c3) = (cxmh(c3) / cxph(c3)) * Hz(iz,iy,c3) + (mui * czp(iz) / cxph(c3)) * tmp(iz,iy) - (mui * czm(iz) / cxph(c3)) * Bza(iz,iy,c3);
-                            Bza(iz,iy,c3) = tmp(iz,iy);
+                        val T1c1_4 = T1c1;
+                        val T1c3_3 = T1c3;
+                        val T1c2_2 = T1c2;
+                        val tmpUb_1 = tmpUb;
+                        val tmpLb_0 = tmpLb;
+                        Foreach.block(tmpLb_0,tmpUb_1,(var c1t1 : long) => {
+                            var c3t1 : long;
+                            var c2t1 : long;
+                            var c1 : long;
+                            var c2 : long;
+                            var c3 : long;
+                            for (c2t1 = (Math.round(((-1 + (1 / T1c2_2))) as double)) as long; (c2t1 <= (Math.round((((cym * (1 / T1c2_2)) + ((1 / T1c2_2) * -1))) as double)) as long); ++c2t1) {
+                                for (c3t1 = (Math.round(((-1 + (1 / T1c3_3))) as double)) as long; (c3t1 <= (Math.round((((cxm * (1 / T1c3_3)) + ((1 / T1c3_3) * -1))) as double)) as long); ++c3t1) {
+                                    for (c1 = ((c1t1 * T1c1_4) > 0 ? ((c1t1 * T1c1_4)) as long : (0) as long); (c1 <= (((c1t1 * T1c1_4) + (T1c1_4 + -1)) < (cz + -1) ? (((c1t1 * T1c1_4) + (T1c1_4 + -1))) as long : ((cz + -1)) as long)); c1++) {
+                                        for (c2 = ((c2t1 * T1c2_2) > 0 ? ((c2t1 * T1c2_2)) as long : (0) as long); (c2 <= (((c2t1 * T1c2_2) + (T1c2_2 + -1)) < (cym + -1) ? (((c2t1 * T1c2_2) + (T1c2_2 + -1))) as long : ((cym + -1)) as long)); c2++) {
+                                            for (c3 = ((c3t1 * T1c3_3) > 0 ? ((c3t1 * T1c3_3)) as long : (0) as long); (c3 <= (((c3t1 * T1c3_3) + (T1c3_3 + -1)) < (cxm + -1) ? (((c3t1 * T1c3_3) + (T1c3_3 + -1))) as long : ((cxm + -1)) as long)); c3++) {
+                                                clf(c1,c2) = Ex(c1,c2,c3) - Ex(c1,c2 + 1L,c3) + Ey(c1,c2,c3 + 1L) - Ey(c1,c2,c3);
+                                                tmp(c1,c2) = (cymh(c2) / cyph(c2)) * Bza(c1,c2,c3) - (ch / cyph(c2)) * clf(c1,c2);
+                                                Hz(c1,c2,c3) = (cxmh(c3) / cxph(c3)) * Hz(c1,c2,c3) + (mui * czp(c1) / cxph(c3)) * tmp(c1,c2) - (mui * czm(c1) / cxph(c3)) * Bza(c1,c2,c3);
+                                                Bza(c1,c2,c3) = tmp(c1,c2);
+                                            }
+                                        }
+                                    }
+                                }
+                            }
                         }
-                        clf(iz,iy) = Ex(iz,iy,cxm) - Ex(iz,iy + 1L,cxm) + Ry(iz,iy) - Ey(iz,iy,cxm);
-                    }
-                    tmp(iz,iy) = (cymh(iy) / cyph(iy)) * Bza(iz,iy,Fdtd_apml.this._PB_CXM) - (ch / cyph(iy)) * clf(iz,iy);
-                    {
-                        var ___pace_tile_sizes : Rail[long] = new Rail[Long](0L);
-                        Pace_tiling_api.PACETileSizeVectorInit(___pace_tile_sizes,0,3);
-                        var c9 : long;
-                        Hz(iz,iy,cxm) = (cxmh(cxm) / cxph(cxm)) * Hz(iz,iy,cxm) + (mui * czp(iz) / cxph(cxm)) * tmp(iz,iy) - (mui * czm(iz) / cxph(cxm)) * Bza(iz,iy,cxm);
-                        Bza(iz,iy,cxm) = tmp(iz,iy);
-                        for (c9 = 0; (c9 <= (cxm + -1)); c9++) {
-                            clf(iz,iy) = Ex(iz,cym,c9) - Ax(iz,c9) + Ey(iz,cym,c9 + 1L) - Ey(iz,cym,c9);
-                            tmp(iz,iy) = (cymh(cym) / cyph(iy)) * Bza(iz,iy,c9) - (ch / cyph(iy)) * clf(iz,iy);
-                            Hz(iz,cym,c9) = (cxmh(c9) / cxph(c9)) * Hz(iz,cym,c9) + (mui * czp(iz) / cxph(c9)) * tmp(iz,iy) - (mui * czm(iz) / cxph(c9)) * Bza(iz,cym,c9);
-                            Bza(iz,cym,c9) = tmp(iz,iy);
-                        }
-                        clf(iz,iy) = Ex(iz,cym,cxm) - Ax(iz,cxm) + Ry(iz,cym) - Ey(iz,cym,cxm);
-                        tmp(iz,iy) = (cymh(cym) / cyph(cym)) * Bza(iz,cym,cxm) - (ch / cyph(cym)) * clf(iz,iy);
-                        Hz(iz,cym,cxm) = (cxmh(cxm) / cxph(cxm)) * Hz(iz,cym,cxm) + (mui * czp(iz) / cxph(cxm)) * tmp(iz,iy) - (mui * czm(iz) / cxph(cxm)) * Bza(iz,cym,cxm);
-                        Bza(iz,cym,cxm) = tmp(iz,iy);
+);
                     }
                 }
             }
+            {
+                var tmpLb : long;
+                var tmpUb : long;
+                tmpLb = (Math.round(((-1 + (1 / T1c1))) as double)) as long;
+                tmpUb = (Math.round((((cz * (1 / T1c1)) + ((1 / T1c1) * -1))) as double)) as long;
+                {
+                    val T1c1_3 = T1c1;
+                    val T1c2_2 = T1c2;
+                    val tmpUb_1 = tmpUb;
+                    val tmpLb_0 = tmpLb;
+                    Foreach.block(tmpLb_0,tmpUb_1,(var c1t1 : long) => {
+                        var c3t1 : long;
+                        var c2t1 : long;
+                        var c1 : long;
+                        var c2 : long;
+                        var c3 : long;
+                        for (c2t1 = (Math.round(((-1 + (1 / T1c2_2))) as double)) as long; (c2t1 <= (Math.round((((cym * (1 / T1c2_2)) + ((1 / T1c2_2) * -1))) as double)) as long); ++c2t1) {
+                            for (c1 = ((c1t1 * T1c1_3) > 0 ? ((c1t1 * T1c1_3)) as long : (0) as long); (c1 <= (((c1t1 * T1c1_3) + (T1c1_3 + -1)) < (cz + -1) ? (((c1t1 * T1c1_3) + (T1c1_3 + -1))) as long : ((cz + -1)) as long)); c1++) {
+                                for (c2 = ((c2t1 * T1c2_2) > 0 ? ((c2t1 * T1c2_2)) as long : (0) as long); (c2 <= (((c2t1 * T1c2_2) + (T1c2_2 + -1)) < (cym + -1) ? (((c2t1 * T1c2_2) + (T1c2_2 + -1))) as long : ((cym + -1)) as long)); c2++) {
+                                    clf(c1,c2) = Ex(c1,c2,cxm) - Ex(c1,c2 + 1L,cxm) + Ry(c1,c2) - Ey(c1,c2,cxm);
+                                    tmp(c1,c2) = (cymh(c2) / cyph(c2)) * Bza(c1,c2,cxm) - (ch / cyph(c2)) * clf(c1,c2);
+                                    Hz(c1,c2,cxm) = (cxmh(cxm) / cxph(cxm)) * Hz(c1,c2,cxm) + (mui * czp(c1) / cxph(cxm)) * tmp(c1,c2) - (mui * czm(c1) / cxph(cxm)) * Bza(c1,c2,cxm);
+                                    Bza(c1,c2,cxm) = tmp(c1,c2);
+                                }
+                            }
+                        }
+                    }
+);
+                }
+            }
+            if ((cxm >= 1)) {
+                {
+                    var tmpLb : long;
+                    var tmpUb : long;
+                    tmpLb = (Math.round(((-1 + (1 / T1c1))) as double)) as long;
+                    tmpUb = (Math.round((((cz * (1 / T1c1)) + ((1 / T1c1) * -1))) as double)) as long;
+                    {
+                        val T1c1_4 = T1c1;
+                        val T1c3_3 = T1c3;
+                        val T1c2_2 = T1c2;
+                        val tmpUb_1 = tmpUb;
+                        val tmpLb_0 = tmpLb;
+                        Foreach.block(tmpLb_0,tmpUb_1,(var c1t1 : long) => {
+                            var c3t1 : long;
+                            var c2t1 : long;
+                            var c1 : long;
+                            var c2 : long;
+                            var c3 : long;
+                            for (c2t1 = (Math.round(((-1 + (1 / T1c2_2))) as double)) as long; (c2t1 <= (Math.round((((cym * (1 / T1c2_2)) + ((1 / T1c2_2) * -1))) as double)) as long); ++c2t1) {
+                                for (c3t1 = (Math.round(((-1 + (1 / T1c3_3))) as double)) as long; (c3t1 <= (Math.round((((cxm * (1 / T1c3_3)) + ((1 / T1c3_3) * -1))) as double)) as long); ++c3t1) {
+                                    for (c1 = ((c1t1 * T1c1_4) > 0 ? ((c1t1 * T1c1_4)) as long : (0) as long); (c1 <= (((c1t1 * T1c1_4) + (T1c1_4 + -1)) < (cz + -1) ? (((c1t1 * T1c1_4) + (T1c1_4 + -1))) as long : ((cz + -1)) as long)); c1++) {
+                                        for (c2 = ((c2t1 * T1c2_2) > 0 ? ((c2t1 * T1c2_2)) as long : (0) as long); (c2 <= (((c2t1 * T1c2_2) + (T1c2_2 + -1)) < (cym + -1) ? (((c2t1 * T1c2_2) + (T1c2_2 + -1))) as long : ((cym + -1)) as long)); c2++) {
+                                            for (c3 = ((c3t1 * T1c3_3) > 0 ? ((c3t1 * T1c3_3)) as long : (0) as long); (c3 <= (((c3t1 * T1c3_3) + (T1c3_3 + -1)) < (cxm + -1) ? (((c3t1 * T1c3_3) + (T1c3_3 + -1))) as long : ((cxm + -1)) as long)); c3++) {
+                                                clf(c1,c2) = Ex(c1,cym,c3) - Ax(c1,c3) + Ey(c1,cym,c3 + 1L) - Ey(c1,cym,c3);
+                                                tmp(c1,c2) = (cymh(cym) / cyph(c2)) * Bza(c1,c2,c3) - (ch / cyph(c2)) * clf(c1,c2);
+                                                Hz(c1,cym,c3) = (cxmh(c3) / cxph(c3)) * Hz(c1,cym,c3) + (mui * czp(c1) / cxph(c3)) * tmp(c1,c2) - (mui * czm(c1) / cxph(c3)) * Bza(c1,cym,c3);
+                                                Bza(c1,cym,c3) = tmp(c1,c2);
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+);
+                    }
+                }
+            }
+            {
+                var tmpLb : long;
+                var tmpUb : long;
+                tmpLb = (Math.round(((-1 + (1 / T1c1))) as double)) as long;
+                tmpUb = (Math.round((((cz * (1 / T1c1)) + ((1 / T1c1) * -1))) as double)) as long;
+                {
+                    val T1c1_3 = T1c1;
+                    val T1c2_2 = T1c2;
+                    val tmpUb_1 = tmpUb;
+                    val tmpLb_0 = tmpLb;
+                    Foreach.block(tmpLb_0,tmpUb_1,(var c1t1 : long) => {
+                        var c3t1 : long;
+                        var c2t1 : long;
+                        var c1 : long;
+                        var c2 : long;
+                        var c3 : long;
+                        for (c2t1 = (Math.round(((-1 + (1 / T1c2_2))) as double)) as long; (c2t1 <= (Math.round((((cym * (1 / T1c2_2)) + ((1 / T1c2_2) * -1))) as double)) as long); ++c2t1) {
+                            for (c1 = ((c1t1 * T1c1_3) > 0 ? ((c1t1 * T1c1_3)) as long : (0) as long); (c1 <= (((c1t1 * T1c1_3) + (T1c1_3 + -1)) < (cz + -1) ? (((c1t1 * T1c1_3) + (T1c1_3 + -1))) as long : ((cz + -1)) as long)); c1++) {
+                                for (c2 = ((c2t1 * T1c2_2) > 0 ? ((c2t1 * T1c2_2)) as long : (0) as long); (c2 <= (((c2t1 * T1c2_2) + (T1c2_2 + -1)) < (cym + -1) ? (((c2t1 * T1c2_2) + (T1c2_2 + -1))) as long : ((cym + -1)) as long)); c2++) {
+                                    clf(c1,c2) = Ex(c1,cym,cxm) - Ax(c1,cxm) + Ry(c1,cym) - Ey(c1,cym,cxm);
+                                    tmp(c1,c2) = (cymh(cym) / cyph(cym)) * Bza(c1,cym,cxm) - (ch / cyph(cym)) * clf(c1,c2);
+                                    Hz(c1,cym,cxm) = (cxmh(cxm) / cxph(cxm)) * Hz(c1,cym,cxm) + (mui * czp(c1) / cxph(cxm)) * tmp(c1,c2) - (mui * czm(c1) / cxph(cxm)) * Bza(c1,cym,cxm);
+                                    Bza(c1,cym,cxm) = tmp(c1,c2);
+                                }
+                            }
+                        }
+                    }
+);
+                }
+            }
         }
-    }  public static def main(args : Rail[String])
+
+    }  
+
+  public static def main(args : Rail[String])
   {
     var CZ : Long = 0;
     var CXM : Long = 0;

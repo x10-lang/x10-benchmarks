@@ -130,7 +130,7 @@ public class Fdtd_apml {
   	      Bza(iz,iy,ix) = tmp(iz,iy);
   	    }
   	  clf(iz,iy) = Ex(iz,iy,cxm) - Ex(iz,iy+1,cxm) + Ry(iz,iy) - Ey(iz,iy,cxm);
-  	  tmp(iz,iy) = (cymh(iy) / cyph(iy)) * Bza(iz,iy,_PB_CXM) - (ch / cyph(iy)) * clf(iz,iy);
+  	  tmp(iz,iy) = (cymh(iy) / cyph(iy)) * Bza(iz,iy,cxm) - (ch / cyph(iy)) * clf(iz,iy);
   	  Hz(iz,iy,cxm)=(cxmh(cxm) / cxph(cxm)) * Hz(iz,iy,cxm)
   	    + (mui * czp(iz) / cxph(cxm)) * tmp(iz,iy)
   	    - (mui * czm(iz) / cxph(cxm)) * Bza(iz,iy,cxm);
