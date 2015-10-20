@@ -49,54 +49,191 @@ public class Reg_detect {
         if ((i * maxgrid + j) % 20 == 0) Console.ERR.printf("\n");
       }
     Console.ERR.printf("\n");
-  }  /* Main computational kernel. The whole function will be timed,
+  }  
+
+  /* Main computational kernel. The whole function will be timed,
      including the call and return. */
-  /* Source (modified): http://www.cs.uic.edu/~iluican/reg_detect.c */
     def kernel_reg_detect(niter : long, maxgrid : long, length : long, sum_tang : Array_2[long], mean : Array_2[long], path : Array_2[long], diff : Array_3[long], sum_diff : Array_3[long])  {
         {
-            for (var t : long = 0L; t < niter; t++) {
-                for (var j : long = 0L; j <= maxgrid - 1L; j++) {
-                    for (var i : long = j; i <= maxgrid - 1L; i++) {
-                        var ___pace_tile_sizes : Rail[long] = new Rail[Long](0L);
-                        Pace_tiling_api.PACETileSizeVectorInit(___pace_tile_sizes,0,2);
-                        var c0 : long;
-                        if ((length >= 1)) {
-                            for (c0 = 0; (c0 <= (length + -1)); c0++) {
-                                diff(j,i,c0) = sum_tang(j,i);
+            var t : long;
+            var j : long;
+            var i : long;
+            {
+                var ___pace_tile_sizes : Rail[long] = new Rail[Long](3L);
+                Pace_tiling_api.PACETileSizeVectorInit(___pace_tile_sizes,3,1);
+                var wPTile : long;
+                var c2t1 : long;
+                var c0t1 : long;
+                var T1c2 : float = (___pace_tile_sizes(2L)) as float; 
+                var c1t1 : long;
+                var T1c0 : float = (___pace_tile_sizes(0L)) as float;
+                var T1c1 : float = (___pace_tile_sizes(1L)) as float;
+                var c4 : long;
+                var c1 : long;
+                var c0 : long;
+                var c2 : long;
+                if (((maxgrid >= 1) && (niter >= 1))) {
+                    if (((length >= 2) && (maxgrid >= 2))) {
+                        for (c0 = 0; (c0 <= (niter + -1)); c0++) { 
+                            for (c4 = 0; (c4 <= (length + -1)); c4++) {
+                                diff(0,0,c4) = sum_tang(0,0); 
+                            }
+                            sum_diff(0,0,0L) = diff(0,0,0L);
+                            for (c4 = 1; (c4 <= (length + -1)); c4++) {
+                                sum_diff(0,0,c4) = sum_diff(0,0,c4 - 1L) + diff(0,0,c4);
+                            }
+                            mean(0,0) = sum_diff(0,0,length - 1L);
+                            path(0L,0) = mean(0L,0); 
+                            for (c1 = (c0 + 1); (c1 <= ((c0 + maxgrid) + -1)); c1++) { 
+                                for (c4 = 0; (c4 <= (length + -1)); c4++) {
+                                    diff(0,((-1 * c0) + c1),c4) = sum_tang(0,((-1 * c0) + c1)); 
+                                }
+                                sum_diff(0,((-1 * c0) + c1),0L) = diff(0,((-1 * c0) + c1),0L);
+                                for (c4 = 1; (c4 <= (length + -1)); c4++) { 
+                                    sum_diff(0,((-1 * c0) + c1),c4) = sum_diff(0,((-1 * c0) + c1),c4 - 1L) + diff(0,((-1 * c0) + c1),c4);
+                                }
+                                mean(0,((-1 * c0) + c1)) = sum_diff(0,((-1 * c0) + c1),length - 1L); 
+                                path(0L,((-1 * c0) + c1)) = mean(0L,((-1 * c0) + c1));
+                                for (c2 = (c0 + 1); (c2 <= c1); c2++) {
+                                    for (c4 = 0; (c4 <= (length + -1)); c4++) {
+                                        diff(((-1 * c0) + c2),((-1 * c0) + c1),c4) = sum_tang(((-1 * c0) + c2),((-1 * c0) + c1));
+                                    }
+                                    sum_diff(((-1 * c0) + c2),((-1 * c0) + c1),0L) = diff(((-1 * c0) + c2),((-1 * c0) + c1),0L);
+                                    for (c4 = 1; (c4 <= (length + -1)); c4++) {
+                                        sum_diff(((-1 * c0) + c2),((-1 * c0) + c1),c4) = sum_diff(((-1 * c0) + c2),((-1 * c0) + c1),c4 - 1L) + diff(((-1 * c0) + c2),((-1 * c0) + c1),c4);
+                                    }
+                                    mean(((-1 * c0) + c2),((-1 * c0) + c1)) = sum_diff(((-1 * c0) + c2),((-1 * c0) + c1),length - 1L);
+                                    path(((-1 * c0) + c2),((-1 * c0) + c1)) = path(((-1 * c0) + c2) - 1L,((-1 * c0) + c1) - 1L) + mean(((-1 * c0) + c2),((-1 * c0) + c1));
+                                }
                             }
                         }
                     }
-                }
-                for (var j : long = 0L; j <= maxgrid - 1L; j++) {
-                    for (var i : long = j; i <= maxgrid - 1L; i++) {
-                        var ___pace_tile_sizes : Rail[long] = new Rail[Long](0L);
-                        Pace_tiling_api.PACETileSizeVectorInit(___pace_tile_sizes,0,3);
-                        var c3 : long;
-                        sum_diff(j,i,0L) = diff(j,i,0L);
-                        for (c3 = 1; (c3 <= (length + -1)); c3++) {
-                            sum_diff(j,i,c3) = sum_diff(j,i,c3 - 1L) + diff(j,i,c3);
+                    if (((length == 1) && (maxgrid >= 2))) {
+                        for (wPTile = (Math.round(((((((-1 + (1 / T1c2)) + -1) + (1 / T1c1)) + (((T1c1 + T1c0) / T1c1) * -1)) + ((T1c1 + T1c0) / (T1c0 * T1c1)))) as double)) as long; (wPTile <= (Math.round(((((((((maxgrid * (((((((((((((((T1c1 * T1c2) * T1c2) * T1c2) + (((T1c0 * T1c2) * T1c2) * T1c2)) + (((T1c0 * T1c1) * T1c2) * T1c2)) + (((T1c1 * T1c1) * T1c2) * T1c2)) + (((T1c0 * T1c1) * T1c2) * T1c2)) + (((T1c0 * T1c1) * T1c1) * T1c2)) + (((T1c1 * T1c1) * T1c2) * T1c2)) + (((T1c0 * T1c1) * T1c2) * T1c2)) + (((T1c0 * T1c1) * T1c1) * T1c2)) + (((T1c1 * T1c1) * T1c1) * T1c2)) + (((T1c0 * T1c1) * T1c1) * T1c2)) + (((T1c0 * T1c1) * T1c1) * T1c1)) / (((((((((T1c1 * T1c1) * T1c2) * T1c2) * T1c2) + ((((T1c1 * T1c1) * T1c1) * T1c2) * T1c2)) + ((((T1c0 * T1c1) * T1c2) * T1c2) * T1c2)) + ((((T1c0 * T1c1) * T1c1) * T1c2) * T1c2)) + ((((T1c0 * T1c1) * T1c1) * T1c2) * T1c2)) + ((((T1c0 * T1c1) * T1c1) * T1c1) * T1c2)))) + (niter * ((((((((T1c1 * T1c2) * T1c2) + ((T1c0 * T1c2) * T1c2)) + ((T1c0 * T1c1) * T1c2)) + ((T1c1 * T1c1) * T1c2)) + ((T1c0 * T1c1) * T1c2)) + ((T1c0 * T1c1) * T1c1)) / ((((T1c0 * T1c1) * T1c2) * T1c2) + (((T1c0 * T1c1) * T1c1) * T1c2))))) + ((((((((((((((((T1c1 * T1c1) * T1c2) * T1c2) * T1c2) + ((((T1c0 * T1c1) * T1c2) * T1c2) * T1c2)) + ((((T1c0 * T1c1) * T1c1) * T1c2) * T1c2)) + ((((T1c1 * T1c1) * T1c1) * T1c2) * T1c2)) + ((((T1c0 * T1c1) * T1c1) * T1c2) * T1c2)) + ((((T1c0 * T1c1) * T1c1) * T1c1) * T1c2)) + ((((T1c1 * T1c1) * T1c1) * T1c2) * T1c2)) + ((((T1c0 * T1c1) * T1c1) * T1c2) * T1c2)) + ((((T1c0 * T1c1) * T1c1) * T1c1) * T1c2)) + ((((T1c1 * T1c1) * T1c1) * T1c1) * T1c2)) + ((((T1c0 * T1c1) * T1c1) * T1c1) * T1c2)) + ((((T1c0 * T1c1) * T1c1) * T1c1) * T1c1)) / (((((((((((((((T1c1 * T1c2) * T1c2) * T1c2) * T1c2) + ((((T1c1 * T1c1) * T1c2) * T1c2) * T1c2)) + ((((T1c0 * T1c2) * T1c2) * T1c2) * T1c2)) + ((((T1c0 * T1c1) * T1c2) * T1c2) * T1c2)) + ((((T1c0 * T1c1) * T1c2) * T1c2) * T1c2)) + ((((T1c0 * T1c1) * T1c1) * T1c2) * T1c2)) + ((((T1c1 * T1c1) * T1c2) * T1c2) * T1c2)) + ((((T1c1 * T1c1) * T1c1) * T1c2) * T1c2)) + ((((T1c0 * T1c1) * T1c2) * T1c2) * T1c2)) + ((((T1c0 * T1c1) * T1c1) * T1c2) * T1c2)) + ((((T1c0 * T1c1) * T1c1) * T1c2) * T1c2)) + ((((T1c0 * T1c1) * T1c1) * T1c1) * T1c2)))) + ((((((((((((((((T1c1 * T1c2) * T1c2) * T1c2) + (((T1c0 * T1c2) * T1c2) * T1c2)) + (((T1c0 * T1c1) * T1c2) * T1c2)) + (((T1c1 * T1c1) * T1c2) * T1c2)) + (((T1c0 * T1c1) * T1c2) * T1c2)) + (((T1c0 * T1c1) * T1c1) * T1c2)) + (((T1c1 * T1c1) * T1c2) * T1c2)) + (((T1c0 * T1c1) * T1c2) * T1c2)) + (((T1c0 * T1c1) * T1c1) * T1c2)) + (((T1c1 * T1c1) * T1c1) * T1c2)) + (((T1c0 * T1c1) * T1c1) * T1c2)) + (((T1c0 * T1c1) * T1c1) * T1c1)) / (((((((((((((((T1c1 * T1c2) * T1c2) * T1c2) * T1c2) + ((((T1c1 * T1c1) * T1c2) * T1c2) * T1c2)) + ((((T1c0 * T1c2) * T1c2) * T1c2) * T1c2)) + ((((T1c0 * T1c1) * T1c2) * T1c2) * T1c2)) + ((((T1c0 * T1c1) * T1c2) * T1c2) * T1c2)) + ((((T1c0 * T1c1) * T1c1) * T1c2) * T1c2)) + ((((T1c1 * T1c1) * T1c2) * T1c2) * T1c2)) + ((((T1c1 * T1c1) * T1c1) * T1c2) * T1c2)) + ((((T1c0 * T1c1) * T1c2) * T1c2) * T1c2)) + ((((T1c0 * T1c1) * T1c1) * T1c2) * T1c2)) + ((((T1c0 * T1c1) * T1c1) * T1c2) * T1c2)) + ((((T1c0 * T1c1) * T1c1) * T1c1) * T1c2))) * -1)) + ((((((((((((((((T1c0 * T1c1) * T1c2) * T1c2) * T1c2) + ((((T1c0 * T1c0) * T1c2) * T1c2) * T1c2)) + ((((T1c0 * T1c0) * T1c1) * T1c2) * T1c2)) + ((((T1c0 * T1c1) * T1c1) * T1c2) * T1c2)) + ((((T1c0 * T1c0) * T1c1) * T1c2) * T1c2)) + ((((T1c0 * T1c0) * T1c1) * T1c1) * T1c2)) + ((((T1c0 * T1c1) * T1c1) * T1c2) * T1c2)) + ((((T1c0 * T1c0) * T1c1) * T1c2) * T1c2)) + ((((T1c0 * T1c0) * T1c1) * T1c1) * T1c2)) + ((((T1c0 * T1c1) * T1c1) * T1c1) * T1c2)) + ((((T1c0 * T1c0) * T1c1) * T1c1) * T1c2)) + ((((T1c0 * T1c0) * T1c1) * T1c1) * T1c1)) / (((((((((T1c1 * T1c1) * T1c2) * T1c2) * T1c2) + ((((T1c1 * T1c1) * T1c1) * T1c2) * T1c2)) + ((((T1c0 * T1c1) * T1c2) * T1c2) * T1c2)) + ((((T1c0 * T1c1) * T1c1) * T1c2) * T1c2)) + ((((T1c0 * T1c1) * T1c1) * T1c2) * T1c2)) + ((((T1c0 * T1c1) * T1c1) * T1c1) * T1c2)))) + ((((((((((((((((T1c1 * T1c2) * T1c2) * T1c2) + (((T1c0 * T1c2) * T1c2) * T1c2)) + (((T1c0 * T1c1) * T1c2) * T1c2)) + (((T1c1 * T1c1) * T1c2) * T1c2)) + (((T1c0 * T1c1) * T1c2) * T1c2)) + (((T1c0 * T1c1) * T1c1) * T1c2)) + (((T1c1 * T1c1) * T1c2) * T1c2)) + (((T1c0 * T1c1) * T1c2) * T1c2)) + (((T1c0 * T1c1) * T1c1) * T1c2)) + (((T1c1 * T1c1) * T1c1) * T1c2)) + (((T1c0 * T1c1) * T1c1) * T1c2)) + (((T1c0 * T1c1) * T1c1) * T1c1)) / (((((((((T1c1 * T1c1) * T1c2) * T1c2) * T1c2) + ((((T1c1 * T1c1) * T1c1) * T1c2) * T1c2)) + ((((T1c0 * T1c1) * T1c2) * T1c2) * T1c2)) + ((((T1c0 * T1c1) * T1c1) * T1c2) * T1c2)) + ((((T1c0 * T1c1) * T1c1) * T1c2) * T1c2)) + ((((T1c0 * T1c1) * T1c1) * T1c1) * T1c2))) * -2)) + (((((((((T1c1 * T1c2) * T1c2) + ((T1c0 * T1c2) * T1c2)) + ((T1c0 * T1c1) * T1c2)) + ((T1c1 * T1c1) * T1c2)) + ((T1c0 * T1c1) * T1c2)) + ((T1c0 * T1c1) * T1c1)) / ((((T1c0 * T1c1) * T1c2) * T1c2) + (((T1c0 * T1c1) * T1c1) * T1c2))) * -1))) as double)) as long); ++wPTile) {
+                            {
+                                var tmpLb : long;
+                                var tmpUb : long;
+                                tmpLb = ((Math.round((((((((wPTile * ((((T1c1 * T1c2) * T1c2) + ((T1c1 * T1c1) * T1c2)) / (((((((T1c1 * T1c2) * T1c2) + ((T1c0 * T1c2) * T1c2)) + ((T1c0 * T1c1) * T1c2)) + ((T1c1 * T1c1) * T1c2)) + ((T1c0 * T1c1) * T1c2)) + ((T1c0 * T1c1) * T1c1)))) + ((maxgrid * ((T1c2 + T1c1) / (((T1c1 * T1c2) + (T1c0 * T1c2)) + (T1c0 * T1c1)))) * -1)) + (((((T1c1 * T1c1) * T1c2) + ((T1c1 * T1c1) * T1c1)) / (((((((T1c1 * T1c2) * T1c2) + ((T1c0 * T1c2) * T1c2)) + ((T1c0 * T1c1) * T1c2)) + ((T1c1 * T1c1) * T1c2)) + ((T1c0 * T1c1) * T1c2)) + ((T1c0 * T1c1) * T1c1))) * -1)) + (((T1c1 * T1c2) + (T1c1 * T1c1)) / (((((((T1c1 * T1c2) * T1c2) + ((T1c0 * T1c2) * T1c2)) + ((T1c0 * T1c1) * T1c2)) + ((T1c1 * T1c1) * T1c2)) + ((T1c0 * T1c1) * T1c2)) + ((T1c0 * T1c1) * T1c1)))) + ((((T1c0 * T1c2) + (T1c0 * T1c1)) / (((T1c1 * T1c2) + (T1c0 * T1c2)) + (T1c0 * T1c1))) * -1)) + (((T1c2 + T1c1) / (((T1c1 * T1c2) + (T1c0 * T1c2)) + (T1c0 * T1c1))) * 2))) as double)) as long > (Math.round(((-1 + (1 / T1c0))) as double)) as long ? ((Math.round((((((((wPTile * ((((T1c1 * T1c2) * T1c2) + ((T1c1 * T1c1) * T1c2)) / (((((((T1c1 * T1c2) * T1c2) + ((T1c0 * T1c2) * T1c2)) + ((T1c0 * T1c1) * T1c2)) + ((T1c1 * T1c1) * T1c2)) + ((T1c0 * T1c1) * T1c2)) + ((T1c0 * T1c1) * T1c1)))) + ((maxgrid * ((T1c2 + T1c1) / (((T1c1 * T1c2) + (T1c0 * T1c2)) + (T1c0 * T1c1)))) * -1)) + (((((T1c1 * T1c1) * T1c2) + ((T1c1 * T1c1) * T1c1)) / (((((((T1c1 * T1c2) * T1c2) + ((T1c0 * T1c2) * T1c2)) + ((T1c0 * T1c1) * T1c2)) + ((T1c1 * T1c1) * T1c2)) + ((T1c0 * T1c1) * T1c2)) + ((T1c0 * T1c1) * T1c1))) * -1)) + (((T1c1 * T1c2) + (T1c1 * T1c1)) / (((((((T1c1 * T1c2) * T1c2) + ((T1c0 * T1c2) * T1c2)) + ((T1c0 * T1c1) * T1c2)) + ((T1c1 * T1c1) * T1c2)) + ((T1c0 * T1c1) * T1c2)) + ((T1c0 * T1c1) * T1c1)))) + ((((T1c0 * T1c2) + (T1c0 * T1c1)) / (((T1c1 * T1c2) + (T1c0 * T1c2)) + (T1c0 * T1c1))) * -1)) + (((T1c2 + T1c1) / (((T1c1 * T1c2) + (T1c0 * T1c2)) + (T1c0 * T1c1))) * 2))) as double)) as long) as long : ((Math.round(((-1 + (1 / T1c0))) as double)) as long) as long);
+                                tmpUb = ((Math.round(((((((wPTile * (T1c1 / (T1c1 + T1c0))) + (T1c1 / (T1c1 + T1c0))) + ((T1c1 / ((T1c1 * T1c2) + (T1c0 * T1c2))) * -1)) + (T1c1 / (T1c1 + T1c0))) + ((1 / (T1c1 + T1c0)) * -1))) as double)) as long < (Math.round((((niter * (1 / T1c0)) + ((1 / T1c0) * -1))) as double)) as long ? ((Math.round(((((((wPTile * (T1c1 / (T1c1 + T1c0))) + (T1c1 / (T1c1 + T1c0))) + ((T1c1 / ((T1c1 * T1c2) + (T1c0 * T1c2))) * -1)) + (T1c1 / (T1c1 + T1c0))) + ((1 / (T1c1 + T1c0)) * -1))) as double)) as long) as long : ((Math.round((((niter * (1 / T1c0)) + ((1 / T1c0) * -1))) as double)) as long) as long);
+                                {
+                                    val T1c0_5 = T1c0;
+                                    val T1c1_4 = T1c1;
+                                    val T1c2_3 = T1c2;
+                                    val wPTile_2 = wPTile;
+                                    val tmpUb_1 = tmpUb;
+                                    val tmpLb_0 = tmpLb;
+                                    Foreach.block(tmpLb_0,tmpUb_1,(var c0t1 : long) => {
+                                        var c2t1 : long;
+                                        var c1t1 : long;
+                                        var c1 : long;
+                                        var c0 : long;
+                                        var c2 : long;
+                                        for (c1t1 = ((Math.round((((((wPTile_2 * (T1c2_3 / (T1c2_3 + T1c1_4))) + ((c0t1 * (T1c2_3 / (T1c2_3 + T1c1_4))) * -1)) + ((T1c1_4 / (T1c2_3 + T1c1_4)) * -1)) + (1 / (T1c2_3 + T1c1_4)))) as double)) as long > (Math.round(((((c0t1 * (T1c0_5 / T1c1_4)) + -1) + (1 / T1c1_4))) as double)) as long ? ((Math.round((((((wPTile_2 * (T1c2_3 / (T1c2_3 + T1c1_4))) + ((c0t1 * (T1c2_3 / (T1c2_3 + T1c1_4))) * -1)) + ((T1c1_4 / (T1c2_3 + T1c1_4)) * -1)) + (1 / (T1c2_3 + T1c1_4)))) as double)) as long) as long : ((Math.round(((((c0t1 * (T1c0_5 / T1c1_4)) + -1) + (1 / T1c1_4))) as double)) as long) as long); (c1t1 <= ((Math.round(((((wPTile_2 + (c0t1 * -1)) + 1) + ((1 / T1c2_3) * -1))) as double)) as long < (Math.round((((((c0t1 * (T1c0_5 / T1c1_4)) + (maxgrid * (1 / T1c1_4))) + (T1c0_5 / T1c1_4)) + ((1 / T1c1_4) * -2))) as double)) as long ? ((Math.round(((((wPTile_2 + (c0t1 * -1)) + 1) + ((1 / T1c2_3) * -1))) as double)) as long) as long : ((Math.round((((((c0t1 * (T1c0_5 / T1c1_4)) + (maxgrid * (1 / T1c1_4))) + (T1c0_5 / T1c1_4)) + ((1 / T1c1_4) * -2))) as double)) as long) as long)); ++c1t1) {
+                                            for (c2t1 = ((Math.round((((wPTile_2 + (c0t1 * -1)) + (c1t1 * -1))) as double)) as long > (Math.round(((-1 + (1 / T1c2_3))) as double)) as long ? ((Math.round((((wPTile_2 + (c0t1 * -1)) + (c1t1 * -1))) as double)) as long) as long : ((Math.round(((-1 + (1 / T1c2_3))) as double)) as long) as long); (c2t1 <= ((Math.round((((wPTile_2 + (c0t1 * -1)) + (c1t1 * -1))) as double)) as long < (Math.round(((((c1t1 * (T1c1_4 / T1c2_3)) + (T1c1_4 / T1c2_3)) + ((1 / T1c2_3) * -1))) as double)) as long ? ((Math.round((((wPTile_2 + (c0t1 * -1)) + (c1t1 * -1))) as double)) as long) as long : ((Math.round(((((c1t1 * (T1c1_4 / T1c2_3)) + (T1c1_4 / T1c2_3)) + ((1 / T1c2_3) * -1))) as double)) as long) as long)); ++c2t1) {
+                                                for (c0 = ((c0t1 * T1c0_5) > 0 ? ((c0t1 * T1c0_5)) as long : (0) as long); (c0 <= (((c0t1 * T1c0_5) + (T1c0_5 + -1)) < (niter + -1) ? (((c0t1 * T1c0_5) + (T1c0_5 + -1))) as long : ((niter + -1)) as long)); c0++) {
+                                                    for (c1 = ((c1t1 * T1c1_4) > ((c0 + 1) - 1) ? ((c1t1 * T1c1_4)) as long : (((c0 + 1) - 1)) as long); (c1 <= (((c1t1 * T1c1_4) + (T1c1_4 + -1)) < ((c0 + 1) - 1) ? (((c1t1 * T1c1_4) + (T1c1_4 + -1))) as long : (((c0 + 1) - 1)) as long)); c1++) {
+                                                        for (c2 = ((c2t1 * T1c2_3) > 0 ? ((c2t1 * T1c2_3)) as long : (0) as long); (c2 <= (((c2t1 * T1c2_3) + (T1c2_3 + -1)) < 0 ? (((c2t1 * T1c2_3) + (T1c2_3 + -1))) as long : (0) as long)); c2++) {
+                                                            diff(0,0,0) = sum_tang(0,0);
+                                                            sum_diff(0,0,0L) = diff(0,0,0L);
+                                                            mean(0,0) = sum_diff(0,0,length - 1L);
+                                                            path(0L,0) = mean(0L,0);
+                                                        }
+                                                    }
+                                                    for (c1 = ((c1t1 * T1c1_4) > (c0 + 1) ? ((c1t1 * T1c1_4)) as long : ((c0 + 1)) as long); (c1 <= (((c1t1 * T1c1_4) + (T1c1_4 + -1)) < ((c0 + maxgrid) + -1) ? (((c1t1 * T1c1_4) + (T1c1_4 + -1))) as long : (((c0 + maxgrid) + -1)) as long)); c1++) {
+                                                        for (c2 = ((c2t1 * T1c2_3) > ((c0 + 1) - 1) ? ((c2t1 * T1c2_3)) as long : (((c0 + 1) - 1)) as long); (c2 <= (((c2t1 * T1c2_3) + (T1c2_3 + -1)) < ((c0 + 1) - 1) ? (((c2t1 * T1c2_3) + (T1c2_3 + -1))) as long : (((c0 + 1) - 1)) as long)); c2++) {
+                                                            diff(0,((-1 * c0) + c1),0) = sum_tang(0,((-1 * c0) + c1));
+                                                            sum_diff(0,((-1 * c0) + c1),0L) = diff(0,((-1 * c0) + c1),0L);
+                                                            mean(0,((-1 * c0) + c1)) = sum_diff(0,((-1 * c0) + c1),length - 1L);
+                                                            path(0L,((-1 * c0) + c1)) = mean(0L,((-1 * c0) + c1));
+                                                        }
+                                                        for (c2 = ((c2t1 * T1c2_3) > (c0 + 1) ? ((c2t1 * T1c2_3)) as long : ((c0 + 1)) as long); (c2 <= (((c2t1 * T1c2_3) + (T1c2_3 + -1)) < c1 ? (((c2t1 * T1c2_3) + (T1c2_3 + -1))) as long : (c1) as long)); c2++) {
+                                                            diff(((-1 * c0) + c2),((-1 * c0) + c1),0) = sum_tang(((-1 * c0) + c2),((-1 * c0) + c1));
+                                                            sum_diff(((-1 * c0) + c2),((-1 * c0) + c1),0L) = diff(((-1 * c0) + c2),((-1 * c0) + c1),0L);
+                                                            mean(((-1 * c0) + c2),((-1 * c0) + c1)) = sum_diff(((-1 * c0) + c2),((-1 * c0) + c1),length - 1L);
+                                                            path(((-1 * c0) + c2),((-1 * c0) + c1)) = path(((-1 * c0) + c2) - 1L,((-1 * c0) + c1) - 1L) + mean(((-1 * c0) + c2),((-1 * c0) + c1));
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+);
+                                }
+                            }
                         }
-                        mean(j,i) = sum_diff(j,i,length - 1L);
                     }
-                }
-                {
-                    var ___pace_tile_sizes : Rail[long] = new Rail[Long](0L);
-                    Pace_tiling_api.PACETileSizeVectorInit(___pace_tile_sizes,0,4);
-                    var c0 : long;
-                    if ((maxgrid >= 1)) {
-                        for (c0 = 0; (c0 <= (maxgrid + -1)); c0++) {
-                            path(0L,c0) = mean(0L,c0);
+                    if (((length == 1) && (maxgrid == 1))) {
+                        for (c0 = 0; (c0 <= (niter + -1)); c0++) {
+                            diff(0,0,0) = sum_tang(0,0);
+                            sum_diff(0,0,0L) = diff(0,0,0L);
+                            mean(0,0) = sum_diff(0,0,length - 1L);
+                            path(0L,0) = mean(0L,0);
                         }
                     }
-                }
-                for (var j : long = 1L; j <= maxgrid - 1L; j++) {
-                    for (var i : long = j; i <= maxgrid - 1L; i++) {
-                        path(j,i) = path(j - 1L,i - 1L) + mean(j,i);
+                    if (((length <= 0) && (maxgrid >= 2))) {
+                        for (wPTile = (Math.round(((((((-1 + (1 / T1c2)) + -1) + (1 / T1c1)) + (((T1c1 + T1c0) / T1c1) * -1)) + ((T1c1 + T1c0) / (T1c0 * T1c1)))) as double)) as long; (wPTile <= (Math.round(((((((((maxgrid * (((((((((((((((T1c1 * T1c2) * T1c2) * T1c2) + (((T1c0 * T1c2) * T1c2) * T1c2)) + (((T1c0 * T1c1) * T1c2) * T1c2)) + (((T1c1 * T1c1) * T1c2) * T1c2)) + (((T1c0 * T1c1) * T1c2) * T1c2)) + (((T1c0 * T1c1) * T1c1) * T1c2)) + (((T1c1 * T1c1) * T1c2) * T1c2)) + (((T1c0 * T1c1) * T1c2) * T1c2)) + (((T1c0 * T1c1) * T1c1) * T1c2)) + (((T1c1 * T1c1) * T1c1) * T1c2)) + (((T1c0 * T1c1) * T1c1) * T1c2)) + (((T1c0 * T1c1) * T1c1) * T1c1)) / (((((((((T1c1 * T1c1) * T1c2) * T1c2) * T1c2) + ((((T1c1 * T1c1) * T1c1) * T1c2) * T1c2)) + ((((T1c0 * T1c1) * T1c2) * T1c2) * T1c2)) + ((((T1c0 * T1c1) * T1c1) * T1c2) * T1c2)) + ((((T1c0 * T1c1) * T1c1) * T1c2) * T1c2)) + ((((T1c0 * T1c1) * T1c1) * T1c1) * T1c2)))) + (niter * ((((((((T1c1 * T1c2) * T1c2) + ((T1c0 * T1c2) * T1c2)) + ((T1c0 * T1c1) * T1c2)) + ((T1c1 * T1c1) * T1c2)) + ((T1c0 * T1c1) * T1c2)) + ((T1c0 * T1c1) * T1c1)) / ((((T1c0 * T1c1) * T1c2) * T1c2) + (((T1c0 * T1c1) * T1c1) * T1c2))))) + ((((((((((((((((T1c1 * T1c1) * T1c2) * T1c2) * T1c2) + ((((T1c0 * T1c1) * T1c2) * T1c2) * T1c2)) + ((((T1c0 * T1c1) * T1c1) * T1c2) * T1c2)) + ((((T1c1 * T1c1) * T1c1) * T1c2) * T1c2)) + ((((T1c0 * T1c1) * T1c1) * T1c2) * T1c2)) + ((((T1c0 * T1c1) * T1c1) * T1c1) * T1c2)) + ((((T1c1 * T1c1) * T1c1) * T1c2) * T1c2)) + ((((T1c0 * T1c1) * T1c1) * T1c2) * T1c2)) + ((((T1c0 * T1c1) * T1c1) * T1c1) * T1c2)) + ((((T1c1 * T1c1) * T1c1) * T1c1) * T1c2)) + ((((T1c0 * T1c1) * T1c1) * T1c1) * T1c2)) + ((((T1c0 * T1c1) * T1c1) * T1c1) * T1c1)) / (((((((((((((((T1c1 * T1c2) * T1c2) * T1c2) * T1c2) + ((((T1c1 * T1c1) * T1c2) * T1c2) * T1c2)) + ((((T1c0 * T1c2) * T1c2) * T1c2) * T1c2)) + ((((T1c0 * T1c1) * T1c2) * T1c2) * T1c2)) + ((((T1c0 * T1c1) * T1c2) * T1c2) * T1c2)) + ((((T1c0 * T1c1) * T1c1) * T1c2) * T1c2)) + ((((T1c1 * T1c1) * T1c2) * T1c2) * T1c2)) + ((((T1c1 * T1c1) * T1c1) * T1c2) * T1c2)) + ((((T1c0 * T1c1) * T1c2) * T1c2) * T1c2)) + ((((T1c0 * T1c1) * T1c1) * T1c2) * T1c2)) + ((((T1c0 * T1c1) * T1c1) * T1c2) * T1c2)) + ((((T1c0 * T1c1) * T1c1) * T1c1) * T1c2)))) + ((((((((((((((((T1c1 * T1c2) * T1c2) * T1c2) + (((T1c0 * T1c2) * T1c2) * T1c2)) + (((T1c0 * T1c1) * T1c2) * T1c2)) + (((T1c1 * T1c1) * T1c2) * T1c2)) + (((T1c0 * T1c1) * T1c2) * T1c2)) + (((T1c0 * T1c1) * T1c1) * T1c2)) + (((T1c1 * T1c1) * T1c2) * T1c2)) + (((T1c0 * T1c1) * T1c2) * T1c2)) + (((T1c0 * T1c1) * T1c1) * T1c2)) + (((T1c1 * T1c1) * T1c1) * T1c2)) + (((T1c0 * T1c1) * T1c1) * T1c2)) + (((T1c0 * T1c1) * T1c1) * T1c1)) / (((((((((((((((T1c1 * T1c2) * T1c2) * T1c2) * T1c2) + ((((T1c1 * T1c1) * T1c2) * T1c2) * T1c2)) + ((((T1c0 * T1c2) * T1c2) * T1c2) * T1c2)) + ((((T1c0 * T1c1) * T1c2) * T1c2) * T1c2)) + ((((T1c0 * T1c1) * T1c2) * T1c2) * T1c2)) + ((((T1c0 * T1c1) * T1c1) * T1c2) * T1c2)) + ((((T1c1 * T1c1) * T1c2) * T1c2) * T1c2)) + ((((T1c1 * T1c1) * T1c1) * T1c2) * T1c2)) + ((((T1c0 * T1c1) * T1c2) * T1c2) * T1c2)) + ((((T1c0 * T1c1) * T1c1) * T1c2) * T1c2)) + ((((T1c0 * T1c1) * T1c1) * T1c2) * T1c2)) + ((((T1c0 * T1c1) * T1c1) * T1c1) * T1c2))) * -1)) + ((((((((((((((((T1c0 * T1c1) * T1c2) * T1c2) * T1c2) + ((((T1c0 * T1c0) * T1c2) * T1c2) * T1c2)) + ((((T1c0 * T1c0) * T1c1) * T1c2) * T1c2)) + ((((T1c0 * T1c1) * T1c1) * T1c2) * T1c2)) + ((((T1c0 * T1c0) * T1c1) * T1c2) * T1c2)) + ((((T1c0 * T1c0) * T1c1) * T1c1) * T1c2)) + ((((T1c0 * T1c1) * T1c1) * T1c2) * T1c2)) + ((((T1c0 * T1c0) * T1c1) * T1c2) * T1c2)) + ((((T1c0 * T1c0) * T1c1) * T1c1) * T1c2)) + ((((T1c0 * T1c1) * T1c1) * T1c1) * T1c2)) + ((((T1c0 * T1c0) * T1c1) * T1c1) * T1c2)) + ((((T1c0 * T1c0) * T1c1) * T1c1) * T1c1)) / (((((((((T1c1 * T1c1) * T1c2) * T1c2) * T1c2) + ((((T1c1 * T1c1) * T1c1) * T1c2) * T1c2)) + ((((T1c0 * T1c1) * T1c2) * T1c2) * T1c2)) + ((((T1c0 * T1c1) * T1c1) * T1c2) * T1c2)) + ((((T1c0 * T1c1) * T1c1) * T1c2) * T1c2)) + ((((T1c0 * T1c1) * T1c1) * T1c1) * T1c2)))) + ((((((((((((((((T1c1 * T1c2) * T1c2) * T1c2) + (((T1c0 * T1c2) * T1c2) * T1c2)) + (((T1c0 * T1c1) * T1c2) * T1c2)) + (((T1c1 * T1c1) * T1c2) * T1c2)) + (((T1c0 * T1c1) * T1c2) * T1c2)) + (((T1c0 * T1c1) * T1c1) * T1c2)) + (((T1c1 * T1c1) * T1c2) * T1c2)) + (((T1c0 * T1c1) * T1c2) * T1c2)) + (((T1c0 * T1c1) * T1c1) * T1c2)) + (((T1c1 * T1c1) * T1c1) * T1c2)) + (((T1c0 * T1c1) * T1c1) * T1c2)) + (((T1c0 * T1c1) * T1c1) * T1c1)) / (((((((((T1c1 * T1c1) * T1c2) * T1c2) * T1c2) + ((((T1c1 * T1c1) * T1c1) * T1c2) * T1c2)) + ((((T1c0 * T1c1) * T1c2) * T1c2) * T1c2)) + ((((T1c0 * T1c1) * T1c1) * T1c2) * T1c2)) + ((((T1c0 * T1c1) * T1c1) * T1c2) * T1c2)) + ((((T1c0 * T1c1) * T1c1) * T1c1) * T1c2))) * -2)) + (((((((((T1c1 * T1c2) * T1c2) + ((T1c0 * T1c2) * T1c2)) + ((T1c0 * T1c1) * T1c2)) + ((T1c1 * T1c1) * T1c2)) + ((T1c0 * T1c1) * T1c2)) + ((T1c0 * T1c1) * T1c1)) / ((((T1c0 * T1c1) * T1c2) * T1c2) + (((T1c0 * T1c1) * T1c1) * T1c2))) * -1))) as double)) as long); ++wPTile) {
+                            {
+                                var tmpLb : long;
+                                var tmpUb : long;
+                                tmpLb = ((Math.round((((((((wPTile * ((((T1c1 * T1c2) * T1c2) + ((T1c1 * T1c1) * T1c2)) / (((((((T1c1 * T1c2) * T1c2) + ((T1c0 * T1c2) * T1c2)) + ((T1c0 * T1c1) * T1c2)) + ((T1c1 * T1c1) * T1c2)) + ((T1c0 * T1c1) * T1c2)) + ((T1c0 * T1c1) * T1c1)))) + ((maxgrid * ((T1c2 + T1c1) / (((T1c1 * T1c2) + (T1c0 * T1c2)) + (T1c0 * T1c1)))) * -1)) + (((((T1c1 * T1c1) * T1c2) + ((T1c1 * T1c1) * T1c1)) / (((((((T1c1 * T1c2) * T1c2) + ((T1c0 * T1c2) * T1c2)) + ((T1c0 * T1c1) * T1c2)) + ((T1c1 * T1c1) * T1c2)) + ((T1c0 * T1c1) * T1c2)) + ((T1c0 * T1c1) * T1c1))) * -1)) + (((T1c1 * T1c2) + (T1c1 * T1c1)) / (((((((T1c1 * T1c2) * T1c2) + ((T1c0 * T1c2) * T1c2)) + ((T1c0 * T1c1) * T1c2)) + ((T1c1 * T1c1) * T1c2)) + ((T1c0 * T1c1) * T1c2)) + ((T1c0 * T1c1) * T1c1)))) + ((((T1c0 * T1c2) + (T1c0 * T1c1)) / (((T1c1 * T1c2) + (T1c0 * T1c2)) + (T1c0 * T1c1))) * -1)) + (((T1c2 + T1c1) / (((T1c1 * T1c2) + (T1c0 * T1c2)) + (T1c0 * T1c1))) * 2))) as double)) as long > (Math.round(((-1 + (1 / T1c0))) as double)) as long ? ((Math.round((((((((wPTile * ((((T1c1 * T1c2) * T1c2) + ((T1c1 * T1c1) * T1c2)) / (((((((T1c1 * T1c2) * T1c2) + ((T1c0 * T1c2) * T1c2)) + ((T1c0 * T1c1) * T1c2)) + ((T1c1 * T1c1) * T1c2)) + ((T1c0 * T1c1) * T1c2)) + ((T1c0 * T1c1) * T1c1)))) + ((maxgrid * ((T1c2 + T1c1) / (((T1c1 * T1c2) + (T1c0 * T1c2)) + (T1c0 * T1c1)))) * -1)) + (((((T1c1 * T1c1) * T1c2) + ((T1c1 * T1c1) * T1c1)) / (((((((T1c1 * T1c2) * T1c2) + ((T1c0 * T1c2) * T1c2)) + ((T1c0 * T1c1) * T1c2)) + ((T1c1 * T1c1) * T1c2)) + ((T1c0 * T1c1) * T1c2)) + ((T1c0 * T1c1) * T1c1))) * -1)) + (((T1c1 * T1c2) + (T1c1 * T1c1)) / (((((((T1c1 * T1c2) * T1c2) + ((T1c0 * T1c2) * T1c2)) + ((T1c0 * T1c1) * T1c2)) + ((T1c1 * T1c1) * T1c2)) + ((T1c0 * T1c1) * T1c2)) + ((T1c0 * T1c1) * T1c1)))) + ((((T1c0 * T1c2) + (T1c0 * T1c1)) / (((T1c1 * T1c2) + (T1c0 * T1c2)) + (T1c0 * T1c1))) * -1)) + (((T1c2 + T1c1) / (((T1c1 * T1c2) + (T1c0 * T1c2)) + (T1c0 * T1c1))) * 2))) as double)) as long) as long : ((Math.round(((-1 + (1 / T1c0))) as double)) as long) as long);
+                                tmpUb = ((Math.round(((((((wPTile * (T1c1 / (T1c1 + T1c0))) + (T1c1 / (T1c1 + T1c0))) + ((T1c1 / ((T1c1 * T1c2) + (T1c0 * T1c2))) * -1)) + (T1c1 / (T1c1 + T1c0))) + ((1 / (T1c1 + T1c0)) * -1))) as double)) as long < (Math.round((((niter * (1 / T1c0)) + ((1 / T1c0) * -1))) as double)) as long ? ((Math.round(((((((wPTile * (T1c1 / (T1c1 + T1c0))) + (T1c1 / (T1c1 + T1c0))) + ((T1c1 / ((T1c1 * T1c2) + (T1c0 * T1c2))) * -1)) + (T1c1 / (T1c1 + T1c0))) + ((1 / (T1c1 + T1c0)) * -1))) as double)) as long) as long : ((Math.round((((niter * (1 / T1c0)) + ((1 / T1c0) * -1))) as double)) as long) as long);
+                                {
+                                    val T1c0_5 = T1c0;
+                                    val T1c1_4 = T1c1;
+                                    val T1c2_3 = T1c2;
+                                    val wPTile_2 = wPTile;
+                                    val tmpUb_1 = tmpUb;
+                                    val tmpLb_0 = tmpLb;
+                                    Foreach.block(tmpLb_0,tmpUb_1,(var c0t1 : long) => {
+                                        var c2t1 : long;
+                                        var c1t1 : long;
+                                        var c1 : long;
+                                        var c0 : long;
+                                        var c2 : long;
+                                        for (c1t1 = ((Math.round((((((wPTile_2 * (T1c2_3 / (T1c2_3 + T1c1_4))) + ((c0t1 * (T1c2_3 / (T1c2_3 + T1c1_4))) * -1)) + ((T1c1_4 / (T1c2_3 + T1c1_4)) * -1)) + (1 / (T1c2_3 + T1c1_4)))) as double)) as long > (Math.round(((((c0t1 * (T1c0_5 / T1c1_4)) + -1) + (1 / T1c1_4))) as double)) as long ? ((Math.round((((((wPTile_2 * (T1c2_3 / (T1c2_3 + T1c1_4))) + ((c0t1 * (T1c2_3 / (T1c2_3 + T1c1_4))) * -1)) + ((T1c1_4 / (T1c2_3 + T1c1_4)) * -1)) + (1 / (T1c2_3 + T1c1_4)))) as double)) as long) as long : ((Math.round(((((c0t1 * (T1c0_5 / T1c1_4)) + -1) + (1 / T1c1_4))) as double)) as long) as long); (c1t1 <= ((Math.round(((((wPTile_2 + (c0t1 * -1)) + 1) + ((1 / T1c2_3) * -1))) as double)) as long < (Math.round((((((c0t1 * (T1c0_5 / T1c1_4)) + (maxgrid * (1 / T1c1_4))) + (T1c0_5 / T1c1_4)) + ((1 / T1c1_4) * -2))) as double)) as long ? ((Math.round(((((wPTile_2 + (c0t1 * -1)) + 1) + ((1 / T1c2_3) * -1))) as double)) as long) as long : ((Math.round((((((c0t1 * (T1c0_5 / T1c1_4)) + (maxgrid * (1 / T1c1_4))) + (T1c0_5 / T1c1_4)) + ((1 / T1c1_4) * -2))) as double)) as long) as long)); ++c1t1) {
+                                            for (c2t1 = ((Math.round((((wPTile_2 + (c0t1 * -1)) + (c1t1 * -1))) as double)) as long > (Math.round(((-1 + (1 / T1c2_3))) as double)) as long ? ((Math.round((((wPTile_2 + (c0t1 * -1)) + (c1t1 * -1))) as double)) as long) as long : ((Math.round(((-1 + (1 / T1c2_3))) as double)) as long) as long); (c2t1 <= ((Math.round((((wPTile_2 + (c0t1 * -1)) + (c1t1 * -1))) as double)) as long < (Math.round(((((c1t1 * (T1c1_4 / T1c2_3)) + (T1c1_4 / T1c2_3)) + ((1 / T1c2_3) * -1))) as double)) as long ? ((Math.round((((wPTile_2 + (c0t1 * -1)) + (c1t1 * -1))) as double)) as long) as long : ((Math.round(((((c1t1 * (T1c1_4 / T1c2_3)) + (T1c1_4 / T1c2_3)) + ((1 / T1c2_3) * -1))) as double)) as long) as long)); ++c2t1) {
+                                                for (c0 = ((c0t1 * T1c0_5) > 0 ? ((c0t1 * T1c0_5)) as long : (0) as long); (c0 <= (((c0t1 * T1c0_5) + (T1c0_5 + -1)) < (niter + -1) ? (((c0t1 * T1c0_5) + (T1c0_5 + -1))) as long : ((niter + -1)) as long)); c0++) {
+                                                    for (c1 = ((c1t1 * T1c1_4) > ((c0 + 1) - 1) ? ((c1t1 * T1c1_4)) as long : (((c0 + 1) - 1)) as long); (c1 <= (((c1t1 * T1c1_4) + (T1c1_4 + -1)) < ((c0 + 1) - 1) ? (((c1t1 * T1c1_4) + (T1c1_4 + -1))) as long : (((c0 + 1) - 1)) as long)); c1++) {
+                                                        for (c2 = ((c2t1 * T1c2_3) > 0 ? ((c2t1 * T1c2_3)) as long : (0) as long); (c2 <= (((c2t1 * T1c2_3) + (T1c2_3 + -1)) < 0 ? (((c2t1 * T1c2_3) + (T1c2_3 + -1))) as long : (0) as long)); c2++) {
+                                                            sum_diff(0,0,0L) = diff(0,0,0L);
+                                                            mean(0,0) = sum_diff(0,0,length - 1L);
+                                                            path(0L,0) = mean(0L,0);
+                                                        }
+                                                    }
+                                                    for (c1 = ((c1t1 * T1c1_4) > (c0 + 1) ? ((c1t1 * T1c1_4)) as long : ((c0 + 1)) as long); (c1 <= (((c1t1 * T1c1_4) + (T1c1_4 + -1)) < ((c0 + maxgrid) + -1) ? (((c1t1 * T1c1_4) + (T1c1_4 + -1))) as long : (((c0 + maxgrid) + -1)) as long)); c1++) {
+                                                        for (c2 = ((c2t1 * T1c2_3) > ((c0 + 1) - 1) ? ((c2t1 * T1c2_3)) as long : (((c0 + 1) - 1)) as long); (c2 <= (((c2t1 * T1c2_3) + (T1c2_3 + -1)) < ((c0 + 1) - 1) ? (((c2t1 * T1c2_3) + (T1c2_3 + -1))) as long : (((c0 + 1) - 1)) as long)); c2++) {
+                                                            sum_diff(0,((-1 * c0) + c1),0L) = diff(0,((-1 * c0) + c1),0L);
+                                                            mean(0,((-1 * c0) + c1)) = sum_diff(0,((-1 * c0) + c1),length - 1L);
+                                                            path(0L,((-1 * c0) + c1)) = mean(0L,((-1 * c0) + c1));
+                                                        }
+                                                        for (c2 = ((c2t1 * T1c2_3) > (c0 + 1) ? ((c2t1 * T1c2_3)) as long : ((c0 + 1)) as long); (c2 <= (((c2t1 * T1c2_3) + (T1c2_3 + -1)) < c1 ? (((c2t1 * T1c2_3) + (T1c2_3 + -1))) as long : (c1) as long)); c2++) {
+                                                            sum_diff(((-1 * c0) + c2),((-1 * c0) + c1),0L) = diff(((-1 * c0) + c2),((-1 * c0) + c1),0L);
+                                                            mean(((-1 * c0) + c2),((-1 * c0) + c1)) = sum_diff(((-1 * c0) + c2),((-1 * c0) + c1),length - 1L);
+                                                            path(((-1 * c0) + c2),((-1 * c0) + c1)) = path(((-1 * c0) + c2) - 1L,((-1 * c0) + c1) - 1L) + mean(((-1 * c0) + c2),((-1 * c0) + c1));
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+);
+                                }
+                            }
+                        }
+                    }
+                    if (((length <= 0) && (maxgrid == 1))) {
+                        for (c0 = 0; (c0 <= (niter + -1)); c0++) {
+                            sum_diff(0,0,0L) = diff(0,0,0L);
+                            mean(0,0) = sum_diff(0,0,length - 1L);
+                            path(0L,0) = mean(0L,0);
+                        }
                     }
                 }
             }
         }
-    }  public static def main(args : Rail[String])
+    }  
+
+  public static def main(args : Rail[String])
   {
     var NITER : Long = 0;
     var LENGTH : Long = 0;

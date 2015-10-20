@@ -49,55 +49,179 @@ public class Reg_detect {
         if ((i * maxgrid + j) % 20 == 0) Console.ERR.printf("\n");
       }
     Console.ERR.printf("\n");
-  }  /* Main computational kernel. The whole function will be timed,
+  }  
+
+  /* Main computational kernel. The whole function will be timed,
      including the call and return. */
-  /* Source (modified): http://www.cs.uic.edu/~iluican/reg_detect.c */
     def kernel_reg_detect(niter : long, maxgrid : long, length : long, sum_tang : Array_2[long], mean : Array_2[long], path : Array_2[long], diff : Array_3[long], sum_diff : Array_3[long])  {
         {
-            for (var t : long = 0L; t < niter; t++) {
-                for (var j : long = 0L; j <= maxgrid - 1L; j++) {
-                    for (var i : long = j; i <= maxgrid - 1L; i++) {
-                        if ((length >= 1)) {
+            var t : long;
+            var j : long;
+            var i : long;
+            {
+                var c0 : long;
+                var c1 : long;
+                var c2 : long;
+                var c4 : long;
+                if (((maxgrid >= 1) && (niter >= 1))) {
+                    if ((length >= 2)) {
+                        for (c4 = 0; (c4 <= (length + -1)); c4++) {
+                            diff(0,0,c4) = sum_tang(0,0);
+                        }
+                        sum_diff(0,0,0L) = diff(0,0,0L);
+                        for (c4 = 1; (c4 <= (length + -1)); c4++) {
+                            sum_diff(0,0,c4) = sum_diff(0,0,c4 - 1L) + diff(0,0,c4);
+                        }
+                        mean(0,0) = sum_diff(0,0,length - 1L);
+                        path(0L,0) = mean(0L,0);
+                    }
+                    if ((length == 1)) {
+                        diff(0,0,0) = sum_tang(0,0);
+                        sum_diff(0,0,0L) = diff(0,0,0L);
+                        mean(0,0) = sum_diff(0,0,length - 1L);
+                        path(0L,0) = mean(0L,0);
+                    }
+                    if ((length <= 0)) {
+                        sum_diff(0,0,0L) = diff(0,0,0L);
+                        mean(0,0) = sum_diff(0,0,length - 1L);
+                        path(0L,0) = mean(0L,0);
+                    }
+                    if (((length >= 2) && (maxgrid >= 2))) {
+                        for (c0 = 1; (c0 <= ((maxgrid + (2 * niter)) + -3)); c0++) {
+                            if ((c0 <= ((2 * niter) + -2))) {
+                                if (((c0 % 2) == 0)) {
+                                    for (c4 = 0; (c4 <= (length + -1)); c4++) {
+                                        diff(0,0,c4) = sum_tang(0,0);
+                                    }
+                                    sum_diff(0,0,0L) = diff(0,0,0L);
+                                    for (c4 = 1; (c4 <= (length + -1)); c4++) {
+                                        sum_diff(0,0,c4) = sum_diff(0,0,c4 - 1L) + diff(0,0,c4);
+                                    }
+                                    mean(0,0) = sum_diff(0,0,length - 1L);
+                                    path(0L,0) = mean(0L,0);
+                                }
+                            }
                             {
-                                val i_2 = i;
-                                val j_1 = j;
-                                Foreach.block(0,(length + -1),(var c0 : long) => {
-                                    diff(j_1,i_2,c0) = sum_tang(j_1,i_2);
+                                val c0_0 = c0;
+                                Foreach.block((((c0_0 + 1) * 2 < 0 ?  -( -((c0_0 + 1)) / 2) : (2 < 0 ? ( -((c0_0 + 1)) +  -(2) - 1) /  -(2) : ((c0_0 + 1) + 2 - 1) / 2)) > ((c0_0 + (-1 * niter)) + 1) ? (((c0_0 + 1) * 2 < 0 ?  -( -((c0_0 + 1)) / 2) : (2 < 0 ? ( -((c0_0 + 1)) +  -(2) - 1) /  -(2) : ((c0_0 + 1) + 2 - 1) / 2))) as long : (((c0_0 + (-1 * niter)) + 1)) as long),((((c0_0 + maxgrid) + -1) * 2 < 0 ? (2 < 0 ?  -(( -(((c0_0 + maxgrid) + -1)) + 2 + 1) / 2) :  -(( -(((c0_0 + maxgrid) + -1)) + 2 - 1) / 2)) : ((c0_0 + maxgrid) + -1) / 2) < c0_0 ? ((((c0_0 + maxgrid) + -1) * 2 < 0 ? (2 < 0 ?  -(( -(((c0_0 + maxgrid) + -1)) + 2 + 1) / 2) :  -(( -(((c0_0 + maxgrid) + -1)) + 2 - 1) / 2)) : ((c0_0 + maxgrid) + -1) / 2)) as long : (c0_0) as long),(var c1 : long) => {
+                                    var c2 : long;
+                                    var c4 : long;
+                                    for (c4 = 0; (c4 <= (length + -1)); c4++) {
+                                        diff(0,((-1 * c0_0) + (2 * c1)),c4) = sum_tang(0,((-1 * c0_0) + (2 * c1)));
+                                    }
+                                    sum_diff(0,((-1 * c0_0) + (2 * c1)),0L) = diff(0,((-1 * c0_0) + (2 * c1)),0L);
+                                    for (c4 = 1; (c4 <= (length + -1)); c4++) {
+                                        sum_diff(0,((-1 * c0_0) + (2 * c1)),c4) = sum_diff(0,((-1 * c0_0) + (2 * c1)),c4 - 1L) + diff(0,((-1 * c0_0) + (2 * c1)),c4);
+                                    }
+                                    mean(0,((-1 * c0_0) + (2 * c1))) = sum_diff(0,((-1 * c0_0) + (2 * c1)),length - 1L);
+                                    path(0L,((-1 * c0_0) + (2 * c1))) = mean(0L,((-1 * c0_0) + (2 * c1)));
+                                    for (c2 = ((c0_0 + (-1 * c1)) + 1); (c2 <= c1); c2++) {
+                                        for (c4 = 0; (c4 <= (length + -1)); c4++) {
+                                            diff((((-1 * c0_0) + c1) + c2),((-1 * c0_0) + (2 * c1)),c4) = sum_tang((((-1 * c0_0) + c1) + c2),((-1 * c0_0) + (2 * c1)));
+                                        }
+                                        sum_diff((((-1 * c0_0) + c1) + c2),((-1 * c0_0) + (2 * c1)),0L) = diff((((-1 * c0_0) + c1) + c2),((-1 * c0_0) + (2 * c1)),0L);
+                                        for (c4 = 1; (c4 <= (length + -1)); c4++) {
+                                            sum_diff((((-1 * c0_0) + c1) + c2),((-1 * c0_0) + (2 * c1)),c4) = sum_diff((((-1 * c0_0) + c1) + c2),((-1 * c0_0) + (2 * c1)),c4 - 1L) + diff((((-1 * c0_0) + c1) + c2),((-1 * c0_0) + (2 * c1)),c4);
+                                        }
+                                        mean((((-1 * c0_0) + c1) + c2),((-1 * c0_0) + (2 * c1))) = sum_diff((((-1 * c0_0) + c1) + c2),((-1 * c0_0) + (2 * c1)),length - 1L);
+                                        path((((-1 * c0_0) + c1) + c2),((-1 * c0_0) + (2 * c1))) = path((((-1 * c0_0) + c1) + c2) - 1L,((-1 * c0_0) + (2 * c1)) - 1L) + mean((((-1 * c0_0) + c1) + c2),((-1 * c0_0) + (2 * c1)));
+                                    }
                                 }
 );
                             }
                         }
                     }
-                }
-                for (var j : long = 0L; j <= maxgrid - 1L; j++) {
-                    for (var i : long = j; i <= maxgrid - 1L; i++) {
-                        var c3 : long;
-                        sum_diff(j,i,0L) = diff(j,i,0L);
-                        for (c3 = 1; (c3 <= (length + -1)); c3++) {
-                            sum_diff(j,i,c3) = sum_diff(j,i,c3 - 1L) + diff(j,i,c3);
-                        }
-                        mean(j,i) = sum_diff(j,i,length - 1L);
-                    }
-                }
-                {
-                    var c0 : long;
-                    if ((maxgrid >= 1)) {
-                        {
-                            Foreach.block(0,(maxgrid + -1),(var c0 : long) => {
-                                path(0L,c0) = mean(0L,c0);
+                    if (((length >= 2) && (maxgrid == 1))) {
+                        for (c0 = 2; (c0 <= ((2 * niter) + -2)); c0 = (c0 + 2)) {
+                            for (c4 = 0; (c4 <= (length + -1)); c4++) {
+                                diff(0,0,c4) = sum_tang(0,0);
                             }
-);
+                            sum_diff(0,0,0L) = diff(0,0,0L);
+                            for (c4 = 1; (c4 <= (length + -1)); c4++) {
+                                sum_diff(0,0,c4) = sum_diff(0,0,c4 - 1L) + diff(0,0,c4);
+                            }
+                            mean(0,0) = sum_diff(0,0,length - 1L);
+                            path(0L,0) = mean(0L,0);
                         }
                     }
-                }
-                for (var j : long = 1L; j <= maxgrid - 1L; j++) {
-                    for (var i : long = j; i <= maxgrid - 1L; i++) {
-                        path(j,i) = path(j - 1L,i - 1L) + mean(j,i);
+                    if (((length == 1) && (maxgrid >= 2))) {
+                        for (c0 = 1; (c0 <= ((maxgrid + (2 * niter)) + -3)); c0++) {
+                            if ((c0 <= ((2 * niter) + -2))) {
+                                if (((c0 % 2) == 0)) {
+                                    diff(0,0,0) = sum_tang(0,0);
+                                    sum_diff(0,0,0L) = diff(0,0,0L);
+                                    mean(0,0) = sum_diff(0,0,length - 1L);
+                                    path(0L,0) = mean(0L,0);
+                                }
+                            }
+                            {
+                                val c0_0 = c0;
+                                Foreach.block((((c0_0 + 1) * 2 < 0 ?  -( -((c0_0 + 1)) / 2) : (2 < 0 ? ( -((c0_0 + 1)) +  -(2) - 1) /  -(2) : ((c0_0 + 1) + 2 - 1) / 2)) > ((c0_0 + (-1 * niter)) + 1) ? (((c0_0 + 1) * 2 < 0 ?  -( -((c0_0 + 1)) / 2) : (2 < 0 ? ( -((c0_0 + 1)) +  -(2) - 1) /  -(2) : ((c0_0 + 1) + 2 - 1) / 2))) as long : (((c0_0 + (-1 * niter)) + 1)) as long),((((c0_0 + maxgrid) + -1) * 2 < 0 ? (2 < 0 ?  -(( -(((c0_0 + maxgrid) + -1)) + 2 + 1) / 2) :  -(( -(((c0_0 + maxgrid) + -1)) + 2 - 1) / 2)) : ((c0_0 + maxgrid) + -1) / 2) < c0_0 ? ((((c0_0 + maxgrid) + -1) * 2 < 0 ? (2 < 0 ?  -(( -(((c0_0 + maxgrid) + -1)) + 2 + 1) / 2) :  -(( -(((c0_0 + maxgrid) + -1)) + 2 - 1) / 2)) : ((c0_0 + maxgrid) + -1) / 2)) as long : (c0_0) as long),(var c1 : long) => {
+                                    var c2 : long;
+                                    var c4 : long;
+                                    diff(0,((-1 * c0_0) + (2 * c1)),0) = sum_tang(0,((-1 * c0_0) + (2 * c1)));
+                                    sum_diff(0,((-1 * c0_0) + (2 * c1)),0L) = diff(0,((-1 * c0_0) + (2 * c1)),0L);
+                                    mean(0,((-1 * c0_0) + (2 * c1))) = sum_diff(0,((-1 * c0_0) + (2 * c1)),length - 1L);
+                                    path(0L,((-1 * c0_0) + (2 * c1))) = mean(0L,((-1 * c0_0) + (2 * c1)));
+                                    for (c2 = ((c0_0 + (-1 * c1)) + 1); (c2 <= c1); c2++) {
+                                        diff((((-1 * c0_0) + c1) + c2),((-1 * c0_0) + (2 * c1)),0) = sum_tang((((-1 * c0_0) + c1) + c2),((-1 * c0_0) + (2 * c1)));
+                                        sum_diff((((-1 * c0_0) + c1) + c2),((-1 * c0_0) + (2 * c1)),0L) = diff((((-1 * c0_0) + c1) + c2),((-1 * c0_0) + (2 * c1)),0L);
+                                        mean((((-1 * c0_0) + c1) + c2),((-1 * c0_0) + (2 * c1))) = sum_diff((((-1 * c0_0) + c1) + c2),((-1 * c0_0) + (2 * c1)),length - 1L);
+                                        path((((-1 * c0_0) + c1) + c2),((-1 * c0_0) + (2 * c1))) = path((((-1 * c0_0) + c1) + c2) - 1L,((-1 * c0_0) + (2 * c1)) - 1L) + mean((((-1 * c0_0) + c1) + c2),((-1 * c0_0) + (2 * c1)));
+                                    }
+                                }
+);
+                            }
+                        }
+                    }
+                    if (((length == 1) && (maxgrid == 1))) {
+                        for (c0 = 2; (c0 <= ((2 * niter) + -2)); c0 = (c0 + 2)) {
+                            diff(0,0,0) = sum_tang(0,0);
+                            sum_diff(0,0,0L) = diff(0,0,0L);
+                            mean(0,0) = sum_diff(0,0,length - 1L);
+                            path(0L,0) = mean(0L,0);
+                        }
+                    }
+                    if (((length <= 0) && (maxgrid >= 2))) {
+                        for (c0 = 1; (c0 <= ((maxgrid + (2 * niter)) + -3)); c0++) {
+                            if ((c0 <= ((2 * niter) + -2))) {
+                                if (((c0 % 2) == 0)) {
+                                    sum_diff(0,0,0L) = diff(0,0,0L);
+                                    mean(0,0) = sum_diff(0,0,length - 1L);
+                                    path(0L,0) = mean(0L,0);
+                                }
+                            }
+                            {
+                                val c0_0 = c0;
+                                Foreach.block((((c0_0 + 1) * 2 < 0 ?  -( -((c0_0 + 1)) / 2) : (2 < 0 ? ( -((c0_0 + 1)) +  -(2) - 1) /  -(2) : ((c0_0 + 1) + 2 - 1) / 2)) > ((c0_0 + (-1 * niter)) + 1) ? (((c0_0 + 1) * 2 < 0 ?  -( -((c0_0 + 1)) / 2) : (2 < 0 ? ( -((c0_0 + 1)) +  -(2) - 1) /  -(2) : ((c0_0 + 1) + 2 - 1) / 2))) as long : (((c0_0 + (-1 * niter)) + 1)) as long),((((c0_0 + maxgrid) + -1) * 2 < 0 ? (2 < 0 ?  -(( -(((c0_0 + maxgrid) + -1)) + 2 + 1) / 2) :  -(( -(((c0_0 + maxgrid) + -1)) + 2 - 1) / 2)) : ((c0_0 + maxgrid) + -1) / 2) < c0_0 ? ((((c0_0 + maxgrid) + -1) * 2 < 0 ? (2 < 0 ?  -(( -(((c0_0 + maxgrid) + -1)) + 2 + 1) / 2) :  -(( -(((c0_0 + maxgrid) + -1)) + 2 - 1) / 2)) : ((c0_0 + maxgrid) + -1) / 2)) as long : (c0_0) as long),(var c1 : long) => {
+                                    var c2 : long;
+                                    var c4 : long;
+                                    sum_diff(0,((-1 * c0_0) + (2 * c1)),0L) = diff(0,((-1 * c0_0) + (2 * c1)),0L);
+                                    mean(0,((-1 * c0_0) + (2 * c1))) = sum_diff(0,((-1 * c0_0) + (2 * c1)),length - 1L);
+                                    path(0L,((-1 * c0_0) + (2 * c1))) = mean(0L,((-1 * c0_0) + (2 * c1)));
+                                    for (c2 = ((c0_0 + (-1 * c1)) + 1); (c2 <= c1); c2++) {
+                                        sum_diff((((-1 * c0_0) + c1) + c2),((-1 * c0_0) + (2 * c1)),0L) = diff((((-1 * c0_0) + c1) + c2),((-1 * c0_0) + (2 * c1)),0L);
+                                        mean((((-1 * c0_0) + c1) + c2),((-1 * c0_0) + (2 * c1))) = sum_diff((((-1 * c0_0) + c1) + c2),((-1 * c0_0) + (2 * c1)),length - 1L);
+                                        path((((-1 * c0_0) + c1) + c2),((-1 * c0_0) + (2 * c1))) = path((((-1 * c0_0) + c1) + c2) - 1L,((-1 * c0_0) + (2 * c1)) - 1L) + mean((((-1 * c0_0) + c1) + c2),((-1 * c0_0) + (2 * c1)));
+                                    }
+                                }
+);
+                            }
+                        }
+                    }
+                    if (((length <= 0) && (maxgrid == 1))) {
+                        for (c0 = 2; (c0 <= ((2 * niter) + -2)); c0 = (c0 + 2)) {
+                            sum_diff(0,0,0L) = diff(0,0,0L);
+                            mean(0,0) = sum_diff(0,0,length - 1L);
+                            path(0L,0) = mean(0L,0);
+                        }
                     }
                 }
             }
         }
-    }  public static def main(args : Rail[String])
+    }  
+
+  public static def main(args : Rail[String])
   {
     var NITER : Long = 0;
     var LENGTH : Long = 0;
