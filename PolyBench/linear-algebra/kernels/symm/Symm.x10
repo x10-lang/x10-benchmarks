@@ -15,8 +15,8 @@
 import x10.compiler.Ifdef;
 import x10.array.Array_2;
 import x10.array.Array_3;
-public class Symm {
 
+public class Symm { 
   var _PB_NI : Long;
   var _PB_NJ : Long;  
 
@@ -24,16 +24,16 @@ public class Symm {
     _PB_NI = ni; 
     _PB_NJ = nj; 
   }
-  def init_array(ni : Long,
-  nj : Long,
+
+  def init_array(ni : Long, nj : Long,
   		alpha : Rail[Double],
   		beta : Rail[Double],
   		C : Array_2[Double],
   		A : Array_2[Double],
   		B : Array_2[Double])
   {
-    alpha(0) = 32412;
-    beta(0) = 2123;
+    alpha(0) = 32412d;
+    beta(0) = 2123d;
     for (var i : Long = 0; i < ni; i++)
       for (var j : Long = 0; j < nj; j++) {
         C(i,j) = ((i as Double) *j) / ni;
@@ -42,7 +42,9 @@ public class Symm {
     for (var i : Long = 0; i < nj; i++)
       for (var j : Long = 0; j < nj; j++)
         A(i,j) = ((i as Double) *j) / ni;
-  }  /* DCE code. Must scan the entire live-out data.
+  }  
+
+  /* DCE code. Must scan the entire live-out data.
      Can be used also to check the correctness of the output. */
   def print_array(ni : Long,
   nj : Long,
@@ -54,34 +56,35 @@ public class Symm {
   	if ((i * ni + j) % 20 == 0) Console.ERR.printf("\n");
       }
     Console.ERR.printf("\n");
-  }  /* Main computational kernel. The whole function will be timed,
+  }  
+
+  /* Main computational kernel. The whole function will be timed,
      including the call and return. */
-  def kernel_symm(ni : Long,
-  nj : Long,
+  def kernel_symm(ni : Long, nj : Long,
   		 alpha : Double,
   		 beta : Double,
   		 C : Array_2[Double],
   		 A : Array_2[Double],
   		 B : Array_2[Double])
   {
-    var acc : Double;
-  
   // #pragma scop
     /*  C := alpha *A *B + beta *C, A is symetric */
     for (var i : Long = 0; i < ni; i++)
-      for (var j : Long = 0; j < nj; j++)
-        {
-  	acc = 0;
-  	for (var k : Long = 0; k < j - 1; k++)
-  	  {
-  	    C(k,j) += alpha * A(k,i) * B(i,j);
-  	    acc += B(k,j) * A(k,i);
-  	  }
-  	C(i,j) = beta * C(i,j) + alpha * A(i,i) * B(i,j) + alpha * acc;
-        }
+      for (var j : Long = 0; j < nj; j++) {
+  	     var acc:Double = 0d;
+        val b = B(i,j);
+        for (var k : Long = 0; k < j - 1; k++) {
+            val a = A(k,i);
+            C(k,j) += alpha * a * b;
+  	         acc += B(k,j) * a;
+  	     }
+  	     C(i,j) = beta * C(i,j) + alpha * A(i,i) * b + alpha * acc;
+      }
   // #pragma endscop
   
-  }  public static def main(args : Rail[String])
+  }  
+  
+  public static def main(args : Rail[String])
   {
     var NI : Long = 0;
     var NJ : Long = 0;
