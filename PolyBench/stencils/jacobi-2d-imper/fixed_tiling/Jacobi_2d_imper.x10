@@ -142,7 +142,7 @@ public class Jacobi_2d_imper {
         N = 500;
     }
     @Ifdef("LARGE_DATASET") {
-        TSTEPS = 20;
+        TSTEPS = 200;
         N = 2000;
     }
     

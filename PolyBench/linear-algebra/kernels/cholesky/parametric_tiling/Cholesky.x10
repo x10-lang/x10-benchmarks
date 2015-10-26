@@ -116,7 +116,7 @@ public class Cholesky {
         N = 128;
     }
     @Ifdef("LARGE_DATASET") {
-        N = 2000;
+        N = 10000;
     }
     
     val cholesky = new Cholesky();

@@ -74,7 +74,7 @@ var  j : Long;
       {
         mean(j) = 0.0;
         for (var i : Long = 0; i < n; i++)
-  	mean(j) += data(i,j);
+  	         mean(j) += data(i,j);
         mean(j) /= float_n;
       }
   
@@ -83,7 +83,7 @@ var  j : Long;
       {
         stddev(j) = 0.0;
         for (var i : Long = 0; i < n; i++)
-  	stddev(j) += (data(i,j) - mean(j)) * (data(i,j) - mean(j));
+  	         stddev(j) += (data(i,j) - mean(j)) * (data(i,j) - mean(j));
         stddev(j) /= float_n;
         stddev(j) = sqrt_of_array_cell(stddev, j);
         /* The following in an inelegant but usual way to handle
@@ -137,8 +137,8 @@ var  j : Long;
         N = 500;
     }
     @Ifdef("LARGE_DATASET") {
-        M = 2000;
-        N = 2000;
+        M = 4000;
+        N = 4000;
     }
     
     val correlation = new Correlation();

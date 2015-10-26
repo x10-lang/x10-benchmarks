@@ -232,8 +232,8 @@ public class Covariance {
         N = 500;
     }
     @Ifdef("LARGE_DATASET") {
-        M = 2000;
-        N = 2000;
+        M = 4000;
+        N = 4000;
     }
     
     val covariance = new Covariance();

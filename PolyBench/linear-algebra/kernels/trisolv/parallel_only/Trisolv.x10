@@ -87,7 +87,7 @@ public class Trisolv {
         N = 500;
     }
     @Ifdef("LARGE_DATASET") {
-        N = 8000;
+        N = 40000;
     }
     
     val trisolv = new Trisolv();
