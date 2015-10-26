@@ -5,8 +5,8 @@
 ----------------------
 * System Requirements:
 ----------------------
-- python 2.4 ~ 2.7
-- gcc
+- python 2.4-2.7
+- gcc, xlc(V12.1)
 - x10 compiler and runtime installed and exported in PATH
 
 -------------------------
@@ -68,6 +68,13 @@ $> for i in {1..N}; do python run_bench.py; done
 
 to run benchmarks for several times. The results will be appended to original time.dat file.
 Don't forget to delete old time.dat file if you want to record only new data.
+
+-------------
+* Notes
+-------------
+Please note that the input sizes in PolyBench/X10 suite are partly different
+from those in other implementations of PolyBench in order to have at least
+a few seconds for the execution time in each benchmark. 
 
 --------------
 * KNOWN ISSUES
