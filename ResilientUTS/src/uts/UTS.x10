@@ -236,10 +236,7 @@ final class UTS {
     val transferMode = isSequential ? Worker.TRANSFER_MODE_NOMAP : specifiedTransferMode;
     val diffThreads = isSequential ? 0n : (specifiedWorkers + 1n - x10.xrx.Runtime.NTHREADS);
     
-    val pg = isSequential ? new SparsePlaceGroup(here) : Place.places();
     val mapPrefix = "utsWave";
-    val initMapName = mapPrefix + "1";
-    val workers = Worker.make(initMapName, diffThreads, pg, numWorkersPerPlace, transferMode);
     
     //Console.OUT.println("Starting...");
     val startTime:Long = System.nanoTime();
@@ -248,10 +245,15 @@ final class UTS {
     var workLeftBag: Bag = null;
     var count:Long = 0;
     var waves:Long = 0;
+    var stats:Stats = null;
 
     while(stillHasWork) {
     	val waveStartTime:Long = System.nanoTime();
     	waves++;
+    	val mapName = mapPrefix + waves;
+    	val pg = isSequential ? new SparsePlaceGroup(here) : Place.places();
+    	val workers = Worker.make(mapName, diffThreads, pg, numWorkersPerPlace, transferMode);
+
 
 		val runSequential : Boolean;
 		// first pass
@@ -259,8 +261,7 @@ final class UTS {
 			workers()(0).init(19n, depth);
 			runSequential = isSequential;
 		} else {
-			val mapName = mapPrefix + waves;
-			Worker.resetAllWorkers(mapName, pg, numWorkersPerPlace, workers);
+			
 			workers()(0).init(workLeftBag);
 			runSequential = isSequential || isRecoverySequential;
 		}
@@ -324,14 +325,24 @@ final class UTS {
 	    	val waveTime = waveEndTime - waveStartTime;
 	    	Console.ERR.println("Ending" + seqString + "wave " + waves + ", which took: " + (waveTime/1e9) + "s");
 	    	Console.ERR.println("Current count is: " + count);
+	    	val waveStats = Worker.getGlobalStats(pg, numWorkersPerPlace, workers);
+	    	if(stats == null) {
+	    		stats = waveStats;
+	    	} else {
+	    		stats.add(waveStats);
+	    	}
+	    	
+
 	    }
     }
-
+    
     val endTime = System.nanoTime();
     val time = endTime - startTime;
     //Console.OUT.println("Finished.");
 
-    val stats = Worker.getGlobalStats(pg, numWorkersPerPlace, workers);
+    if(stats == null) {
+    	stats = new Stats();
+    }
     
     if(csv) {
     		printCSV(time, count, waves, stats);    	

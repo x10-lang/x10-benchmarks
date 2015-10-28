@@ -47,9 +47,11 @@ final class Worker(numWorkersPerPlace:Long) implements Unserializable {
 		property(numWorkersPerPlace);
 
 		this.transfer_mode = transfer_mode;
+		this.mapName = mapName;
 		if(useMap()) {
-			this.mapName = mapName;
 			this.map = ResilientMap.getMap[Long,Checkpoint](mapName);
+		} else {
+			this.map = null;
 		}
 		this.location = globalLocation;
 		this.numLocations = locations;
@@ -74,44 +76,6 @@ final class Worker(numWorkersPerPlace:Long) implements Unserializable {
 		}
 	}
 	
-	private def resetWorker(mapName:String) {
-		if(useMap()) {
-			this.mapName = mapName;
-			this.map = ResilientMap.getMap[Long,Checkpoint](mapName);
-		}
-		this.bag = new Bag(4096n);
-		this.count = 0;
-	}
-	
-	public static def resetAllWorkers(mapName:String, pg:PlaceGroup, numWorkersPerPlace:Long, workers:Workers(numWorkersPerPlace)) {
-		try {
-			finish {
-				val pl = pg;
-				for (p in pl) {
-					if(p != here) {
-						val wplh = workers;
-						async at(p) {
-							for(w in wplh()) {
-								w.resetWorker(mapName);
-							}
-						}
-					}
-				}
-				if(pl.contains(here)) {
-					for(w in workers()) {
-						w.resetWorker(mapName);
-					}
-				}
-			}
-		} catch(me:MultipleExceptions) {
-			val me2 = me.filterExceptionsOfType[DeadPlaceException](true);
-			if(me2 != null) {
-				throw me;
-			} else {
-				// Just DeadPlaceExceptions, which can be safely ignored
-			}
-		}
-	}
 	public static def initAllWorkers(diffThreads:Int, pg:PlaceGroup, numWorkersPerPlace:Long, workers:Workers(numWorkersPerPlace)) {
 		try {
 			finish {
@@ -206,8 +170,8 @@ final class Worker(numWorkersPerPlace:Long) implements Unserializable {
 
 	private val transfer_mode:Int;
 	
-	var mapName:String;
-	var map:ResilientMap[Long,Checkpoint];
+	val mapName:String;
+	val map:ResilientMap[Long,Checkpoint];
 
 	val location:Long;
 	val numLocations:Long;
