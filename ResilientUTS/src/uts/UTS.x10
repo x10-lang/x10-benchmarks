@@ -237,7 +237,9 @@ final class UTS {
     val diffThreads = isSequential ? 0n : (specifiedWorkers + 1n - x10.xrx.Runtime.NTHREADS);
     
     val pg = isSequential ? new SparsePlaceGroup(here) : Place.places();
-    val workers = Worker.make(diffThreads, pg, numWorkersPerPlace, transferMode);
+    val mapPrefix = "utsWave";
+    val initMapName = mapPrefix + "1";
+    val workers = Worker.make(initMapName, diffThreads, pg, numWorkersPerPlace, transferMode);
     
     //Console.OUT.println("Starting...");
     val startTime:Long = System.nanoTime();
@@ -250,13 +252,15 @@ final class UTS {
     while(stillHasWork) {
     	val waveStartTime:Long = System.nanoTime();
     	waves++;
+
 		val runSequential : Boolean;
 		// first pass
 		if(workLeftBag == null) {
 			workers()(0).init(19n, depth);
 			runSequential = isSequential;
 		} else {
-			Worker.resetAllWorkers(pg, numWorkersPerPlace, workers);
+			val mapName = mapPrefix + waves;
+			Worker.resetAllWorkers(mapName, pg, numWorkersPerPlace, workers);
 			workers()(0).init(workLeftBag);
 			runSequential = isSequential || isRecoverySequential;
 		}

@@ -26,7 +26,7 @@ final class Worker(numWorkersPerPlace:Long) implements Unserializable {
 	static type LocalWorkers(n:Long) = Rail[Worker{numWorkersPerPlace==n}]{self.size==n};
 	static type Workers(n:Long) = PlaceLocalHandle[LocalWorkers(n)];
 
-	public static def make(diffThreads:Int, pg:PlaceGroup, numWorkersPerPlace:Long, transfer_mode:Int):Workers(numWorkersPerPlace) {
+	public static def make(mapName:String, diffThreads:Int, pg:PlaceGroup, numWorkersPerPlace:Long, transfer_mode:Int):Workers(numWorkersPerPlace) {
 		val numPlaces = pg.size();
 		val numLocations = numPlaces * numWorkersPerPlace;
 		val workers = PlaceLocalHandle.make(pg,
@@ -35,20 +35,21 @@ final class Worker(numWorkersPerPlace:Long) implements Unserializable {
 					val baseLocation = placeIndex*numWorkersPerPlace;
 					return new Rail[Worker{self.numWorkersPerPlace==numWorkersPerPlace}](numWorkersPerPlace, 
 						(i:Long) => 
-							new Worker(baseLocation+i, numLocations, numWorkersPerPlace, transfer_mode) as Worker{self.numWorkersPerPlace==numWorkersPerPlace})
+							new Worker(mapName, baseLocation+i, numLocations, numWorkersPerPlace, transfer_mode) as Worker{self.numWorkersPerPlace==numWorkersPerPlace})
 							as LocalWorkers(numWorkersPerPlace);
 				});
 		initAllWorkers(diffThreads, pg, numWorkersPerPlace, workers);
 		return workers;
 	}
 	
-	def this(globalLocation:Long, locations:Long, numWorkersPerPlace:Long, transfer_mode:Int)
+	def this(mapName:String, globalLocation:Long, locations:Long, numWorkersPerPlace:Long, transfer_mode:Int)
 	:Worker{self.numWorkersPerPlace==numWorkersPerPlace} {
 		property(numWorkersPerPlace);
 
 		this.transfer_mode = transfer_mode;
 		if(useMap()) {
-			this.map = ResilientMap.getMap[Long,Checkpoint]("map");
+			this.mapName = mapName;
+			this.map = ResilientMap.getMap[Long,Checkpoint](mapName);
 		}
 		this.location = globalLocation;
 		this.numLocations = locations;
@@ -73,12 +74,16 @@ final class Worker(numWorkersPerPlace:Long) implements Unserializable {
 		}
 	}
 	
-	private def resetWorker() {
+	private def resetWorker(mapName:String) {
+		if(useMap()) {
+			this.mapName = mapName;
+			this.map = ResilientMap.getMap[Long,Checkpoint](mapName);
+		}
 		this.bag = new Bag(4096n);
 		this.count = 0;
 	}
 	
-	public static def resetAllWorkers(pg:PlaceGroup, numWorkersPerPlace:Long, workers:Workers(numWorkersPerPlace)) {
+	public static def resetAllWorkers(mapName:String, pg:PlaceGroup, numWorkersPerPlace:Long, workers:Workers(numWorkersPerPlace)) {
 		try {
 			finish {
 				val pl = pg;
@@ -87,14 +92,14 @@ final class Worker(numWorkersPerPlace:Long) implements Unserializable {
 						val wplh = workers;
 						async at(p) {
 							for(w in wplh()) {
-								w.resetWorker();
+								w.resetWorker(mapName);
 							}
 						}
 					}
 				}
 				if(pl.contains(here)) {
 					for(w in workers()) {
-						w.resetWorker();
+						w.resetWorker(mapName);
 					}
 				}
 			}
@@ -201,6 +206,7 @@ final class Worker(numWorkersPerPlace:Long) implements Unserializable {
 
 	private val transfer_mode:Int;
 	
+	var mapName:String;
 	var map:ResilientMap[Long,Checkpoint];
 
 	val location:Long;
@@ -515,7 +521,7 @@ final class Worker(numWorkersPerPlace:Long) implements Unserializable {
 		while(true) {
 			try {
 				if(transfer_mode == TRANSFER_MODE_TRANSACTIONAL) {
-                    ResilientTransactionalMap.runTransaction("map",
+                    ResilientTransactionalMap.runTransaction(this.mapName,
                     (map:ResilientTransactionalMap[Long, Checkpoint]) => {
 							map.set(location, new Checkpoint(bag, count));
 							val cor:Checkpoint = map.getForUpdate(thief) as Checkpoint;
