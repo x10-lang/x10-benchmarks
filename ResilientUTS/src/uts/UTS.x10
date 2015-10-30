@@ -41,6 +41,10 @@ final class UTS {
 	  Console.ERR.println("-depth <INT>\t\tSet the depth to be used");
 	  Console.ERR.println("-d <INT>\t\tSet the depth to be used");
 	  Console.ERR.println("<INT>\t\tSet the depth to be used");
+	  
+	  Console.ERR.println("-kill <place>:<timespan>\t\tTells the place to kill itself after the allotted timespan (after any warmup)");
+	  Console.ERR.println("\t\t <timespan> can be specified, using an optional suffix, in nanoseconds (ns, default), milliseconds (ms), seconds(s), minutes(m), or hours(h)");
+
   }
   
   public static val RECOVERY_MODE_SEQUENTIAL = 0n;
@@ -75,6 +79,9 @@ final class UTS {
 	var specifiedTransferMode:Int = Worker.TRANSFER_MODE_DEFAULT;
 	var specifiedRecoveryMode:Int = RECOVERY_MODE_DEFAULT;
 	var csv:Boolean = false;
+	
+	val killTimes = new Rail[Long](Place.numAllPlaces());
+	
 	
 	for(var curArg:Long = 0; curArg < args.size; curArg++) {
 		val arg = args(curArg);
@@ -203,6 +210,94 @@ final class UTS {
 				System.setExitCode(-1n);
 				return;
 			}
+		} else if(arg.equalsIgnoreCase("-kill") || arg.equalsIgnoreCase("-killAfter") || arg.equalsIgnoreCase("-k")) {
+			curArg++;
+			if(curArg >= args.size) {
+				Console.ERR.println("Illegal " + arg + " argument with no corresponding place:timespan argument");
+				printUsage();
+				System.setExitCode(-1n);
+				return;
+			}
+			val arg2 = args(curArg);
+			val sp = arg2.split(":");
+			if(sp.size != 2) {
+				Console.ERR.println("Malformed " + arg + " argument: '" + arg2 + "' does not have exactly one colon");
+				printUsage();
+				System.setExitCode(-1n);
+				return;
+			}
+			
+			val timeString : String = sp(1);
+			var timeToKill : Long;
+			try {
+				timeToKill = getTime(timeString);
+			} catch(e:Exception) {
+				Console.ERR.println("Malformed " + arg + " argument.  The second part of '" + arg2 + "' is not parseable as a long.  Note that only ns, ms, s, and m, and h are allowed as suffixes");
+				printUsage();
+				System.setExitCode(-1n);
+				return;
+			}
+			
+			// allow comma separated list of places which can have ranges
+			val toKillRangeList = sp(0).split(",");
+			for(toKillRange in toKillRangeList) {
+				val range = toKillRange.split("-");
+				if(range.size == 0) {
+					// allow and ignore stray commas
+					continue;
+				} else if(range.size > 2) {
+					Console.ERR.println("Malformed " + arg + " argument.  The first part of '" 
+							+ arg2 + "' has an invalid range specification: '" 
+							+ toKillRange + "' (too many - symbols)");
+					printUsage();
+					System.setExitCode(-1n);
+					return;
+				}
+				
+				var firstPlaceToKill : Long = -1L;
+				var lastPlaceToKill : Long = -1L;
+				
+				try {
+					firstPlaceToKill = Long.parseLong(range(0));
+				} catch(e:Exception) {
+					Console.ERR.println("Malformed " + arg + " argument.  The first part of '" + arg2 + "' has a place specifier '" +range(0) + "'that is not parseable as a place list");
+					printUsage();
+					System.setExitCode(-1n);
+					return;
+				}
+				
+				if(range.size == 2) {
+					try {
+						lastPlaceToKill = Long.parseLong(range(1));
+					} catch(e:Exception) {
+						Console.ERR.println("Malformed " + arg + " argument.  The first part of '" + arg2 + "' has a place specifier '" +range(1) + "'that is not parseable as a place list");
+						printUsage();
+						System.setExitCode(-1n);
+						return;
+					}
+				} else {
+					lastPlaceToKill=firstPlaceToKill;
+				}
+				if(firstPlaceToKill < 0 || firstPlaceToKill > lastPlaceToKill) {
+					Console.ERR.println("Malformed " + arg + " argument.  The first part of '" + arg2 + "' has a range specifier '" + toKillRange + "' that is not a valid range.");
+					printUsage();
+					System.setExitCode(-1n);
+					return;
+				}
+				
+				if(firstPlaceToKill == 0) {
+					Console.ERR.println("The " + arg + " argument.  Requested that place 0 die (as part of) '" + arg2 + "', specifically '" +  toKillRange + "'.  We don't currently support killing place 0");
+					printUsage();
+					System.setExitCode(-1n);
+					return;
+				}
+				
+				// allow and ignore places that are too large
+				val cappedLastPlaceToKill = Math.min(lastPlaceToKill, Place.numAllPlaces()-1);
+				for(pl in firstPlaceToKill..cappedLastPlaceToKill) {
+					killTimes(pl) = timeToKill;
+				}
+			}	
 		} else {
 			try {
 				specifiedDepth = Int.parseInt(arg);
@@ -250,16 +345,19 @@ final class UTS {
     var stats:Stats = null;
 
     while(stillHasWork) {
+    	val isFirstWave = workLeftBag == null;
     	val waveStartTime:Long = System.nanoTime();
     	waves++;
     	val mapName = mapPrefix + waves;
     	val pg = isSequential ? new SparsePlaceGroup(here) : Place.places();
-    	val workers = Worker.make(mapName, diffThreads, pg, numWorkersPerPlace, transferMode);
-
+    	val kt = isFirstWave ? killTimes : null; 
+    	val workers = Worker.make(mapName, diffThreads, pg, numWorkersPerPlace, transferMode, kt);
+    	Worker.startAllKillers(pg, numWorkersPerPlace, workers);
+    	
 
 		val runSequential : Boolean;
 		// first pass
-		if(workLeftBag == null) {
+		if(isFirstWave) {
 			workers()(0).init(19n, depth);
 			runSequential = isSequential;
 		} else {
@@ -367,5 +465,32 @@ final class UTS {
 				  return map.values();
 			  }
 	  );
+  }
+  
+  /**
+   * parses a string and returns the corresponding timespan in nanoseconds
+   */
+  public static def getTime(var timeString:String):Long {
+	  val units : Long;
+
+	  if(timeString.endsWith("ns")) {
+		  timeString = timeString.substring(0n,(timeString.length()-2n) as Int);
+		  units = 1;
+	  } else if(timeString.endsWith("ms")) {
+		  timeString = timeString.substring(0n,(timeString.length()-2n) as Int);
+		  units = 1000;
+	  } else if(timeString.endsWith("s")) {
+		  timeString = timeString.substring(0n,(timeString.length()-1n) as Int);
+		  units = 1000*1000;
+	  } else if(timeString.endsWith("m")) {
+		  timeString = timeString.substring(0n,(timeString.length()-1n) as Int);
+		  units = 1000*1000*60;
+	  } else if(timeString.endsWith("h")) {
+		  timeString = timeString.substring(0n,(timeString.length()-1n) as Int);
+		  units = 1000*1000*60*60;
+	  } else {
+		  units = 1;
+	  }
+	  return Long.parseLong(timeString) * units;
   }
 }

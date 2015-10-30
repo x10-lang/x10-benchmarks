@@ -26,7 +26,7 @@ final class Worker(numWorkersPerPlace:Long) implements Unserializable {
 	static type LocalWorkers(n:Long) = Rail[Worker{numWorkersPerPlace==n}]{self.size==n};
 	static type Workers(n:Long) = PlaceLocalHandle[LocalWorkers(n)];
 
-	public static def make(mapName:String, diffThreads:Int, pg:PlaceGroup, numWorkersPerPlace:Long, transfer_mode:Int):Workers(numWorkersPerPlace) {
+	public static def make(mapName:String, diffThreads:Int, pg:PlaceGroup, numWorkersPerPlace:Long, transfer_mode:Int, killTimes:Rail[Long]):Workers(numWorkersPerPlace) {
 		val numPlaces = pg.size();
 		val numLocations = numPlaces * numWorkersPerPlace;
 		val workers = PlaceLocalHandle.make(pg,
@@ -38,7 +38,7 @@ final class Worker(numWorkersPerPlace:Long) implements Unserializable {
 							new Worker(mapName, baseLocation+i, numLocations, numWorkersPerPlace, transfer_mode) as Worker{self.numWorkersPerPlace==numWorkersPerPlace})
 							as LocalWorkers(numWorkersPerPlace);
 				});
-		initAllWorkers(diffThreads, pg, numWorkersPerPlace, workers);
+		initAllWorkers(diffThreads, pg, numWorkersPerPlace, workers, killTimes);
 		return workers;
 	}
 	
@@ -76,7 +76,66 @@ final class Worker(numWorkersPerPlace:Long) implements Unserializable {
 		}
 	}
 	
-	public static def initAllWorkers(diffThreads:Int, pg:PlaceGroup, numWorkersPerPlace:Long, workers:Workers(numWorkersPerPlace)) {
+	public static def setKillTime(time:Long) {
+		killer.setKillTime(time);
+	}
+	
+	public static def startKiller() {
+		killer.startKiller();
+	}
+	
+	private static class Killer implements java.lang.Runnable {
+		def this() { }
+		
+		public def startKiller() {
+			if(killDelay > 0) {
+				val t = new java.lang.Thread(this, "Suicide (delayed) thread");
+				t.setDaemon(true);
+				t.start();
+				// we can lose the to reference, since there is no
+				// way to cancel suicide :-
+			}
+		}
+		
+		def setKillTime(newTime:Long) {
+			if(newTime <= 0) {
+				return;
+			}
+			this.killDelay = newTime;
+		}
+		
+		private var killDelay : Long;
+		
+		public def run():void {
+			if(killDelay <= 0) {
+				return;
+			}
+			val startTime = java.lang.System.nanoTime();
+
+			val endTime = startTime + killDelay;
+			var curTime : Long;
+			
+			while ((curTime = java.lang.System.nanoTime()) < endTime) {
+				val timeLeftNs = endTime - curTime;
+				val timeLeftMspart = timeLeftNs / 1000;
+				val timeLeftNspart = timeLeftNs % 1000;
+				try {
+					java.lang.Thread.sleep(timeLeftMspart, timeLeftNspart as Int);
+				} catch (iex:java.lang.InterruptedException) {}
+			}
+			// time ran out.  time to commit suicide
+			// NB: do not use -1, since this will be
+			// interpreted by the X10Launcher as ssh failing to start the process
+			java.lang.System.exit(1n);
+		}
+	};
+	
+	private static killer:Killer = new Killer();
+	
+	public static def startAllKillers(
+			pg:PlaceGroup, 			
+			numWorkersPerPlace:Long, 
+			workers:Workers(numWorkersPerPlace)) { 
 		try {
 			finish {
 				val pl = pg;
@@ -84,6 +143,33 @@ final class Worker(numWorkersPerPlace:Long) implements Unserializable {
 					if(p != here) {
 						val wplh = workers;
 						async at(p) {
+							startKiller();
+						}
+					}
+				}
+			}
+		} catch(me:MultipleExceptions) {
+			val me2 = me.filterExceptionsOfType[DeadPlaceException](true);
+			if(me2 != null) {
+				throw me;
+			} else {
+				// Just DeadPlaceExceptions, which can be safely ignored
+			}
+		}
+	}
+	
+	public static def initAllWorkers(diffThreads:Int, pg:PlaceGroup, numWorkersPerPlace:Long, workers:Workers(numWorkersPerPlace), killTimes:Rail[Long]) {
+		// work around an X10 compiler optimization bug
+		val killTimesAny:Any = killTimes;
+		try {
+			finish {
+				val pl = pg;
+				for (p in pl) {
+					if(p != here) {
+						val wplh = workers;
+						val killTime = killTimesAny == null ? -1 : (killTimesAny as Rail[Long])(p.id);
+						async at(p) {
+							setKillTime(killTime);
 							adjustThreads(diffThreads);
 							registerPlaceDeadHandler(numWorkersPerPlace, wplh());
 							for(w in wplh()) {
@@ -93,6 +179,8 @@ final class Worker(numWorkersPerPlace:Long) implements Unserializable {
 					}
 				}
 				if(pl.contains(here)) {
+					val killTime = killTimesAny == null ? -1 : (killTimesAny as Rail[Long])(here.id);
+					setKillTime(killTime);
 					adjustThreads(diffThreads);
 					registerPlaceDeadHandler(numWorkersPerPlace, workers());
 					for(w in workers()) {
