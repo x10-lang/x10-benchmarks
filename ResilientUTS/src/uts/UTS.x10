@@ -13,6 +13,8 @@ package uts;
 
 import java.security.DigestException;
 import x10.util.concurrent.AtomicLong;
+import x10.util.Collection;
+import x10.util.resilient.ResilientTransactionalMap;
 
 final class UTS {
 
@@ -290,23 +292,26 @@ final class UTS {
 	    	// if places have died, gather up the remaining bags
 	    	// and merge them together so we can finish computation
 	    	if(workers()(0).useMap()) {
-	    		for (e in workers()(0).map.entrySet()) {
-	    			val b:Bag = e.getValue().bag;
+	    		val cps = getAllCheckpointsFromMap(mapName);
+	    		workers()(0).map.clear();
+	    		
+	    		for (cp in cps) {
+	    			if(cp == null) {
+	    				continue;
+	    			}
+	    			val b:Bag = cp.bag;
 	    			if (b != null && b.size != 0n) {
-	    				Console.ERR.println("Recovering " + workers()(0).getLocationString(e.getKey()));
 	    				if(workLeftBag == null) {
 	    					workLeftBag = b;
 	    				} else {
 	    					workLeftBag = workLeftBag.merge(b);
 	    				}
 	    			}
+	    			count += cp.count;
+	    			if(workLeftBag != null) {
+	    				Console.ERR.println("Recovering bag(s)");
+	    			}
 	    		}
-	    		
-	    		// collect all counts
-	    		for (c in workers()(0).map.values()) {
-	    			count += c.count;
-	    		}
-	    		workers()(0).map.clear();
 	    		
 	    	} else {
 	    		// don't use the resilient map
@@ -353,5 +358,14 @@ final class UTS {
 	    
 	    stats.print(Console.OUT);
     }
+  }
+  
+  private static def getAllCheckpointsFromMap(mapName:String)
+  	: Collection[Checkpoint] {
+	  return ResilientTransactionalMap.runTransaction(mapName,
+			  (map:ResilientTransactionalMap[Long, Checkpoint]) => {
+				  return map.values();
+			  }
+	  );
   }
 }
