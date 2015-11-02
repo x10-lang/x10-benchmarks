@@ -171,7 +171,7 @@ final class Worker(numWorkersPerPlace:Long) implements Unserializable {
 						async at(p) {
 							setKillTime(killTime);
 							adjustThreads(diffThreads);
-							registerPlaceDeadHandler(numWorkersPerPlace, wplh());
+							registerPlaceDeadHandler(numWorkersPerPlace, wplh(), pl);
 							for(w in wplh()) {
 								w.initWorkers(pg, workers);
 							}
@@ -182,7 +182,7 @@ final class Worker(numWorkersPerPlace:Long) implements Unserializable {
 					val killTime = killTimesAny == null ? -1 : (killTimesAny as Rail[Long])(here.id);
 					setKillTime(killTime);
 					adjustThreads(diffThreads);
-					registerPlaceDeadHandler(numWorkersPerPlace, workers());
+					registerPlaceDeadHandler(numWorkersPerPlace, workers(), pl);
 					for(w in workers()) {
 						w.initWorkers(pg, workers);
 					}
@@ -210,8 +210,14 @@ final class Worker(numWorkersPerPlace:Long) implements Unserializable {
 	
 	val sync_lock:Monitor = new Monitor();	
 	
-	private static def registerPlaceDeadHandler(numWorkersPerPlace:Long, workers:LocalWorkers(numWorkersPerPlace)) {
+	private static def registerPlaceDeadHandler(numWorkersPerPlace:Long, workers:LocalWorkers(numWorkersPerPlace), pg:PlaceGroup) {
 		System.registerPlaceRemovedHandler((place:Place) => {
+			if(!pg.contains(place)) {
+				if(place.id > 0) {
+					Console.ERR.println(here + " observed the irrelevant message that " + place + " failed!");
+				}
+				return;
+			}
 			if(place.id > 0) {
 				Console.ERR.println(here + " observes that " + place + " failed!");
 			}
@@ -223,32 +229,32 @@ final class Worker(numWorkersPerPlace:Long) implements Unserializable {
 		
 	private def handle(p:Place):void {
 		sync_lock.lock();
-		// p is dead, unblock if waiting on p
-		if(state >= 0) {
-			val statePlace = placeOfLocation(state);
-			if (statePlace == p) {
-				try {
-					if(DEBUG) {
-						Console.ERR.println(getLocationString(location) + ": handle(" + p + "): unblocking");
-					}
-					// attempt to extract loot from store
-					val c:Checkpoint = map.get(location) as Checkpoint;
-					if (c.bag != null) {
-						merge(c.bag);
-					}
-					state = -1;
-				} finally {
-					sync_lock.release();
-				}
-			}
-		} else {
-			sync_lock.unlock();
+		try {
+			state = -3;
+		} finally {
+			sync_lock.release();
 		}
 	}
 	
 	final def useMap() {
 		return TRANSFER_MODE_NOMAP != transfer_mode;
 	}
+	
+	def safe_abort() {
+		sync_lock.lock();
+		try {
+			locked_abort();
+		} finally {
+			sync_lock.unlock();
+		}
+	}
+
+	def locked_abort() {
+		if (state == -3) {
+			throw new DeadPlaceException(here);
+		}
+	}
+
 		
 	public static val TRANSFER_MODE_TRANSACTIONAL:Int = 0n;
 	public static val TRANSFER_MODE_ATOMIC:Int = 1n;
@@ -272,7 +278,7 @@ final class Worker(numWorkersPerPlace:Long) implements Unserializable {
 
 	val thieves:ConcurrentLinkedQueue = new ConcurrentLinkedQueue();
 	val lifeline:AtomicBoolean;
-	var state:Long = -2; // -2: inactive, -1: running, p: stealing from p
+	var state:Long = -2; // -3: aborting, -2: inactive, -1: running, p: stealing from p
 
 	var stats:Stats = new Stats();
 	
@@ -372,6 +378,7 @@ final class Worker(numWorkersPerPlace:Long) implements Unserializable {
 		
 		sync_lock.lock();
 	    try {
+	    	locked_abort();
 			state = -1;
 		} finally {
 			sync_lock.unlock();
@@ -382,6 +389,7 @@ final class Worker(numWorkersPerPlace:Long) implements Unserializable {
 				for (var n:int = 500n; (n > 0n) && (bag.size > 0n); --n) {
 					expand();
 				}
+				safe_abort();
 				distribute();
 			}
 			if(useMap()) {
@@ -392,6 +400,7 @@ final class Worker(numWorkersPerPlace:Long) implements Unserializable {
 		
 		sync_lock.lock();
 		try {
+			locked_abort();
 			state = -2;
 		} finally {
 			sync_lock.unlock();
@@ -459,6 +468,7 @@ final class Worker(numWorkersPerPlace:Long) implements Unserializable {
 		
 		sync_lock.lock();
 		try {
+			locked_abort();
 			state = victim;
 		} finally {
 			sync_lock.unlock();
@@ -495,6 +505,9 @@ final class Worker(numWorkersPerPlace:Long) implements Unserializable {
 	def request(thief:Long):void {
 		sync_lock.lock();
 		try {
+			if(state == -3) {
+				return;
+			}
 			if (state == -1) {
 				if(DEBUG) {
 					Console.ERR.println(getLocationString(location) + ": request(" + getLocationString(thief) + ") being queued");
@@ -549,6 +562,10 @@ final class Worker(numWorkersPerPlace:Long) implements Unserializable {
 		val startTime = stats.startDeal();
 		sync_lock.lock();
 		try {
+			if(state == -3) {
+				return;
+			}
+
 			if (state != victim) {
 				if(DEBUG) {
 					Console.ERR.println(getLocationString(location) + ": deal(" + getLocationString(victim) + "): dead victim");

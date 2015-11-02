@@ -14,6 +14,7 @@ package uts;
 import java.security.DigestException;
 import x10.util.concurrent.AtomicLong;
 import x10.util.Collection;
+import x10.util.ArrayList;
 import x10.util.resilient.ResilientTransactionalMap;
 
 final class UTS {
@@ -406,11 +407,10 @@ final class UTS {
 	    				}
 	    			}
 	    			count += cp.count;
-	    			if(workLeftBag != null) {
-	    				Console.ERR.println("Recovering bag(s)");
-	    			}
 	    		}
-	    		
+	    		if(workLeftBag != null) {
+	    			Console.ERR.println("Recovering bag(s)");
+	    		}
 	    	} else {
 	    		// don't use the resilient map
 	    		if(Place.numDead() > 0) {
@@ -456,6 +456,11 @@ final class UTS {
 	    
 	    stats.print(Console.OUT);
     }
+  }
+  
+  private static def runWave(bags:ArrayList[Bag], wave:Long):ArrayList {
+	  
+	  return null;
   }
   
   private static def getAllCheckpointsFromMap(mapName:String)
