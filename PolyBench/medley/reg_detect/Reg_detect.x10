@@ -118,9 +118,9 @@ public class Reg_detect {
         MAXGRID = 6;
     }
     @Ifdef("LARGE_DATASET") {
-        NITER = 1000;
-        LENGTH = 500;
-        MAXGRID = 12;
+        NITER = 10000;
+        LENGTH = 100;
+        MAXGRID = 1000;
     }
     
     val reg_detect = new Reg_detect();
