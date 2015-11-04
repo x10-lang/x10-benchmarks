@@ -161,7 +161,7 @@ final class ResilientUTS implements Unserializable {
 
     def request(thief:Int) {
       atomic {
-        abort();
+        if (state == -3n) return;
         if (state == -1n) {
           thieves.add(thief);
           return;
@@ -178,7 +178,7 @@ final class ResilientUTS implements Unserializable {
     }
 
     atomic def deal(loot:Bag) {
-      abort();
+      if (state == -3n) return;
       if (loot != null) {
         bag.merge(loot);
       }
@@ -251,6 +251,7 @@ final class ResilientUTS implements Unserializable {
       for (i in 0n..(s-1n)) plh().map.set(i * r, bags.get(i));
     }
     if (wave >= 0) println(time0, "Wave " + wave + ": Setup complete"); 
+    var failed:Boolean = false;
     try {
       finish {
         for (i in 1n..(s-1n)) {
@@ -265,12 +266,13 @@ final class ResilientUTS implements Unserializable {
         plh().workers(0).lifelinedeal(bags.get(0));
       }
     } catch (e:MultipleExceptions) {
+      failed = true;
 //      e.printStackTrace();
     }
     if (wave >= 0) println(time0, "Wave " + wave + ": Compute complete"); 
     val bag = new Bag();
     val l = new ArrayList[Bag]();
-    if (resilient) {
+    if (resilient && failed) {
       val values:Collection[Bag] = ResilientTransactionalMap.runTransaction("map" + wave,
           (map:ResilientTransactionalMap[Int,Bag]) => {
             // return map.values();
