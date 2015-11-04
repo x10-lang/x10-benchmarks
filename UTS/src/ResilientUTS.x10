@@ -262,7 +262,8 @@ final class ResilientUTS implements Unserializable {
     if (resilient) {
       val values:Collection[Bag] = ResilientTransactionalMap.runTransaction("map" + wave,
           (map:ResilientTransactionalMap[Int,Bag]) => {
-            return map.values();
+            // return map.values();
+            @x10.compiler.Native("java", "return map.values();") { return null as Collection[Bag]; }
           });
       for (b in values) {
         if (b.size > 0n) {
