@@ -26,7 +26,7 @@ import x10.util.Collection;
 import x10.util.Map.Entry;
 import x10.xrx.Runtime;
 
-final class ResilientUTS implements Unserializable {
+final class ResilientUTS implements Unserializable {  
   val map:ResilientMap[Int,Bag];
   val wave:Int;
   val group:PlaceGroup;
@@ -34,6 +34,7 @@ final class ResilientUTS implements Unserializable {
   val power:Int;
   val mask:Int;
   val resilient:Boolean;
+  var failureTime:Long;
 
   def this(wave:Int, group:PlaceGroup, power:Int, resilient:Boolean) {
     map = resilient ? ResilientMap.getMap[Int,Bag]("map" + wave) : null;
@@ -56,7 +57,7 @@ final class ResilientUTS implements Unserializable {
       return;
     }
     if (p.id > 0) {
-      Console.ERR.println("Observing failure of " + p + " from " + here);
+      Console.OUT.println(System.nanoTime() + ": Observing failure of " + p + " from " + here);
     }
     for (i in 0n..mask) workers(i).unblock(p);
   }
@@ -82,15 +83,14 @@ final class ResilientUTS implements Unserializable {
       lifeline = new AtomicBoolean(((next % ratio) != 0n) || ((next / ratio) >= size));
     }
 
-    atomic def abort() {
+    /* atomic */ def abort() {
       if (state == -3n) {
         throw new DeadPlaceException(here);
       }
     }
-    
+
     def run() {
       try {
-        Console.ERR.println(me + " starting");
         atomic {
           abort();
           state = -1n;
@@ -100,7 +100,7 @@ final class ResilientUTS implements Unserializable {
             for (var n:Int = 500n; (n > 0n) && (bag.size > 0n); --n) {
               bag.expand(md);
             }
-            abort();
+            atomic { abort(); }
             distribute();
           }
           if (resilient) {
@@ -116,7 +116,9 @@ final class ResilientUTS implements Unserializable {
         lifelinesteal();
       } catch (DigestException) {
       } finally {
-        Console.ERR.println(me + " stopping");
+        if (state == -3n) {
+          Console.OUT.println(System.nanoTime() + ": Aborting worker " + me); 
+        }
       }
     }
 
@@ -150,9 +152,7 @@ final class ResilientUTS implements Unserializable {
 
     def request(thief:Int) {
       atomic {
-        if (state == -3n) {
-          return;
-        }
+        abort();
         if (state == -1n) {
           thieves.add(thief);
           return;
@@ -169,9 +169,7 @@ final class ResilientUTS implements Unserializable {
     }
 
     atomic def deal(loot:Bag) {
-      if (state == -3n) {
-        return;
-      }
+      abort();
       if (loot != null) {
         bag.merge(loot);
       }
@@ -241,6 +239,7 @@ final class ResilientUTS implements Unserializable {
     if (resilient) {
       for (i in 0n..(s-1n)) plh().map.set(i * r, bags.get(i));
     }
+    if (wave >= 0) Console.OUT.println(System.nanoTime() + ": Wave " + wave + ": Setup complete"); 
     try {
       finish {
         for (i in 1n..(s-1n)) {
@@ -255,8 +254,9 @@ final class ResilientUTS implements Unserializable {
         plh().workers(0).lifelinedeal(bags.get(0));
       }
     } catch (e:MultipleExceptions) {
-      e.printStackTrace();
+//      e.printStackTrace();
     }
+    if (wave >= 0) Console.OUT.println(System.nanoTime() + ": Wave " + wave + ": Compute complete"); 
     val bag = new Bag();
     val l = new ArrayList[Bag]();
     if (resilient) {
@@ -289,6 +289,7 @@ final class ResilientUTS implements Unserializable {
     } else {
       l.add(bag);
     }
+    if (wave >= 0) Console.OUT.println(System.nanoTime() + ": Wave " + wave + ": Collection complete"); 
     return l;
   }
 
@@ -327,14 +328,14 @@ final class ResilientUTS implements Unserializable {
 
     val md = Bag.encoder();
 
-    Console.OUT.println("Warmup...");
+    Console.OUT.println(System.nanoTime() + ": Warmup...");
 
     val tmp = new Bag(64n);
     tmp.seed(md, 19n, depth - 2n);
     finish step(explode(tmp), -1n, power, resilient);
 
-    Console.OUT.println("Starting...");
-    var time:Long = -System.nanoTime();
+    val startTime = System.nanoTime();
+    Console.OUT.println(startTime + ": Begin");
 
     val bag = new Bag(64n);
     bag.seed(md, 19n, depth);
@@ -343,16 +344,19 @@ final class ResilientUTS implements Unserializable {
     var wave:Int = 0n;
     while (bags.get(0).size > 0) {
       val w = wave++;
-      Console.OUT.println("Wave: " + w);
+      Console.OUT.println(System.nanoTime() + ": Wave " + w + ": Starting");
       try {
         finish bags = ResilientUTS.step(bags, w, power, resilient);
       } catch (e:MultipleExceptions) {
-        e.printStackTrace();
+//        e.printStackTrace();
       }
+      Console.OUT.println(System.nanoTime() + ": Wave " + w + ": Finished");
     }
 
-    time += System.nanoTime();
-    Console.OUT.println("Finished.");
+    val stopTime = System.nanoTime();
+    Console.OUT.println(System.nanoTime() + ": End");
+
+    val time = stopTime - startTime;
 
     Console.OUT.println("Depth: " + depth + ", Places: " + maxPlaces
         + ", Waves: " + wave + ", Performance: " + bags.get(0).count + "/"
