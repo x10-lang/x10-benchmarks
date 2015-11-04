@@ -273,13 +273,16 @@ final class ResilientUTS implements Unserializable {
         }
       }
     } else {
-      for (p in group) {
-        bag.count += at (p) {
+      val ref = new GlobalRef(bag);
+      finish for (p in group) {
+        at (p) async {
           var count:Long = 0;
           for (i in 0n..((1n << power) - 1n)) count += plh().workers(i).bag.count;
-          count
-        };
+          val c = count;
+          at (ref) async ref().count += c;
+        }
       }
+      ref.forget();
     }
     if (!l.isEmpty()) {
       l.get(0).count += bag.count;
