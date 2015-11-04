@@ -236,10 +236,12 @@ final class ResilientUTS implements Unserializable {
   
   static def step(bags:ArrayList[Bag], wave:Int, power:Int, resilient:Boolean, time0:Long) {
     val group = Place.places();
-    while (bags.size() > (group.size() << power)) {
+    val surplus = bags.size() - (group.size() << power);
+    for (i in 0..(surplus-1n)) {
       val b = bags.removeLast();
-      bags.get(0).merge(b);
-      bags.get(0).count += b.count;
+      val id = i * (group.size() << power) / surplus;
+      bags.get(id).merge(b);
+      bags.get(id).count += b.count;
     }
     val s = bags.size() as Int;
     val r = (group.size() as Int << power) / s;
@@ -273,11 +275,8 @@ final class ResilientUTS implements Unserializable {
     val bag = new Bag();
     val l = new ArrayList[Bag]();
     if (resilient && failed) {
-      val values:Collection[Bag] = ResilientTransactionalMap.runTransaction("map" + wave,
-          (map:ResilientTransactionalMap[Int,Bag]) => {
-            // return map.values();
-            @x10.compiler.Native("java", "return map.values();") { return null as Collection[Bag]; }
-          });
+      val values:Collection[Bag] = ResilientTransactionalMap.runLocalTransaction("map" + wave,
+          (map:ResilientTransactionalMap[Int,Bag]) => map.values());
       for (b in values) {
         if (b.size > 0n) {
           l.add(b);
