@@ -330,6 +330,12 @@ final class ResilientUTS implements Unserializable {
     try {
       power = Int.parse(args(1));
     } catch (Exception) {}
+    
+    val maxPlaces = Place.places().size();
+
+    Console.OUT.println("Depth: " + depth + ", Places: " + maxPlaces
+        + ", Workers/place: " + (1n << power) + ", resilient mode: " + Runtime.RESILIENT_MODE);
+
     val resilient = Runtime.RESILIENT_MODE != 0n;
     val missing = (1n << power) + 1n - Runtime.NTHREADS;
     if (missing > 0) {
@@ -337,7 +343,6 @@ final class ResilientUTS implements Unserializable {
         for (i in 1..missing) Runtime.increaseParallelism();
       }
     }
-    val maxPlaces = Place.places().size();
 
     val md = Bag.encoder();
 
@@ -372,7 +377,8 @@ final class ResilientUTS implements Unserializable {
     val time = stopTime - startTime;
 
     Console.OUT.println("Depth: " + depth + ", Places: " + maxPlaces
-        + ", Workers/place: " + (1n << power)
+        + ", Workers/place: " + (1n << power) + ", resilient mode: " + Runtime.RESILIENT_MODE
+        + ", Remaining places: " + Place.places().size()
         + ", Waves: " + wave + ", Performance: " + bags.get(0).count + "/"
         + Bag.sub("" + time / 1e9, 0n, 6n) + " = "
         + Bag.sub("" + (bags.get(0).count / (time / 1e3)), 0n, 6n) + "M nodes/s");
