@@ -28,7 +28,7 @@ import x10.xrx.Runtime;
 
 final class ResilientUTS implements Unserializable {
   val time0:Long;
-  val map:ResilientMap[Int,Bag];
+  val map:Store;
   val wave:Int;
   val group:PlaceGroup;
   val workers:Rail[Worker];
@@ -44,8 +44,8 @@ final class ResilientUTS implements Unserializable {
     Console.OUT.println(s1 + "." + s2 + ": " + message);
   }
 
-  def this(wave:Int, group:PlaceGroup, power:Int, resilient:Boolean, time0:Long) {
-    map = resilient ? ResilientMap.getMap[Int,Bag]("map" + wave) : null;
+  def this(wave:Int, group:PlaceGroup, power:Int, resilient:Boolean, time0:Long, map:Store) {
+    this.map = map;
     this.group = group;
     this.wave = wave;
     this.power = power;
@@ -159,6 +159,7 @@ final class ResilientUTS implements Unserializable {
     val thieves:ConcurrentLinkedQueue = new ConcurrentLinkedQueue();
     val lifeline:AtomicBoolean;
     var state:Int;
+    val cell = GlobalRef[Cell[Boolean]](new Cell[Boolean](false));
     
     def this(plh:PlaceLocalHandle[ResilientUTS], id:Int, size:Int, ratio:Int) {
       this.plh = plh;
@@ -190,7 +191,7 @@ final class ResilientUTS implements Unserializable {
             distribute();
           }
           if (resilient) {
-            map.set(me, bag.trim());
+            map.setRemote(me, bag.trim(), cell);
           }
           steal();
         }
@@ -268,18 +269,6 @@ final class ResilientUTS implements Unserializable {
 //    notifyAll();
     }
 
-    def transfer(thief:Int, loot:Bag) {
-      val bag = this.bag.trim();
-      val me = this.me;
-      ResilientTransactionalMap.runTransaction("map" + wave, (map:ResilientTransactionalMap[Int,Bag]) => {
-        map.set(me, bag);
-        val old = map.getForUpdate(thief);
-        loot.count = old == null ? 0 : old.count;
-        map.set(thief, loot);
-        return null;
-      });
-    }
-
     def distribute() {
       if (group.size() == 1 && power == 0n) {
         return;
@@ -289,7 +278,7 @@ final class ResilientUTS implements Unserializable {
         val t = thief as Int;
         val loot = bag.split();
         if (loot != null && resilient) {
-          transfer(t, loot);
+          map.transfer(me, bag.trim(), t, loot, cell);
         }
         val id = t & mask;
         val plh = this.plh;
@@ -300,7 +289,7 @@ final class ResilientUTS implements Unserializable {
         if (loot != null) {
           val t = next;
           if (resilient) {
-            transfer(t, loot);
+            map.transfer(me, bag.trim(), t, loot, cell);
           }
           lifeline.set(false);
           val id = t & mask;
@@ -322,7 +311,8 @@ final class ResilientUTS implements Unserializable {
     }
     val s = bags.size() as Int;
     val r = (group.size() as Int << power) / s;
-    val plh = PlaceLocalHandle.make[ResilientUTS](group, () => new ResilientUTS(wave, group, power, resilient, time0));
+    val map = resilient ? Store.make("map" + wave): null;
+    val plh = PlaceLocalHandle.make[ResilientUTS](group, () => new ResilientUTS(wave, group, power, resilient, time0, map));
     if (wave >= 0) println(time0, "Wave " + wave + ": PLH init complete");
     // WORKAROUND x10c codegen bug
     // which otherwise hoists the Rail.value
@@ -339,7 +329,7 @@ final class ResilientUTS implements Unserializable {
     }
     if (wave >= 0) println(time0, "Wave " + wave + ": Workers init complete"); 
     if (resilient) {
-      for (i in 0n..(s-1n)) plh().map.set(i * r, bags.get(i));
+      for (i in 0n..(s-1n)) map.set(i * r, bags.get(i));
     }
     if (wave >= 0) println(time0, "Wave " + wave + ": Setup complete"); 
     var failed:Boolean = false;
@@ -364,15 +354,14 @@ final class ResilientUTS implements Unserializable {
     val bag = new Bag();
     val l = new ArrayList[Bag]();
     if (resilient && failed) {
-      val values:Collection[Bag] = ResilientTransactionalMap.runLocalTransaction("map" + wave,
-          (map:ResilientTransactionalMap[Int,Bag]) => map.values());
-      for (b in values) {
+      for (b in map.values()) {
         if (b.size > 0n) {
           l.add(b);
         } else {
           bag.count += b.count;
         }
       }
+      map.clear();
     } else {
       val ref = new GlobalRef(bag);
       finish for (p in group) {
