@@ -9,23 +9,11 @@
  *  (C) Copyright IBM Corporation 2006-2015.
  */
 
-import java.security.DigestException;
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
-import java.util.Random;
-import java.util.concurrent.ConcurrentLinkedQueue;
-
 import x10.compiler.Uncounted;
-import x10.interop.Java;
-import x10.io.Unserializable;
-import x10.util.concurrent.AtomicBoolean;
 import x10.util.concurrent.Lock;
 import x10.util.resilient.ResilientMap;
 import x10.util.resilient.ResilientTransactionalMap;
 import x10.util.ArrayList;
-import x10.util.Collection;
-import x10.util.Map.Entry;
-import x10.xrx.Runtime;
 
 abstract class Store {
   abstract def set(key:Int, value:Bag):void;
@@ -43,7 +31,7 @@ abstract class Store {
   }
 }
 
-class HazelcastStore extends Store {
+final class HazelcastStore extends Store {
   val name:String;
   val map:ResilientMap[Int,Bag];
 
@@ -80,7 +68,7 @@ class HazelcastStore extends Store {
   }
 }
 
-class UncountedStore extends Store {
+final class UncountedStore extends Store {
   static def convert[T](iter:java.util.Iterator):Iterator[T] {
     return new Iterator[T]() {
       public def hasNext():Boolean = iter.hasNext();
@@ -98,34 +86,34 @@ class UncountedStore extends Store {
   val lock = GlobalRef[Lock](new Lock());
 
   def set(key:Int, value:Bag) {
-    map().put(key, value);
+    map.getLocalOrCopy().put(key, value);
   }
 
   def setRemote(key:Int, value:Bag, flag:GlobalRef[Cell[Boolean]]) {
-    flag()() = false;
+    flag.getLocalOrCopy()() = false;
     at (map) @Uncounted async {
       lock().lock();
       map().put(key, value);
       lock().unlock();
       at (flag) @Uncounted async atomic flag()() = true;
     }
-    when(flag()());
+    when(flag.getLocalOrCopy()());
   }
 
   def clear() {
-    map().clear();
+    map.getLocalOrCopy().clear();
   }
 
   def values():Iterable[Bag] {
-    lock().lock();
+    lock.getLocalOrCopy().lock();
     val list = new ArrayList[Bag]();
-    for (b in convert[Bag](map().values())) list.add(b);
-    lock().unlock();
+    for (b in convert[Bag](map.getLocalOrCopy().values())) list.add(b);
+    lock.getLocalOrCopy().unlock();
     return list;
   }
 
   def transfer(src:Int, bag:Bag, dst:Int, loot:Bag, flag:GlobalRef[Cell[Boolean]]) {
-    flag()() = false;
+    flag.getLocalOrCopy()() = false;
     at (map) @Uncounted async {
       lock().lock();
       map().put(src, bag);
@@ -135,6 +123,6 @@ class UncountedStore extends Store {
       lock().unlock();
       at (flag) @Uncounted async atomic flag()() = true;
     }
-    when(flag()());
+    when(flag.getLocalOrCopy()());
   }
 }
