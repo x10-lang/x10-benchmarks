@@ -415,9 +415,10 @@ final class ResilientUTS implements Unserializable {
     }
     
     val maxPlaces = Place.places().size();
-
+    val useHazelcast = "Hazelcast".equalsIgnoreCase(java.lang.System.getProperty("X10RT_DATASTORE", "none"));
     Console.OUT.println("Depth: " + opt.depth + ", Warmup: " + opt.warmupDepth + ", Places: " + maxPlaces
-        + ", Workers/place: " + (1n << opt.power) + ", resilient mode: " + Runtime.RESILIENT_MODE);
+        + ", Workers/place: " + (1n << opt.power) + ", resilient mode: " + Runtime.RESILIENT_MODE
+        + ", hazelcast: " + useHazelcast);
 
     val resilient = Runtime.RESILIENT_MODE != 0n;
     val missing = (1n << opt.power) + 1n - Runtime.NTHREADS;
@@ -461,6 +462,7 @@ final class ResilientUTS implements Unserializable {
 
     Console.OUT.println("Depth: " + opt.depth + ", Places: " + maxPlaces
         + ", Workers/place: " + (1n << opt.power) + ", resilient mode: " + Runtime.RESILIENT_MODE
+        + ", hazelcast: " + useHazelcast
         + ", Remaining places: " + Place.places().size()
         + ", Waves: " + wave + ", Performance: " + bags.get(0).count + "/"
         + Bag.sub("" + time / 1e9, 0n, 6n) + " = "
