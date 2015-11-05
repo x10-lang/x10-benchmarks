@@ -55,10 +55,87 @@ final class ResilientUTS implements Unserializable {
     workers = new Rail[Worker](1n << power);
   }
   
-  static def init(plh:PlaceLocalHandle[ResilientUTS], size:Int, ratio:Int) {
+  public static def setAndStartKiller(time0:Long, time:Long) {
+	  if(time > 0 && ! killer.isStarted()) {
+		  killer.setTime0(time0);
+		  setKillTime(time);
+		  startKiller();
+	  }
+  }
+  
+  public static def setKillTime(time:Long) {
+	  killer.setKillTime(time);
+  }
+  
+  public static def startKiller() {
+	  killer.startKiller();
+  }
+  
+  private static class Killer implements java.lang.Runnable {
+	  def this() {
+		  this.started = false;
+	  }
+	  
+	  public def setTime0(time0:Long) {
+		  this.time0 = time0;
+	  }
+	  
+	  public def startKiller() {
+		  if(killDelay > 0) {
+			  this.started = true;
+			  val t = new java.lang.Thread(this, "Suicide (delayed) thread");
+			  t.setDaemon(true);
+			  t.start();
+			  // we can lose the to reference, since there is no
+			  // way to cancel suicide :-
+		  }
+	  }
+	  
+	  def setKillTime(newTime:Long) {
+		  this.killDelay = newTime;
+	  }
+	  
+	  public def isStarted() {
+		  return started;
+	  }
+	  
+	  private var killDelay : Long;
+	  private var started : Boolean;
+	  private var time0 : Long;
+	  
+	  public def run():void {
+		  if(killDelay <= 0) {
+			  return;
+		  }
+		  val startTime = java.lang.System.nanoTime();
+
+		  val endTime = startTime + killDelay;
+		  var curTime : Long;
+		  
+		  while ((curTime = java.lang.System.nanoTime()) < endTime) {
+			  val timeLeftNs = endTime - curTime;
+			  val timeLeftMspart = timeLeftNs / 1000;
+			  val timeLeftNspart = timeLeftNs % 1000;
+			  try {
+				  java.lang.Thread.sleep(timeLeftMspart, timeLeftNspart as Int);
+			  } catch (iex:java.lang.InterruptedException) {}
+		  }
+		  // time ran out.  time to commit suicide
+		  // NB: do not use -1, since this will be
+		  // interpreted by the X10Launcher as ssh failing to start the process
+		  println(time0, "Suicide at " + here);
+		  java.lang.System.exit(1n);
+	  }
+  };
+  
+  private static killer:Killer = new Killer();
+  
+  
+  static def init(plh:PlaceLocalHandle[ResilientUTS], size:Int, ratio:Int, time0:Long, killTime:Long) {
     val me = plh();
     for (i in 0n..me.mask) me.workers(i) = me.new Worker(plh, i, size, ratio);
     System.registerPlaceRemovedHandler((p:Place) => { me.unblock(p); });
+    setAndStartKiller(time0, killTime);
   }
 
   def unblock(p:Place) {
@@ -234,7 +311,7 @@ final class ResilientUTS implements Unserializable {
     }
   }
   
-  static def step(bags:ArrayList[Bag], wave:Int, power:Int, resilient:Boolean, time0:Long) {
+  static def step(bags:ArrayList[Bag], wave:Int, power:Int, resilient:Boolean, time0:Long, killTimes:Rail[Long]) {
     val group = Place.places();
     val surplus = bags.size() - (group.size() << power);
     for (i in 0..(surplus-1n)) {
@@ -246,8 +323,20 @@ final class ResilientUTS implements Unserializable {
     val s = bags.size() as Int;
     val r = (group.size() as Int << power) / s;
     val plh = PlaceLocalHandle.make[ResilientUTS](group, () => new ResilientUTS(wave, group, power, resilient, time0));
-    if (wave >= 0) println(time0, "Wave " + wave + ": PLH init complete"); 
-    finish for (p in group) at (p) async init(plh, s, r);
+    if (wave >= 0) println(time0, "Wave " + wave + ": PLH init complete");
+    // WORKAROUND x10c codegen bug
+    // which otherwise hoists the Rail.value
+    // before the null check
+    val kts = killTimes as Any;
+    finish for (p in group) {
+    	    val kt:Long;
+    	    if(kts == null) {
+    	    	  kt = 0;
+    	    } else {
+    	    	  kt = (kts as Rail[Long])(p.id); 
+    	    }
+    		at (p) async init(plh, s, r, time0, kt);
+    }
     if (wave >= 0) println(time0, "Wave " + wave + ": Workers init complete"); 
     if (resilient) {
       for (i in 0n..(s-1n)) plh().map.set(i * r, bags.get(i));
@@ -322,23 +411,27 @@ final class ResilientUTS implements Unserializable {
 
   public static def main(args:Rail[String]) {
     val time0 = System.currentTimeMillis();
-
-    var depth:Int = 13n;
+    
+    var opt:Options = null;
     try {
-      depth = Int.parse(args(0));
-    } catch (Exception) {}
-    var power:Int = 1n;
-    try {
-      power = Int.parse(args(1));
-    } catch (Exception) {}
+    	  opt = new Options(args);
+    } catch(ex:IllegalArgumentException) {
+    	  val msg = ex.getMessage();
+    	  if(! msg.equals("help")) {
+    	  	Console.ERR.println(ex.getMessage());
+    	  	System.setExitCode(-1n);
+    	  }
+    	  Options.printUsage();
+    	  return;
+    }
     
     val maxPlaces = Place.places().size();
 
-    Console.OUT.println("Depth: " + depth + ", Places: " + maxPlaces
-        + ", Workers/place: " + (1n << power) + ", resilient mode: " + Runtime.RESILIENT_MODE);
+    Console.OUT.println("Depth: " + opt.depth + ", Warmup: " + opt.warmupDepth + ", Places: " + maxPlaces
+        + ", Workers/place: " + (1n << opt.power) + ", resilient mode: " + Runtime.RESILIENT_MODE);
 
     val resilient = Runtime.RESILIENT_MODE != 0n;
-    val missing = (1n << power) + 1n - Runtime.NTHREADS;
+    val missing = (1n << opt.power) + 1n - Runtime.NTHREADS;
     if (missing > 0) {
       finish for (p in Place.places()) at (p) async {
         for (i in 1..missing) Runtime.increaseParallelism();
@@ -350,14 +443,14 @@ final class ResilientUTS implements Unserializable {
     println(time0, "Warmup...");
 
     val tmp = new Bag(64n);
-    tmp.seed(md, 19n, depth - 2n);
-    finish step(explode(tmp), -1n, power, resilient, time0);
+    tmp.seed(md, 19n, opt.warmupDepth);
+    finish step(explode(tmp), -1n, opt.power, resilient, time0, null);
 
     println(time0, "Begin");
     val startTime = System.nanoTime();
 
     val bag = new Bag(64n);
-    bag.seed(md, 19n, depth);
+    bag.seed(md, 19n, opt.depth);
     var bags:ArrayList[Bag] = explode(bag);
 
     var wave:Int = 0n;
@@ -365,7 +458,7 @@ final class ResilientUTS implements Unserializable {
       val w = wave++;
       println(time0, "Wave " + w + ": Starting");
       try {
-        finish bags = ResilientUTS.step(bags, w, power, resilient, time0);
+        finish bags = ResilientUTS.step(bags, w, opt.power, resilient, time0, opt.killTimes);
       } catch (e:MultipleExceptions) {
 //        e.printStackTrace();
       }
@@ -377,11 +470,194 @@ final class ResilientUTS implements Unserializable {
 
     val time = stopTime - startTime;
 
-    Console.OUT.println("Depth: " + depth + ", Places: " + maxPlaces
-        + ", Workers/place: " + (1n << power) + ", resilient mode: " + Runtime.RESILIENT_MODE
+    Console.OUT.println("Depth: " + opt.depth + ", Places: " + maxPlaces
+        + ", Workers/place: " + (1n << opt.power) + ", resilient mode: " + Runtime.RESILIENT_MODE
         + ", Remaining places: " + Place.places().size()
         + ", Waves: " + wave + ", Performance: " + bags.get(0).count + "/"
         + Bag.sub("" + time / 1e9, 0n, 6n) + " = "
         + Bag.sub("" + (bags.get(0).count / (time / 1e3)), 0n, 6n) + "M nodes/s");
+  }
+  
+  static class Options {
+
+	  val depth:Int;
+	  val warmupDepth:Int;
+	  val power:Int;
+	  val killTimes:Rail[Long];
+	  
+	  def this(args:Rail[String]) {
+		  var specifiedDepth:Int = 13n;
+		  var specifiedWarmupDepth:Int = -2n;
+		  var specifiedWorkers:Int = 1n;
+		  // for each place, stores a time to suicide
+		  // 0 means that it will not suicide
+		  this.killTimes = new Rail[Long](Place.numAllPlaces());
+		  
+		  for(var curArg:Long = 0; curArg < args.size; curArg++) {
+			  val arg = args(curArg);
+			  
+			  if(arg.equalsIgnoreCase("-help") || arg.equalsIgnoreCase("-usage")) {
+				  throw new IllegalArgumentException("help");
+			  } else if(arg.equalsIgnoreCase("-workers") || arg.equalsIgnoreCase("-w")) {
+				  curArg++;
+				  if(curArg >= args.size) {
+					  throw new IllegalArgumentException("Illegal " + arg + " argument with no corresponding number");
+				  }
+				  val arg2 = args(curArg);
+				  try {
+					  specifiedWorkers = Int.parseInt(arg2);
+				  } catch(e:Exception) {
+					  throw new IllegalArgumentException("workers argument is not parseable as an integer " + arg2);
+				  }
+			  } else if(arg.equalsIgnoreCase("-depth") || arg.equalsIgnoreCase("-d")) {
+				  curArg++;
+				  if(curArg >= args.size) {
+					  throw new IllegalArgumentException("Illegal " + arg + " argument with no corresponding depth");
+				  }
+				  val arg2 = args(curArg);
+				  try {
+					  specifiedDepth = Int.parseInt(arg2);
+				  } catch(e:Exception) {
+					  throw new IllegalArgumentException("depth argument is not parseable as an integer " + arg2);
+				  }
+			  } else if(arg.equalsIgnoreCase("-warmupDepth") || arg.equalsIgnoreCase("-warmup") || arg.equalsIgnoreCase("-wd")) {
+				  curArg++;
+				  if(curArg >= args.size) {
+					  throw new IllegalArgumentException("Illegal " + arg + " argument with no corresponding depth");
+				  }
+				  val arg2 = args(curArg);
+				  try {
+					  specifiedWarmupDepth = Int.parseInt(arg2);
+				  } catch(e:Exception) {
+					  throw new IllegalArgumentException("warmupDepth argument is not parseable as an integer " + arg2);
+				  }
+			  } else if(arg.equalsIgnoreCase("-kill") || arg.equalsIgnoreCase("-killAfter") || arg.equalsIgnoreCase("-k")) {
+				  curArg++;
+				  if(curArg >= args.size) {
+					  throw new IllegalArgumentException("Illegal " + arg + " argument with no corresponding place:timespan argument");
+				  }
+				  val arg2 = args(curArg);
+				  val sp = arg2.split(":");
+				  if(sp.size != 2) {
+					  throw new IllegalArgumentException("Malformed " + arg + " argument: '" + arg2 + "' does not have exactly one colon");
+				  }
+
+				  val timeString : String = sp(1);
+				  var timeToKill : Long;
+				  try {
+					  timeToKill = getTime(timeString);
+				  } catch(e:Exception) {
+					  throw new IllegalArgumentException("Malformed " + arg + " argument.  The second part of '" + arg2 + "' is not parseable as a long.  Note that only ns, ms, s, and m, and h are allowed as suffixes");
+				  }
+				  
+				  // allow comma separated list of places which can have ranges
+				  val toKillRangeList = sp(0).split(",");
+				  for(toKillRange in toKillRangeList) {
+					  val range = toKillRange.split("-");
+					  if(range.size == 0) {
+						  // allow and ignore stray commas
+						  continue;
+					  } else if(range.size > 2) {
+						  throw new IllegalArgumentException("Malformed " + arg + " argument.  The first part of '" 
+								  + arg2 + "' has an invalid range specification: '" 
+								  + toKillRange + "' (too many - symbols)");
+					  }
+
+					  var firstPlaceToKill : Long = -1L;
+					  var lastPlaceToKill : Long = -1L;
+
+					  try {
+						  firstPlaceToKill = Long.parseLong(range(0));
+					  } catch(e:Exception) {
+						  throw new IllegalArgumentException("Malformed " + arg + " argument.  The first part of '" + arg2 + "' has a place specifier '" +range(0) + "'that is not parseable as a place list");
+					  }
+					  
+					  if(range.size == 2) {
+						  try {
+							  lastPlaceToKill = Long.parseLong(range(1));
+						  } catch(e:Exception) {
+							  throw new IllegalArgumentException("Malformed " + arg + " argument.  The first part of '" + arg2 + "' has a place specifier '" +range(1) + "'that is not parseable as a place list");
+						  }
+					  } else {
+						  lastPlaceToKill=firstPlaceToKill;
+					  }
+					  if(firstPlaceToKill < 0 || firstPlaceToKill > lastPlaceToKill) {
+						  throw new IllegalArgumentException("Malformed " + arg + " argument.  The first part of '" + arg2 + "' has a range specifier '" + toKillRange + "' that is not a valid range.");
+					  }
+					  
+					  if(firstPlaceToKill == 0) {
+						  throw new IllegalArgumentException("The " + arg + " argument.  Requested that place 0 die (as part of) '" + arg2 + "', specifically '" +  toKillRange + "'.  We don't currently support killing place 0");
+					  }
+
+					  // allow and ignore places that are too large
+					  val cappedLastPlaceToKill = Math.min(lastPlaceToKill, Place.numAllPlaces()-1);
+					  for(pl in firstPlaceToKill..cappedLastPlaceToKill) {
+						  killTimes(pl) = timeToKill;
+					  }
+					  
+				  }
+			  } else {
+				  try {
+					  specifiedDepth = Int.parseInt(arg);
+				  } catch(e:Exception) {
+					  throw new IllegalArgumentException("Unknown argument " + arg);
+				  }
+			  }
+		  }
+		  
+		  if(specifiedDepth <= 0) {
+			  throw new IllegalArgumentException("depth argument must be greater than zero, not " + specifiedDepth);
+		  }
+
+		  if(specifiedWorkers < 0) {
+			  throw new IllegalArgumentException("workers argument must be less than zero, not " + specifiedWorkers);
+		  }
+		  
+		  this.depth = specifiedDepth;
+		  this.warmupDepth = specifiedWarmupDepth < 0n ? specifiedDepth + specifiedWarmupDepth : specifiedWarmupDepth;
+		  this.power = specifiedWorkers;
+	  }
+	  
+	  /**
+	   * parses a string and returns the corresponding timespan in nanoseconds
+	   */
+	  public static def getTime(var timeString:String):Long {
+		  val units : Long;
+
+		  if(timeString.endsWith("ns")) {
+			  timeString = timeString.substring(0n,(timeString.length()-2n) as Int);
+			  units = 1;
+		  } else if(timeString.endsWith("ms")) {
+			  timeString = timeString.substring(0n,(timeString.length()-2n) as Int);
+			  units = 1000;
+		  } else if(timeString.endsWith("s")) {
+			  timeString = timeString.substring(0n,(timeString.length()-1n) as Int);
+			  units = 1000*1000;
+		  } else if(timeString.endsWith("m")) {
+			  timeString = timeString.substring(0n,(timeString.length()-1n) as Int);
+			  units = 1000*1000*60;
+		  } else if(timeString.endsWith("h")) {
+			  timeString = timeString.substring(0n,(timeString.length()-1n) as Int);
+			  units = 1000*1000*60*60;
+		  } else {
+			  units = 1;
+		  }
+		  return Long.parseLong(timeString) * units;
+	  }
+	  
+	  static def printUsage() {
+		  Console.ERR.println("invoked as ResilientUTS ARGS where ARGS can be from");
+		  Console.ERR.println("-help\t\tPrint this usage message and quit");
+		  
+		  Console.ERR.println("-workers <INT>\t\tSet the base-2 log of the number of workers used (per-place).");
+		  Console.ERR.println("-depth <INT>\t\tSet the depth to be used");
+		  Console.ERR.println("-d <INT>\t\tSet the depth to be used");
+		  Console.ERR.println("<INT>\t\tSet the depth to be used");
+		  Console.ERR.println("-warmupDepth <INT>\t\tSet the depth to be used for warmup.  Negative value is relative to depth.  0 omits the warmup. The default is -2");
+	
+		  Console.ERR.println("-kill <place>:<timespan>\t\tTells the place to kill itself after the allotted timespan (after any warmup)");
+		  Console.ERR.println("\t\t <timespan> can be specified, using an optional suffix, in nanoseconds (ns, default), milliseconds (ms), seconds(s), minutes(m), or hours(h)");
+		  
+	  }
   }
 }
