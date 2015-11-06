@@ -164,7 +164,7 @@ final class ResilientUTS implements Unserializable {
     var thread:java.lang.Thread;
     var failed:Long;
     val stack = new CheckedThrowable();
-    val cell = GlobalRef[Cell[Boolean]](new Cell[Boolean](false));
+    val cell = GlobalRef[Cell[Int]](new Cell[Int](0n));
     
     def this(plh:PlaceLocalHandle[ResilientUTS], id:Int, size:Int, ratio:Int) {
       this.plh = plh;
@@ -275,6 +275,7 @@ final class ResilientUTS implements Unserializable {
       failed = println(time0, "Unblocking " + me);
       @x10.compiler.Native("java", "if (stack != null && thread != null) stack.setStackTrace(thread.getStackTrace());") {}
       state = -3n;
+      cell.getLocalOrCopy()() = -1n;
 //    notifyAll();
     }
 
@@ -312,7 +313,7 @@ final class ResilientUTS implements Unserializable {
   static def step(bags:ArrayList[Bag], wave:Int, power:Int, resilient:Boolean, time0:Long, killTimes:Rail[Long]) {
     val group = Place.places();
     val surplus = bags.size() - (group.size() << power);
-    println(time0, "Surplus " + surplus);
+    if (wave >= 0) println(time0, "Wave " + wave + ": " + bags.size() + " bags");
     for (i in 0..(surplus-1n)) {
       val b = bags.removeLast();
       val id = i * (group.size() << power) / surplus;
@@ -321,8 +322,6 @@ final class ResilientUTS implements Unserializable {
     }
     val s = bags.size() as Int;
     val r = (group.size() as Int << power) / s;
-    println(time0, "s " + s);
-    println(time0, "r " + r);
     val map = resilient ? Store.make("map" + wave): null;
     val plh = PlaceLocalHandle.make[ResilientUTS](group, () => new ResilientUTS(wave, group, power, resilient, time0, map));
     if (wave >= 0) println(time0, "Wave " + wave + ": PLH init complete");
@@ -347,16 +346,15 @@ final class ResilientUTS implements Unserializable {
     var failed:Boolean = false;
     try {
       finish {
-        for (i in 1n..(s-1n)) {
+        for (i in 0n..(s-1n)) {
           val bag = bags.get(i);
           val id = (i * r) & plh().mask;
+          // at ensures the orig bags are left intact in case we have to retry
           at (group((i * r) >> power)) async {
             plh().workers(id).bag.count = bag.count;
             plh().workers(id).lifelinedeal(bag);
           }
         }
-        plh().workers(0).bag.count = bags.get(0).count;
-        plh().workers(0).lifelinedeal(bags.get(0));
       }
     } catch (e:MultipleExceptions) {
       failed = true;
@@ -373,6 +371,7 @@ final class ResilientUTS implements Unserializable {
           bag.count += b.count;
         }
       }
+      // only clear after processing the values
       map.clear();
     } else {
       val ref = new GlobalRef(bag);
@@ -427,10 +426,10 @@ final class ResilientUTS implements Unserializable {
     }
     
     val maxPlaces = Place.places().size();
-    val useHazelcast = "Hazelcast".equalsIgnoreCase(java.lang.System.getProperty("X10RT_DATASTORE", "none"));
+    val store = java.lang.System.getProperty("X10RT_DATASTORE", "counted");
     Console.OUT.println("Depth: " + opt.depth + ", Warmup: " + opt.warmupDepth + ", Places: " + maxPlaces
         + ", Workers/P: " + (1n << opt.power) + ", Res mode: " + Runtime.RESILIENT_MODE
-        + ", HC: " + useHazelcast);
+        + ", Store: " + store);
 
     val resilient = Runtime.RESILIENT_MODE != 0n;
     val missing = (1n << opt.power) + 1n - Runtime.NTHREADS;
@@ -475,7 +474,7 @@ final class ResilientUTS implements Unserializable {
 
     Console.OUT.println("Depth: " + opt.depth + ", Places: " + maxPlaces
         + ", Workers/P: " + (1n << opt.power) + ", Res mode: " + Runtime.RESILIENT_MODE
-        + ", HC: " + useHazelcast
+        + ", Store: " + store
         + ", Places left: " + Place.places().size()
         + ", Waves: " + wave + ", Perf: " + bags.get(0).count + "/"
         + Bag.sub("" + time / 1e9, 0n, 6n) + " = "
