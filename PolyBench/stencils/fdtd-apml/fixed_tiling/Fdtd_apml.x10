@@ -108,20 +108,20 @@ public class Fdtd_apml {
         if (((cym >= 1) && (cz >= 1))) {
             if ((cxm >= 1)) {
                 {
-                    Foreach.block(0,((cz + -1) * 32 < 0 ? (32 < 0 ?  -(( -((cz + -1)) + 32 + 1) / 32) :  -(( -((cz + -1)) + 32 - 1) / 32)) : (cz + -1) / 32),(var c1 : long) => {
+                    Foreach.block(0,((cz + -1) * 256 < 0 ? (256 < 0 ?  -(( -((cz + -1)) + 256 + 1) / 256) :  -(( -((cz + -1)) + 256 - 1) / 256)) : (cz + -1) / 256),(var c1 : long) => {
                         var c2 : long;
                         var c3 : long;
                         var c4 : long;
                         var c5 : long;
                         var c6 : long;
-                        for (c2 = 0; (c2 <= ((cym + -1) * 32 < 0 ? (32 < 0 ?  -(( -((cym + -1)) + 32 + 1) / 32) :  -(( -((cym + -1)) + 32 - 1) / 32)) : (cym + -1) / 32)); c2++) {
-                            for (c3 = 0; (c3 <= ((cxm + -1) * 32 < 0 ? (32 < 0 ?  -(( -((cxm + -1)) + 32 + 1) / 32) :  -(( -((cxm + -1)) + 32 - 1) / 32)) : (cxm + -1) / 32)); c3++) {
-                                for (c4 = (32 * c3); (c4 <= (((32 * c3) + 31) < (cxm + -1) ? (((32 * c3) + 31)) as long : ((cxm + -1)) as long)); c4++) {
-                                    for (c5 = (32 * c2); (c5 <= (((32 * c2) + 31) < (cym + -1) ? (((32 * c2) + 31)) as long : ((cym + -1)) as long)); c5++) {
+                        for (c2 = 0; (c2 <= ((cym + -1) * 256 < 0 ? (256 < 0 ?  -(( -((cym + -1)) + 256 + 1) / 256) :  -(( -((cym + -1)) + 256 - 1) / 256)) : (cym + -1) / 256)); c2++) {
+                            for (c3 = 0; (c3 <= ((cxm + -1) * 256 < 0 ? (256 < 0 ?  -(( -((cxm + -1)) + 256 + 1) / 256) :  -(( -((cxm + -1)) + 256 - 1) / 256)) : (cxm + -1) / 256)); c3++) {
+                                for (c4 = (256 * c3); (c4 <= (((256 * c3) + 32) < (cxm + -1) ? (((256 * c3) + 32)) as long : ((cxm + -1)) as long)); c4++) {
+                                    for (c5 = (256 * c2); (c5 <= (((256 * c2) + 32) < (cym + -1) ? (((256 * c2) + 32)) as long : ((cym + -1)) as long)); c5++) {
 @x10.compiler.Native("c++", "#pragma ivdep"){}
 @x10.compiler.Native("c++", "#pragma vector always"){}
 @x10.compiler.Native("c++", "#pragma simd"){}
-                                        for (c6 = (32 * c1); (c6 <= (((32 * c1) + 31) < (cz + -1) ? (((32 * c1) + 31)) as long : ((cz + -1)) as long)); c6++) {
+                                        for (c6 = (256 * c1); (c6 <= (((256 * c1) + 32) < (cz + -1) ? (((256 * c1) + 32)) as long : ((cz + -1)) as long)); c6++) {
                                             clf(c6,c5) = Ex(c6,c5,c4) - Ex(c6,c5 + 1L,c4) + Ey(c6,c5,c4 + 1L) - Ey(c6,c5,c4);
                                             tmp(c6,c5) = (cymh(c5) / cyph(c5)) * Bza(c6,c5,c4) - (ch / cyph(c5)) * clf(c6,c5);
                                             Hz(c6,c5,c4) = (cxmh(c4) / cxph(c4)) * Hz(c6,c5,c4) + (mui * czp(c6) / cxph(c4)) * tmp(c6,c5) - (mui * czm(c6) / cxph(c4)) * Bza(c6,c5,c4);
@@ -136,18 +136,18 @@ public class Fdtd_apml {
                 }
             }
             {
-                Foreach.block(0,((cz + -1) * 32 < 0 ? (32 < 0 ?  -(( -((cz + -1)) + 32 + 1) / 32) :  -(( -((cz + -1)) + 32 - 1) / 32)) : (cz + -1) / 32),(var c1 : long) => {
+                Foreach.block(0,((cz + -1) * 256 < 0 ? (256 < 0 ?  -(( -((cz + -1)) + 256 + 1) / 256) :  -(( -((cz + -1)) + 256 - 1) / 256)) : (cz + -1) / 256),(var c1 : long) => {
                     var c2 : long;
                     var c3 : long;
                     var c4 : long;
                     var c5 : long;
                     var c6 : long;
-                    for (c2 = 0; (c2 <= ((cym + -1) * 32 < 0 ? (32 < 0 ?  -(( -((cym + -1)) + 32 + 1) / 32) :  -(( -((cym + -1)) + 32 - 1) / 32)) : (cym + -1) / 32)); c2++) {
-                        for (c5 = (32 * c2); (c5 <= (((32 * c2) + 31) < (cym + -1) ? (((32 * c2) + 31)) as long : ((cym + -1)) as long)); c5++) {
+                    for (c2 = 0; (c2 <= ((cym + -1) * 256 < 0 ? (256 < 0 ?  -(( -((cym + -1)) + 256 + 1) / 256) :  -(( -((cym + -1)) + 256 - 1) / 256)) : (cym + -1) / 256)); c2++) {
+                        for (c5 = (256 * c2); (c5 <= (((256 * c2) + 32) < (cym + -1) ? (((256 * c2) + 32)) as long : ((cym + -1)) as long)); c5++) {
 @x10.compiler.Native("c++", "#pragma ivdep"){}
 @x10.compiler.Native("c++", "#pragma vector always"){}
 @x10.compiler.Native("c++", "#pragma simd"){}
-                            for (c6 = (32 * c1); (c6 <= (((32 * c1) + 31) < (cz + -1) ? (((32 * c1) + 31)) as long : ((cz + -1)) as long)); c6++) {
+                            for (c6 = (256 * c1); (c6 <= (((256 * c1) + 32) < (cz + -1) ? (((256 * c1) + 32)) as long : ((cz + -1)) as long)); c6++) {
                                 clf(c6,c5) = Ex(c6,c5,cxm) - Ex(c6,c5 + 1L,cxm) + Ry(c6,c5) - Ey(c6,c5,cxm);
                                 tmp(c6,c5) = (cymh(c5) / cyph(c5)) * Bza(c6,c5,cxm) - (ch / cyph(c5)) * clf(c6,c5);
                                 Hz(c6,c5,cxm) = (cxmh(cxm) / cxph(cxm)) * Hz(c6,c5,cxm) + (mui * czp(c6) / cxph(cxm)) * tmp(c6,c5) - (mui * czm(c6) / cxph(cxm)) * Bza(c6,c5,cxm);
@@ -160,20 +160,20 @@ public class Fdtd_apml {
             }
             if ((cxm >= 1)) {
                 {
-                    Foreach.block(0,((cz + -1) * 32 < 0 ? (32 < 0 ?  -(( -((cz + -1)) + 32 + 1) / 32) :  -(( -((cz + -1)) + 32 - 1) / 32)) : (cz + -1) / 32),(var c1 : long) => {
+                    Foreach.block(0,((cz + -1) * 256 < 0 ? (256 < 0 ?  -(( -((cz + -1)) + 256 + 1) / 256) :  -(( -((cz + -1)) + 256 - 1) / 256)) : (cz + -1) / 256),(var c1 : long) => {
                         var c2 : long;
                         var c3 : long;
                         var c4 : long;
                         var c5 : long;
                         var c6 : long;
-                        for (c2 = 0; (c2 <= ((cym + -1) * 32 < 0 ? (32 < 0 ?  -(( -((cym + -1)) + 32 + 1) / 32) :  -(( -((cym + -1)) + 32 - 1) / 32)) : (cym + -1) / 32)); c2++) {
-                            for (c3 = 0; (c3 <= ((cxm + -1) * 32 < 0 ? (32 < 0 ?  -(( -((cxm + -1)) + 32 + 1) / 32) :  -(( -((cxm + -1)) + 32 - 1) / 32)) : (cxm + -1) / 32)); c3++) {
-                                for (c4 = (32 * c3); (c4 <= (((32 * c3) + 31) < (cxm + -1) ? (((32 * c3) + 31)) as long : ((cxm + -1)) as long)); c4++) {
-                                    for (c5 = (32 * c2); (c5 <= (((32 * c2) + 31) < (cym + -1) ? (((32 * c2) + 31)) as long : ((cym + -1)) as long)); c5++) {
+                        for (c2 = 0; (c2 <= ((cym + -1) * 256 < 0 ? (256 < 0 ?  -(( -((cym + -1)) + 256 + 1) / 256) :  -(( -((cym + -1)) + 256 - 1) / 256)) : (cym + -1) / 256)); c2++) {
+                            for (c3 = 0; (c3 <= ((cxm + -1) * 256 < 0 ? (256 < 0 ?  -(( -((cxm + -1)) + 256 + 1) / 256) :  -(( -((cxm + -1)) + 256 - 1) / 256)) : (cxm + -1) / 256)); c3++) {
+                                for (c4 = (256 * c3); (c4 <= (((256 * c3) + 32) < (cxm + -1) ? (((256 * c3) + 32)) as long : ((cxm + -1)) as long)); c4++) {
+                                    for (c5 = (256 * c2); (c5 <= (((256 * c2) + 32) < (cym + -1) ? (((256 * c2) + 32)) as long : ((cym + -1)) as long)); c5++) {
 @x10.compiler.Native("c++", "#pragma ivdep"){}
 @x10.compiler.Native("c++", "#pragma vector always"){}
 @x10.compiler.Native("c++", "#pragma simd"){}
-                                        for (c6 = (32 * c1); (c6 <= (((32 * c1) + 31) < (cz + -1) ? (((32 * c1) + 31)) as long : ((cz + -1)) as long)); c6++) {
+                                        for (c6 = (256 * c1); (c6 <= (((256 * c1) + 32) < (cz + -1) ? (((256 * c1) + 32)) as long : ((cz + -1)) as long)); c6++) {
                                             clf(c6,c5) = Ex(c6,cym,c4) - Ax(c6,c4) + Ey(c6,cym,c4 + 1L) - Ey(c6,cym,c4);
                                             tmp(c6,c5) = (cymh(cym) / cyph(c5)) * Bza(c6,c5,c4) - (ch / cyph(c5)) * clf(c6,c5);
                                             Hz(c6,cym,c4) = (cxmh(c4) / cxph(c4)) * Hz(c6,cym,c4) + (mui * czp(c6) / cxph(c4)) * tmp(c6,c5) - (mui * czm(c6) / cxph(c4)) * Bza(c6,cym,c4);
@@ -188,18 +188,18 @@ public class Fdtd_apml {
                 }
             }
             {
-                Foreach.block(0,((cz + -1) * 32 < 0 ? (32 < 0 ?  -(( -((cz + -1)) + 32 + 1) / 32) :  -(( -((cz + -1)) + 32 - 1) / 32)) : (cz + -1) / 32),(var c1 : long) => {
+                Foreach.block(0,((cz + -1) * 256 < 0 ? (256 < 0 ?  -(( -((cz + -1)) + 256 + 1) / 256) :  -(( -((cz + -1)) + 256 - 1) / 256)) : (cz + -1) / 256),(var c1 : long) => {
                     var c2 : long;
                     var c3 : long;
                     var c4 : long;
                     var c5 : long;
                     var c6 : long;
-                    for (c2 = 0; (c2 <= ((cym + -1) * 32 < 0 ? (32 < 0 ?  -(( -((cym + -1)) + 32 + 1) / 32) :  -(( -((cym + -1)) + 32 - 1) / 32)) : (cym + -1) / 32)); c2++) {
-                        for (c5 = (32 * c2); (c5 <= (((32 * c2) + 31) < (cym + -1) ? (((32 * c2) + 31)) as long : ((cym + -1)) as long)); c5++) {
+                    for (c2 = 0; (c2 <= ((cym + -1) * 256 < 0 ? (256 < 0 ?  -(( -((cym + -1)) + 256 + 1) / 256) :  -(( -((cym + -1)) + 256 - 1) / 256)) : (cym + -1) / 256)); c2++) {
+                        for (c5 = (256 * c2); (c5 <= (((256 * c2) + 32) < (cym + -1) ? (((256 * c2) + 32)) as long : ((cym + -1)) as long)); c5++) {
 @x10.compiler.Native("c++", "#pragma ivdep"){}
 @x10.compiler.Native("c++", "#pragma vector always"){}
 @x10.compiler.Native("c++", "#pragma simd"){}
-                            for (c6 = (32 * c1); (c6 <= (((32 * c1) + 31) < (cz + -1) ? (((32 * c1) + 31)) as long : ((cz + -1)) as long)); c6++) {
+                            for (c6 = (256 * c1); (c6 <= (((256 * c1) + 32) < (cz + -1) ? (((256 * c1) + 32)) as long : ((cz + -1)) as long)); c6++) {
                                 clf(c6,c5) = Ex(c6,cym,cxm) - Ax(c6,cxm) + Ry(c6,cym) - Ey(c6,cym,cxm);
                                 tmp(c6,c5) = (cymh(cym) / cyph(cym)) * Bza(c6,cym,cxm) - (ch / cyph(cym)) * clf(c6,c5);
                                 Hz(c6,cym,cxm) = (cxmh(cxm) / cxph(cxm)) * Hz(c6,cym,cxm) + (mui * czp(c6) / cxph(cxm)) * tmp(c6,c5) - (mui * czm(c6) / cxph(cxm)) * Bza(c6,cym,cxm);
