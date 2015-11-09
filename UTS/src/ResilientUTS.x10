@@ -193,7 +193,7 @@ final class ResilientUTS implements Unserializable {
             for (var n:Int = 500n; (n > 0n) && (bag.size > 0n); --n) {
               bag.expand(md);
             }
-            atomic { abort(); }
+            atomic if (state == -3n) break;
             distribute();
           }
           if (resilient) {
@@ -209,7 +209,7 @@ final class ResilientUTS implements Unserializable {
         lifelinesteal();
       } catch (DigestException) {
       } finally {
-        if (state == -3n) atomic {
+        atomic if (state == -3n) {
           val now = println(time0, "Aborting worker " + me); 
           if(now - failed > 1000) stack.printStackTrace();
         }

@@ -37,8 +37,7 @@ final class UncountedStore extends Store {
   def setRemote(key:Int, value:Bag, flag:GlobalRef[Cell[Int]]) {
     val f = flag.getLocalOrCopy();
     atomic {
-      if (f() == -1n) throw new DeadPlaceException(here);
-      f() = 1n;
+      if (f() != -1n) f() = 1n;
     }
     at (map) @Uncounted async {
       lock().lock();
