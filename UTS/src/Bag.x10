@@ -175,7 +175,7 @@ final class Bag {
     upper = u;
   }
 
-  static sub(str:String, start:Int, end:Int):String {
+  static def sub(str:String, start:Int, end:Int):String {
     return str.substring(start, Math.min(end, str.length()));
   }
 
