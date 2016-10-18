@@ -18,27 +18,27 @@ import x10.util.ArrayList;
 final class HazelcastStore[V]{V haszero} extends Store[V] {
   static final class LogEntry[V] {
     val value:V;
-    val key2:Int;
+    val key2:Long;
     val value2:V;
 
-    def this(value:V, key2:Int, value2:V) {
+    def this(value:V, key2:Long, value2:V) {
       this.value = value;
       this.key2 = key2;
       this.value2 = value2;
     }
   }
 
-  val map:ResilientMap[Int,V];
-  val log:ResilientMap[Int,LogEntry[V]];
+  val map:ResilientMap[Long,V];
+  val log:ResilientMap[Long,LogEntry[V]];
   var group:PlaceGroup;
 
   def this(name:String, group:PlaceGroup) {
-    map = ResilientMap.getMap[Int,V]("_map_"+ name);
-    log = ResilientMap.getMap[Int,LogEntry[V]]("_log_" + name);
+    map = ResilientMap.getMap[Long,V]("_map_"+ name);
+    log = ResilientMap.getMap[Long,LogEntry[V]]("_log_" + name);
     this.group = group;
   }
 
-  private def k(place:Place, key:Int) = (group.indexOf(place) as Int << 16n) + key;
+  private def k(place:Place, key:Int) = (group.indexOf(place) << 32) + key;
 
   def get(key:Int) = getRemote(here, key);
 
