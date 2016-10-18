@@ -18,9 +18,11 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 import x10.compiler.Uncounted;
 import x10.interop.Java;
 import x10.io.Unserializable;
-import x10.util.concurrent.AtomicBoolean;
+import x10.util.concurrent.AtomicLong;
+import x10.util.concurrent.Lock;
 import x10.util.resilient.ResilientMap;
 import x10.util.resilient.ResilientTransactionalMap;
+import x10.util.resilient.iterative.PlaceGroupBuilder;
 import x10.util.ArrayList;
 import x10.util.Collection;
 import x10.util.Map.Entry;
@@ -28,7 +30,7 @@ import x10.xrx.Runtime;
 
 final class ResilientUTS implements Unserializable {
   val time0:Long;
-  val map:Store;
+  val map:Store[Bag];
   val wave:Int;
   val group:PlaceGroup;
   val workers:Rail[Worker];
@@ -46,7 +48,7 @@ final class ResilientUTS implements Unserializable {
     return time;
   }
 
-  def this(wave:Int, group:PlaceGroup, power:Int, resilient:Boolean, time0:Long, map:Store) {
+  def this(wave:Int, group:PlaceGroup, power:Int, resilient:Boolean, time0:Long, map:Store[Bag]) {
     this.map = map;
     this.group = group;
     this.wave = wave;
@@ -133,9 +135,9 @@ final class ResilientUTS implements Unserializable {
   private static killer:Killer = new Killer();
   
   
-  static def init(plh:PlaceLocalHandle[ResilientUTS], size:Int, ratio:Int, time0:Long, killTime:Long) {
+  static def init(plh:PlaceLocalHandle[ResilientUTS], time0:Long, killTime:Long) {
     val me = plh();
-    for (i in 0n..me.mask) me.workers(i) = me.new Worker(plh, i, size, ratio);
+    for (i in 0n..me.mask) me.workers(i) = me.new Worker(plh, i);
     System.registerPlaceRemovedHandler((p:Place) => { me.unblock(p); });
     setAndStartKiller(time0, killTime);
   }
@@ -150,6 +152,16 @@ final class ResilientUTS implements Unserializable {
     for (i in 0n..mask) workers(i).unblock(p);
   }
 
+  private static class Request {
+    val thief:Int;
+    val count:Long;
+    
+    def this(thief:Int, count:Long) {
+      this.thief = thief;
+      this.count = count;
+    }
+  }
+
   final class Worker implements Unserializable {
     val plh:PlaceLocalHandle[ResilientUTS];
     val me:Int;
@@ -159,20 +171,20 @@ final class ResilientUTS implements Unserializable {
     val md = Bag.encoder();
     val bag = new Bag(64n);
     val thieves:ConcurrentLinkedQueue = new ConcurrentLinkedQueue();
-    val lifeline:AtomicBoolean;
+    val lifeline:AtomicLong;
     var state:Int;
     var thread:java.lang.Thread;
     var failed:Long;
     val stack = new CheckedThrowable();
-    val cell = GlobalRef[Cell[Int]](new Cell[Int](0n));
+    val lock = new Lock();
     
-    def this(plh:PlaceLocalHandle[ResilientUTS], id:Int, size:Int, ratio:Int) {
+    def this(plh:PlaceLocalHandle[ResilientUTS], id:Int) {
       this.plh = plh;
       me = (group.indexOf(here.id) as Int << power) + id;
       random = new Random(me);
       prev = (me + (group.size() as Int << power) - 1n) % (group.size() as Int << power);
       next = (me + 1n) % (group.size() as Int << power);
-      lifeline = new AtomicBoolean(((next % ratio) != 0n) || ((next / ratio) >= size));
+      lifeline = new AtomicLong(-1);
     }
 
     /* atomic */ def abort() {
@@ -181,37 +193,59 @@ final class ResilientUTS implements Unserializable {
       }
     }
 
+    def resume() {
+      if (resilient) {
+        val b = map.get(me);
+        if (b != null) {
+          if (b.size > 0n) bag.merge(b);
+          bag.count = b.count;
+        }
+      }
+      run();
+    }
+
     def run() {
       thread = java.lang.Thread.currentThread();
       try {
-        atomic {
+        try {
+          lock.lock();
           abort();
           state = -1n;
+        } finally {
+          lock.unlock();
         }
         while (bag.size > 0n) {
           while (bag.size > 0n) {
             for (var n:Int = 500n; (n > 0n) && (bag.size > 0n); --n) {
               bag.expand(md);
             }
-            atomic if (state == -3n) break;
+            try {
+              lock.lock();
+              if (state == -3n) break;
+            } finally {
+              lock.unlock();
+            }
             distribute();
           }
           if (resilient) {
-            map.setRemote(me, bag.trim(), cell);
+            map.set(me, bag.trim());
           }
           steal();
         }
-        atomic {
+        try {
+          lock.lock();
           abort();
           state = -2n;
+        } finally {
+          lock.unlock();
         }
         distribute();
         lifelinesteal();
       } catch (DigestException) {
       } finally {
-        atomic if (state == -3n) {
+        if (state == -3n) {
           val now = println(time0, "Aborting worker " + me); 
-          if(now - failed > 1000) stack.printStackTrace();
+          if(now - failed > 2500) stack.printStackTrace();
         }
       }
     }
@@ -222,7 +256,8 @@ final class ResilientUTS implements Unserializable {
       }
       val id = prev & mask;
       val plh = this.plh;
-      at (group(prev >> power)) @Uncounted async plh().workers(id).lifeline.set(true);
+      val count = bag.count;
+      at (group(prev >> power)) @Uncounted async plh().workers(id).lifeline.set(count);
     }
 
     def steal() {
@@ -234,23 +269,38 @@ final class ResilientUTS implements Unserializable {
       if (p >= me) {
         p++;
       }
-      atomic {
+      try {
+        lock.lock();
         abort();
         state = p;
+      } finally {
+        lock.unlock();
       }
       val id = p & mask;
       val plh = this.plh;
-      at (group(p >> power)) @Uncounted async plh().workers(id).request(me);
-      when(state < 0n);
+      val count = bag.count;
+      at (group(p >> power)) @Uncounted async plh().workers(id).request(me, count);
+      for (;;) {
+        try {
+          lock.lock();
+          if (state < 0n) return;
+        } finally {
+          lock.unlock();
+        }
+        java.util.concurrent.locks.LockSupport.park();
+      }
     }
 
-    def request(thief:Int) {
-      atomic {
+    def request(thief:Int, count:Long) {
+      try {
+        lock.lock();
         if (state == -3n) return;
         if (state == -1n) {
-          thieves.add(thief);
+          thieves.add(new Request(thief, count));
           return;
         }
+      } finally {
+        lock.unlock();
       }
       val id = thief & mask;
       val plh = this.plh;
@@ -262,46 +312,60 @@ final class ResilientUTS implements Unserializable {
       run();
     }
 
-    atomic def deal(loot:Bag) {
-      if (state == -3n) return;
-      if (loot != null) {
-        bag.merge(loot);
+    def deal(loot:Bag) {
+      try {
+        lock.lock();
+        if (state == -3n) return;
+        if (loot != null) {
+          bag.merge(loot);
+        }
+        state = -1n;
+        java.util.concurrent.locks.LockSupport.unpark(thread);
+//      notifyAll();
+      } finally {
+        lock.unlock();
       }
-      state = -1n;
-//    notifyAll();
     }
 
-    atomic def unblock(p:Place) {
+    def unblock(p:Place) {
       failed = println(time0, "Unblocking " + me);
       @x10.compiler.Native("java", "if (stack != null && thread != null) stack.setStackTrace(thread.getStackTrace());") {}
-      state = -3n;
-      cell.getLocalOrCopy()() = -1n;
-//    notifyAll();
+      try {
+        lock.lock();
+        state = -3n;
+        java.util.concurrent.locks.LockSupport.unpark(thread);
+//      notifyAll();
+      } finally {
+        lock.unlock();
+      }
     }
 
     def distribute() {
       if (group.size() == 1 && power == 0n) {
         return;
       }
-      var thief:Any;
-      while ((thief = thieves.poll()) != null) {
-        val t = thief as Int;
+      var thief:Request;
+      while ((thief = thieves.poll() as Request) != null) {
+        val t = thief.thief;
         val loot = bag.split();
         if (loot != null && resilient) {
-          map.transfer(me, bag.trim(), t, loot, cell);
+          loot.count = thief.count;
+          map.set2(me, bag.trim(), group(t >> power), t, loot);
         }
         val id = t & mask;
         val plh = this.plh;
         at (group(t >> power)) @Uncounted async plh().workers(id).deal(loot);
       }
-      if (bag.size > 0n && lifeline.get()) {
-        val loot = bag.split();
+      var lifelineCount:Long;
+      if (bag.size > 0n && ((lifelineCount = lifeline.get()) >= 0)) {
+        val loot = bag.split(); // TODO count
         if (loot != null) {
+          loot.count = lifelineCount;
           val t = next;
           if (resilient) {
-            map.transfer(me, bag.trim(), t, loot, cell);
+            map.set2(me, bag.trim(), group(t >> power), t, loot);
           }
-          lifeline.set(false);
+          lifeline.set(-1);
           val id = t & mask;
           val plh = this.plh;
           at (group(t >> power)) async plh().workers(id).lifelinedeal(loot);
@@ -310,19 +374,8 @@ final class ResilientUTS implements Unserializable {
     }
   }
   
-  static def step(bags:ArrayList[Bag], wave:Int, power:Int, resilient:Boolean, time0:Long, killTimes:Rail[Long]) {
-    val group = Place.places();
-    val surplus = bags.size() - (group.size() << power);
-    if (wave >= 0) println(time0, "Wave " + wave + ": " + bags.size() + " bags");
-    for (i in 0..(surplus-1n)) {
-      val b = bags.removeLast();
-      val id = i * (group.size() << power) / surplus;
-      bags.get(id).merge(b);
-      bags.get(id).count += b.count;
-    }
-    val s = bags.size() as Int;
-    val r = (group.size() as Int << power) / s;
-    val map = resilient ? Store.make("map" + wave): null;
+  static def step(group:PlaceGroup, bag: Bag, wave:Int, power:Int, resilient:Boolean, map:Store[Bag], time0:Long, killTimes:Rail[Long]) {
+    val max = group.size() as Int << power;
     val plh = PlaceLocalHandle.make[ResilientUTS](group, () => new ResilientUTS(wave, group, power, resilient, time0, map));
     if (wave >= 0) println(time0, "Wave " + wave + ": PLH init complete");
     // WORKAROUND x10c codegen bug
@@ -336,77 +389,68 @@ final class ResilientUTS implements Unserializable {
     	    } else {
     	    	  kt = (kts as Rail[Long])(p.id); 
     	    }
-    		at (p) async init(plh, s, r, time0, kt);
+    		at (p) async init(plh, time0, kt);
     }
-    if (wave >= 0) println(time0, "Wave " + wave + ": Workers init complete"); 
-    if (resilient) {
-      for (i in 0n..(s-1n)) map.set(i * r, bags.get(i));
-    }
-    if (wave >= 0) println(time0, "Wave " + wave + ": Setup complete"); 
-    var failed:Boolean = false;
-    try {
-      finish {
-        for (i in 0n..(s-1n)) {
-          val bag = bags.get(i);
-          val id = (i * r) & plh().mask;
-          // at ensures the orig bags are left intact in case we have to retry
-          at (group((i * r) >> power)) async {
-            plh().workers(id).bag.count = bag.count;
-            plh().workers(id).lifelinedeal(bag);
+    if (wave >= 0) println(time0, "Wave " + wave + ": Workers init complete");
+    if (bag != null) {
+      if (bag.upper(0) > group.size()) {
+        if (resilient) {
+          map.set(0n, bag);
+        } else {
+          plh().workers(0).bag.count = bag.count;
+          plh().workers(0).bag.merge(bag);
+        }
+      } else {
+        finish for (i in 0n..(bag.upper(0)-1n)) {
+          val b = new Bag(64n);
+          b.merge(bag);
+          b.lower(0) = i;
+          b.upper(0) = i + 1n;
+          if (i == 0n) {
+            if (resilient) {
+              b.count = 1n;
+              map.set(0n, b);
+            } else {
+              plh().workers(0).bag.count = 1;
+              plh().workers(0).bag.merge(b);
+            }
+          } else {
+            val d = (i * group.size()) / b.upper(0);
+            at (group(d)) async {
+              if (resilient) {
+                map.set((d as Int) << power, b);
+              } else {
+                plh().workers(0).bag.merge(b);
+              }
+            }
           }
         }
       }
-    } catch (e:MultipleExceptions) {
-      failed = true;
-//      e.printStackTrace();
+    } else {
+      if (resilient) map.replay();
     }
-    if (wave >= 0) println(time0, "Wave " + wave + ": Compute complete"); 
-    val bag = new Bag();
-    val l = new ArrayList[Bag]();
-    if (resilient && failed) {
-      for (b in map.values()) {
-        if (b.size > 0n) {
-          l.add(b);
-        } else {
-          bag.count += b.count;
+    if (wave >= 0) println(time0, "Wave " + wave + ": Setup complete"); 
+    finish {
+      for (i in 0n..(max-1n)) {
+        val id = i & plh().mask;
+        at (group(i >> power)) async {
+          plh().workers(id).resume();
         }
       }
-      // only clear after processing the values
-      map.clear();
-    } else {
-      val ref = new GlobalRef(bag);
-      finish for (p in group) {
-        at (p) async {
-          var count:Long = 0;
-          for (i in 0n..((1n << power) - 1n)) count += plh().workers(i).bag.count;
-          val c = count;
-          at (ref) async ref().count += c;
-        }
+    }
+    if (wave >= 0) println(time0, "Wave " + wave + ": Compute complete");
+    val ref = new GlobalRef[Cell[Long]](new Cell[Long](0));
+    finish for (p in group) {
+      at (p) async {
+        var count:Long = 0;
+        for (i in 0n..((1n << power) - 1n)) count += plh().workers(i).bag.count;
+        val c = count;
+        at (ref) async atomic ref()() += c;
       }
-      ref.forget();
     }
-    if (!l.isEmpty()) {
-      l.get(0).count += bag.count;
-    } else {
-      l.add(bag);
-    }
+    ref.forget();
     if (wave >= 0) println(time0, "Wave " + wave + ": Collection complete"); 
-    return l;
-  }
-
-  static def explode(bag:Bag) {
-    val bags = new ArrayList[Bag]();
-    for (i in 0n..(bag.upper(0)-1n)) {
-      val b = new Bag(64n);
-      b.merge(bag);
-      if (i == 0n) {
-        b.count = 1;
-      }
-      b.lower(0) = i;
-      b.upper(0) = i + 1n;
-      bags.add(b);
-    }
-    return bags;
+    return ref()();
   }
 
   public static def main(args:Rail[String]) {
@@ -426,10 +470,9 @@ final class ResilientUTS implements Unserializable {
     }
     
     val maxPlaces = Place.places().size();
-    val store = java.lang.System.getProperty("X10RT_DATASTORE", "counted");
     Console.OUT.println("Depth: " + opt.depth + ", Warmup: " + opt.warmupDepth + ", Places: " + maxPlaces
         + ", Workers/P: " + (1n << opt.power) + ", Res mode: " + Runtime.RESILIENT_MODE
-        + ", Store: " + store);
+        + ", Spare places: " + opt.spares);
 
     val resilient = Runtime.RESILIENT_MODE != 0n;
     val missing = (1n << opt.power) + 1n - Runtime.NTHREADS;
@@ -440,29 +483,40 @@ final class ResilientUTS implements Unserializable {
     }
 
     val md = Bag.encoder();
+    val world = Place.places();
+    val map = resilient ? Store.make[Bag]("map", world): null;
 
     println(time0, "Warmup...");
 
     val tmp = new Bag(64n);
     tmp.seed(md, 19n, opt.warmupDepth);
-    finish step(explode(tmp), -1n, opt.power, resilient, time0, null);
+    finish step(world, tmp, -1n, opt.power, resilient, map, time0, null);
+    var group:PlaceGroup = PlaceGroup.make(Math.max(1, Place.numPlaces() - opt.spares));
+    if (resilient) {
+      map.clear();
+      map.update(group);
+    }
 
     println(time0, "Begin");
     val startTime = System.nanoTime();
 
     val bag = new Bag(64n);
     bag.seed(md, 19n, opt.depth);
-    var bags:ArrayList[Bag] = explode(bag);
 
     var wave:Int = 0n;
-    while (bags.get(0).size > 0) {
+    var count:Long = 0;
+    
+    for(;;) {
       val w = wave++;
       println(time0, "Wave " + w + ": Starting");
       try {
-        finish bags = ResilientUTS.step(bags, w, opt.power, resilient, time0, opt.killTimes);
+        if (w > 0n) group = PlaceGroupBuilder.createRestorePlaceGroup(group).newGroup;
+        map.update(group);
+        finish count = ResilientUTS.step(group, w == 0n ? bag : null, w, opt.power, resilient, map, time0, opt.killTimes);
+        break;
       } catch (e:MultipleExceptions) {
         println(time0,  "Wave " + w + ": Failed");
-        e.printStackTrace();
+//        e.printStackTrace();
       }
       println(time0, "Wave " + w + ": Finished");
     }
@@ -474,24 +528,25 @@ final class ResilientUTS implements Unserializable {
 
     Console.OUT.println("Depth: " + opt.depth + ", Places: " + maxPlaces
         + ", Workers/P: " + (1n << opt.power) + ", Res mode: " + Runtime.RESILIENT_MODE
-        + ", Store: " + store
+        + ", Spare places: " + opt.spares
         + ", Places left: " + Place.places().size()
-        + ", Waves: " + wave + ", Perf: " + bags.get(0).count + "/"
+        + ", Waves: " + wave + ", Perf: " + count + "/"
         + Bag.sub("" + time / 1e9, 0n, 6n) + " = "
-        + Bag.sub("" + (bags.get(0).count / (time / 1e3)), 0n, 6n) + "M nodes/s");
+        + Bag.sub("" + (count / (time / 1e3)), 0n, 6n) + "M nodes/s");
   }
   
   static class Options {
-
 	  val depth:Int;
 	  val warmupDepth:Int;
 	  val power:Int;
+	  val spares:Long;
 	  val killTimes:Rail[Long];
 	  
 	  def this(args:Rail[String]) {
 		  var specifiedDepth:Int = 13n;
 		  var specifiedWarmupDepth:Int = -2n;
 		  var specifiedWorkers:Int = 1n;
+		  var specifiedSpares:Long = 0;
 		  // for each place, stores a time to suicide
 		  // 0 means that it will not suicide
 		  this.killTimes = new Rail[Long](Place.numAllPlaces());
@@ -523,6 +578,17 @@ final class ResilientUTS implements Unserializable {
 				  } catch(e:Exception) {
 					  throw new IllegalArgumentException("depth argument is not parseable as an integer " + arg2);
 				  }
+			  } else if(arg.equalsIgnoreCase("-spares") || arg.equalsIgnoreCase("-s")) {
+			      curArg++;
+			      if(curArg >= args.size) {
+			          throw new IllegalArgumentException("Illegal " + arg + " argument with no corresponding depth");
+			      }
+			      val arg2 = args(curArg);
+			      try {
+			          specifiedSpares = Long.parseLong(arg2);
+			      } catch(e:Exception) {
+			          throw new IllegalArgumentException("spare places argument is not parseable as a long " + arg2);
+			      }
 			  } else if(arg.equalsIgnoreCase("-warmupDepth") || arg.equalsIgnoreCase("-warmup") || arg.equalsIgnoreCase("-wd")) {
 				  curArg++;
 				  if(curArg >= args.size) {
@@ -619,6 +685,7 @@ final class ResilientUTS implements Unserializable {
 		  this.depth = specifiedDepth;
 		  this.warmupDepth = specifiedWarmupDepth < 0n ? specifiedDepth + specifiedWarmupDepth : specifiedWarmupDepth;
 		  this.power = specifiedWorkers;
+		  this.spares = specifiedSpares;
 	  }
 	  
 	  /**
@@ -655,6 +722,7 @@ final class ResilientUTS implements Unserializable {
 		  Console.ERR.println("-workers <INT>\t\tSet the base-2 log of the number of workers used (per-place).");
 		  Console.ERR.println("-depth <INT>\t\tSet the depth to be used");
 		  Console.ERR.println("-d <INT>\t\tSet the depth to be used");
+		  Console.ERR.println("-s <INT>\t\tSet the spare places to be used");
 		  Console.ERR.println("<INT>\t\tSet the depth to be used");
 		  Console.ERR.println("-warmupDepth <INT>\t\tSet the depth to be used for warmup.  Negative value is relative to depth.  0 omits the warmup. The default is -2");
 	

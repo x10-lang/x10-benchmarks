@@ -9,21 +9,19 @@
  *  (C) Copyright IBM Corporation 2006-2015.
  */
 
-abstract class Store {
-  abstract def set(key:Int, value:Bag):void;
-  abstract def setRemote(key:Int, value:Bag, flag:GlobalRef[Cell[Int]]):void;
+abstract class Store[V]{V haszero} {
+  abstract def get(key:Int):V;
+  abstract def set(key:Int, value:V):void;
+  abstract def set2(key:Int, value:V, place:Place, key2:Int, value2:V):void;
   abstract def clear():void;
-  abstract def values():Iterable[Bag];
-  abstract def transfer(src:Int, bag:Bag, dst:Int, loot:Bag, flag:GlobalRef[Cell[Int]]):void;
 
-  static def make(name:String) {
-    val config = java.lang.System.getProperty("X10RT_DATASTORE", "counted");
-    if ("Hazelcast".equalsIgnoreCase(config)) {
-      return new HazelcastStore(name);
-    } else if ("uncounted".equalsIgnoreCase(config)) {
-      return new UncountedStore();
-    } else {
-      return new CountedStore();
-    }
+  def update(group:PlaceGroup) {}
+  def replay() {}
+
+  def getRemote(place:Place, key:Int) = at (place) get(key);
+  def setRemote(place:Place, key:Int, value:V) { at(place) set(key, value); }
+
+  static def make[V](name:String, group:PlaceGroup){V haszero} {
+    return new HazelcastStore[V](name, group);
   }
 }
