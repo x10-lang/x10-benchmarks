@@ -1,4 +1,7 @@
 package core;
+
+import x10.xrx.Runtime;
+
 public class Logger {
     var nodesCount:Long = 0;
     var nodesGiven:Long = 0;

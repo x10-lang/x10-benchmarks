@@ -4,7 +4,7 @@ import x10.util.Random;
 import x10.compiler.Ifdef;
 import x10.compiler.Uncounted;
 import x10.compiler.Pragma;
-;
+import x10.xrx.Runtime;
 
 /**
  * The local runner for the GLB framework. An instance of this class runs at each

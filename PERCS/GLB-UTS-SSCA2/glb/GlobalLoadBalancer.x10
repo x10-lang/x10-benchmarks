@@ -1,5 +1,6 @@
 package glb;
 
+import x10.xrx.Runtime;
 import x10.compiler.Inline;
 
 /**

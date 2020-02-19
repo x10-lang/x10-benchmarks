@@ -1,4 +1,7 @@
 package glb;
+
+import x10.xrx.Runtime;
+
 /**
  * Class that collects lifeline statistics of GLB
  */

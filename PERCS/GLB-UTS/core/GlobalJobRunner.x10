@@ -12,6 +12,8 @@ import x10.util.Option;
 import x10.util.OptionsParser;
 import core.TaskBag;
 import core.LocalJobRunner;
+import x10.xrx.Runtime;
+
 public abstract class GlobalJobRunner[T,Z] {
 	@Inline static def min(i:Long, j:Long) = i < j ? i : j;
 	

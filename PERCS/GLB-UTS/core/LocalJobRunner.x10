@@ -8,6 +8,8 @@ import x10.compiler.Pragma;
 import x10.util.Option;
 import x10.util.OptionsParser;
 import core.TaskBag;
+import x10.xrx.Runtime;
+
 public class LocalJobRunner[T,Z] {
 	
 	val tf:TaskFrame[T,Z];
